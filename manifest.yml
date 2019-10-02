@@ -1,0 +1,8 @@
+# manifest.yml
+---
+applications:
+- name: countries_of_interest_service
+  memory: 512M
+  instances: 1
+  buildpack: python_buildpack
+  command: python app.py
