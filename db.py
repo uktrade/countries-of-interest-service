@@ -17,5 +17,8 @@ def get_db():
 
     return g.db
 
-def query_db():
-    pass
+def query_db(db, query):
+    cursor = db.cursor()
+    cursor.execute(query)
+    rows = cursor.fetchall()
+    return rows
