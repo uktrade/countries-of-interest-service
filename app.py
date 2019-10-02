@@ -8,9 +8,38 @@ app = Flask(__name__)
 
 @app.route('/get-companies-affected-by-trade-barrier/<country>/<sector>')
 def get_companies_affected_by_trade_barrier(country, sector):
-    return ('get-companies-affected-by-trade-barrier, '
-'country: {country}, sector: {sector}'
-''.format(country=country, sector=sector))
+    sql_query = '''
+with companies_affected_by_countries_of_interest as (
+select
+  company_id
+
+from countries_of_interest
+
+where country = '{country}'
+
+), companies_affected_by_sector as (
+select
+  company_id
+
+from company_sectors
+
+where sector = '{sector}'
+
+)
+
+select
+  company_id
+
+from companies_affected_by_countries_of_interest join
+  companies_affected_by_sector using (company_id)
+
+'''.format(country=country, sector=sector)
+    db = get_db()
+    rows = query_db(db, sql_query)
+    return {
+        'headers': ['companyID'],
+        'data': [r[0] for r in rows]
+    }
 
 @app.route('/get-company-export-countries')
 def get_company_export_countries():
