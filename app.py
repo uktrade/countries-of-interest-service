@@ -24,13 +24,25 @@ from export_countries join datahub_company_ids using (company_id)
     db = get_db()
     rows = query_db(db, sql_query)
     return {
-        'headers': ['companyID', 'exportCountry'],
+        'headers': ['datahubCompanyID', 'exportCountry'],
         'data': [tuple(r) for r in rows]
     }
 
 @app.route('/get-company-countries-of-interest')
 def get_company_countries_of_interest():
-    return 'get-company-countries-of-interest'
+    sql_query = '''
+select
+  datahub_company_id,
+  country
+
+from countries_of_interest join datahub_company_ids using (company_id)
+'''
+    db = get_db()
+    rows = query_db(db, sql_query)
+    return {
+        'headers': ['datahubCompanyID', 'countryOfInterest'],
+        'data': [tuple(r) for r in rows]
+    }
 
 if __name__ == '__main__':
     if cf_port is None:
