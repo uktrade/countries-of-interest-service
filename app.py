@@ -5,6 +5,11 @@ from flask import Flask
 cf_port = os.getenv("PORT")
 
 app = Flask(__name__)
+if app.config['ENV'] == 'production':
+    app.config['DATABASE'] = os.environ['DATABASE_URL']
+else:
+    app.config['DATABASE'] = 'postgresql://countries_of_interest_service@localhost'\
+        '/countries_of_interest_service'
 
 @app.route('/get-companies-affected-by-trade-barrier/<country>/<sector>')
 def get_companies_affected_by_trade_barrier(country, sector):

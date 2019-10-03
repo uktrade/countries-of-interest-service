@@ -1,4 +1,5 @@
 import sqlite3
+import psycopg2
 from flask import current_app, g
 
 def close_db(e=None):
@@ -9,12 +10,7 @@ def close_db(e=None):
 
 def get_db():
     if 'db' not in g:
-        g.db = sqlite3.connect(
-            current_app.config['DATABASE'],
-            detect_types=sqlite3.PARSE_DECLTYPES
-        )
-        g.db.row_factory = sqlite3.Row
-
+        g.db = psycopg2.connect(current_app.config['DATABASE'])
     return g.db
 
 def query_db(db, query):
