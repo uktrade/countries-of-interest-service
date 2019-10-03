@@ -14,29 +14,13 @@ else:
 @app.route('/get-companies-affected-by-trade-barrier/<country>/<sector>')
 def get_companies_affected_by_trade_barrier(country, sector):
     sql_query = '''
-with companies_affected_by_countries_of_interest as (
 select
-  company_id
+  companies_house_company_number
+  
+from countries_and_sectors_of_interest_by_companies_house_company_number
 
-from countries_of_interest
-
-where country = '{country}'
-
-), companies_affected_by_sector as (
-select
-  company_id
-
-from company_sectors
-
-where sector = '{sector}'
-
-)
-
-select
-  company_id
-
-from companies_affected_by_countries_of_interest join
-  companies_affected_by_sector using (company_id)
+where country_of_interest_id = '{country}'
+  and sector_of_interest_id = '{sector}'
 
 '''.format(country=country, sector=sector)
     db = get_db()
@@ -51,9 +35,12 @@ def get_company_export_countries():
     sql_query = '''
 select
   datahub_company_id,
-  country
+  export_country_id
 
-from export_countries join datahub_company_ids using (company_id)
+from export_countries_by_companies_house_company_number join 
+  datahub_company_id_to_companies_house_company_number 
+  using (companies_house_company_number)
+
 '''
     db = get_db()
     rows = query_db(db, sql_query)
@@ -67,9 +54,12 @@ def get_company_countries_of_interest():
     sql_query = '''
 select
   datahub_company_id,
-  country
+  country_of_interest_id
 
-from countries_of_interest join datahub_company_ids using (company_id)
+from countries_of_interest_by_companies_house_company_number join 
+  datahub_company_id_to_companies_house_company_number
+  using (companies_house_company_number)
+
 '''
     db = get_db()
     rows = query_db(db, sql_query)
