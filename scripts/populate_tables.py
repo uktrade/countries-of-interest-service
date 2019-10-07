@@ -1,3 +1,4 @@
+import psycopg2
 from argparse import ArgumentParser
 from etl.datahub_company_id_to_companies_house_company_number import Task \
     as DatahubCompanyIDToCompaniesHouseCompanyNumberTask
@@ -12,33 +13,21 @@ parser.add_argument('--drop-tables', action='store_true', default=False, dest='d
 args = parser.parse_args()
 
 connection = conduit_connect('countries_of_interest_service_db', 'data-workspace-apps-dev')
+# connection = psycopg2.connect('postgresql://countries_of_interest_service@localhost'\
+#         '/countries_of_interest_service')
 connection_datahub = conduit_connect('datahub-dev-db', 'datahub-dev')
 
 print('\n\n\033[31margs\033[0m')
 print(args)
-
-task = DatahubCompanyIDToCompaniesHouseCompanyNumberTask(
-    input_connection=connection_datahub,
-    output_connection=connection,
-    drop_table=args.drop_tables
-)
-print('\n\n\033[31m===== TASK: {} =====\033[0m'.format(task.table_name))
-task()
-
-task = ExportCountriesTask(
-    input_connection=connection_datahub,
-    output_connection=connection,
-    drop_table=args.drop_tables
-)
-print('\n\n\033[31m===== TASK: {} =====\033[0m'.format(task.table_name))
-task()
 
 task = CountriesOfInterestTask(
     input_connection=connection_datahub,
     output_connection=connection,
     drop_table=args.drop_tables
 )
-print('\n\n\033[31m===== TASK: {} =====\033[0m'.format(task.table_name))
+print('\n\n\033[31m' + '=' * 75 + '\033[0m')
+print('\033[31m===== TASK: {} =====\033[0m'.format(task.table_name))
+print('\033[31m' + '=' * 75 + '\033[0m')
 task()
 
 task = CountriesAndSectorsOfInterestTask(
@@ -46,6 +35,29 @@ task = CountriesAndSectorsOfInterestTask(
     output_connection=connection,
     drop_table=args.drop_tables
 )
-print('\n\n\033[31m===== TASK: {} =====\033[0m'.format(task.table_name))
+print('\n\n\033[31m' + '=' * 75 + '\033[0m')
+print('\033[31m===== TASK: {} =====\033[0m'.format(task.table_name))
+print('\033[31m' + '=' * 75 + '\033[0m')
+task()
+
+task = DatahubCompanyIDToCompaniesHouseCompanyNumberTask(
+    input_connection=connection_datahub,
+    output_connection=connection,
+    drop_table=args.drop_tables
+)
+
+print('\n\n\033[31m' + '=' * 75 + '\033[0m')
+print('\033[31m===== TASK: {} =====\033[0m'.format(task.table_name))
+print('\033[31m' + '=' * 75 + '\033[0m')
+task()
+
+task = ExportCountriesTask(
+    input_connection=connection_datahub,
+    output_connection=connection,
+    drop_table=args.drop_tables
+)
+print('\n\n\033[31m' + '=' * 75 + '\033[0m')
+print('\033[31m===== TASK: {} =====\033[0m'.format(task.table_name))
+print('\033[31m' + '=' * 75 + '\033[0m')
 task()
 
