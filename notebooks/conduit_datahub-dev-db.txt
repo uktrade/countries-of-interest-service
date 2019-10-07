@@ -1,0 +1,14 @@
+
+The following services are ready for you to connect to:
+
+* service: datahub-dev-db (postgres)
+  host: 127.0.0.1
+  jdbcuri: jdbc:postgresql://127.0.0.1:7082/rdsbroker_723069ee_da4e_4005_91bb_05ae87d4c572?password=C9n6bpku9PNZyLb618Wtm0tLSbPYB1OA&ssl=true&user=uuyl5xms4hq0i_ad
+  name: rdsbroker_723069ee_da4e_4005_91bb_05ae87d4c572
+  password: C9n6bpku9PNZyLb618Wtm0tLSbPYB1OA
+  port: 7082
+  uri: postgres://uuyl5xms4hq0i_ad:C9n6bpku9PNZyLb618Wtm0tLSbPYB1OA@127.0.0.1:7082/rdsbroker_723069ee_da4e_4005_91bb_05ae87d4c572
+  username: uuyl5xms4hq0i_ad
+
+
+Press Ctrl+C to shutdown.

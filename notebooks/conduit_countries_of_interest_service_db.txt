@@ -1,0 +1,83 @@
+
+The following services are ready for you to connect to:
+
+* service: countries_of_interest_service_db (postgres)
+  host: 127.0.0.1
+  jdbcuri: jdbc:postgresql://127.0.0.1:7081/rdsbroker_9f20b9ec_4c01_43f4_bee6_0202b153d0b3?password=AE11UYuYshUGonf43jGLSAbYzgui7kwv&ssl=true&user=u7rhteo_hybixxvm
+  name: rdsbroker_9f20b9ec_4c01_43f4_bee6_0202b153d0b3
+  password: AE11UYuYshUGonf43jGLSAbYzgui7kwv
+  port: 7081
+  uri: postgres://u7rhteo_hybixxvm:AE11UYuYshUGonf43jGLSAbYzgui7kwv@127.0.0.1:7081/rdsbroker_9f20b9ec_4c01_43f4_bee6_0202b153d0b3
+  username: u7rhteo_hybixxvm
+
+
+Press Ctrl+C to shutdown.
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
+Authorization server did not redirect with one time code
