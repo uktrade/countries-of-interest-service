@@ -1,10 +1,26 @@
-import os, sqlite3
+import datetime, os, sqlite3
 from db import get_db, query_db
 from flask import Flask, render_template
+from flask.json import JSONEncoder
 
 cf_port = os.getenv("PORT")
 
+class CustomJSONEncoder(JSONEncoder):
+
+    def default(self, obj):
+        try:
+            if isinstance(obj, datetime.datetime):
+                return obj.isoformat()
+            iterable = iter(obj)
+        except TypeError:
+            pass
+        else:
+            return list(iterable)
+        return JSONEncoder.default(self, obj)
+
 app = Flask(__name__)
+app.json_encoder = CustomJSONEncoder
+
 if app.config['ENV'] == 'production':
     app.config['DATABASE'] = os.environ['DATABASE_URL']
 else:
@@ -49,13 +65,44 @@ from datahub_company_id_to_companies_house_company_number
         'data': [r[0] for r in rows]
     }
 
+@app.route('/get-company-countries-and-sectors-of-interest')
+def get_company_countries_and_sectors_of_interest():
+    sql_query = '''
+select
+  companies_house_company_number,
+  country_of_interest_id,
+  sector_segment,
+  source,
+  source_id,
+  timestamp
+
+from countries_and_sectors_of_interest_by_companies_house_company_number
+
+'''
+    db = get_db()
+    rows = query_db(db, sql_query)
+    # rows = [(r.isoformat() if type(r) == datetime.datetime else r  for r in row) for row in rows]
+    return {
+        'headers': [
+            'companiesHouseCompanyNumber',
+            'countryOfInterest',
+            'sectorSegmentOfInterest',
+            'source',
+            'sourceID',
+            'timestamp'
+        ],
+        'data': [tuple(r) for r in rows]
+    }
+
 @app.route('/get-company-countries-of-interest')
 def get_company_countries_of_interest():
     sql_query = '''
 select
   datahub_company_id,
   country_of_interest_id,
-  source
+  source,
+  source_id,
+  timestamp
 
 from countries_of_interest_by_companies_house_company_number join 
   datahub_company_id_to_companies_house_company_number
@@ -65,31 +112,7 @@ from countries_of_interest_by_companies_house_company_number join
     db = get_db()
     rows = query_db(db, sql_query)
     return {
-        'headers': ['datahubCompanyID', 'countryOfInterest', 'source'],
-        'data': [tuple(r) for r in rows]
-    }
-
-@app.route('/get-company-countries-and-sectors-of-interest')
-def get_company_countries_and_sectors_of_interest():
-    sql_query = '''
-select
-  companies_house_company_number,
-  country_of_interest_id,
-  sector_segment,
-  source
-
-from countries_and_sectors_of_interest_by_companies_house_company_number
-
-'''
-    db = get_db()
-    rows = query_db(db, sql_query)
-    return {
-        'headers': [
-            'companiesHouseCompanyNumber',
-            'countryOfInterest',
-            'sectorSegmentOfInterest',
-            'source'
-        ],
+        'headers': ['datahubCompanyID', 'countryOfInterest', 'source', 'sourceID', 'timestamp'],
         'data': [tuple(r) for r in rows]
     }
 
@@ -99,7 +122,9 @@ def get_company_export_countries():
 select
   datahub_company_id,
   export_country_id,
-  source
+  source,
+  source_id,
+  timestamp
 
 from export_countries_by_companies_house_company_number join 
   datahub_company_id_to_companies_house_company_number 
@@ -109,7 +134,7 @@ from export_countries_by_companies_house_company_number join
     db = get_db()
     rows = query_db(db, sql_query)
     return {
-        'headers': ['datahubCompanyID', 'exportCountry', 'source'],
+        'headers': ['datahubCompanyID', 'exportCountry', 'source', 'sourceID', 'timestamp'],
         'data': [tuple(r) for r in rows]
     }
 
@@ -128,13 +153,29 @@ from datahub_company_id_to_companies_house_company_number
         'data': [r[0] for r in rows]
     }
 
+@app.route('/get-datahub-company-ids-to-companies-house-company-numbers')
+def get_datahub_company_ids_to_companies_house_company_numbers():
+    sql_query = '''
+select 
+  datahub_company_id,
+  companies_house_company_number
+
+from datahub_company_id_to_companies_house_company_number
+'''
+    db = get_db()
+    rows = query_db(db, sql_query)
+    return {
+        'headers': ['datahubCompanyID', 'companiesHouseCompanyNumber'],
+        'data': rows
+    }
+
 @app.route('/get-sector-segments')
 def get_sector_segments():
     sql_query = '''
 select distinct
-  sector_segment
+  segment
 
-from countries_and_sectors_of_interest_by_companies_house_company_number
+from segments
 
 order by 1
 

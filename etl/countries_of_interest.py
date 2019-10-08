@@ -6,6 +6,7 @@ with omis_countries_of_interest as (
       company_number as companies_house_company_number,
       z.iso_alpha2_code as country_id,
       'datahub_order' as source,
+      l.id::varchar(100) as source_id,
       l.created_on as timestamp
 
     from order_order l join company_company r on l.company_id=r.id
@@ -20,6 +21,7 @@ with omis_countries_of_interest as (
       company_number as companies_house_company_number,
       z.iso_alpha2_code as country_id,
       'datahub_future_interest' as source,
+      l.id::varchar(100) as source_id,
       null::timestamp as timestamp
 
     from company_company_future_interest_countries l join company_company r on l.company_id=r.id
@@ -36,10 +38,11 @@ with omis_countries_of_interest as (
   
 )
 
-select distinct
+select
   companies_house_company_number,
   country_id,
   source,
+  source_id,
   timestamp
   
 from combined_countries_of_interest
@@ -55,8 +58,9 @@ table_fields = '''(
     companies_house_company_number varchar(12), 
     country_of_interest_id varchar(12), 
     source varchar(50), 
+    source_id varchar(100),
     timestamp timestamp,
-    primary key (companies_house_company_number, country_of_interest_id, source)
+    primary key (companies_house_company_number, country_of_interest_id, source, source_id)
 )'''
 
 table_name = 'countries_of_interest_by_companies_house_company_number'
