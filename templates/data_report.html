@@ -1,0 +1,22 @@
+<html>
+  <head>
+    <title>Data report</title>
+    <script src={{ url_for('static', filename='dist/vendors.bundle.js') }}></script>
+    <link rel="stylesheet" type="text/css" href={{ url_for('static', filename="styles.css") }} />
+    <link rel="shortcut icon" href={{ url_for('static', filename="favicon-16x16.png") }}>
+  </head>
+
+  <body>
+    
+    <div class="container" style="padding-top: 1em">
+      <div class="row">
+	<div class="col">
+	  <h1>Data report</h1>
+	  <div id="react-container"></div>
+	</div>
+      </div>
+    </div>
+    <script src={{ url_for('static', filename='dist/data_report.bundle.js') }}></script>
+    
+  </body>
+</html>

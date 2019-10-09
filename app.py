@@ -32,6 +32,56 @@ elif app.config['ENV'] == 'test':
 else:
     raise Exception('unrecognised environment')
 
+@app.route('/api/get-matched-companies')
+def get_matched_companies():
+    sql = ''' select * from matched_companies order by timestamp limit 1 '''
+    db = get_db()
+    rows = query_db(db, sql)
+    row = rows[0]
+    return {
+        'nCompanies': row[0],
+        'nMatches': row[1],
+        'nDuplicates': row[2],
+        'nUniqueMatches': row[3]
+    }
+
+@app.route('/api/get-sector-matches')
+def get_sector_matches():
+    sql = ''' select * from sector_matches order by timestamp limit 1 '''
+    db = get_db()
+    rows = query_db(db, sql)
+    row = rows[0]
+    return {
+        'nCompanies': row[0],
+        'nSectors': row[1],
+        'nMatches': row[2],
+    }
+
+@app.route('/api/get-top-sectors')
+def get_top_sectors():
+    sql = ''' with latest_top_sectors as (
+      select max(timestamp) as timestamp_most_recent from top_sectors
+
+    ), top_sectors_most_recent as (
+      select
+        sector, 
+        count
+
+      from top_sectors join latest_top_sectors on 1=1 
+
+      where timestamp = timestamp_most_recent
+    )
+    select * from top_sectors_most_recent order by count desc '''
+    db = get_db()
+    rows = query_db(db, sql)
+    return {
+        'data': [{'name': row[0], 'count': row[1]} for row in rows]
+    }
+
+@app.route('/data-report')
+def data_report():
+    return render_template('data_report.html')
+
 @app.route('/')
 def get_index():
     return render_template('index.html')

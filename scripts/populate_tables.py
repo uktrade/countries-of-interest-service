@@ -5,6 +5,9 @@ from etl.datahub_company_id_to_companies_house_company_number import Task \
 from etl.export_countries import Task as ExportCountriesTask
 from etl.countries_of_interest import Task as CountriesOfInterestTask
 from etl.countries_and_sectors_of_interest import Task as CountriesAndSectorsOfInterestTask
+from etl.matched_companies import Task as MatchedCompaniesTask
+from etl.sector_matches import Task as SectorMatchesTask
+from etl.top_sectors import Task as TopSectorsTask
 from etl.segments import Task as SegmentsTask
 from utils.conduit import conduit_connect
 from utils.sql import execute_query, query_database
@@ -73,3 +76,32 @@ print('\033[31m===== TASK: {} =====\033[0m'.format(task.table_name))
 print('\033[31m' + '=' * 75 + '\033[0m')
 task()
 
+task = MatchedCompaniesTask(
+    input_connection=connection_datahub,
+    output_connection=connection,
+    drop_table=args.drop_tables
+)
+print('\n\n\033[31m' + '=' * 75 + '\033[0m')
+print('\033[31m===== TASK: {} =====\033[0m'.format(task.table_name))
+print('\033[31m' + '=' * 75 + '\033[0m')
+task()
+
+task = SectorMatchesTask(
+    input_connection=connection_datahub,
+    output_connection=connection,
+    drop_table=args.drop_tables
+)
+print('\n\n\033[31m' + '=' * 75 + '\033[0m')
+print('\033[31m===== TASK: {} =====\033[0m'.format(task.table_name))
+print('\033[31m' + '=' * 75 + '\033[0m')
+task()
+
+task = TopSectorsTask(
+    input_connection=connection_datahub,
+    output_connection=connection,
+    drop_table=args.drop_tables
+)
+print('\n\n\033[31m' + '=' * 75 + '\033[0m')
+print('\033[31m===== TASK: {} =====\033[0m'.format(task.table_name))
+print('\033[31m' + '=' * 75 + '\033[0m')
+task()
