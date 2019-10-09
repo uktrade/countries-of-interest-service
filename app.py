@@ -23,9 +23,14 @@ app.json_encoder = CustomJSONEncoder
 
 if app.config['ENV'] == 'production':
     app.config['DATABASE'] = os.environ['DATABASE_URL']
-else:
+elif app.config['ENV'] in ['dev', 'development']:
     app.config['DATABASE'] = 'postgresql://countries_of_interest_service@localhost'\
         '/countries_of_interest_service'
+elif app.config['ENV'] == 'test':
+    app.config['DATABASE'] = 'postgresql://countries_of_interest_service@localhost'\
+        '/test_countries_of_interest_service'
+else:
+    raise Exception('unrecognised environment')
 
 @app.route('/')
 def get_index():
@@ -57,6 +62,8 @@ select distinct
   companies_house_company_number
 
 from datahub_company_id_to_companies_house_company_number
+
+order by 1
 '''
     db = get_db()
     rows = query_db(db, sql_query)

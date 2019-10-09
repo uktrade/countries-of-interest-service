@@ -1,5 +1,5 @@
 import app
-import os, tempfile, unittest
+import datetime, psycopg2, os, tempfile, unittest
 from db import get_db
 from unittest.mock import Mock, patch
 
@@ -8,14 +8,23 @@ class TestCase(unittest.TestCase):
     def setUp(self):
         self.config = app.app.config
         self.client = app.app.test_client()
-        self.db_fd, app.app.config['DATABASE'] = tempfile.mkstemp()
+        connection = psycopg2.connect('postgresql://postgres@localhost')
+        connection.autocommit = True
+        cursor = connection.cursor()
+        cursor.execute(''' create database test_countries_of_interest_service; ''')
+        cursor.execute(''' create user test_countries_of_interest_service; ''')
+        cursor.execute(''' grant all privileges on database test_countries_of_interest_service ''' \
+            ''' to test_countries_of_interest_service; ''')
         with app.app.app_context():
-            self.db = get_db()
+            db = get_db()
 
     def tearDown(self):
-        os.close(self.db_fd)
-        os.unlink(app.app.config['DATABASE'])
-
+        print('tear down')
+        connection = psycopg2.connect('postgresql://postgres@localhost')
+        connection.autocommit = True
+        cursor = connection.cursor()
+        cursor.execute(''' drop database test_countries_of_interest_service; ''')
+        cursor.execute( ''' drop user test_countries_of_interest_service; ''')
 
 
 @patch('app.query_db')
@@ -44,7 +53,7 @@ class TestGetCompanyExportCountries(TestCase):
         rows = [(0, 'germany'), (1, 'china')]
         query_db.return_value = rows
         expected = {
-            'headers': ['datahubCompanyID', 'exportCountry'],
+            'headers': ['datahubCompanyID', 'exportCountry', 'source', 'sourceID', 'timestamp'],
             'data': [(0, 'germany'), (1, 'china')]
         }
         response = app.get_company_export_countries()
@@ -74,11 +83,17 @@ class TestGetCompanyCountriesOfInterest(TestCase):
         self.assertEqual(db, expected_db)
 
     def test_converts_to_a_dictionary(self, get_db, query_db):
-        rows = [(0, 'germany'), (1, 'china')]
+        rows = [
+            (0, 'germany', 'datahub_order', '123', datetime.datetime(2019, 1, 1)),
+            (1, 'china', 'datahub_order', '444', datetime.datetime(2019, 2, 1))
+        ]
         query_db.return_value = rows
         expected = {
-            'headers': ['datahubCompanyID', 'countryOfInterest'],
-            'data': [(0, 'germany'), (1, 'china')]
+            'headers': ['datahubCompanyID', 'countryOfInterest', 'source', 'sourceID', 'timestamp'],
+            'data': [
+                (0, 'germany', 'datahub_order', '123', datetime.datetime(2019, 1, 1)),
+                (1, 'china', 'datahub_order', '444', datetime.datetime(2019, 2, 1))
+            ]
         }
         response = app.get_company_countries_of_interest()
         self.assertEqual(response, expected)
@@ -110,11 +125,8 @@ class TestGetCompaniesAffectedByTradeBarrier(TestCase):
         rows = [(0,), (1,)]
         query_db.return_value = rows
         expected = {
-            'headers': ['companyID'],
+            'headers': ['companiesHouseCompanyNumber'],
             'data': [0, 1]
         }
         response = app.get_companies_affected_by_trade_barrier('country', 'sector')
         self.assertEqual(response, expected)
-
-        
-        
