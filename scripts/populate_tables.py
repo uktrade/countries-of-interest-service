@@ -8,9 +8,12 @@ from etl.countries_and_sectors_of_interest import Task as CountriesAndSectorsOfI
 from etl.matched_companies import Task as MatchedCompaniesTask
 from etl.sector_matches import Task as SectorMatchesTask
 from etl.top_sectors import Task as TopSectorsTask
+from etl.companies_with_orders import Task as CompaniesWithOrdersTask
+from etl.companies_with_export_countries import Task as CompaniesWithExportCountriesTask
+from etl.companies_with_countries_of_interest import Task as CompaniesWithCountriesOfInterestTask
+from etl.order_frequency import Task as OrderFrequencyByDateTask
 from etl.segments import Task as SegmentsTask
 from utils.conduit import conduit_connect
-from utils.sql import execute_query, query_database
 
 parser = ArgumentParser()
 parser.add_argument('--drop-tables', action='store_true', default=False, dest='drop_tables')
@@ -97,6 +100,46 @@ print('\033[31m' + '=' * 75 + '\033[0m')
 task()
 
 task = TopSectorsTask(
+    input_connection=connection_datahub,
+    output_connection=connection,
+    drop_table=args.drop_tables
+)
+print('\n\n\033[31m' + '=' * 75 + '\033[0m')
+print('\033[31m===== TASK: {} =====\033[0m'.format(task.table_name))
+print('\033[31m' + '=' * 75 + '\033[0m')
+task()
+
+task = CompaniesWithOrdersTask(
+    input_connection=connection_datahub,
+    output_connection=connection,
+    drop_table=args.drop_tables
+)
+print('\n\n\033[31m' + '=' * 75 + '\033[0m')
+print('\033[31m===== TASK: {} =====\033[0m'.format(task.table_name))
+print('\033[31m' + '=' * 75 + '\033[0m')
+task()
+
+task = CompaniesWithExportCountriesTask(
+    input_connection=connection_datahub,
+    output_connection=connection,
+    drop_table=args.drop_tables
+)
+print('\n\n\033[31m' + '=' * 75 + '\033[0m')
+print('\033[31m===== TASK: {} =====\033[0m'.format(task.table_name))
+print('\033[31m' + '=' * 75 + '\033[0m')
+task()
+
+task = CompaniesWithCountriesOfInterestTask(
+    input_connection=connection_datahub,
+    output_connection=connection,
+    drop_table=args.drop_tables
+)
+print('\n\n\033[31m' + '=' * 75 + '\033[0m')
+print('\033[31m===== TASK: {} =====\033[0m'.format(task.table_name))
+print('\033[31m' + '=' * 75 + '\033[0m')
+task()
+
+task = OrderFrequencyByDateTask(
     input_connection=connection_datahub,
     output_connection=connection,
     drop_table=args.drop_tables

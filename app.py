@@ -1,23 +1,36 @@
-import datetime, os, sqlite3
+import datetime, numpy as np, os, sqlite3
 from db import get_db, query_db
 from flask import Flask, render_template
 from flask.json import JSONEncoder
+from utils.utils import to_web_dict
+from utils.sql import query_database
 
 cf_port = os.getenv("PORT")
 
 class CustomJSONEncoder(JSONEncoder):
-
+    
     def default(self, obj):
-        try:
-            if isinstance(obj, datetime.datetime):
-                return obj.isoformat()
-            iterable = iter(obj)
-        except TypeError:
-            pass
-        else:
-            return list(iterable)
-        return JSONEncoder.default(self, obj)
+    #     try:
+    #         if isinstance(obj, datetime.datetime):
+    #             return obj.isoformat()
+    #         iterable = iter(obj)
+    #     except TypeError:
+    #         pass
+    #     else:
+    #         return list(iterable)
+    #     return JSONEncoder.default(self, obj)
 
+        if isinstance(obj, datetime.datetime):
+            return obj.isoformat()
+        elif isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        else:
+            return super(MyEncoder, self).default(obj)
+    
 app = Flask(__name__)
 app.json_encoder = CustomJSONEncoder
 
@@ -31,6 +44,121 @@ elif app.config['ENV'] == 'test':
         '/test_countries_of_interest_service'
 else:
     raise Exception('unrecognised environment')
+
+@app.route('/api/get-data-report-data')
+def get_data_report_data():
+    connection = get_db()
+    output = {}
+    sql = ''' 
+select 
+    n_companies, 
+    n_companies_with_orders 
+
+from companies_with_orders 
+
+order by timestamp desc 
+
+limit 1 '''
+    df = query_database(connection, sql)
+    web_dict = to_web_dict(df)
+    web_dict['data'] = web_dict['data'][0]
+    output['companyOrderSummary'] =  web_dict
+
+    sql = ''' 
+select 
+    n_companies, 
+    n_companies_with_export_countries
+
+from companies_with_export_countries
+
+order by timestamp desc 
+
+limit 1 '''
+    df = query_database(connection, sql)
+    web_dict = to_web_dict(df)
+    web_dict['data'] = web_dict['data'][0]
+    output['companyExportCountriesSummary'] = web_dict
+
+    sql = ''' 
+select 
+    n_companies, 
+    n_companies_with_countries_of_interest
+
+from companies_with_countries_of_interest
+
+order by timestamp desc 
+
+limit 1 '''
+    df = query_database(connection, sql)
+    web_dict = to_web_dict(df)
+    web_dict['data'] = web_dict['data'][0]
+    output['countriesOfInterestSummary'] = web_dict
+
+    order_frequencies = {}
+    sql = ''' 
+with latest_timestamp as (
+  select max(timestamp) as timestamp from order_frequency_by_date order by timestamp desc limit 1
+), order_frequency as (
+  select * from order_frequency_by_date join latest_timestamp using (timestamp)
+)
+select 
+    date, 
+    count as n_orders
+
+from order_frequency
+
+order by date
+
+'''
+    df = query_database(connection, sql)
+    web_dict = to_web_dict(df)
+    order_frequencies['daily'] = web_dict
+
+    sql = ''' 
+with latest_timestamp as (
+  select max(timestamp) as timestamp from order_frequency_by_date order by timestamp desc limit 1
+), order_frequency as (
+  select * from order_frequency_by_date join latest_timestamp using (timestamp)
+)
+select 
+    date_trunc('week', date) as date, 
+    sum(count) as n_orders
+
+from order_frequency
+
+group by 1
+
+order by date
+
+'''
+    df = query_database(connection, sql)
+    web_dict = to_web_dict(df)
+    order_frequencies['weekly'] = web_dict
+
+    sql = ''' 
+with latest_timestamp as (
+  select max(timestamp) as timestamp from order_frequency_by_date order by timestamp desc limit 1
+), order_frequency as (
+  select * from order_frequency_by_date join latest_timestamp using (timestamp)
+)
+select 
+    date_trunc('month', date) as date, 
+    sum(count) as n_orders
+
+from order_frequency
+
+group by 1
+
+order by date
+
+'''
+    df = query_database(connection, sql)
+    web_dict = to_web_dict(df)
+    order_frequencies['monthly'] = web_dict
+
+    output['orderFrequency'] = order_frequencies
+    
+    return output
 
 @app.route('/api/get-matched-companies')
 def get_matched_companies():
@@ -138,7 +266,6 @@ from countries_and_sectors_of_interest_by_companies_house_company_number
 '''
     db = get_db()
     rows = query_db(db, sql_query)
-    # rows = [(r.isoformat() if type(r) == datetime.datetime else r  for r in row) for row in rows]
     return {
         'headers': [
             'companiesHouseCompanyNumber',

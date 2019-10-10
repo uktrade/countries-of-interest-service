@@ -7,3 +7,11 @@
     padding-bottom: 0.5em;
     margin-bottom: 1em;
 }
+
+
+
+.line {
+    fill: none;
+    stroke: #ffab00;
+    stroke-width: 3;
+}
