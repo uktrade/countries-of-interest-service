@@ -19,9 +19,9 @@ parser = ArgumentParser()
 parser.add_argument('--drop-tables', action='store_true', default=False, dest='drop_tables')
 args = parser.parse_args()
 
-# connection = conduit_connect('countries_of_interest_service_db', 'data-workspace-apps-dev')
-connection = psycopg2.connect('postgresql://countries_of_interest_service@localhost'\
-                              '/countries_of_interest_service')
+connection = conduit_connect('countries_of_interest_service_db', 'data-workspace-apps-dev')
+# connection = psycopg2.connect('postgresql://countries_of_interest_service@localhost'\
+#                               '/countries_of_interest_service')
 connection_datahub = conduit_connect('datahub-dev-db', 'datahub-dev')
 
 print('\n\n\033[31margs\033[0m')
