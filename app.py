@@ -1,25 +1,15 @@
-import datetime, numpy as np, os, sqlite3
+import datetime, mohawk, numpy as np, os, sqlite3
 from db import get_db, query_db
-from flask import Flask, render_template
+from decouple import config
+from flask import Flask, render_template, request
 from flask.json import JSONEncoder
 from utils.utils import to_web_dict
 from utils.sql import query_database
 
-cf_port = os.getenv("PORT")
 
 class CustomJSONEncoder(JSONEncoder):
     
     def default(self, obj):
-    #     try:
-    #         if isinstance(obj, datetime.datetime):
-    #             return obj.isoformat()
-    #         iterable = iter(obj)
-    #     except TypeError:
-    #         pass
-    #     else:
-    #         return list(iterable)
-    #     return JSONEncoder.default(self, obj)
-
         if isinstance(obj, datetime.datetime):
             return obj.isoformat()
         elif isinstance(obj, np.integer):
@@ -30,9 +20,11 @@ class CustomJSONEncoder(JSONEncoder):
             return obj.tolist()
         else:
             return super(MyEncoder, self).default(obj)
-    
+
 app = Flask(__name__)
 app.json_encoder = CustomJSONEncoder
+app.config['HAWK_ENABLED'] = config('HAWK_ENABLED', app.config['ENV'] == 'production', cast=bool)
+cf_port = os.getenv("PORT")
 
 if app.config['ENV'] == 'production':
     app.config['DATABASE'] = os.environ['DATABASE_URL']
@@ -45,7 +37,46 @@ elif app.config['ENV'] == 'test':
 else:
     raise Exception('unrecognised environment')
 
+def lookup_hawk_credentials(user_id):
+    sql = ''' select * from users where user_id='{user_id}' '''.format(user_id=user_id)
+    connection = get_db()
+    try:
+        df = query_database(connection, sql)
+        user_key = df['user_key'].values[0]
+    except Exception as e:
+        raise LookupError()
+    
+    return {
+        'id': user_id,
+        'key': user_key,
+        'algorithm': 'sha256'
+    }
+
+def hawk_required(view, *args, **kwargs):
+    if app.config['HAWK_ENABLED'] == False:
+        return view
+
+    def wrapper(*args, **kwargs):
+        url = request.url
+        method = request.method
+        content = request.data
+        content_type = request.content_type
+        request_header = request.headers['Authorization']
+    
+        receiver = mohawk.Receiver(
+            lookup_hawk_credentials,
+            request_header=request.headers['Authorization'],
+            url=url,
+            method=method,
+            content=content,
+            content_type=content_type
+        )
+        return view(*args, **kwargs)
+    wrapper.__name__ = view.__name__
+    return wrapper
+
 @app.route('/api/get-data-report-data')
+@hawk_required
 def get_data_report_data():
     connection = get_db()
     output = {}
@@ -161,6 +192,7 @@ order by date
     return output
 
 @app.route('/api/get-matched-companies')
+@hawk_required
 def get_matched_companies():
     sql = ''' select * from matched_companies order by timestamp limit 1 '''
     db = get_db()
@@ -174,6 +206,7 @@ def get_matched_companies():
     }
 
 @app.route('/api/get-sector-matches')
+@hawk_required
 def get_sector_matches():
     sql = ''' select * from sector_matches order by timestamp limit 1 '''
     db = get_db()
@@ -186,6 +219,7 @@ def get_sector_matches():
     }
 
 @app.route('/api/get-top-sectors')
+@hawk_required
 def get_top_sectors():
     sql = ''' with latest_top_sectors as (
       select max(timestamp) as timestamp_most_recent from top_sectors
@@ -207,14 +241,17 @@ def get_top_sectors():
     }
 
 @app.route('/data-report')
+@hawk_required
 def data_report():
     return render_template('data_report.html')
 
 @app.route('/')
+@hawk_required
 def get_index():
     return render_template('index.html')
     
 @app.route('/get-companies-affected-by-trade-barrier/<country>/<sector>')
+@hawk_required
 def get_companies_affected_by_trade_barrier(country, sector):
     sql_query = '''
 select
@@ -234,6 +271,7 @@ where country_of_interest_id = '{country}'
     }
 
 @app.route('/get-companies-house-company-numbers')
+@hawk_required
 def get_companies_house_company_numbers():
     sql_query = '''
 select distinct
@@ -251,6 +289,7 @@ order by 1
     }
 
 @app.route('/get-company-countries-and-sectors-of-interest')
+@hawk_required
 def get_company_countries_and_sectors_of_interest():
     sql_query = '''
 select
@@ -301,6 +340,7 @@ from countries_of_interest_by_companies_house_company_number join
     }
 
 @app.route('/get-company-export-countries')
+@hawk_required
 def get_company_export_countries():
     sql_query = '''
 select
@@ -322,7 +362,9 @@ from export_countries_by_companies_house_company_number join
         'data': [tuple(r) for r in rows]
     }
 
+
 @app.route('/get-datahub-company-ids')
+@hawk_required
 def get_datahub_company_ids():
     sql_query = '''
 select distinct
@@ -338,6 +380,7 @@ from datahub_company_id_to_companies_house_company_number
     }
 
 @app.route('/get-datahub-company-ids-to-companies-house-company-numbers')
+@hawk_required
 def get_datahub_company_ids_to_companies_house_company_numbers():
     sql_query = '''
 select 
@@ -354,6 +397,7 @@ from datahub_company_id_to_companies_house_company_number
     }
 
 @app.route('/get-sector-segments')
+@hawk_required
 def get_sector_segments():
     sql_query = '''
 select distinct
@@ -376,4 +420,3 @@ if __name__ == '__main__':
         app.run(host='0.0.0.0', port=5000, debug=True)
     else:
         app.run(host='0.0.0.0', port=int(cf_port), debug=True)
-        
