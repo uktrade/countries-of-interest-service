@@ -1,11 +1,11 @@
 import datetime, mohawk, numpy as np, os, sqlite3
 from db import get_db, query_db
 from decouple import config
-from flask import Flask, render_template, request
+from flask import current_app, Flask, render_template, request
 from flask.json import JSONEncoder
 from utils.utils import to_web_dict
 from utils.sql import query_database
-
+from authbroker_client import authbroker_blueprint, login_required
 
 class CustomJSONEncoder(JSONEncoder):
     
@@ -22,8 +22,15 @@ class CustomJSONEncoder(JSONEncoder):
             return super(MyEncoder, self).default(obj)
 
 app = Flask(__name__)
-app.json_encoder = CustomJSONEncoder
+
+app.config['ABC_BASE_URL'] = config('ABC_BASE_URL', 'https://sso.trade.gov.uk')
+app.config['ABC_CLIENT_ID'] = config('ABC_CLIENT_ID', 'get this from your network admin')
+app.config['ABC_CLIENT_SECRET'] = config('ABC_CLIENT_SECRET', 'get this from your network admin')
+app.secret_key = config('APP_SECRET_KEY', 'the random string')
+app.register_blueprint(authbroker_blueprint)
+
 app.config['HAWK_ENABLED'] = config('HAWK_ENABLED', app.config['ENV'] == 'production', cast=bool)
+app.json_encoder = CustomJSONEncoder
 cf_port = os.getenv("PORT")
 
 if app.config['ENV'] == 'production':
@@ -247,6 +254,7 @@ def data_report():
 
 @app.route('/')
 @hawk_required
+@login_required
 def get_index():
     return render_template('index.html')
     

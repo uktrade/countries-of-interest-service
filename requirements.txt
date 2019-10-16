@@ -1,6 +1,9 @@
 flask==1.*
+gunicorn==19.*
 mohawk==1.*
 numpy==1.*
 pandas==0.*
 psycopg2==2.*
 python-decouple==3.*
+-e git://github.com/uktrade/flask-authbroker-client#egg=authbroker_client
+flask_oauthlib==0.*
