@@ -48,4 +48,4 @@ The countries of interest service is nominally deployed in a Cloud Foundry insta
 ## Testing
 From the project base directory use the command,
 
-`pytest`
+``PYTHONPATH=${PYTHONPATH}:`pwd` pytest``
