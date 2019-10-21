@@ -1,7 +1,7 @@
 # Countries of interest service
 The countries of interest service aims to provide insight into the countries that a specific company is interested in or currently exporting to. The service makes use several data sources including,
 
-* OMIS order
+* OMIS orders
 * Datahub company profiles
 
 to give the most informed view into a companies intereset in particular countries.
@@ -32,7 +32,20 @@ The backend is built in Python using the Flask framework. Authentication impleme
 9. go to `http://localhost:5000`
   
 
-## Deployment
+## Deployment (to development environment)
 The countries of interest service is nominally deployed in a Cloud Foundry instance. 
 
+1. Install Cloud Foundry
+    <br />https://docs.cloudfoundry.org/cf-cli/install-go-cli.html
+2. Request a Government PaaS account from the web devops team
+3. Request access to the `datahub-dev` and `data-workspace-apps-dev` spaces
+4. Login to cloud foundry
+    <br /> `cf login -u <username> -p <password>`
+5. Set the cloud foundry target
+    <br /> `cf target -o dit-staging -s data-workspace-apps-dev`
+6. Push the application
+    <br />`cf push`
 ## Testing
+From the project base directory use the command,
+
+`pytest`
