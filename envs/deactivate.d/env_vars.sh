@@ -1,0 +1,4 @@
+unset FLASK_ENV
+unset ABC_CLIENT_ID
+unset ABC_CLIENT_SECRET
+unset APP_SECRET_KEY
