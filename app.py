@@ -370,6 +370,25 @@ from export_countries_by_companies_house_company_number join
         'data': [tuple(r) for r in rows]
     }
 
+@app.route('/get-company-sectors-of-interest')
+@hawk_required
+def get_company_sectors_of_interest():
+    sql_query = '''
+select
+  companies_house_company_number,
+  sector_of_interest,
+  timestamp
+
+from sectors_of_interest_by_companies_house_company_number
+
+order by 1, 3, 2
+'''
+    connection = get_db()
+    df = query_database(connection, sql_query)
+    web_dict = to_web_dict(df)
+    web_dict['data'] = web_dict['data'][0]
+    return web_dict
+    
 
 @app.route('/get-datahub-company-ids')
 @hawk_required
