@@ -9,7 +9,7 @@ from scheduler import Scheduler
 
 import views
 from db import get_db, query_db
-
+import datapipeline.views
 
 class CustomJSONEncoder(JSONEncoder):
     
@@ -449,7 +449,7 @@ order by 1
 @app.route('/api/populate-database')
 @hawk_required
 def populate_database():
-    return views.populate_database()
+    return datapipeline.views.populate_database()
 
 scheduled_task = Scheduler()
 scheduled_task.start()
