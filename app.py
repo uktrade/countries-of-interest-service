@@ -5,7 +5,7 @@ from flask.json import JSONEncoder
 from utils.utils import to_web_dict
 from utils.sql import query_database
 from authbroker_client import authbroker_blueprint, login_required
-from scheduler import Scheduler
+from datapipeline.scheduler import Scheduler
 
 import views
 from db import get_db, query_db
