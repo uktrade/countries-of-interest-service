@@ -7,3 +7,4 @@ psycopg2==2.*
 python-decouple==3.*
 -e git://github.com/uktrade/flask-authbroker-client#egg=authbroker_client
 flask_oauthlib==0.*
+apscheduler==3.*

@@ -1,11 +1,15 @@
 import datetime, mohawk, numpy as np, os, sqlite3
-from db import get_db, query_db
 from decouple import config
 from flask import current_app, Flask, render_template, request
 from flask.json import JSONEncoder
 from utils.utils import to_web_dict
 from utils.sql import query_database
 from authbroker_client import authbroker_blueprint, login_required
+from scheduler import Scheduler
+
+import views
+from db import get_db, query_db
+
 
 class CustomJSONEncoder(JSONEncoder):
     
@@ -441,6 +445,14 @@ order by 1
         'headers': ['sectorSegment'],
         'data': [r[0] for r in rows]
     }
+
+@app.route('/api/populate-database')
+@hawk_required
+def populate_database():
+    return views.populate_database()
+
+scheduled_task = Scheduler()
+scheduled_task.start()
 
 if __name__ == '__main__':
     if cf_port is None:
