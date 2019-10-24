@@ -269,10 +269,10 @@ def get_companies_affected_by_trade_barrier(country, sector):
 select
   companies_house_company_number
   
-from countries_and_sectors_of_interest_by_companies_house_company_number
+from countries_and_sectors_of_interest
 
-where country_of_interest_id = '{country}'
-  and sector_segment = '{sector}'
+where country_of_interest = '{country}'
+  and sector_of_interest = '{sector}'
 
 '''.format(country=country, sector=sector)
     db = get_db()
@@ -306,13 +306,13 @@ def get_company_countries_and_sectors_of_interest():
     sql_query = '''
 select
   companies_house_company_number,
-  country_of_interest_id,
-  sector_segment,
+  country_of_interest,
+  sector_of_interest,
   source,
   source_id,
   timestamp
 
-from countries_and_sectors_of_interest_by_companies_house_company_number
+from countries_and_sectors_of_interest
 
 '''
     db = get_db()
@@ -321,7 +321,7 @@ from countries_and_sectors_of_interest_by_companies_house_company_number
         'headers': [
             'companiesHouseCompanyNumber',
             'countryOfInterest',
-            'sectorSegmentOfInterest',
+            'sectorOfIntereset',
             'source',
             'sourceID',
             'timestamp'
@@ -333,21 +333,25 @@ from countries_and_sectors_of_interest_by_companies_house_company_number
 def get_company_countries_of_interest():
     sql_query = '''
 select
-  datahub_company_id,
-  country_of_interest_id,
+  companies_house_company_number,
+  country_of_interest,
   source,
   source_id,
   timestamp
 
-from countries_of_interest_by_companies_house_company_number join 
-  datahub_company_id_to_companies_house_company_number
-  using (companies_house_company_number)
+from countries_of_interest
 
 '''
     db = get_db()
     rows = query_db(db, sql_query)
     return {
-        'headers': ['datahubCompanyID', 'countryOfInterest', 'source', 'sourceID', 'timestamp'],
+        'headers': [
+            'companiesHouseCompanyNumber',
+            'countryOfInterest',
+            'source',
+            'sourceId',
+            'timestamp'
+        ],
         'data': [tuple(r) for r in rows]
     }
 
@@ -356,21 +360,25 @@ from countries_of_interest_by_companies_house_company_number join
 def get_company_export_countries():
     sql_query = '''
 select
-  datahub_company_id,
-  export_country_id,
+  companies_house_company_number,
+  export_country,
   source,
   source_id,
   timestamp
 
-from export_countries_by_companies_house_company_number join 
-  datahub_company_id_to_companies_house_company_number 
-  using (companies_house_company_number)
+from export_countries
 
 '''
     db = get_db()
     rows = query_db(db, sql_query)
     return {
-        'headers': ['datahubCompanyID', 'exportCountry', 'source', 'sourceID', 'timestamp'],
+        'headers': [
+            'companiesHouseCompanyNumber',
+            'exportCountry',
+            'source',
+            'sourceID',
+            'timestamp'
+        ],
         'data': [tuple(r) for r in rows]
     }
 
@@ -381,16 +389,18 @@ def get_company_sectors_of_interest():
 select
   companies_house_company_number,
   sector_of_interest,
+  source,
+  source_id,
   timestamp
 
-from sectors_of_interest_by_companies_house_company_number
+from sectors_of_interest
 
 order by 1, 3, 2
 '''
     connection = get_db()
     df = query_database(connection, sql_query)
     web_dict = to_web_dict(df)
-    web_dict['data'] = web_dict['data'][0]
+    web_dict['data'] = web_dict['data']
     return web_dict
     
 
@@ -427,14 +437,14 @@ from datahub_company_id_to_companies_house_company_number
         'data': rows
     }
 
-@app.route('/get-sector-segments')
+@app.route('/get-sectors')
 @hawk_required
-def get_sector_segments():
+def get_sectors():
     sql_query = '''
 select distinct
-  segment
+  sector
 
-from segments
+from sectors
 
 order by 1
 
@@ -442,7 +452,7 @@ order by 1
     db = get_db()
     rows = query_db(db, sql_query)
     return {
-        'headers': ['sectorSegment'],
+        'headers': ['sector'],
         'data': [r[0] for r in rows]
     }
 
