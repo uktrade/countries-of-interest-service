@@ -63297,14 +63297,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var d3__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! d3 */ "./node_modules/d3/index.js");
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_3__);
-function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
-
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
-
-function _iterableToArrayLimit(arr, i) { if (!(Symbol.iterator in Object(arr) || Object.prototype.toString.call(arr) === "[object Arguments]")) { return; } var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
-
-function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
-
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
@@ -63348,66 +63340,11 @@ function (_React$Component) {
     _this = _possibleConstructorReturn(this, _getPrototypeOf(App).call(this, props));
     _this.orderFrequencyChartId = 'order-frequency-chart';
     _this.state = {
-      data: {
-        dataReportData: {
-          companyOrderSummary: {
-            headers: ['nCompanies', 'nCompaniesWithOrders'],
-            data: [10, 2]
-          },
-          companyExportCountriesSummary: {
-            headers: ['nCompanies', 'nCompaniesWithExportCountries'],
-            data: [10, 1]
-          },
-          countriesOfInterestSummary: {
-            headers: ['nCompanies', 'nCompaniesWithCountriesOfInterest'],
-            data: [10, 2]
-          },
-          orderFrequency: {
-            daily: {
-              headers: [],
-              data: [['2018-01-01', 1], ['2018-01-02', 2], ['2018-01-03', 3]]
-            },
-            weekly: {
-              headers: [],
-              data: [['2018-01-01', 4], ['2018-01-08', 5], ['2018-01-15', 6]]
-            },
-            monthly: {
-              headers: [],
-              data: [['2018-01-01', 4], ['2018-02-01', 5], ['2018-03-01', 6]]
-            }
-          }
-        },
-        matchedCompanies: {
-          nCompanies: 10,
-          nMatches: 3,
-          nUniqueMatches: 2,
-          nDuplicates: 1,
-          percentMatches: 30,
-          percentUniqueMatches: 20,
-          percentDuplicates: 10
-        },
-        sectorMatches: {
-          nCompanies: 10,
-          nMatches: 9,
-          nSectors: 302
-        },
-        topSectors: [{
-          name: 'Aerospace',
-          count: 6
-        }, {
-          name: 'Defence',
-          count: 2
-        }, {
-          name: 'Food',
-          count: 1
-        }]
-      },
-      orderFrequency: "daily",
+      data: null,
       nRowsTopSector: 5
     };
     _this.drawOrderFrequencyChart = _this.drawOrderFrequencyChart.bind(_assertThisInitialized(_this));
     _this.onNRowsTopSectorChange = _this.onNRowsTopSectorChange.bind(_assertThisInitialized(_this));
-    _this.onOrderFrequencyChange = _this.onOrderFrequencyChange.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -63416,71 +63353,24 @@ function (_React$Component) {
     value: function componentDidMount() {
       var _this2 = this;
 
-      axios__WEBPACK_IMPORTED_MODULE_1___default.a.get('/api/get-matched-companies').then(function (response) {
-        return response.data;
-      }).then(function (results) {
-        return _this2.setState(function (prevState) {
-          var data = prevState.data;
-
-          var newData = _objectSpread({}, data, {
-            matchedCompanies: results
-          });
-
-          return _objectSpread({}, prevState, {
-            data: newData
-          });
-        });
-      });
-      axios__WEBPACK_IMPORTED_MODULE_1___default.a.get('/api/get-sector-matches').then(function (response) {
-        return response.data;
-      }).then(function (results) {
-        return _this2.setState(function (prevState) {
-          var data = prevState.data;
-
-          var newData = _objectSpread({}, data, {
-            sectorMatches: results
-          });
-
-          return _objectSpread({}, prevState, {
-            data: newData
-          });
-        });
-      });
-      axios__WEBPACK_IMPORTED_MODULE_1___default.a.get('/api/get-top-sectors').then(function (response) {
-        return response.data;
-      }).then(function (results) {
-        return _this2.setState(function (prevState) {
-          var data = prevState.data;
-
-          var newData = _objectSpread({}, data, {
-            topSectors: results.data
-          });
-
-          return _objectSpread({}, prevState, {
-            data: newData
-          });
-        });
-      });
       axios__WEBPACK_IMPORTED_MODULE_1___default.a.get('/api/get-data-report-data').then(function (response) {
         return response.data;
-      }).then(function (results) {
-        return _this2.setState(function (prevState) {
-          var data = prevState.data;
-
-          var newData = _objectSpread({}, data, {
-            dataReportData: results
-          });
-
-          return _objectSpread({}, prevState, {
-            data: newData
-          });
+      }).then(function (data) {
+        return _this2.setState({
+          data: data
         });
+      }).then(function (x) {
+        return _this2.drawOrderFrequencyChart();
       });
     }
   }, {
     key: "drawOrderFrequencyChart",
     value: function drawOrderFrequencyChart() {
-      var data = this.state.data.dataReportData.orderFrequency[this.state.orderFrequency].data;
+      if (this.state.data == null) {
+        return;
+      }
+
+      var data = this.state.data.omisOrderFrequency.values;
       var dates = data.map(function (row) {
         return new Date(row[0]);
       });
@@ -63516,31 +63406,17 @@ function (_React$Component) {
       chart.append('g').attr('transform', "translate(0, ".concat(chartHeight, ")")).call(xAxis);
       var yAxis = d3__WEBPACK_IMPORTED_MODULE_2__["axisLeft"](yScale);
       chart.append('g').call(yAxis);
-      chart.selectAll(".dot").data(parsedData).enter().append("circle") // Uses the enter().append() method
-      .attr("class", "dot") // Assign a class for styling
-      .attr("cx", function (d) {
+      chart.selectAll(".dot").data(parsedData).enter().append("circle").attr("class", "dot").attr("cx", function (d) {
         return xScale(d[0]);
       }).attr("cy", function (d) {
         return yScale(d[1]);
       }).attr("r", 2);
     }
   }, {
-    key: "componentDidUpdate",
-    value: function componentDidUpdate() {
-      this.drawOrderFrequencyChart();
-    }
-  }, {
     key: "onNRowsTopSectorChange",
     value: function onNRowsTopSectorChange(nRows) {
       this.setState({
         nRowsTopSector: nRows
-      });
-    }
-  }, {
-    key: "onOrderFrequencyChange",
-    value: function onOrderFrequencyChange(frequency) {
-      this.setState({
-        orderFrequency: frequency
       });
     }
   }, {
@@ -63552,31 +63428,55 @@ function (_React$Component) {
           data = _this$state.data,
           nRowsTopSector = _this$state.nRowsTopSector,
           orderFrequency = _this$state.orderFrequency;
+
+      if (data == null) {
+        return '';
+      }
+
       var dataReportData = data.dataReportData;
+      var dataObj = dataReportData.values.reduce(function (acc, d) {
+        var x = _objectSpread({}, acc);
+
+        x[d[0]] = d[1];
+        return x;
+      }, {});
+      var nCompanies = dataObj.nCompanies,
+          nCompaniesMatchedToCompaniesHouse = dataObj.nCompaniesMatchedToCompaniesHouse,
+          nCompaniesMatchedToSector = dataObj.nCompaniesMatchedToSector,
+          nCompaniesMatchedToDuplicateCompaniesHouseCompany = dataObj.nCompaniesMatchedToDuplicateCompaniesHouseCompany,
+          nSectors = dataObj.nSectors,
+          nCompaniesWithOmisOrders = dataObj.nCompaniesWithOmisOrders,
+          nCompaniesWithExportCountries = dataObj.nCompaniesWithExportCountries,
+          nCompaniesWithFutureInterestCountries = dataObj.nCompaniesWithFutureInterestCountries;
       var chartId = this.orderFrequencyChartId;
       return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         style: {
           paddingTop: '1em'
         }
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(MatchedCompanies, {
-        data: data.matchedCompanies
+        nCompanies: nCompanies,
+        nDuplicates: nCompaniesMatchedToDuplicateCompaniesHouseCompany,
+        nMatches: nCompaniesMatchedToCompaniesHouse
       }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(SectorMatches, {
-        data: data.sectorMatches
+        nCompanies: nCompanies,
+        nMatches: nCompaniesMatchedToSector,
+        nSectors: nSectors
       }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(TopSectors, {
-        data: data.topSectors,
+        data: data.topSectors.values,
         onChange: this.onNRowsTopSectorChange,
         nRows: nRowsTopSector
       }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(CompanyOrderSummary, {
-        data: dataReportData.companyOrderSummary
+        nCompanies: nCompanies,
+        nWithOrders: nCompaniesWithOmisOrders
       }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(CompanyExportCountriesSummary, {
-        data: dataReportData.companyExportCountriesSummary
+        nCompanies: nCompanies,
+        nWithExportCountries: nCompaniesWithExportCountries
       }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(CompanyCountriesOfInterestSummary, {
-        data: dataReportData.countriesOfInterestSummary
+        nCompanies: nCompanies,
+        nWithCountriesOfInterest: nCompaniesWithFutureInterestCountries
       }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(OrderFrequency, {
         chartId: chartId,
-        data: dataReportData.orderFrequency,
-        frequency: orderFrequency,
-        onChange: this.onOrderFrequencyChange
+        data: data.omisOrderFrequency.values
       }));
     }
   }]);
@@ -63585,19 +63485,15 @@ function (_React$Component) {
 }(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component);
 
 var MatchedCompanies = function MatchedCompanies(_ref) {
-  var data = _ref.data;
+  var nCompanies = _ref.nCompanies,
+      nDuplicates = _ref.nDuplicates,
+      nMatches = _ref.nMatches;
 
-  if (data == null) {
+  if (nCompanies == null) {
     return '';
   }
 
-  var nCompanies = data.nCompanies,
-      nMatches = data.nMatches,
-      nUniqueMatches = data.nUniqueMatches,
-      nDuplicates = data.nDuplicates,
-      percentMatches = data.percentMatches,
-      percentUniqueMatches = data.percentUniqueMatches,
-      percentDuplicates = data.percentDuplicates;
+  var nUniqueMatches = nMatches - nDuplicates;
   return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "data-report"
   }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h3", {
@@ -63616,15 +63512,14 @@ var MatchedCompanies = function MatchedCompanies(_ref) {
 };
 
 var SectorMatches = function SectorMatches(_ref2) {
-  var data = _ref2.data;
+  var nCompanies = _ref2.nCompanies,
+      nSectors = _ref2.nSectors,
+      nMatches = _ref2.nMatches;
 
-  if (data == null) {
+  if (nCompanies == null) {
     return '';
   }
 
-  var nCompanies = data.nCompanies,
-      nSectors = data.nSectors,
-      nMatches = data.nMatches;
   return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "sector-summary"
   }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h3", null, "Sector summary"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", {
@@ -63661,34 +63556,27 @@ var TopSectors = function TopSectors(_ref3) {
   }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("thead", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Sector"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Count"))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, filteredData.map(function (sector, i) {
     return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", {
       key: i
-    }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, sector.name), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, sector.count));
+    }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, sector[0]), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, sector[1]));
   }))));
 };
 
 var CompanyOrderSummary = function CompanyOrderSummary(_ref4) {
-  var data = _ref4.data;
-
-  var _data$data = _slicedToArray(data.data, 2),
-      nCompanies = _data$data[0],
-      nCompaniesWithOrders = _data$data[1];
-
+  var nCompanies = _ref4.nCompanies,
+      nWithOrders = _ref4.nWithOrders;
   return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "company-order-summary"
   }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h3", null, "Company order summary"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", {
     className: "table table-striped"
-  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "#Companies"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, nCompanies)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "#Companies with orders"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, nCompaniesWithOrders)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "%Companies with orders"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, Math.round(100 * 100 * nCompaniesWithOrders / nCompanies) / 100)))));
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "#Companies"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, nCompanies)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "#Companies with orders"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, nWithOrders)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "%Companies with orders"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, Math.round(100 * 100 * nWithOrders / nCompanies) / 100)))));
 };
 
 var CompanyExportCountriesSummary = function CompanyExportCountriesSummary(_ref5) {
-  var data = _ref5.data;
+  var nCompanies = _ref5.nCompanies,
+      nWithExportCountries = _ref5.nWithExportCountries;
 
-  if (data == null) {
+  if (nCompanies == null) {
     return '';
   }
-
-  var _data$data2 = _slicedToArray(data.data, 2),
-      nCompanies = _data$data2[0],
-      nWithExportCountries = _data$data2[1];
 
   return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "company-export-country-summary"
@@ -63698,59 +63586,32 @@ var CompanyExportCountriesSummary = function CompanyExportCountriesSummary(_ref5
 };
 
 var CompanyCountriesOfInterestSummary = function CompanyCountriesOfInterestSummary(_ref6) {
-  var data = _ref6.data;
+  var nCompanies = _ref6.nCompanies,
+      nWithCountriesOfInterest = _ref6.nWithCountriesOfInterest;
 
-  if (data == null) {
+  if (nCompanies == null) {
     return '';
   }
-
-  var _data$data3 = _slicedToArray(data.data, 2),
-      nCompanies = _data$data3[0],
-      nCompaniesWithCountriesOfInterest = _data$data3[1];
 
   return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "company-countries-of-interest-summary"
   }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h3", null, "Countries of interest summary"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", {
     className: "table table-striped"
-  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "#Companies"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, nCompanies)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "#Companies with countries of interest"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, nCompaniesWithCountriesOfInterest)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "%Companies with countries of interest"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, Math.round(100 * 100 * nCompaniesWithCountriesOfInterest / nCompanies) / 100)))));
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "#Companies"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, nCompanies)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "#Companies with countries of interest"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, nWithCountriesOfInterest)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "%Companies with countries of interest"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, Math.round(100 * 100 * nWithCountriesOfInterest / nCompanies) / 100)))));
 };
 
 var OrderFrequency = function OrderFrequency(_ref7) {
-  var data = _ref7.data,
-      frequency = _ref7.frequency,
-      onChange = _ref7.onChange,
-      chartId = _ref7.chartId;
+  var chartId = _ref7.chartId,
+      data = _ref7.data;
 
   if (data == null) {
     return '';
   }
 
-  var onChange2 = function onChange2(e) {
-    return onChange(frequencyInput.value);
-  };
-
-  var frequencyInput;
-
-  var freqData = _objectSpread({}, data[frequency]);
-
   return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "order-frequency"
-  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h3", null, "Order frequency"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", {
-    className: "form-label"
-  }, "Frequency"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("select", {
-    className: "form-control",
-    onChange: onChange2,
-    ref: function ref(input) {
-      return frequencyInput = input;
-    }
-  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("option", {
-    value: "daily"
-  }, "Daily"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("option", {
-    value: "weekly"
-  }, "Weekly"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("option", {
-    value: "monthly"
-  }, "Monthly")), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(OrderFrequencyChart, {
-    data: freqData,
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h3", null, "Order frequency"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(OrderFrequencyChart, {
+    data: data,
     id: chartId
   }));
 };

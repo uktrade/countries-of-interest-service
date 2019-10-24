@@ -66,10 +66,12 @@ def populate_table(url, table_name, schema, primary_key=None, stubbed_data={}):
         values = data['values'] if len(schema) > 1 else [[d] for d in data['values']]
         result = cursor.executemany(sql, values)
         connection.commit()
-        output = "{} record(s) inserted successfully into {} table".format(
-            cursor.rowcount,
-            table_name
-        )
+        n_rows = cursor.rowcount
+        output = {
+            'table_name': table_name,
+            'rows': n_rows,
+            'status': 'success'
+        }
         print(output)
 
     except (Exception, psycopg2.Error) as error:

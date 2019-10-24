@@ -11,131 +11,25 @@ class App extends React.Component {
         super(props);
         this.orderFrequencyChartId = 'order-frequency-chart';
         this.state = {
-            data: {
-                dataReportData: {
-                    companyOrderSummary: {
-                        headers: ['nCompanies', 'nCompaniesWithOrders'],
-                        data: [10, 2]
-                    },
-                    companyExportCountriesSummary: {
-                        headers: ['nCompanies', 'nCompaniesWithExportCountries'],
-                        data: [10, 1]
-                    },
-                    countriesOfInterestSummary: {
-                        headers: ['nCompanies', 'nCompaniesWithCountriesOfInterest'],
-                        data: [10, 2]
-                    },
-                    orderFrequency: {
-                        daily: {
-                            headers: [],
-                            data: [
-                                ['2018-01-01', 1],
-                                ['2018-01-02', 2],
-                                ['2018-01-03', 3]
-                            ]
-                        },
-                        weekly: {
-                            headers: [],
-                            data: [
-                                ['2018-01-01', 4],
-                                ['2018-01-08', 5],
-                                ['2018-01-15', 6]
-                            ]
-                        },
-                        monthly: {
-                            headers: [],
-                            data: [
-                                ['2018-01-01', 4],
-                                ['2018-02-01', 5],
-                                ['2018-03-01', 6]
-                            ]
-                        }
-                    }
-                },
-                matchedCompanies: {
-                    nCompanies: 10,
-                    nMatches: 3,
-                    nUniqueMatches: 2,
-                    nDuplicates: 1,
-                    percentMatches: 30,
-                    percentUniqueMatches: 20,
-                    percentDuplicates: 10
-                },
-                sectorMatches: {
-                    nCompanies: 10,
-                    nMatches: 9,
-                    nSectors: 302
-                },
-                topSectors: [
-                        {name: 'Aerospace', count: 6},
-                        {name: 'Defence', count: 2},
-                        {name: 'Food', count: 1}
-                ],
-            },
-            orderFrequency: "daily",
+            data: null,
             nRowsTopSector: 5
         };
         this.drawOrderFrequencyChart = this.drawOrderFrequencyChart.bind(this);
         this.onNRowsTopSectorChange = this.onNRowsTopSectorChange.bind(this);
-        this.onOrderFrequencyChange = this.onOrderFrequencyChange.bind(this);
     }
 
     componentDidMount() {
-        axios.get('/api/get-matched-companies')
-            .then(response => response.data)
-            .then(
-                results => this.setState(
-                    prevState => {
-                        const {data} = prevState;
-                        const newData = {...data, matchedCompanies: results};
-                        return {...prevState, data: newData};
-                    }
-                )
-            );
-
-        axios.get('/api/get-sector-matches')
-            .then(response => response.data)
-            .then(
-                results => this.setState(
-                    prevState => {
-                        const {data} = prevState;
-                        const newData = {...data, sectorMatches: results};
-                        return {...prevState, data: newData};
-                    }
-                )
-            );
-
-        axios.get('/api/get-top-sectors')
-            .then(response => response.data)
-            .then(
-                results => {
-                    return this.setState(
-                        prevState => {
-                            const {data} = prevState;
-                            const newData = {...data, topSectors: results.data};
-                            return {...prevState, data: newData};
-                        }
-                    );
-                }
-            );
-
         axios.get('/api/get-data-report-data')
             .then(response => response.data)
-            .then(
-                results => {
-                    return this.setState(
-                        prevState => {
-                            const {data} = prevState;
-                            const newData = {...data, dataReportData: results};
-                            return {...prevState, data: newData};
-                        }
-                    );
-                }
-            );
+            .then(data => this.setState({data: data}))
+            .then(x => this.drawOrderFrequencyChart());
     }
 
     drawOrderFrequencyChart() {
-        const {data} = this.state.data.dataReportData.orderFrequency[this.state.orderFrequency];
+        if (this.state.data == null){
+            return
+        }
+        const data = this.state.data.omisOrderFrequency.values;
         const dates = data.map(row=>new Date(row[0]));
         const n_orders = data.map(row=>row[1]);
         const parsedData = d3.zip(dates, n_orders);
@@ -194,24 +88,16 @@ class App extends React.Component {
         chart.selectAll(".dot")
             .data(parsedData)
             .enter()
-            .append("circle") // Uses the enter().append() method
-            .attr("class", "dot") // Assign a class for styling
-            .attr("cx", function(d) { return xScale(d[0]) })
-            .attr("cy", function(d) { return yScale(d[1]) })
+            .append("circle") 
+            .attr("class", "dot") 
+            .attr("cx", function(d) { return xScale(d[0]); })
+            .attr("cy", function(d) { return yScale(d[1]); })
             .attr("r", 2);  
 
-    }
-
-    componentDidUpdate() {
-        this.drawOrderFrequencyChart();
     }
     
     onNRowsTopSectorChange(nRows){
         this.setState({nRowsTopSector: nRows});
-    }
-
-    onOrderFrequencyChange(frequency){
-        this.setState({orderFrequency: frequency});
     }
     
     render() {
@@ -219,27 +105,60 @@ class App extends React.Component {
         console.log(this.state);
 
         const {data, nRowsTopSector, orderFrequency} = this.state;
+        if (data == null){
+            return '';
+        }
+        
         const {dataReportData} = data;
+        let dataObj = dataReportData.values.reduce(
+            (acc, d) => {
+                let x = {...acc};
+                x[d[0]] = d[1];
+                return x;
+            },
+            {}
+        );
+        const {
+            nCompanies,
+            nCompaniesMatchedToCompaniesHouse,
+            nCompaniesMatchedToSector,
+            nCompaniesMatchedToDuplicateCompaniesHouseCompany,
+            nSectors,
+            nCompaniesWithOmisOrders,
+            nCompaniesWithExportCountries,
+            nCompaniesWithFutureInterestCountries,
+        } = dataObj;
+        
         const chartId = this.orderFrequencyChartId;
         return (
             <div style={{paddingTop: '1em'}}>
-              <MatchedCompanies data={data.matchedCompanies}/>
-              <SectorMatches data={data.sectorMatches}/>
+              <MatchedCompanies
+                nCompanies={nCompanies}
+                nDuplicates={nCompaniesMatchedToDuplicateCompaniesHouseCompany}
+                nMatches={nCompaniesMatchedToCompaniesHouse}
+              />
+              <SectorMatches
+                nCompanies={nCompanies}
+                nMatches={nCompaniesMatchedToSector}
+                nSectors={nSectors}
+              />
               <TopSectors
-                data={data.topSectors}
+                data={data.topSectors.values}
                 onChange={this.onNRowsTopSectorChange}
                 nRows={nRowsTopSector}
               />
-              <CompanyOrderSummary data={dataReportData.companyOrderSummary}/>
-              <CompanyExportCountriesSummary data={dataReportData.companyExportCountriesSummary}/>
+              <CompanyOrderSummary nCompanies={nCompanies} nWithOrders={nCompaniesWithOmisOrders}/>
+              <CompanyExportCountriesSummary
+                nCompanies={nCompanies}
+                nWithExportCountries={nCompaniesWithExportCountries}
+              />
               <CompanyCountriesOfInterestSummary
-                data={dataReportData.countriesOfInterestSummary}
+                nCompanies={nCompanies}
+                nWithCountriesOfInterest={nCompaniesWithFutureInterestCountries}
               />
               <OrderFrequency
                 chartId={chartId}
-                data={dataReportData.orderFrequency}
-                frequency={orderFrequency}
-                onChange={this.onOrderFrequencyChange}
+                data={data.omisOrderFrequency.values}
               />
             </div>
         );
@@ -247,20 +166,13 @@ class App extends React.Component {
     }
 }
 
-const MatchedCompanies = ({data}) => {
-    if(data == null){
+const MatchedCompanies = ({nCompanies, nDuplicates, nMatches}) => {
+    if(nCompanies == null){
         return '';
     }
+
+    let nUniqueMatches = nMatches - nDuplicates;
     
-    const {
-        nCompanies,
-        nMatches,
-        nUniqueMatches,
-        nDuplicates,
-        percentMatches,
-        percentUniqueMatches,
-        percentDuplicates
-    } = data;
     return (
         
         <div className="data-report">
@@ -312,24 +224,18 @@ const MatchedCompanies = ({data}) => {
                 <td>{nDuplicates}</td>
                 <td>{Math.round(100 * 100 * nDuplicates / nMatches) / 100}</td>
               </tr>
-            </tbody>        
-          </table>          
+            </tbody>
+          </table>
         </div>
         
     );
 };
 
-const SectorMatches = ({data}) => {
+const SectorMatches = ({nCompanies, nSectors, nMatches}) => {
 
-    if(data == null){
+    if(nCompanies == null){
         return '';
     }
-    
-    const {
-        nCompanies,
-        nSectors,
-        nMatches
-    } = data;
     
     return (
         <div className="sector-summary">
@@ -386,8 +292,8 @@ const TopSectors = ({data, onChange, nRows=5}) => {
                   filteredData.map((sector, i) => {
                       return (
                           <tr key={i}>
-                            <td>{sector.name}</td>
-                            <td>{sector.count}</td>
+                            <td>{sector[0]}</td>
+                            <td>{sector[1]}</td>
                           </tr>
                       );
                   })
@@ -398,18 +304,17 @@ const TopSectors = ({data, onChange, nRows=5}) => {
     );
 };
 
-const CompanyOrderSummary = ({data}) => {
-    const [nCompanies, nCompaniesWithOrders] = data.data;
+const CompanyOrderSummary = ({nCompanies, nWithOrders}) => {
     return (
         <div className="company-order-summary">
           <h3>Company order summary</h3>
           <table className="table table-striped">
             <tbody>
             <tr><td>#Companies</td><td>{nCompanies}</td></tr>
-            <tr><td>#Companies with orders</td><td>{nCompaniesWithOrders}</td></tr>
+            <tr><td>#Companies with orders</td><td>{nWithOrders}</td></tr>
               <tr>
                 <td>%Companies with orders</td>
-                <td>{Math.round(100 * 100 * nCompaniesWithOrders/nCompanies)/100}</td>
+                <td>{Math.round(100 * 100 * nWithOrders/nCompanies)/100}</td>
               </tr>
             </tbody>
           </table>
@@ -418,12 +323,11 @@ const CompanyOrderSummary = ({data}) => {
 
 };
 
-const CompanyExportCountriesSummary = ({data}) => {
-    if(data == null){
+const CompanyExportCountriesSummary = ({nCompanies, nWithExportCountries}) => {
+    if(nCompanies == null){
         return '';
     }
     
-    const [nCompanies, nWithExportCountries] = data.data;
     return (
         <div className="company-export-country-summary">
           <h3>Company export country summary</h3>
@@ -442,12 +346,11 @@ const CompanyExportCountriesSummary = ({data}) => {
 
 };
 
-const CompanyCountriesOfInterestSummary = ({data}) => {
-    if(data == null){
+const CompanyCountriesOfInterestSummary = ({nCompanies, nWithCountriesOfInterest}) => {
+    if(nCompanies == null){
         return '';
     }
 
-    const [nCompanies, nCompaniesWithCountriesOfInterest] = data.data;
     return (
         <div className="company-countries-of-interest-summary">
           <h3>Countries of interest summary</h3>
@@ -456,11 +359,11 @@ const CompanyCountriesOfInterestSummary = ({data}) => {
               <tr><td>#Companies</td><td>{nCompanies}</td></tr>
               <tr>
                 <td>#Companies with countries of interest</td>
-                <td>{nCompaniesWithCountriesOfInterest}</td>
+                <td>{nWithCountriesOfInterest}</td>
               </tr>
               <tr>
                 <td>%Companies with countries of interest</td>
-                <td>{Math.round(100 * 100 * nCompaniesWithCountriesOfInterest/nCompanies)/100}</td>
+                <td>{Math.round(100 * 100 * nWithCountriesOfInterest/nCompanies)/100}</td>
               </tr>
             </tbody>
           </table>
@@ -468,28 +371,15 @@ const CompanyCountriesOfInterestSummary = ({data}) => {
     );
 };
 
-const OrderFrequency = ({data, frequency, onChange, chartId}) => {
+const OrderFrequency = ({chartId, data}) => {
     if(data == null){
         return '';
     }
 
-    const onChange2 = (e) => {
-        return onChange(frequencyInput.value);
-    };
-
-    let frequencyInput
-    const freqData = {...data[frequency]};
-    
     return (
         <div className='order-frequency'>
           <h3>Order frequency</h3>
-          <label className="form-label">Frequency</label>
-          <select className="form-control" onChange={onChange2} ref={input=>frequencyInput=input}>
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
-            <option value="monthly">Monthly</option>
-          </select>
-          <OrderFrequencyChart data={freqData} id={chartId}/>
+          <OrderFrequencyChart data={data} id={chartId}/>
         </div>
     );
 };
