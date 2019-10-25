@@ -63299,12 +63299,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_3__);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(source, true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -63433,21 +63427,14 @@ function (_React$Component) {
         return '';
       }
 
-      var dataReportData = data.dataReportData;
-      var dataObj = dataReportData.values.reduce(function (acc, d) {
-        var x = _objectSpread({}, acc);
-
-        x[d[0]] = d[1];
-        return x;
-      }, {});
-      var nCompanies = dataObj.nCompanies,
-          nCompaniesMatchedToCompaniesHouse = dataObj.nCompaniesMatchedToCompaniesHouse,
-          nCompaniesMatchedToSector = dataObj.nCompaniesMatchedToSector,
-          nCompaniesMatchedToDuplicateCompaniesHouseCompany = dataObj.nCompaniesMatchedToDuplicateCompaniesHouseCompany,
-          nSectors = dataObj.nSectors,
-          nCompaniesWithOmisOrders = dataObj.nCompaniesWithOmisOrders,
-          nCompaniesWithExportCountries = dataObj.nCompaniesWithExportCountries,
-          nCompaniesWithFutureInterestCountries = dataObj.nCompaniesWithFutureInterestCountries;
+      var nCompanies = data.nCompanies,
+          nCompaniesMatchedToCompaniesHouse = data.nCompaniesMatchedToCompaniesHouse,
+          nCompaniesMatchedToSector = data.nCompaniesMatchedToSector,
+          nCompaniesMatchedToDuplicateCompaniesHouse = data.nCompaniesMatchedToDuplicateCompaniesHouse,
+          nSectors = data.nSectors,
+          nCompaniesWithOmisOrders = data.nCompaniesWithOmisOrders,
+          nCompaniesWithExportCountries = data.nCompaniesWithExportCountries,
+          nCompaniesWithFutureInterestCountries = data.nCompaniesWithFutureInterestCountries;
       var chartId = this.orderFrequencyChartId;
       return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         style: {
@@ -63455,7 +63442,7 @@ function (_React$Component) {
         }
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(MatchedCompanies, {
         nCompanies: nCompanies,
-        nDuplicates: nCompaniesMatchedToDuplicateCompaniesHouseCompany,
+        nDuplicates: nCompaniesMatchedToDuplicateCompaniesHouse,
         nMatches: nCompaniesMatchedToCompaniesHouse
       }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(SectorMatches, {
         nCompanies: nCompanies,

@@ -1,31 +1,35 @@
 from etl.etl import ETLTask
+from etl.config import (
+    datahub_company_table_name,
+    datahub_future_interest_countries_table_name,
+    omis_table_name,
+    countries_of_interest_table_name
+)
 
 sql = '''
 with omis_countries_of_interest as (
     select distinct
       company_number as companies_house_company_number,
-      z.iso_alpha2_code as country_id,
-      'datahub_order' as source,
+      country,
+      'datahub_omis' as source,
       l.id::varchar(100) as source_id,
       l.created_on as timestamp
 
-    from order_order l join company_company r on l.company_id=r.id
-      join metadata_country z on l.primary_market_id = z.id
+    from {omis} l join {datahub_company} r on l.company_id=r.id
     
     where company_number is not null 
       and company_number != ''
-      and primary_market_id is not null
+      and country is not null
 
 ), datahub_countries_of_interest as (
     select distinct
       company_number as companies_house_company_number,
-      z.iso_alpha2_code as country_id,
+      country,
       'datahub_future_interest' as source,
       l.id::varchar(100) as source_id,
       null::timestamp as timestamp
 
-    from company_company_future_interest_countries l join company_company r on l.company_id=r.id
-      join metadata_country z on l.country_id = z.id
+    from {future_interest_countries} l join {datahub_company} r on l.company_id=r.id
     
     where company_number is not null and company_number != ''
     
@@ -40,30 +44,34 @@ with omis_countries_of_interest as (
 
 select
   companies_house_company_number,
-  country_id,
+  country,
   source,
   source_id,
   timestamp
   
 from combined_countries_of_interest
 
-where country_id is not null
-  and country_id != ''
+where country is not null
+  and country != ''
 
 order by 1
 
-'''
+'''.format(
+    datahub_company=datahub_company_table_name,
+    future_interest_countries=datahub_future_interest_countries_table_name,
+    omis=omis_table_name
+)
 
 table_fields = '''(
     companies_house_company_number varchar(12), 
-    country_of_interest_id varchar(12), 
+    country_of_interest varchar(2), 
     source varchar(50), 
     source_id varchar(100),
     timestamp timestamp,
-    primary key (companies_house_company_number, country_of_interest_id, source, source_id)
+    primary key (companies_house_company_number, country_of_interest, source, source_id)
 )'''
 
-table_name = 'countries_of_interest_by_companies_house_company_number'
+table_name = countries_of_interest_table_name
 
 class Task(ETLTask):
 

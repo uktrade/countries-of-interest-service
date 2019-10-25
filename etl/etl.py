@@ -25,15 +25,13 @@ class ETLTask:
 
     def __init__(
             self,
-            input_connection,
-            output_connection,
+            connection,
             sql,
             table_fields,
             table_name,
             drop_table=False
     ):
-        self.input_connection = input_connection
-        self.output_connection = output_connection
+        self.connection = connection
         self.drop_table = drop_table
         self.sql = sql
         self.table_fields = table_fields
@@ -42,24 +40,30 @@ class ETLTask:
     def __call__(self):
         if self.drop_table is True:
             print('\033[31mdropping table: {}\033[0m'.format(self.table_name))
-            drop_table(self.output_connection, self.table_name)
+            drop_table(self.connection, self.table_name)
 
         print('\033[31mcreate table: {}\033[0m'.format(self.table_name))
-        create_table(self.output_connection, self.table_fields, self.table_name)
+        create_table(self.connection, self.table_fields, self.table_name)
 
         print('\033[31mextract data\033[0m')
-        df = query_database(self.input_connection, self.sql)
+        df = query_database(self.connection, self.sql)
         print(df.head())
 
         print('\033[31mingest data\033[0m')
-        insert_data(df, self.output_connection, self.table_name)
+        insert_data(df, self.connection, self.table_name)
 
         print('\033[31mcheck data\033[0m')
         sql = ''' select * from {} limit 5 '''.format(self.table_name)
-        df = query_database(self.output_connection, sql)
+        df = query_database(self.connection, sql)
         print(df.head())
 
         print('\033[31mcheck data size\033[0m')
         sql = ''' select count(1) from {} '''.format(self.table_name)
-        df = query_database(self.output_connection, sql)
+        df = query_database(self.connection, sql)
         print('{} rows'.format(df.values[0][0]))
+
+        return {
+            'status': 'success',
+            'rows': df.values[0][0],
+            'table': self.table_name
+        }

@@ -1,5 +1,5 @@
-import datapipeline 
+import etl.views
 
 def populate_database():
-    return datapipeline.populate_database()
+    return etl.views.populate_database()
 

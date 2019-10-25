@@ -3,8 +3,8 @@ def to_camel_case(word):
 
 def to_web_dict(df):
     headers = [to_camel_case(c) for c in df.columns]
-    values = df.values
+    values = df.values.tolist()
     return {
         'headers': headers,
-        'data': values
+        'values': values
     }

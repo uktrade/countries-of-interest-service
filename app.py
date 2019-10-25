@@ -5,11 +5,20 @@ from flask.json import JSONEncoder
 from utils.utils import to_web_dict
 from utils.sql import query_database
 from authbroker_client import authbroker_blueprint, login_required
-from datapipeline.scheduler import Scheduler
+from etl.scheduler import Scheduler
 
 import views
 from db import get_db, query_db
-import datapipeline.views
+import etl.views
+import data_report
+from etl.config import (
+    countries_and_sectors_of_interest_table_name,
+    countries_of_interest_table_name,
+    datahub_company_id_to_companies_house_company_number_table_name,
+    datahub_sector_table_name,
+    export_countries_table_name,
+    sectors_of_interest_table_name,
+)
 
 class CustomJSONEncoder(JSONEncoder):
     
@@ -85,31 +94,24 @@ def hawk_required(view, *args, **kwargs):
         return view(*args, **kwargs)
     wrapper.__name__ = view.__name__
     return wrapper
-
-@app.route('/')
-@hawk_required
-@login_required
-def get_index():
-    return render_template('index.html')
-
-@app.route('/api/get-data-report-data')
-@hawk_required
-def get_data_report_data():
-    return datapipeline.views.get_data_report_data()
     
-@app.route('/get-companies-affected-by-trade-barrier/<country>/<sector>')
+@app.route('/api/get-companies-affected-by-trade-barrier/<country>/<sector>')
 @hawk_required
 def get_companies_affected_by_trade_barrier(country, sector):
     sql_query = '''
 select
   companies_house_company_number
   
-from countries_and_sectors_of_interest
+from {table}
 
 where country_of_interest = '{country}'
   and sector_of_interest = '{sector}'
 
-'''.format(country=country, sector=sector)
+'''.format(
+    country=country,
+    sector=sector,
+    table=countries_and_sectors_of_interest_table_name
+)
     db = get_db()
     rows = query_db(db, sql_query)
     return {
@@ -117,17 +119,17 @@ where country_of_interest = '{country}'
         'data': [r[0] for r in rows]
     }
 
-@app.route('/get-companies-house-company-numbers')
+@app.route('/api/get-companies-house-company-numbers')
 @hawk_required
 def get_companies_house_company_numbers():
     sql_query = '''
 select distinct
   companies_house_company_number
 
-from datahub_company_id_to_companies_house_company_number
+from {table}
 
 order by 1
-'''
+'''.format(table=datahub_company_id_to_companies_house_company_number_table_name)
     db = get_db()
     rows = query_db(db, sql_query)
     return {
@@ -135,7 +137,7 @@ order by 1
         'data': [r[0] for r in rows]
     }
 
-@app.route('/get-company-countries-and-sectors-of-interest')
+@app.route('/api/get-company-countries-and-sectors-of-interest')
 @hawk_required
 def get_company_countries_and_sectors_of_interest():
     sql_query = '''
@@ -147,9 +149,9 @@ select
   source_id,
   timestamp
 
-from countries_and_sectors_of_interest
+from {table}
 
-'''
+'''.format(table=countries_and_sectors_of_interest_table_name)
     db = get_db()
     rows = query_db(db, sql_query)
     return {
@@ -164,7 +166,7 @@ from countries_and_sectors_of_interest
         'data': [tuple(r) for r in rows]
     }
 
-@app.route('/get-company-countries-of-interest')
+@app.route('/api/get-company-countries-of-interest')
 def get_company_countries_of_interest():
     sql_query = '''
 select
@@ -174,9 +176,9 @@ select
   source_id,
   timestamp
 
-from countries_of_interest
+from {table}
 
-'''
+'''.format(table=countries_of_interest_table_name)
     db = get_db()
     rows = query_db(db, sql_query)
     return {
@@ -190,7 +192,7 @@ from countries_of_interest
         'data': [tuple(r) for r in rows]
     }
 
-@app.route('/get-company-export-countries')
+@app.route('/api/get-company-export-countries')
 @hawk_required
 def get_company_export_countries():
     sql_query = '''
@@ -201,9 +203,9 @@ select
   source_id,
   timestamp
 
-from export_countries
+from {table}
 
-'''
+'''.format(table=export_countries_table_name)
     db = get_db()
     rows = query_db(db, sql_query)
     return {
@@ -217,7 +219,7 @@ from export_countries
         'data': [tuple(r) for r in rows]
     }
 
-@app.route('/get-company-sectors-of-interest')
+@app.route('/api/get-company-sectors-of-interest')
 @hawk_required
 def get_company_sectors_of_interest():
     sql_query = '''
@@ -228,26 +230,35 @@ select
   source_id,
   timestamp
 
-from sectors_of_interest
+from {table}
 
 order by 1, 3, 2
-'''
+'''.format(table=sectors_of_interest_table_name)
     connection = get_db()
     df = query_database(connection, sql_query)
     web_dict = to_web_dict(df)
     web_dict['data'] = web_dict['data']
     return web_dict
-    
 
-@app.route('/get-datahub-company-ids')
+@app.route('/data-report')
+@hawk_required
+def get_data_report():
+    return render_template('data_report.html')
+
+@app.route('/api/get-data-report-data')
+@hawk_required
+def get_data_report_data():
+    return data_report.get_data_report_data()
+
+@app.route('/api/get-datahub-company-ids')
 @hawk_required
 def get_datahub_company_ids():
     sql_query = '''
 select distinct
   datahub_company_id
 
-from datahub_company_id_to_companies_house_company_number
-'''
+from {table}
+'''.format(table=datahub_company_id_to_companies_house_company_number_table_name)
     db = get_db()
     rows = query_db(db, sql_query)
     return {
@@ -255,7 +266,7 @@ from datahub_company_id_to_companies_house_company_number
         'data': [r[0] for r in rows]
     }
 
-@app.route('/get-datahub-company-ids-to-companies-house-company-numbers')
+@app.route('/api/get-datahub-company-ids-to-companies-house-company-numbers')
 @hawk_required
 def get_datahub_company_ids_to_companies_house_company_numbers():
     sql_query = '''
@@ -263,8 +274,8 @@ select
   datahub_company_id,
   companies_house_company_number
 
-from datahub_company_id_to_companies_house_company_number
-'''
+from {table}
+'''.format(table=datahub_company_id_to_companies_house_company_number_table_name)
     db = get_db()
     rows = query_db(db, sql_query)
     return {
@@ -272,18 +283,24 @@ from datahub_company_id_to_companies_house_company_number
         'data': rows
     }
 
-@app.route('/get-sectors')
+@app.route('/')
+@hawk_required
+@login_required
+def get_index():
+    return render_template('index.html')
+
+@app.route('/api/get-sectors')
 @hawk_required
 def get_sectors():
     sql_query = '''
 select distinct
   sector
 
-from sectors
+from {table}
 
 order by 1
 
-'''
+'''.format(table=datahub_sector_table_name)
     db = get_db()
     rows = query_db(db, sql_query)
     return {
@@ -294,12 +311,7 @@ order by 1
 @app.route('/api/populate-database')
 @hawk_required
 def populate_database():
-    return datapipeline.views.populate_database()
-
-@app.route('/data-report')
-@hawk_required
-def data_report():
-    return render_template('data_report.html')
+    return etl.views.populate_database()
 
 scheduled_task = Scheduler()
 scheduled_task.start()

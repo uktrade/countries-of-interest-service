@@ -109,32 +109,23 @@ class App extends React.Component {
             return '';
         }
         
-        const {dataReportData} = data;
-        let dataObj = dataReportData.values.reduce(
-            (acc, d) => {
-                let x = {...acc};
-                x[d[0]] = d[1];
-                return x;
-            },
-            {}
-        );
         const {
             nCompanies,
             nCompaniesMatchedToCompaniesHouse,
             nCompaniesMatchedToSector,
-            nCompaniesMatchedToDuplicateCompaniesHouseCompany,
+            nCompaniesMatchedToDuplicateCompaniesHouse,
             nSectors,
             nCompaniesWithOmisOrders,
             nCompaniesWithExportCountries,
             nCompaniesWithFutureInterestCountries,
-        } = dataObj;
+        } = data;
         
         const chartId = this.orderFrequencyChartId;
         return (
             <div style={{paddingTop: '1em'}}>
               <MatchedCompanies
                 nCompanies={nCompanies}
-                nDuplicates={nCompaniesMatchedToDuplicateCompaniesHouseCompany}
+                nDuplicates={nCompaniesMatchedToDuplicateCompaniesHouse}
                 nMatches={nCompaniesMatchedToCompaniesHouse}
               />
               <SectorMatches
@@ -310,8 +301,8 @@ const CompanyOrderSummary = ({nCompanies, nWithOrders}) => {
           <h3>Company order summary</h3>
           <table className="table table-striped">
             <tbody>
-            <tr><td>#Companies</td><td>{nCompanies}</td></tr>
-            <tr><td>#Companies with orders</td><td>{nWithOrders}</td></tr>
+              <tr><td>#Companies</td><td>{nCompanies}</td></tr>
+              <tr><td>#Companies with orders</td><td>{nWithOrders}</td></tr>
               <tr>
                 <td>%Companies with orders</td>
                 <td>{Math.round(100 * 100 * nWithOrders/nCompanies)/100}</td>
@@ -333,8 +324,8 @@ const CompanyExportCountriesSummary = ({nCompanies, nWithExportCountries}) => {
           <h3>Company export country summary</h3>
           <table className="table table-striped">
             <tbody>
-            <tr><td>#Companies</td><td>{nCompanies}</td></tr>
-            <tr><td>#Companies with export countries</td><td>{nWithExportCountries}</td></tr>
+              <tr><td>#Companies</td><td>{nCompanies}</td></tr>
+              <tr><td>#Companies with export countries</td><td>{nWithExportCountries}</td></tr>
               <tr>
                 <td>%Companies with export countries</td>
                 <td>{Math.round(100 * 100 * nWithExportCountries/nCompanies)/100}</td>
