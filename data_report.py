@@ -11,29 +11,37 @@ with datahub_company_summary as (
 
   from datahub_company
 
-), datahub_company_id_to_companies_house_company_number_summary as (
-  select
-    count(1) as n_companies_matched_to_companies_house
-
-  from coi_datahub_company_id_to_companies_house_company_number
+), matched_companies as (
+    select
+        id,
+        company_number
+        
+    from datahub_company
+    
+    where company_number is not null
+        and company_number not in ('', 'NotRegis', 'n/a', 'Not reg', 'N/A')
 
 ), duplicates as (
-  select
-    companies_house_company_number,
-    count(1)
-
-  from coi_datahub_company_id_to_companies_house_company_number
-
-  group by 1
-
-  having count(1) > 1
+    select
+        company_number,
+        count(1)
+    from matched_companies
+    group by 1
+    
+    having count(1) > 1
 
 ), duplicate_summary as (
-  select
-    sum(count) as n_companies_matched_to_duplicate_companies_house
-
-  from duplicates
-
+    select
+        sum(count) as n_companies_matched_to_duplicate_companies_house
+        
+    from duplicates
+    
+), match_summary as (
+    select
+        count(1) as n_companies_matched_to_companies_house
+        
+    from matched_companies
+    
 ), sector_summary as (
   select
     count(1) as n_sectors
@@ -63,14 +71,14 @@ with datahub_company_summary as (
     n_companies,
     n_companies_matched_to_companies_house,
     n_companies_matched_to_sector,
-    n_companies_matched_to_duplicate_companies_house,
+    coalesce(n_companies_matched_to_duplicate_companies_house, 0::float) as n_companies_matched_to_duplicate_companies_house,
     n_companies_with_export_countries,
     n_companies_with_future_interest_countries,
     n_companies_with_omis_orders,
     n_sectors
 
   from datahub_company_summary
-    join datahub_company_id_to_companies_house_company_number_summary on 1=1
+    join match_summary on 1=1
     join duplicate_summary on 1=1
     join sector_summary on 1=1
     join omis_summary on 1=1

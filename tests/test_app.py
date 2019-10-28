@@ -32,8 +32,8 @@ class TestCase(unittest.TestCase):
 class TestGetCompanyExportCountries(TestCase):
         
     def test(self, get_db, query_db):
-        response =  self.client.get('get-company-export-countries')
-        self.assertEquals(response.status_code, 200)
+        response =  self.client.get('/api/get-company-export-countries')
+        self.assertEqual(response.status_code, 200)
 
     def test_creates_a_database_connection(self, get_db, query_db):
         response = app.get_company_export_countries()
@@ -53,8 +53,14 @@ class TestGetCompanyExportCountries(TestCase):
         rows = [(0, 'germany'), (1, 'china')]
         query_db.return_value = rows
         expected = {
-            'headers': ['datahubCompanyID', 'exportCountry', 'source', 'sourceID', 'timestamp'],
-            'data': [(0, 'germany'), (1, 'china')]
+            'headers': [
+                'companiesHouseCompanyNumber',
+                'exportCountry',
+                'source',
+                'sourceId',
+                'timestamp'
+            ],
+            'values': [(0, 'germany'), (1, 'china')]
         }
         response = app.get_company_export_countries()
         self.assertEqual(response, expected)
@@ -65,7 +71,7 @@ class TestGetCompanyExportCountries(TestCase):
 class TestGetCompanyCountriesOfInterest(TestCase):
 
     def test(self, get_db, query_db):
-        response = self.client.get('get-company-countries-of-interest')
+        response = self.client.get('/api/get-company-countries-of-interest')
         self.assertEqual(response.status_code, 200)
 
     def test_creates_a_database_connection(self, get_db, query_db):
@@ -89,8 +95,14 @@ class TestGetCompanyCountriesOfInterest(TestCase):
         ]
         query_db.return_value = rows
         expected = {
-            'headers': ['datahubCompanyID', 'countryOfInterest', 'source', 'sourceID', 'timestamp'],
-            'data': [
+            'headers': [
+                'companiesHouseCompanyNumber',
+                'countryOfInterest',
+                'source',
+                'sourceId',
+                'timestamp'
+            ],
+            'values': [
                 (0, 'germany', 'datahub_order', '123', datetime.datetime(2019, 1, 1)),
                 (1, 'china', 'datahub_order', '444', datetime.datetime(2019, 2, 1))
             ]
@@ -104,7 +116,7 @@ class TestGetCompanyCountriesOfInterest(TestCase):
 class TestGetCompaniesAffectedByTradeBarrier(TestCase):
 
     def test(self, get_db, query_db):
-        response = self.client.get('get-companies-affected-by-trade-barrier/country/sector')
+        response = self.client.get('/api/get-companies-affected-by-trade-barrier/country/sector')
         self.assertEqual(response.status_code, 200)
 
     def test_creates_a_database_connection(self, get_db, query_db):
@@ -126,7 +138,7 @@ class TestGetCompaniesAffectedByTradeBarrier(TestCase):
         query_db.return_value = rows
         expected = {
             'headers': ['companiesHouseCompanyNumber'],
-            'data': [0, 1]
+            'values': [0, 1]
         }
         response = app.get_companies_affected_by_trade_barrier('country', 'sector')
         self.assertEqual(response, expected)

@@ -116,7 +116,7 @@ where country_of_interest = '{country}'
     rows = query_db(db, sql_query)
     return {
         'headers': ['companiesHouseCompanyNumber'],
-        'data': [r[0] for r in rows]
+        'values': [r[0] for r in rows]
     }
 
 @app.route('/api/get-companies-house-company-numbers')
@@ -134,7 +134,7 @@ order by 1
     rows = query_db(db, sql_query)
     return {
         'headers': ['companiesHouseCompanyNumber'],
-        'data': [r[0] for r in rows]
+        'values': [r[0] for r in rows]
     }
 
 @app.route('/api/get-company-countries-and-sectors-of-interest')
@@ -160,10 +160,10 @@ from {table}
             'countryOfInterest',
             'sectorOfIntereset',
             'source',
-            'sourceID',
+            'sourceId',
             'timestamp'
         ],
-        'data': [tuple(r) for r in rows]
+        'values': [tuple(r) for r in rows]
     }
 
 @app.route('/api/get-company-countries-of-interest')
@@ -189,7 +189,7 @@ from {table}
             'sourceId',
             'timestamp'
         ],
-        'data': [tuple(r) for r in rows]
+        'values': [tuple(r) for r in rows]
     }
 
 @app.route('/api/get-company-export-countries')
@@ -213,10 +213,10 @@ from {table}
             'companiesHouseCompanyNumber',
             'exportCountry',
             'source',
-            'sourceID',
+            'sourceId',
             'timestamp'
         ],
-        'data': [tuple(r) for r in rows]
+        'values': [tuple(r) for r in rows]
     }
 
 @app.route('/api/get-company-sectors-of-interest')
@@ -237,7 +237,7 @@ order by 1, 3, 2
     connection = get_db()
     df = query_database(connection, sql_query)
     web_dict = to_web_dict(df)
-    web_dict['data'] = web_dict['data']
+    # web_dict['data'] = web_dict['data']
     return web_dict
 
 @app.route('/data-report')
@@ -263,7 +263,7 @@ from {table}
     rows = query_db(db, sql_query)
     return {
         'headers': ['datahubCompanyID'],
-        'data': [r[0] for r in rows]
+        'values': [r[0] for r in rows]
     }
 
 @app.route('/api/get-datahub-company-ids-to-companies-house-company-numbers')
@@ -280,7 +280,7 @@ from {table}
     rows = query_db(db, sql_query)
     return {
         'headers': ['datahubCompanyID', 'companiesHouseCompanyNumber'],
-        'data': rows
+        'values': rows
     }
 
 @app.route('/')
@@ -305,7 +305,7 @@ order by 1
     rows = query_db(db, sql_query)
     return {
         'headers': ['sector'],
-        'data': [r[0] for r in rows]
+        'values': [r[0] for r in rows]
     }
 
 @app.route('/api/populate-database')
