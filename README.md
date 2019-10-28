@@ -48,4 +48,13 @@ The countries of interest service is nominally deployed in a Cloud Foundry insta
 ## Testing
 From the project base directory use the command,
 
-``PYTHONPATH=${PYTHONPATH}:`pwd` pytest``
+`python -m unittest`
+
+to run tests for a specific test module, do,
+
+`python -m unittest tests.&lttest_module&gt`
+
+to run tests in a specific directory do,
+
+`python -m unittest discover -s &lttest directory&gt`
+
