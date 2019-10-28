@@ -207,7 +207,7 @@ order by 1, 3, 2
     return web_dict
 
 @app.route('/data-report')
-@hawk_authentication
+@login_required
 def get_data_report():
     return render_template('data_report.html')
 
@@ -250,7 +250,6 @@ from {table}
     }
 
 @app.route('/')
-@hawk_authentication
 @login_required
 def get_index():
     return render_template('index.html')
