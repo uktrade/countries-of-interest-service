@@ -19,7 +19,6 @@ class TestCase(unittest.TestCase):
             db = get_db()
 
     def tearDown(self):
-        print('tear down')
         connection = psycopg2.connect('postgresql://postgres@localhost')
         connection.autocommit = True
         cursor = connection.cursor()

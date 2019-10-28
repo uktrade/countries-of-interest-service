@@ -237,7 +237,6 @@ order by 1, 3, 2
     connection = get_db()
     df = query_database(connection, sql_query)
     web_dict = to_web_dict(df)
-    # web_dict['data'] = web_dict['data']
     return web_dict
 
 @app.route('/data-report')
