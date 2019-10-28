@@ -6,6 +6,7 @@ from utils.utils import to_web_dict
 from utils.sql import query_database
 from authbroker_client import authbroker_blueprint, login_required
 from etl.scheduler import Scheduler
+from authentication import hawk_decorator_factory
 
 import views
 from db import get_db, query_db
@@ -35,7 +36,6 @@ class CustomJSONEncoder(JSONEncoder):
             return super(MyEncoder, self).default(obj)
 
 app = Flask(__name__)
-
 app.config['ABC_BASE_URL'] = config('ABC_BASE_URL', 'https://sso.trade.gov.uk')
 app.config['ABC_CLIENT_ID'] = config('ABC_CLIENT_ID', 'get this from your network admin')
 app.config['ABC_CLIENT_SECRET'] = config('ABC_CLIENT_SECRET', 'get this from your network admin')
@@ -57,46 +57,12 @@ elif app.config['ENV'] == 'test':
 else:
     raise Exception('unrecognised environment')
 
-def lookup_hawk_credentials(user_id):
-    sql = ''' select * from users where user_id='{user_id}' '''.format(user_id=user_id)
-    connection = get_db()
-    try:
-        df = query_database(connection, sql)
-        user_key = df['user_key'].values[0]
-    except Exception as e:
-        raise LookupError()
-    
-    return {
-        'id': user_id,
-        'key': user_key,
-        'algorithm': 'sha256'
-    }
-
-def hawk_required(view, *args, **kwargs):
-    if app.config['HAWK_ENABLED'] == False:
-        return view
-
-    def wrapper(*args, **kwargs):
-        url = request.url
-        method = request.method
-        content = request.data
-        content_type = request.content_type
-        request_header = request.headers['Authorization']
-    
-        receiver = mohawk.Receiver(
-            lookup_hawk_credentials,
-            request_header=request.headers['Authorization'],
-            url=url,
-            method=method,
-            content=content,
-            content_type=content_type
-        )
-        return view(*args, **kwargs)
-    wrapper.__name__ = view.__name__
-    return wrapper
+# decorator for hawk authentication
+# when hawk is disabled the authentication is trivial, effectively all requests are authenticated
+hawk_authentication = hawk_decorator_factory(app.config['HAWK_ENABLED'])
     
 @app.route('/api/get-companies-affected-by-trade-barrier/<country>/<sector>')
-@hawk_required
+@hawk_authentication
 def get_companies_affected_by_trade_barrier(country, sector):
     sql_query = '''
 select
@@ -120,7 +86,7 @@ where country_of_interest = '{country}'
     }
 
 @app.route('/api/get-companies-house-company-numbers')
-@hawk_required
+@hawk_authentication
 def get_companies_house_company_numbers():
     sql_query = '''
 select distinct
@@ -138,7 +104,7 @@ order by 1
     }
 
 @app.route('/api/get-company-countries-and-sectors-of-interest')
-@hawk_required
+@hawk_authentication
 def get_company_countries_and_sectors_of_interest():
     sql_query = '''
 select
@@ -167,6 +133,7 @@ from {table}
     }
 
 @app.route('/api/get-company-countries-of-interest')
+@hawk_authentication
 def get_company_countries_of_interest():
     sql_query = '''
 select
@@ -193,7 +160,7 @@ from {table}
     }
 
 @app.route('/api/get-company-export-countries')
-@hawk_required
+@hawk_authentication
 def get_company_export_countries():
     sql_query = '''
 select
@@ -220,7 +187,7 @@ from {table}
     }
 
 @app.route('/api/get-company-sectors-of-interest')
-@hawk_required
+@hawk_authentication
 def get_company_sectors_of_interest():
     sql_query = '''
 select
@@ -240,17 +207,17 @@ order by 1, 3, 2
     return web_dict
 
 @app.route('/data-report')
-@hawk_required
+@hawk_authentication
 def get_data_report():
     return render_template('data_report.html')
 
 @app.route('/api/get-data-report-data')
-@hawk_required
+@hawk_authentication
 def get_data_report_data():
     return data_report.get_data_report_data()
 
 @app.route('/api/get-datahub-company-ids')
-@hawk_required
+@hawk_authentication
 def get_datahub_company_ids():
     sql_query = '''
 select distinct
@@ -266,7 +233,7 @@ from {table}
     }
 
 @app.route('/api/get-datahub-company-ids-to-companies-house-company-numbers')
-@hawk_required
+@hawk_authentication
 def get_datahub_company_ids_to_companies_house_company_numbers():
     sql_query = '''
 select 
@@ -283,13 +250,13 @@ from {table}
     }
 
 @app.route('/')
-@hawk_required
+@hawk_authentication
 @login_required
 def get_index():
     return render_template('index.html')
 
 @app.route('/api/get-sectors')
-@hawk_required
+@hawk_authentication
 def get_sectors():
     sql_query = '''
 select distinct
@@ -308,7 +275,7 @@ order by 1
     }
 
 @app.route('/api/populate-database')
-@hawk_required
+@hawk_authentication
 def populate_database():
     return etl.views.populate_database()
 
