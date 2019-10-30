@@ -20,14 +20,12 @@ from db import get_db
 from utils import sql as sql_utils
 
 dataworkspace_host = os.environ['DATAWORKSPACE_HOST']
-client_id = os.environ['DATAWORKSPACE_HAWK_CLIENT_ID']
-client_key = os.environ['DATAWORKSPACE_HAWK_CLIENT_KEY']
+dataworkspace_client_id = os.environ['DATAWORKSPACE_HAWK_CLIENT_ID']
+dataworkspace_client_key = os.environ['DATAWORKSPACE_HAWK_CLIENT_KEY']
 algorithm = 'sha256'
-credentials = {
-    'id': client_id,
-    'key': client_key,
-    'algorithm': algorithm
-}
+export_wins_host = os.environ['EXPORT_WINS_HOST']
+export_wins_client_id = os.environ['EXPORT_WINS_HAWK_CLIENT_ID']
+export_wins_client_key = os.environ['EXPORT_WINS_HAWK_CLIENT_KEY']
 
 def extract_datahub_company_dataset():
     endpoint = '/api/v1/datahub-company-dataset'
@@ -35,7 +33,9 @@ def extract_datahub_company_dataset():
     schema = datahub_company_schema
     table_name = datahub_company_table_name
     url = 'http://{}/{}'.format(dataworkspace_host, endpoint)
-    headers = get_hawk_headers(url)
+    client_id = dataworkspace_client_id
+    client_key = dataworkspace_client_key
+    headers = get_hawk_headers(url, client_id, client_key)
     fields = ['company_number', 'id', 'sector']
     # TODO: remove stubbed data
     data = {
@@ -45,7 +45,7 @@ def extract_datahub_company_dataset():
             ['2', 'd0af8e52-ff34-4088-98e3-d2d22cd250ae', 'Food']
         ]
     }
-    return populate_table(url, table_name, schema, primary_key, stubbed_data=data)
+    return populate_table(headers, schema, table_name, url, primary_key, stubbed_data=data)
 
 def extract_datahub_export_countries():
     endpoint = '/api/v1/export-countries-dataset'
@@ -53,7 +53,9 @@ def extract_datahub_export_countries():
     schema = datahub_export_countries_schema
     table_name = datahub_export_countries_table_name
     url = 'http://{}/{}'.format(dataworkspace_host, endpoint)
-    headers = get_hawk_headers(url)
+    client_id = dataworkspace_client_id
+    client_key = dataworkspace_client_key
+    headers = get_hawk_headers(url, client_id, client_key)
     # TODO
     # data = requests.get(url, headers=headers).json()
     data = {
@@ -63,7 +65,7 @@ def extract_datahub_export_countries():
             ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', '2', 'MY']
         ]
     }
-    return populate_table(url, table_name, schema, primary_key, stubbed_data=data)
+    return populate_table(headers, schema, table_name, url, primary_key, stubbed_data=data)
 
     
 def extract_datahub_future_interest_countries():
@@ -72,7 +74,9 @@ def extract_datahub_future_interest_countries():
     schema = datahub_future_interest_countries_schema
     table_name = datahub_future_interest_countries_table_name
     url = 'http://{}/{}'.format(dataworkspace_host, endpoint)
-    headers = get_hawk_headers(url)
+    client_id = dataworkspace_client_id
+    client_key = dataworkspace_client_key
+    headers = get_hawk_headers(url, client_id, client_key)
     # TODO
     # data = requests.get(url, headers=headers).json()
     data = {
@@ -82,7 +86,7 @@ def extract_datahub_future_interest_countries():
             ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', '2', 'DE']
         ]
     }
-    return populate_table(url, table_name, schema, primary_key, stubbed_data=data)
+    return populate_table(headers, schema, table_name, url, primary_key, stubbed_data=data)
     
 
 def extract_datahub_omis_dataset():
@@ -91,7 +95,9 @@ def extract_datahub_omis_dataset():
     schema = omis_schema
     table_name = omis_table_name
     url = 'http://{}/{}'.format(dataworkspace_host, endpoint)
-    headers = get_hawk_headers(url)
+    client_id = dataworkspace_client_id
+    client_key = dataworkspace_client_key
+    headers = get_hawk_headers(url, client_id, client_key)
     # TODO
     # data = requests.get(url, headers=headers).json()
     data = {
@@ -113,7 +119,7 @@ def extract_datahub_omis_dataset():
             ]
         ]
     }
-    return populate_table(url, table_name, schema, primary_key, stubbed_data=data)
+    return populate_table(headers, schema, table_name, url, primary_key, stubbed_data=data)
 
 def extract_datahub_sectors():
     endpoint = '/api/v1/datahub-sectors-dataset'
@@ -121,17 +127,57 @@ def extract_datahub_sectors():
     schema = datahub_sector_schema
     table_name = datahub_sector_table_name
     url = 'http://{}/{}'.format(dataworkspace_host, endpoint)
-    headers = get_hawk_headers(url)
+    client_id = dataworkspace_client_id
+    client_key = dataworkspace_client_key
+    headers = get_hawk_headers(url, client_id, client_key)
     # TODO
     # data = requests.get(url, headers=headers).json()
     data = {
         'headers': ['sector'],
         'values': ['Aerospace', 'Food']
     }
-    return populate_table(url, table_name, schema, primary_key, stubbed_data=data)
+    return populate_table(headers, schema, table_name, url, primary_key, stubbed_data=data)
+
+def extract_export_wins():
+    endpoint = '/api/v1/datahub-sectors-dataset'
+    primary_key = 'id'
+    schema = (
+        'id uuid',
+        'company_id varchar(12)',
+        'country varchar(2)',
+        'timestamp timestamp'
+    )
+    table_name = 'export_wins'
+    url = 'http://{}/{}'.format(export_wins_host, endpoint)
+    client_id = export_wins_client_id
+    client_key = export_wins_client_key
+    headers = get_hawk_headers(url, export_wins_client_id, export_wins_client_key)
+    # TODO, remove stubbed data
+    data = {
+        'headers': ['id', 'companyId', 'timestamp'],
+        'values': [
+            ['23f66b0e-05be-40a5-9bf2-fa44dc7714a8', 'asdf', 'IT', '2019-01-01 1:00'],
+            ['f50d892d-388a-405b-9e30-16b9971ac0d4', 'ffff', 'GO', '2019-01-02 18:00']
+        ]
+    }
+    return populate_table(headers, schema, table_name, url, primary_key, stubbed_data=data)
     
 
-def get_hawk_headers(url, content='', content_type='', credentials=credentials, method='GET'):
+def get_hawk_headers(
+        url,
+        client_id,
+        client_key,
+        content='',
+        content_type='',
+        method='GET'
+):
+
+    credentials = {
+        'id': client_id,
+        'key': client_key,
+        'algorithm': algorithm
+    }
+    
     sender = mohawk.Sender(
         credentials=credentials,
         url=url,
@@ -145,8 +191,7 @@ def get_hawk_headers(url, content='', content_type='', credentials=credentials, 
     }
     return headers
 
-def populate_table(url, table_name, schema, primary_key=None, stubbed_data={}):
-    headers = get_hawk_headers(url)
+def populate_table(headers, schema, table_name, url, primary_key=None, stubbed_data={}):
 
     if len(stubbed_data) > 0:
         data = stubbed_data

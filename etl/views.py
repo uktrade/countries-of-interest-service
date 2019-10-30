@@ -5,6 +5,7 @@ from etl.extraction import (
     extract_datahub_future_interest_countries,
     extract_datahub_export_countries,
     extract_datahub_sectors,
+    extract_export_wins,
 )
 from etl.countries_and_sectors_of_interest import Task as PopulateCountriesAndSectorsOfInterestTask
 from etl.countries_of_interest import Task as PopulateCountriesOfInterestTask
@@ -22,6 +23,7 @@ def populate_database():
     output.append(extract_datahub_future_interest_countries())
     output.append(extract_datahub_export_countries())
     output.append(extract_datahub_sectors())
+    output.append(extract_export_wins())
     output.extend(
         [
             PopulateCountriesAndSectorsOfInterestTask(connection=connection)(),
