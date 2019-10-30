@@ -52,9 +52,9 @@ From the project base directory use the command,
 
 to run tests for a specific test module, do,
 
-`python -m unittest tests.&lttest_module&gt`
+`python -m unittest tests.<test_module>`
 
 to run tests in a specific directory do,
 
-`python -m unittest discover -s &lttest directory&gt`
+`python -m unittest discover -s <test directory>`
 
