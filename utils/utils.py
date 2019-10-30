@@ -4,6 +4,8 @@ def to_camel_case(word):
 def to_web_dict(df):
     headers = [to_camel_case(c) for c in df.columns]
     values = df.values.tolist()
+    if len(headers) == 1:
+        values = [v[0] for v in values]
     return {
         'headers': headers,
         'values': values

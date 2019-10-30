@@ -2,10 +2,14 @@ import datetime, mohawk, numpy as np, os, sqlite3
 from decouple import config
 from flask import current_app, Flask, render_template, request
 from flask.json import JSONEncoder
+from etl.scheduler import Scheduler
 from utils.utils import to_web_dict
 from utils.sql import query_database
 from authbroker_client import authbroker_blueprint, login_required
-from etl.scheduler import Scheduler
+
+import os
+print(os.getcwd())
+
 from authentication import hawk_decorator_factory
 
 import views
@@ -42,7 +46,10 @@ app.config['ABC_CLIENT_SECRET'] = config('ABC_CLIENT_SECRET', 'get this from you
 app.secret_key = config('APP_SECRET_KEY', 'the random string')
 app.register_blueprint(authbroker_blueprint)
 
-app.config['HAWK_ENABLED'] = config('HAWK_ENABLED', app.config['ENV'] == 'production', cast=bool)
+app.config['HAWK_ENABLED'] = config(
+    'HAWK_ENABLED', app.config['ENV'] in ('production', 'test'),
+    cast=bool
+)
 app.json_encoder = CustomJSONEncoder
 cf_port = os.getenv("PORT")
 
@@ -52,7 +59,7 @@ elif app.config['ENV'] in ['dev', 'development']:
     app.config['DATABASE'] = 'postgresql://countries_of_interest_service@localhost'\
         '/countries_of_interest_service'
 elif app.config['ENV'] == 'test':
-    app.config['DATABASE'] = 'postgresql://countries_of_interest_service@localhost'\
+    app.config['DATABASE'] = 'postgresql://test_countries_of_interest_service@localhost'\
         '/test_countries_of_interest_service'
 else:
     raise Exception('unrecognised environment')
@@ -78,12 +85,10 @@ where country_of_interest = '{country}'
     sector=sector,
     table=countries_and_sectors_of_interest_table_name
 )
-    db = get_db()
-    rows = query_db(db, sql_query)
-    return {
-        'headers': ['companiesHouseCompanyNumber'],
-        'values': [r[0] for r in rows]
-    }
+    with get_db() as connection:
+        df = query_database(connection, sql_query)
+    connection.close()
+    return to_web_dict(df)
 
 @app.route('/api/get-companies-house-company-numbers')
 @hawk_authentication

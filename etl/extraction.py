@@ -1,4 +1,4 @@
-import mohawk, os, psycopg2
+import mohawk, os, psycopg2, requests
 from etl.config import (
     datahub_company_primary_key,
     datahub_company_schema,
@@ -192,7 +192,7 @@ def get_hawk_headers(
     return headers
 
 def populate_table(headers, schema, table_name, url, primary_key=None, stubbed_data={}):
-
+    
     if len(stubbed_data) > 0:
         data = stubbed_data
     else:
@@ -226,7 +226,6 @@ def populate_table(headers, schema, table_name, url, primary_key=None, stubbed_d
             table_name,
             ','.join(['%s' for i in range(len(schema))])
         )
-        print('sql:', sql)
         values = data['values'] if len(schema) > 1 else [[d] for d in data['values']]
         result = cursor.executemany(sql, values)
         connection.commit()

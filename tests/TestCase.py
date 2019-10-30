@@ -18,6 +18,7 @@ class TestCase(unittest.TestCase):
         sql = ''' drop database if exists {}; '''.format(self.database_name)
         cursor.execute(sql)
         sql = ''' drop user if exists {}; '''.format(self.user_name)
+        cursor.execute(sql)
         
         try:
             cursor.execute(''' create user {}; '''.format(self.user_name))
@@ -36,14 +37,11 @@ class TestCase(unittest.TestCase):
             raise Exception('failed to setup test')
 
         connection.close()
-        url = 'postgresql://{}@localhost/{}'.format(database_name, user_name)
-        self.connection = psycopg2.connect(url)
-        self.connection.autocommit = True
 
     def tearDown(self):
-        self.connection.close()
+        # self.connection.close()
         connection = psycopg2.connect('postgresql://postgres@localhost')
         connection.autocommit = True
         cursor = connection.cursor()
-        cursor.execute(''' drop database if exists {}; '''.format(self.database_name))
-        cursor.execute( ''' drop user if exists {}; '''.format(self.user_name))
+        cursor.execute('''drop database if exists {};'''.format(self.database_name))
+        cursor.execute('''drop user if exists {};'''.format(self.user_name))
