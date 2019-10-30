@@ -48,13 +48,13 @@ The countries of interest service is nominally deployed in a Cloud Foundry insta
 ## Testing
 From the project base directory use the command,
 
-`python -m unittest`
+`FLASK_ENV=test python -m unittest`
 
 to run tests for a specific test module, do,
 
-`python -m unittest tests.<test_module>`
+`FLASK_ENV=test python -m unittest tests.<test_module>`
 
 to run tests in a specific directory do,
 
-`python -m unittest discover -s <test directory>`
+`FLASK_ENV=test python -m unittest discover -s <test directory>`
 
