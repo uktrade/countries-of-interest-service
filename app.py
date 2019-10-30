@@ -68,7 +68,7 @@ else:
 # when hawk is disabled the authentication is trivial, effectively all requests are authenticated
 hawk_authentication = hawk_decorator_factory(app.config['HAWK_ENABLED'])
     
-@app.route('/api/get-companies-affected-by-trade-barrier/<country>/<sector>')
+@app.route('/api/v1/get-companies-affected-by-trade-barrier/<country>/<sector>')
 @hawk_authentication
 def get_companies_affected_by_trade_barrier(country, sector):
     sql_query = '''
@@ -90,7 +90,7 @@ where country_of_interest = '{country}'
     connection.close()
     return to_web_dict(df)
 
-@app.route('/api/get-companies-house-company-numbers')
+@app.route('/api/v1/get-companies-house-company-numbers')
 @hawk_authentication
 def get_companies_house_company_numbers():
     sql_query = '''
@@ -106,7 +106,7 @@ order by 1
     connection.close()
     return to_web_dict(df)
 
-@app.route('/api/get-company-countries-and-sectors-of-interest')
+@app.route('/api/v1/get-company-countries-and-sectors-of-interest')
 @hawk_authentication
 def get_company_countries_and_sectors_of_interest():
     sql_query = '''
@@ -126,7 +126,7 @@ from {table}
     connection.close()
     return to_web_dict(df)
 
-@app.route('/api/get-company-countries-of-interest')
+@app.route('/api/v1/get-company-countries-of-interest')
 @hawk_authentication
 def get_company_countries_of_interest():
     sql_query = '''
@@ -145,7 +145,7 @@ from {table}
     connection.close()
     return to_web_dict(df)
 
-@app.route('/api/get-company-export-countries')
+@app.route('/api/v1/get-company-export-countries')
 @hawk_authentication
 def get_company_export_countries():
     sql_query = '''
@@ -164,7 +164,7 @@ from {table}
     connection.close()
     return to_web_dict(df)
 
-@app.route('/api/get-company-sectors-of-interest')
+@app.route('/api/v1/get-company-sectors-of-interest')
 @hawk_authentication
 def get_company_sectors_of_interest():
     sql_query = '''
@@ -189,12 +189,12 @@ order by 1, 3, 2
 def get_data_report():
     return render_template('data_report.html')
 
-@app.route('/api/get-data-report-data')
+@app.route('/api/v1/get-data-report-data')
 @hawk_authentication
 def get_data_report_data():
     return data_report.get_data_report_data()
 
-@app.route('/api/get-datahub-company-ids')
+@app.route('/api/v1/get-datahub-company-ids')
 @hawk_authentication
 def get_datahub_company_ids():
     sql_query = '''
@@ -208,7 +208,7 @@ from {table}
     connection.close()
     return to_web_dict(df)
 
-@app.route('/api/get-datahub-company-ids-to-companies-house-company-numbers')
+@app.route('/api/v1/get-datahub-company-ids-to-companies-house-company-numbers')
 @hawk_authentication
 def get_datahub_company_ids_to_companies_house_company_numbers():
     sql_query = '''
@@ -228,7 +228,7 @@ from {table}
 def get_index():
     return render_template('index.html')
 
-@app.route('/api/get-sectors')
+@app.route('/api/v1/get-sectors')
 @hawk_authentication
 def get_sectors():
     sql_query = '''
@@ -245,7 +245,7 @@ order by 1
     connection.close()
     return to_web_dict(df)
 
-@app.route('/api/populate-database')
+@app.route('/api/v1/populate-database')
 @hawk_authentication
 def populate_database():
     return etl.views.populate_database()
