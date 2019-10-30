@@ -19,7 +19,7 @@ class App extends React.Component {
     }
 
     componentDidMount() {
-        axios.get('/api/get-data-report-data')
+        axios.get('/api/v1/get-data-report-data')
             .then(response => response.data)
             .then(data => this.setState({data: data}))
             .then(x => this.drawOrderFrequencyChart());

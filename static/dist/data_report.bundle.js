@@ -63347,7 +63347,7 @@ function (_React$Component) {
     value: function componentDidMount() {
       var _this2 = this;
 
-      axios__WEBPACK_IMPORTED_MODULE_1___default.a.get('/api/get-data-report-data').then(function (response) {
+      axios__WEBPACK_IMPORTED_MODULE_1___default.a.get('/api/v1/get-data-report-data').then(function (response) {
         return response.data;
       }).then(function (data) {
         return _this2.setState({
