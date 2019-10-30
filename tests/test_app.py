@@ -19,15 +19,15 @@ class TestCaseHawkAuthenticated(TestCase):
         to_web_dict.return_value = {'headers': ['header1', 'header2'], 'values': [[1, 2], [3, 4]]}
         hawk_authenticate.side_effect = Exception('asdf')
         urls = [
-            '/api/get-companies-affected-by-trade-barrier/country/sector',
-            '/api/get-companies-house-company-numbers',
-            '/api/get-company-countries-and-sectors-of-interest',
-            '/api/get-company-countries-of-interest',
-            '/api/get-company-export-countries',
-            '/api/get-company-sectors-of-interest',
-            '/api/get-datahub-company-ids',
-            '/api/get-datahub-company-ids-to-companies-house-company-numbers',
-            '/api/get-sectors',
+            '/api/v1/get-companies-affected-by-trade-barrier/country/sector',
+            '/api/v1/get-companies-house-company-numbers',
+            '/api/v1/get-company-countries-and-sectors-of-interest',
+            '/api/v1/get-company-countries-of-interest',
+            '/api/v1/get-company-export-countries',
+            '/api/v1/get-company-sectors-of-interest',
+            '/api/v1/get-datahub-company-ids',
+            '/api/v1/get-datahub-company-ids-to-companies-house-company-numbers',
+            '/api/v1/get-sectors',
         ]
         for url in urls:
             response =  self.client.get(url)
@@ -40,7 +40,7 @@ class TestGetCompanyExportCountries(TestCase):
     def test(self, hawk_authenticate):
         schema = export_countries.table_fields
         table_name = export_countries.table_name
-        url = '/api/get-company-export-countries'
+        url = '/api/v1/get-company-export-countries'
         values = [
             ['asdf', 'CN', 'omis', '123', '2019-01-01T00:00:00'],
             ['asdf33', 'US', 'omis', '345', '2019-01-02T00:00:00'],
@@ -73,7 +73,7 @@ class TestGetCompanyCountriesOfInterest(TestCase):
     def test(self, hawk_authenticate):
         schema = countries_of_interest.table_fields
         table_name = countries_of_interest.table_name
-        url = '/api/get-company-countries-of-interest'
+        url = '/api/v1/get-company-countries-of-interest'
         values = [
             ['asdf', 'CN', 'omis', '123', '2019-01-01T00:00:00'],
             ['asdf33', 'US', 'omis', '345', '2019-01-02T00:00:00'],
@@ -106,7 +106,7 @@ class TestGetCompaniesAffectedByTradeBarrier(TestCase):
     def test(self, hawk_authenticate):
         schema = countries_and_sectors_of_interest.table_fields
         table_name = countries_and_sectors_of_interest.table_name
-        url = '/api/get-companies-affected-by-trade-barrier/CN/Aerospace'
+        url = '/api/v1/get-companies-affected-by-trade-barrier/CN/Aerospace'
         values = [
             ('asdf', 'CN', 'Aerospace', 'omis', '123', '2019-01-01'),
             ('asdf33', 'US', 'Food', 'omis', '345', '2019-01-02'),
