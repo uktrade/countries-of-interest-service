@@ -3,7 +3,11 @@ import datetime, psycopg2, os, tempfile, unittest
 from db import get_db
 from unittest.mock import Mock, patch
 from tests.TestCase import TestCase
-from etl import countries_and_sectors_of_interest
+from etl import (
+    countries_and_sectors_of_interest,
+    countries_of_interest,
+    export_countries,
+)
 
 
 class TestCaseHawkAuthenticated(TestCase):
@@ -29,95 +33,71 @@ class TestCaseHawkAuthenticated(TestCase):
             response =  self.client.get(url)
             self.assertEqual(response.status_code, 401)
 
-        
-@patch('app.query_db')
-@patch('app.get_db')
+
 @patch('authentication.hawk_authenticate')
 class TestGetCompanyExportCountries(TestCase):
 
-    def __init__(self, *args, **kwargs):
-        self.example_url = '/api/get-company-export-countries'
-        super().__init__(*args, **kwargs)
-
-    def test(self, hawk_authenticate, get_db, query_db):
-        response =  self.client.get('/api/get-company-export-countries')
-        self.assertEqual(response.status_code, 200)
-
-    def test_creates_a_database_connection(self, hawk_authenticate, get_db, query_db):
-        response = app.get_company_export_countries()
-        get_db.assert_called_once_with()
-
-    def test_queries_the_database(self, hawk_authenticate, get_db, query_db):
-        db = Mock()
-        get_db.return_value = db
-        response = app.get_company_export_countries()
-        calls = query_db.call_args_list
-        self.assertEqual(len(calls), 1)
-        positional_args = calls[0][0]
-        expected_db = positional_args[0]
-        self.assertEqual(db, expected_db)
-
-    def test_converts_to_a_dictionary(self, hawk_authenticate, get_db, query_db):
-        rows = [(0, 'germany'), (1, 'china')]
-        query_db.return_value = rows
+    def test(self, hawk_authenticate):
+        schema = export_countries.table_fields
+        table_name = export_countries.table_name
+        url = '/api/get-company-export-countries'
+        values = [
+            ['asdf', 'CN', 'omis', '123', '2019-01-01T00:00:00'],
+            ['asdf33', 'US', 'omis', '345', '2019-01-02T00:00:00'],
+        ]
+        with app.app.app_context():
+            connection = get_db()
+            connection.autocommit = True
+            cursor = connection.cursor()
+        sql = ''' create table {} {} '''.format(table_name, schema)
+        cursor.execute(sql)
+        sql = ''' insert into {} values (%s, %s, %s, %s, %s) '''.format(table_name)
+        cursor.executemany(sql, values)
+        response = self.client.get(url)
         expected = {
             'headers': [
                 'companiesHouseCompanyNumber',
                 'exportCountry',
                 'source',
                 'sourceId',
-                'timestamp'
+                'timestamp',
             ],
-            'values': [(0, 'germany'), (1, 'china')]
+            'values': values
         }
-        response = app.get_company_export_countries()
-        self.assertEqual(response, expected)
-        
+        self.assertEqual(response.json, expected)        
 
-@patch('app.query_db')
-@patch('app.get_db')
+        
 @patch('authentication.hawk_authenticate')
 class TestGetCompanyCountriesOfInterest(TestCase):
 
-    def test(self, hawk_authenticate, get_db, query_db):
-        response = self.client.get('/api/get-company-countries-of-interest')
-        self.assertEqual(response.status_code, 200)
-
-    def test_creates_a_database_connection(self, hawk_authenticate, get_db, query_db):
-        response = app.get_company_countries_of_interest()
-        get_db.assert_called_once_with()
-        
-    def test_queries_the_database(self, hawk_authenticate, get_db, query_db):
-        db = Mock()
-        get_db.return_value = db
-        response = app.get_company_countries_of_interest()
-        calls = query_db.call_args_list
-        self.assertEqual(len(calls), 1)
-        positional_args = calls[0][0]
-        expected_db = positional_args[0]
-        self.assertEqual(db, expected_db)
-
-    def test_converts_to_a_dictionary(self, hawk_authenticate, get_db, query_db):
-        rows = [
-            (0, 'germany', 'datahub_order', '123', datetime.datetime(2019, 1, 1)),
-            (1, 'china', 'datahub_order', '444', datetime.datetime(2019, 2, 1))
+    def test(self, hawk_authenticate):
+        schema = countries_of_interest.table_fields
+        table_name = countries_of_interest.table_name
+        url = '/api/get-company-countries-of-interest'
+        values = [
+            ['asdf', 'CN', 'omis', '123', '2019-01-01T00:00:00'],
+            ['asdf33', 'US', 'omis', '345', '2019-01-02T00:00:00'],
         ]
-        query_db.return_value = rows
+        with app.app.app_context():
+            connection = get_db()
+            connection.autocommit = True
+            cursor = connection.cursor()
+        sql = ''' create table {} {} '''.format(table_name, schema)
+        cursor.execute(sql)
+        sql = ''' insert into {} values (%s, %s, %s, %s, %s) '''.format(table_name)
+        cursor.executemany(sql, values)
+        response = self.client.get(url)
         expected = {
             'headers': [
                 'companiesHouseCompanyNumber',
                 'countryOfInterest',
                 'source',
                 'sourceId',
-                'timestamp'
+                'timestamp',
             ],
-            'values': [
-                (0, 'germany', 'datahub_order', '123', datetime.datetime(2019, 1, 1)),
-                (1, 'china', 'datahub_order', '444', datetime.datetime(2019, 2, 1))
-            ]
+            'values': values
         }
-        response = app.get_company_countries_of_interest()
-        self.assertEqual(response, expected)
+        self.assertEqual(response.json, expected)
 
 
 @patch('authentication.hawk_authenticate')

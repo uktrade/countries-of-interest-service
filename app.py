@@ -13,7 +13,7 @@ print(os.getcwd())
 from authentication import hawk_decorator_factory
 
 import views
-from db import get_db, query_db
+from db import get_db
 import etl.views
 import data_report
 from etl.config import (
@@ -101,12 +101,10 @@ from {table}
 
 order by 1
 '''.format(table=datahub_company_id_to_companies_house_company_number_table_name)
-    db = get_db()
-    rows = query_db(db, sql_query)
-    return {
-        'headers': ['companiesHouseCompanyNumber'],
-        'values': [r[0] for r in rows]
-    }
+    with get_db() as connection:
+        df = query_database(connection, sql_query)
+    connection.close()
+    return to_web_dict(df)
 
 @app.route('/api/get-company-countries-and-sectors-of-interest')
 @hawk_authentication
@@ -123,19 +121,10 @@ select
 from {table}
 
 '''.format(table=countries_and_sectors_of_interest_table_name)
-    db = get_db()
-    rows = query_db(db, sql_query)
-    return {
-        'headers': [
-            'companiesHouseCompanyNumber',
-            'countryOfInterest',
-            'sectorOfIntereset',
-            'source',
-            'sourceId',
-            'timestamp'
-        ],
-        'values': [tuple(r) for r in rows]
-    }
+    with get_db() as connection:
+        df = query_database(connection, sql_query)
+    connection.close()
+    return to_web_dict(df)
 
 @app.route('/api/get-company-countries-of-interest')
 @hawk_authentication
@@ -151,18 +140,10 @@ select
 from {table}
 
 '''.format(table=countries_of_interest_table_name)
-    db = get_db()
-    rows = query_db(db, sql_query)
-    return {
-        'headers': [
-            'companiesHouseCompanyNumber',
-            'countryOfInterest',
-            'source',
-            'sourceId',
-            'timestamp'
-        ],
-        'values': [tuple(r) for r in rows]
-    }
+    with get_db() as connection:
+        df = query_database(connection, sql_query)
+    connection.close()
+    return to_web_dict(df)
 
 @app.route('/api/get-company-export-countries')
 @hawk_authentication
@@ -178,18 +159,10 @@ select
 from {table}
 
 '''.format(table=export_countries_table_name)
-    db = get_db()
-    rows = query_db(db, sql_query)
-    return {
-        'headers': [
-            'companiesHouseCompanyNumber',
-            'exportCountry',
-            'source',
-            'sourceId',
-            'timestamp'
-        ],
-        'values': [tuple(r) for r in rows]
-    }
+    with get_db() as connection:
+        df = query_database(connection, sql_query)
+    connection.close()
+    return to_web_dict(df)
 
 @app.route('/api/get-company-sectors-of-interest')
 @hawk_authentication
@@ -206,10 +179,10 @@ from {table}
 
 order by 1, 3, 2
 '''.format(table=sectors_of_interest_table_name)
-    connection = get_db()
-    df = query_database(connection, sql_query)
-    web_dict = to_web_dict(df)
-    return web_dict
+    with get_db() as connection:
+        df = query_database(connection, sql_query)
+    connection.close()
+    return to_web_dict(df)
 
 @app.route('/data-report')
 @login_required
@@ -230,12 +203,10 @@ select distinct
 
 from {table}
 '''.format(table=datahub_company_id_to_companies_house_company_number_table_name)
-    db = get_db()
-    rows = query_db(db, sql_query)
-    return {
-        'headers': ['datahubCompanyID'],
-        'values': [r[0] for r in rows]
-    }
+    with get_db() as connection:
+        df = query_database(connection, sql_query)
+    connection.close()
+    return to_web_dict(df)
 
 @app.route('/api/get-datahub-company-ids-to-companies-house-company-numbers')
 @hawk_authentication
@@ -247,12 +218,10 @@ select
 
 from {table}
 '''.format(table=datahub_company_id_to_companies_house_company_number_table_name)
-    db = get_db()
-    rows = query_db(db, sql_query)
-    return {
-        'headers': ['datahubCompanyID', 'companiesHouseCompanyNumber'],
-        'values': rows
-    }
+    with get_db() as connection:
+        df = query_database(connection, sql_query)
+    connection.close()
+    return to_web_dict(df)
 
 @app.route('/')
 @login_required
@@ -271,12 +240,10 @@ from {table}
 order by 1
 
 '''.format(table=datahub_sector_table_name)
-    db = get_db()
-    rows = query_db(db, sql_query)
-    return {
-        'headers': ['sector'],
-        'values': [r[0] for r in rows]
-    }
+    with get_db() as connection:
+        df = query_database(connection, sql_query)
+    connection.close()
+    return to_web_dict(df)
 
 @app.route('/api/populate-database')
 @hawk_authentication

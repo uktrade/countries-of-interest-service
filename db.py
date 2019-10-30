@@ -12,9 +12,3 @@ def get_db():
     if 'db' not in g:
         g.db = psycopg2.connect(current_app.config['DATABASE'])
     return g.db
-
-def query_db(db, query):
-    cursor = db.cursor()
-    cursor.execute(query)
-    rows = cursor.fetchall()
-    return rows
