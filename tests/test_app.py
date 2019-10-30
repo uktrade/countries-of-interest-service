@@ -2,36 +2,7 @@ import app
 import datetime, psycopg2, os, tempfile, unittest
 from db import get_db
 from unittest.mock import Mock, patch
-
-
-class TestCase(unittest.TestCase):
-
-    def setUp(self):
-        self.config = app.app.config
-        self.client = app.app.test_client()
-        connection = psycopg2.connect('postgresql://postgres@localhost')
-        connection.autocommit = True
-        cursor = connection.cursor()
-        try:
-            cursor.execute(''' create database test_countries_of_interest_service; ''')
-            cursor.execute(''' create user test_countries_of_interest_service; ''')
-            cursor.execute(''' grant all privileges on database ''' \
-                           ''' test_countries_of_interest_service ''' \
-                           ''' to test_countries_of_interest_service; '''
-            )
-        except:
-            cursor.execute(''' drop database test_countries_of_interest_service; ''')
-            cursor.execute(''' drop user test_countries_of_interest_service; ''')
-            
-        with app.app.app_context():
-            db = get_db()
-
-    def tearDown(self):
-        connection = psycopg2.connect('postgresql://postgres@localhost')
-        connection.autocommit = True
-        cursor = connection.cursor()
-        cursor.execute(''' drop database test_countries_of_interest_service; ''')
-        cursor.execute( ''' drop user test_countries_of_interest_service; ''')
+from tests.utils import TestCase
 
 
 class TestCaseHawkAuthenticated(TestCase):
@@ -143,11 +114,6 @@ class TestGetCompanyCountriesOfInterest(TestCase):
         }
         response = app.get_company_countries_of_interest()
         self.assertEqual(response, expected)
-
-    def test_unauthenticated_hawk_request(self, hawk_authenticate, get_db, query_db):
-        hawk_authenticate.side_effect = Exception('asdf')
-        response =  self.client.get('/api/get-company-countries-of-interest')
-        self.assertEqual(response.status_code, 401)
 
         
 @patch('app.query_db')
