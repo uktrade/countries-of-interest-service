@@ -16,14 +16,6 @@ import views
 from db import get_db
 import etl.views
 import data_report
-from etl.config import (
-    countries_and_sectors_of_interest_table_name,
-    countries_of_interest_table_name,
-    datahub_company_id_to_companies_house_company_number_table_name,
-    datahub_sector_table_name,
-    export_countries_table_name,
-    sectors_of_interest_table_name,
-)
 
 class CustomJSONEncoder(JSONEncoder):
     
@@ -73,9 +65,9 @@ hawk_authentication = hawk_decorator_factory(app.config['HAWK_ENABLED'])
 def get_companies_affected_by_trade_barrier(country, sector):
     sql_query = '''
 select
-  companies_house_company_number
+  company_id
   
-from {table}
+from coi_countries_and_sectors_of_interest
 
 where country_of_interest = '{country}'
   and sector_of_interest = '{sector}'
@@ -83,7 +75,6 @@ where country_of_interest = '{country}'
 '''.format(
     country=country,
     sector=sector,
-    table=countries_and_sectors_of_interest_table_name
 )
     with get_db() as connection:
         df = query_database(connection, sql_query)
@@ -97,10 +88,10 @@ def get_companies_house_company_numbers():
 select distinct
   companies_house_company_number
 
-from {table}
+from coi_datahub_company_id_to_companies_house_company_number
 
 order by 1
-'''.format(table=datahub_company_id_to_companies_house_company_number_table_name)
+'''
     with get_db() as connection:
         df = query_database(connection, sql_query)
     connection.close()
@@ -111,16 +102,16 @@ order by 1
 def get_company_countries_and_sectors_of_interest():
     sql_query = '''
 select
-  companies_house_company_number,
+  company_id,
   country_of_interest,
   sector_of_interest,
   source,
   source_id,
   timestamp
 
-from {table}
+from coi_countries_and_sectors_of_interest
 
-'''.format(table=countries_and_sectors_of_interest_table_name)
+'''
     with get_db() as connection:
         df = query_database(connection, sql_query)
     connection.close()
@@ -131,15 +122,15 @@ from {table}
 def get_company_countries_of_interest():
     sql_query = '''
 select
-  companies_house_company_number,
+  company_id,
   country_of_interest,
   source,
   source_id,
   timestamp
 
-from {table}
+from coi_countries_of_interest
 
-'''.format(table=countries_of_interest_table_name)
+'''
     with get_db() as connection:
         df = query_database(connection, sql_query)
     connection.close()
@@ -150,15 +141,15 @@ from {table}
 def get_company_export_countries():
     sql_query = '''
 select
-  companies_house_company_number,
+  company_id,
   export_country,
   source,
   source_id,
   timestamp
 
-from {table}
+from coi_export_countries
 
-'''.format(table=export_countries_table_name)
+'''
     with get_db() as connection:
         df = query_database(connection, sql_query)
     connection.close()
@@ -169,16 +160,16 @@ from {table}
 def get_company_sectors_of_interest():
     sql_query = '''
 select
-  companies_house_company_number,
+  company_id,
   sector_of_interest,
   source,
   source_id,
   timestamp
 
-from {table}
+from coi_sectors_of_interest
 
 order by 1, 3, 2
-'''.format(table=sectors_of_interest_table_name)
+'''
     with get_db() as connection:
         df = query_database(connection, sql_query)
     connection.close()
@@ -201,8 +192,8 @@ def get_datahub_company_ids():
 select distinct
   datahub_company_id
 
-from {table}
-'''.format(table=datahub_company_id_to_companies_house_company_number_table_name)
+from coi_datahub_company_id_to_companies_house_company_number
+'''
     with get_db() as connection:
         df = query_database(connection, sql_query)
     connection.close()
@@ -216,8 +207,8 @@ select
   datahub_company_id,
   companies_house_company_number
 
-from {table}
-'''.format(table=datahub_company_id_to_companies_house_company_number_table_name)
+from coi_datahub_company_id_to_companies_house_company_number
+'''
     with get_db() as connection:
         df = query_database(connection, sql_query)
     connection.close()
@@ -235,11 +226,11 @@ def get_sectors():
 select distinct
   sector
 
-from {table}
+from datahub_sector
 
 order by 1
 
-'''.format(table=datahub_sector_table_name)
+'''
     with get_db() as connection:
         df = query_database(connection, sql_query)
     connection.close()

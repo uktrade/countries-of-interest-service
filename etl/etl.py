@@ -19,6 +19,7 @@ def insert_data(df, output_connection, table_name):
         sql += '\n\t({})'.format(', '.join(values))
         sql += ', ' if i != len(df) - 1 else ''
     sql += '\n\ton conflict do nothing'
+    print('sql:', sql)
     execute_query(output_connection, sql)
     
 class ETLTask:

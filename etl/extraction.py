@@ -1,21 +1,4 @@
 import mohawk, os, psycopg2, requests
-from etl.config import (
-    datahub_company_primary_key,
-    datahub_company_schema,
-    datahub_company_table_name,
-    datahub_export_countries_primary_key,
-    datahub_export_countries_schema,
-    datahub_export_countries_table_name,
-    datahub_future_interest_countries_primary_key,
-    datahub_future_interest_countries_schema,
-    datahub_future_interest_countries_table_name,
-    datahub_sector_primary_key,
-    datahub_sector_schema,
-    datahub_sector_table_name,
-    omis_primary_key,
-    omis_schema,
-    omis_table_name,
-)
 from db import get_db
 from utils import sql as sql_utils
 
@@ -29,29 +12,28 @@ export_wins_client_key = os.environ['EXPORT_WINS_HAWK_CLIENT_KEY']
 
 def extract_datahub_company_dataset():
     endpoint = '/api/v1/datahub-company-dataset'
-    primary_key = datahub_company_primary_key
-    schema = datahub_company_schema
-    table_name = datahub_company_table_name
+    table_name = 'datahub_company'
+    schema = ('id uuid', 'company_number varchar(50)', 'sector varchar(50)')
+    primary_key = 'id'
     url = 'http://{}/{}'.format(dataworkspace_host, endpoint)
     client_id = dataworkspace_client_id
     client_key = dataworkspace_client_key
     headers = get_hawk_headers(url, client_id, client_key)
-    fields = ['company_number', 'id', 'sector']
     # TODO: remove stubbed data
     data = {
-        'headers': ['company_number', 'id', 'sector'],
+        'headers': ['id', 'companyNumber', 'sector'],
         'values': [
-            ['1', 'c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'Aerospace'],
-            ['2', 'd0af8e52-ff34-4088-98e3-d2d22cd250ae', 'Food']
+            ['c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'asdf', 'Food'],
+            ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'asdf2', 'Aerospace'],
         ]
     }
     return populate_table(headers, schema, table_name, url, primary_key, stubbed_data=data)
 
 def extract_datahub_export_countries():
     endpoint = '/api/v1/export-countries-dataset'
-    primary_key = datahub_export_countries_primary_key
-    schema = datahub_export_countries_schema
-    table_name = datahub_export_countries_table_name
+    primary_key = 'id'
+    schema = ('company_id uuid', 'country varchar(2)', 'id int', )
+    table_name = 'datahub_export_countries'
     url = 'http://{}/{}'.format(dataworkspace_host, endpoint)
     client_id = dataworkspace_client_id
     client_key = dataworkspace_client_key
@@ -59,10 +41,10 @@ def extract_datahub_export_countries():
     # TODO
     # data = requests.get(url, headers=headers).json()
     data = {
-        'headers': ['company_id', 'id', 'country'],
+        'headers': ['company_id', 'country', 'id', ],
         'values': [
-            ['c31e4492-1f16-48a2-8c5e-8c0334d959a3', '3', 'US'],
-            ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', '2', 'MY']
+            ['c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'US', 1],
+            ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'MY', 2]
         ]
     }
     return populate_table(headers, schema, table_name, url, primary_key, stubbed_data=data)
@@ -70,9 +52,13 @@ def extract_datahub_export_countries():
     
 def extract_datahub_future_interest_countries():
     endpoint = '/api/v1/future-interest-countries-dataset'
-    primary_key = datahub_future_interest_countries_primary_key
-    schema = datahub_future_interest_countries_schema
-    table_name = datahub_future_interest_countries_table_name
+    primary_key = 'id'
+    schema = (
+        'company_id uuid',
+        'country varchar(2)',
+        'id int',
+    )
+    table_name = 'datahub_future_interest_countries'
     url = 'http://{}/{}'.format(dataworkspace_host, endpoint)
     client_id = dataworkspace_client_id
     client_key = dataworkspace_client_key
@@ -80,10 +66,10 @@ def extract_datahub_future_interest_countries():
     # TODO
     # data = requests.get(url, headers=headers).json()
     data = {
-        'headers': ['company_id', 'id', 'country'],
+        'headers': ['companyId', 'country', 'id', ],
         'values': [
-            ['c31e4492-1f16-48a2-8c5e-8c0334d959a3', '1', 'CN'],
-            ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', '2', 'DE']
+            ['c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'CN', 1],
+            ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'DE', 2]
         ]
     }
     return populate_table(headers, schema, table_name, url, primary_key, stubbed_data=data)
@@ -91,9 +77,15 @@ def extract_datahub_future_interest_countries():
 
 def extract_datahub_omis_dataset():
     endpoint = '/api/v1/omis-dataset'
-    primary_key = omis_primary_key
-    schema = omis_schema
-    table_name = omis_table_name
+    primary_key = 'id'
+    schema = (
+        'company_id uuid',
+        'country varchar(2)',
+        'created_on timestamp',
+        'id uuid',
+        'sector varchar(200)',
+    )
+    table_name = 'omis'
     url = 'http://{}/{}'.format(dataworkspace_host, endpoint)
     client_id = dataworkspace_client_id
     client_key = dataworkspace_client_key
@@ -101,7 +93,7 @@ def extract_datahub_omis_dataset():
     # TODO
     # data = requests.get(url, headers=headers).json()
     data = {
-        'headers': ['company_id', 'country', 'created_on', 'id', 'sector'],
+        'headers': ['companyId', 'country', 'createdOn', 'id', 'sector'],
         'values': [
             [
                 'c31e4492-1f16-48a2-8c5e-8c0334d959a3',
@@ -123,9 +115,9 @@ def extract_datahub_omis_dataset():
 
 def extract_datahub_sectors():
     endpoint = '/api/v1/datahub-sectors-dataset'
-    primary_key = datahub_sector_primary_key
-    schema = datahub_sector_schema
-    table_name = datahub_sector_table_name
+    primary_key = 'id'
+    schema = ('id uuid', 'sector varchar(200)',)
+    table_name = 'datahub_sector'
     url = 'http://{}/{}'.format(dataworkspace_host, endpoint)
     client_id = dataworkspace_client_id
     client_key = dataworkspace_client_key
@@ -133,8 +125,11 @@ def extract_datahub_sectors():
     # TODO
     # data = requests.get(url, headers=headers).json()
     data = {
-        'headers': ['sector'],
-        'values': ['Aerospace', 'Food']
+        'headers': ['id', 'sector'],
+        'values': [
+            ['c3467472-3a97-4359-91f4-f860597e1837', 'Aerospace'],
+            ['698d0cc3-ce8e-453b-b3c4-99818c5a9070', 'Food'],
+        ]
     }
     return populate_table(headers, schema, table_name, url, primary_key, stubbed_data=data)
 

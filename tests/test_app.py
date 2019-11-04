@@ -33,17 +33,16 @@ class TestCaseHawkAuthenticated(TestCase):
             response =  self.client.get(url)
             self.assertEqual(response.status_code, 401)
 
-
 @patch('authentication.hawk_authenticate')
-class TestGetCompanyExportCountries(TestCase):
+class TestGetCompaniesAffectedByTradeBarrier(TestCase):
 
     def test(self, hawk_authenticate):
-        schema = export_countries.table_fields
-        table_name = export_countries.table_name
-        url = '/api/v1/get-company-export-countries'
+        schema = countries_and_sectors_of_interest.table_fields
+        table_name = countries_and_sectors_of_interest.table_name
+        url = '/api/v1/get-companies-affected-by-trade-barrier/CN/Aerospace'
         values = [
-            ['asdf', 'CN', 'omis', '123', '2019-01-01T00:00:00'],
-            ['asdf33', 'US', 'omis', '345', '2019-01-02T00:00:00'],
+            ('asdf', 'CN', 'Aerospace', 'omis', '123', '2019-01-01'),
+            ('asdf33', 'US', 'Food', 'omis', '345', '2019-01-02'),
         ]
         with app.app.app_context():
             connection = get_db()
@@ -51,20 +50,62 @@ class TestGetCompanyExportCountries(TestCase):
             cursor = connection.cursor()
         sql = ''' create table {} {} '''.format(table_name, schema)
         cursor.execute(sql)
-        sql = ''' insert into {} values (%s, %s, %s, %s, %s) '''.format(table_name)
+        sql = ''' insert into {} values (%s, %s, %s, %s, %s, %s) '''.format(table_name)
+        cursor.executemany(sql, values)
+        response = self.client.get(url)
+        
+        expected = {
+            'headers': ['companyId'],
+            'values': ['asdf']
+        }
+        self.assertEqual(response.json, expected)
+        
+@patch('authentication.hawk_authenticate')
+class TestGetCompanyCountriesAndSectorsOfInterest(TestCase):
+
+    def test(self, hawk_authenticate):
+        schema = countries_and_sectors_of_interest.table_fields
+        table_name = countries_and_sectors_of_interest.table_name
+        url = '/api/v1/get-company-countries-and-sectors-of-interest'
+        values = [
+            [
+                '9baf4ac5-6654-411d-8671-3e7118f5b49f',
+                'CN',
+                'Aerospace',
+                'omis',
+                '123',
+                '2019-01-01T00:00:00'
+            ],
+            [
+                'a8d7c4dc-9092-4f2d-8d5a-8a69da9d948c',
+                'US',
+                'Food',
+                'omis',
+                '345',
+                '2019-01-02T00:00:00'
+            ],
+        ]
+        with app.app.app_context():
+            connection = get_db()
+            connection.autocommit = True
+            cursor = connection.cursor()
+        sql = ''' create table {} {} '''.format(table_name, schema)
+        cursor.execute(sql)
+        sql = ''' insert into {} values (%s, %s, %s, %s, %s, %s) '''.format(table_name)
         cursor.executemany(sql, values)
         response = self.client.get(url)
         expected = {
             'headers': [
-                'companiesHouseCompanyNumber',
-                'exportCountry',
+                'companyId',
+                'countryOfInterest',
+                'sectorOfInterest',
                 'source',
                 'sourceId',
                 'timestamp',
             ],
             'values': values
         }
-        self.assertEqual(response.json, expected)        
+        self.assertEqual(response.json, expected)
 
         
 @patch('authentication.hawk_authenticate')
@@ -89,7 +130,7 @@ class TestGetCompanyCountriesOfInterest(TestCase):
         response = self.client.get(url)
         expected = {
             'headers': [
-                'companiesHouseCompanyNumber',
+                'companyId',
                 'countryOfInterest',
                 'source',
                 'sourceId',
@@ -101,15 +142,15 @@ class TestGetCompanyCountriesOfInterest(TestCase):
 
 
 @patch('authentication.hawk_authenticate')
-class TestGetCompaniesAffectedByTradeBarrier(TestCase):
+class TestGetCompanyExportCountries(TestCase):
 
     def test(self, hawk_authenticate):
-        schema = countries_and_sectors_of_interest.table_fields
-        table_name = countries_and_sectors_of_interest.table_name
-        url = '/api/v1/get-companies-affected-by-trade-barrier/CN/Aerospace'
+        schema = export_countries.table_fields
+        table_name = export_countries.table_name
+        url = '/api/v1/get-company-export-countries'
         values = [
-            ('asdf', 'CN', 'Aerospace', 'omis', '123', '2019-01-01'),
-            ('asdf33', 'US', 'Food', 'omis', '345', '2019-01-02'),
+            ['asdf', 'CN', 'omis', '123', '2019-01-01T00:00:00'],
+            ['asdf33', 'US', 'omis', '345', '2019-01-02T00:00:00'],
         ]
         with app.app.app_context():
             connection = get_db()
@@ -117,11 +158,19 @@ class TestGetCompaniesAffectedByTradeBarrier(TestCase):
             cursor = connection.cursor()
         sql = ''' create table {} {} '''.format(table_name, schema)
         cursor.execute(sql)
-        sql = ''' insert into {} values (%s, %s, %s, %s, %s, %s) '''.format(table_name)
+        sql = ''' insert into {} values (%s, %s, %s, %s, %s) '''.format(table_name)
         cursor.executemany(sql, values)
         response = self.client.get(url)
         expected = {
-            'headers': ['companiesHouseCompanyNumber'],
-            'values': ['asdf']
+            'headers': [
+                'companyId',
+                'exportCountry',
+                'source',
+                'sourceId',
+                'timestamp',
+            ],
+            'values': values
         }
-        self.assertEqual(response.json, expected)
+        self.assertEqual(response.json, expected)        
+
+
