@@ -1,3 +1,4 @@
+from flask import request
 from db import get_db
 from etl.extraction import (
     extract_datahub_company_dataset,
@@ -16,6 +17,7 @@ from etl.sectors_of_interest import Task as SectorsOfInterestTask
 
 
 def populate_database():
+    drop_table = 'drop-table' in request.args
     connection = get_db()
     output = []
     output.append(extract_datahub_company_dataset())
@@ -26,11 +28,17 @@ def populate_database():
     output.append(extract_export_wins())
     output.extend(
         [
-            PopulateCountriesAndSectorsOfInterestTask(connection=connection)(),
-            PopulateCountriesOfInterestTask(connection=connection)(),
-            DatahubCompanyIDToCompaniesHouseCompanyNumberTask(connection=connection)(),
-            ExportCountriesTask(connection=connection)(),
-            SectorsOfInterestTask(connection=connection)(),
+            PopulateCountriesAndSectorsOfInterestTask(
+                connection=connection,
+                drop_table=drop_table
+            )(),
+            PopulateCountriesOfInterestTask(connection=connection, drop_table=drop_table)(),
+            DatahubCompanyIDToCompaniesHouseCompanyNumberTask(
+                connection=connection,
+                drop_table=drop_table
+            )(),
+            ExportCountriesTask(connection=connection, drop_table=drop_table)(),
+            SectorsOfInterestTask(connection=connection, drop_table=drop_table)(),
         ]
     )
     return {'output': output}

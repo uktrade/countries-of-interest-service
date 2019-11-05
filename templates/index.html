@@ -15,17 +15,6 @@
       <div class="api-description">
 	<h3>
 	  <code>
-	    /api/v1/get-companies-affected-by-trade-barrier/&ltcountry&gt/&ltsector&gt
-	  </code>
-	</h3>
-	<p>Returns a list of companies which are affected by a specified country and sector. Countries are specified using the ISO Alpha-2 codes which can be found <a href="https://www.iso.org/obp/ui/#search/code/">here</a> and sector segments can be found <a href="/api/v1/get-sectors">here</a>.</p>
-	
-	<p>e.g. <a href="/api/v1/get-companies-affected-by-trade-barrier/AF/Advanced%20Engineering">/api/v1/get-companies-affected-by-trade-barrier/AF/Advanced%20Engineering</a></p>
-      </div>
-
-      <div class="api-description">
-	<h3>
-	  <code>
 	    /api/v1/get-companies-house-company-numbers
 	  </code>
 	</h3>
@@ -41,8 +30,15 @@
 	    /api/v1/get-company-countries-and-sectors-of-interest
 	  </code>
 	</h3>
-	<p>Returns a list of company - country and sector of interest relationships for companies stored in Datahub. These companies have expressed interest in the country-sector combination.</p>
-	<p>.e.g <a href="/api/v1/get-company-countries-and-sectors-of-interest">/api/v1/get-company-countries-sectors-of-interest</a></p>
+	<p>Returns a list of company - country and sector of interest relationships for companies stored in Datahub. These companies have expressed interest in the country-sector combination. You can use the <code>country</code>, <code>sector</code> and <code>source</code> arguments to filter on country, sector and data source.</p>
+	<p>e.g.</p>
+	<ul>
+	  <li><a href="/api/v1/get-company-countries-and-sectors-of-interest">/api/v1/get-company-countries-sectors-of-interest</a></li>
+	  <li><a href="/api/v1/get-company-countries-and-sectors-of-interest?country=CN">/api/v1/get-company-countries-sectors-of-interest?country=CN</a></li>
+	  <li><a href="/api/v1/get-company-countries-and-sectors-of-interest?sector=Aerospace">/api/v1/get-company-countries-sectors-of-interest?sector=Aerospace</a></li>
+	  <li><a href="/api/v1/get-company-countries-and-sectors-of-interest?source=omis">/api/v1/get-company-countries-sectors-of-interest?source=omis</a></li>
+	  <li><a href="/api/v1/get-company-countries-and-sectors-of-interest?country=CN&sector=Aerospace">/api/v1/get-company-countries-sectors-of-interest?country=CN&ampsector=Aerospace</a></li>
+	</ul>
       </div>
 
       <div class="api-description">
@@ -52,7 +48,13 @@
 	  </code>
 	</h3>
 	<p>Returns a list of company - country of interest relationships for companies stored in Datahub.</p>
-	<p>.e.g <a href="/api/v1/get-company-countries-of-interest">/api/v1/get-company-countries-of-interest</a></p>
+	<p>e.g.</p>
+	<ul>
+	  <li><a href="/api/v1/get-company-countries-of-interest">/api/v1/get-company-countries-of-interest</a></li>
+	  <li><a href="/api/v1/get-company-countries-of-interest?country=CN">/api/v1/get-company-countries-of-interest?country=CN</a></li>
+	  <li><a href="/api/v1/get-company-countries-of-interest?source=omis">/api/v1/get-company-countries-of-interest?source=omis</a></li>
+	  <li><a href="/api/v1/get-company-countries-of-interest?country=CN&source=omis">/api/v1/get-company-countries-of-interest?country=CN&ampsource=omis</a></li>
+	</ul>
       </div>
 
       <div class="api-description">
@@ -62,7 +64,13 @@
 	  </code>
 	</h3>
 	<p>Returns a list of company-country export relationships for companies stored in Datahub.</p>
-	<p>.e.g <a href="/api/v1/get-company-export-countries">/api/v1/get-company-export-countries</a></p>
+	<p>e.g.</p>
+	<ul>
+	  <li><a href="/api/v1/get-company-export-countries">/api/v1/get-company-export-countries</a></li>
+	  <li><a href="/api/v1/get-company-export-countries?country=US">/api/v1/get-company-export-countries?country=CN</a></li>
+	  <li><a href="/api/v1/get-company-export-countries?source=datahub_export_countries">/api/v1/get-company-export-countries?source=datahub_export_countries</a></li>
+	  <li><a href="/api/v1/get-company-export-countries?country=MY&source=datahub_export_countries">/api/v1/get-company-export-countries?country=MY&ampsource=datahub_export_countries</a></li>
+	</ul>
       </div>
 
       <div class="api-description">
@@ -72,7 +80,13 @@
 	  </code>
 	</h3>
 	<p>Returns a list of company-sector of interest relationships.</p>
-	<p>.e.g <a href="/api/v1/get-company-sectors-of-interest">/api/v1/get-company-sectors-of-interest</a></p>
+	<p>e.g.</p>
+	<ul>
+	  <li><a href="/api/v1/get-company-sectors-of-interest">/api/v1/get-company-sectors-of-interest</a></li>
+	  <li><a href="/api/v1/get-company-sectors-of-interest?sector=Food">/api/v1/get-company-sectors-of-interest?sector=Food</a></li>
+	  <li><a href="/api/v1/get-company-sectors-of-interest?source=omis">/api/v1/get-company-sectors-of-interest?source=omis</a></li>
+	  <li><a href="/api/v1/get-company-sectors-of-interest?sector=Aerospace&source=omis">/api/v1/get-company-sectors-of-interest?sector=Aerospace&ampsource=omis</a></li>
+	</ul>
       </div>
 
       <div class="api-description">

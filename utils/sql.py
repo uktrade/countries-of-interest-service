@@ -6,11 +6,11 @@ def drop_table(connection, table_name, if_exists=True):
     cursor.execute(sql)
     connection.commit()
 
-def execute_query(connection, sql, commit=True):
+def execute_query(connection, sql, commit=True, values=[]):
     if connection.get_transaction_status() == psycopg2.extensions.TRANSACTION_STATUS_INERROR:
         connection.reset()
     cursor = connection.cursor()
-    cursor.execute(sql)
+    cursor.execute(sql, values)
     if commit is True:
         connection.commit()
     return cursor
@@ -24,8 +24,8 @@ def peek_at_table(connection, table, n_rows=10, schema='public'):
     df = query_database(connection, sql)
     return df
 
-def query_database(connection, sql):
-    cursor = execute_query(connection, sql, commit=False)
+def query_database(connection, sql, values=[]):
+    cursor = execute_query(connection, sql, commit=False, values=values)
     rows = cursor.fetchall()
     columns = [d[0] for d in cursor.description]
     df = pd.DataFrame(rows, columns=columns)

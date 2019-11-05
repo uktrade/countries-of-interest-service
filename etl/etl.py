@@ -11,7 +11,7 @@ def drop_table(connection, table_name):
 
 def insert_data(df, output_connection, table_name):
     sql = '''insert into {} values'''.format(table_name)
-    for i, values in enumerate(df.get_values()):
+    for i, values in enumerate(df.values):
         # quote string values
         values = ["'{}'".format(val) if type(val) in [str, pd.Timestamp] else val  for val in values]
         values = ['Null' if pd.isnull(val) else val for val in values]
@@ -19,7 +19,6 @@ def insert_data(df, output_connection, table_name):
         sql += '\n\t({})'.format(', '.join(values))
         sql += ', ' if i != len(df) - 1 else ''
     sql += '\n\ton conflict do nothing'
-    print('sql:', sql)
     execute_query(output_connection, sql)
     
 class ETLTask:
@@ -43,25 +42,25 @@ class ETLTask:
             print('\033[31mdropping table: {}\033[0m'.format(self.table_name))
             drop_table(self.connection, self.table_name)
 
-        print('\033[31mcreate table: {}\033[0m'.format(self.table_name))
+        # print('\033[31mcreate table: {}\033[0m'.format(self.table_name))
         create_table(self.connection, self.table_fields, self.table_name)
 
-        print('\033[31mextract data\033[0m')
+        # print('\033[31mextract data\033[0m')
         df = query_database(self.connection, self.sql)
-        print(df.head())
+        # print(df.head())
 
-        print('\033[31mingest data\033[0m')
+        # print('\033[31mingest data\033[0m')
         insert_data(df, self.connection, self.table_name)
 
-        print('\033[31mcheck data\033[0m')
+        # print('\033[31mcheck data\033[0m')
         sql = ''' select * from {} limit 5 '''.format(self.table_name)
         df = query_database(self.connection, sql)
-        print(df.head())
+        # print(df.head())
 
-        print('\033[31mcheck data size\033[0m')
+        # print('\033[31mcheck data size\033[0m')
         sql = ''' select count(1) from {} '''.format(self.table_name)
         df = query_database(self.connection, sql)
-        print('{} rows'.format(df.values[0][0]))
+        # print('{} rows'.format(df.values[0][0]))
 
         return {
             'status': 'success',

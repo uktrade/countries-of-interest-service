@@ -8,7 +8,6 @@ from utils.sql import query_database
 from authbroker_client import authbroker_blueprint, login_required
 
 import os
-print(os.getcwd())
 
 from authentication import hawk_decorator_factory
 
@@ -55,32 +54,12 @@ elif app.config['ENV'] == 'test':
         '/test_countries_of_interest_service'
 else:
     raise Exception('unrecognised environment')
+app.config['PAGINATION_SIZE'] = config('PAGINATION_SIZE', 1, cast=int)
 
 # decorator for hawk authentication
 # when hawk is disabled the authentication is trivial, effectively all requests are authenticated
 hawk_authentication = hawk_decorator_factory(app.config['HAWK_ENABLED'])
     
-@app.route('/api/v1/get-companies-affected-by-trade-barrier/<country>/<sector>')
-@hawk_authentication
-def get_companies_affected_by_trade_barrier(country, sector):
-    sql_query = '''
-select
-  company_id
-  
-from coi_countries_and_sectors_of_interest
-
-where country_of_interest = '{country}'
-  and sector_of_interest = '{sector}'
-
-'''.format(
-    country=country,
-    sector=sector,
-)
-    with get_db() as connection:
-        df = query_database(connection, sql_query)
-    connection.close()
-    return to_web_dict(df)
-
 @app.route('/api/v1/get-companies-house-company-numbers')
 @hawk_authentication
 def get_companies_house_company_numbers():
@@ -100,6 +79,42 @@ order by 1
 @app.route('/api/v1/get-company-countries-and-sectors-of-interest')
 @hawk_authentication
 def get_company_countries_and_sectors_of_interest():
+    pagination_size = app.config['PAGINATION_SIZE']
+    next_source = request.args.get('next-source')
+    next_source_id = request.args.get('next-source-id')
+    countries = request.args.getlist('country')
+    sectors = request.args.getlist('sector')
+    sources = request.args.getlist('source')
+
+    where = ''
+    values = countries + sectors + sources
+    if len(countries) == 1:
+        where = 'where country_of_interest=%s'
+    elif len(countries) > 1:
+        where = 'where country_of_interest in (' + ','.join(
+            '%s' for i in range(len(countries))
+        ) + ')'
+    if len(sectors) == 1:
+        where = where + ' and' if where != '' else 'where'
+        where = where + ' sector_of_interest=%s'
+    elif len(sectors) > 1:
+        where = where + ' and' if where != '' else 'where'
+        where = where + ' sector_of_interest in (' + ','.join(
+            ['%s' for i in range(len(sectors))]
+        ) + ')'
+    if len(sources) == 1:
+        where = where + ' and' if where != '' else 'where'
+        where = where + ' source=%s'
+    elif len(sources) > 1:
+        where = where + ' and' if where != '' else 'where'
+        where = where + ' source in (' + ','.join(
+            ['%s' for i in range(len(sectors))]
+        ) + ')'
+    if (next_source is not None and next_source_id is not None):
+        where = where + ' and' if where != '' else 'where'
+        where = where + ' (source, source_id) >= (%s, %s)'
+        values = values + [next_source, next_source_id]
+
     sql_query = '''
 select
   company_id,
@@ -111,15 +126,62 @@ select
 
 from coi_countries_and_sectors_of_interest
 
-'''
+{where}
+
+order by (source, source_id)
+
+limit {pagination_size} + 1
+
+'''.format(where=where, pagination_size=pagination_size)
     with get_db() as connection:
-        df = query_database(connection, sql_query)
+        df = query_database(connection, sql_query, values)
     connection.close()
-    return to_web_dict(df)
+    if len(df) == pagination_size + 1:
+        next_ = '{}{}?'.format(request.host_url[:-1], request.path)
+        next_ += '&'.join(['country={}'.format(country) for country in countries])
+        next_ += '&'.join(['source={}'.format(source) for source in sources])
+        next_ += '&' if next_[-1] != '?' else ''
+        next_ += 'next-source={}&next-source-id={}'.format(
+            df['source'].values[-1],
+            df['source_id'].values[-1],
+        )
+        df = df[:-1]
+    else:
+        next_ = None
+    web_dict = to_web_dict(df)
+    web_dict['next'] = next_
+    return web_dict
 
 @app.route('/api/v1/get-company-countries-of-interest')
 @hawk_authentication
 def get_company_countries_of_interest():
+    pagination_size = app.config['PAGINATION_SIZE']
+    next_source = request.args.get('next-source')
+    next_source_id = request.args.get('next-source-id')
+    countries = request.args.getlist('country')
+    sources = request.args.getlist('source')
+
+    values = countries + sources
+    where = ''
+    if len(countries) == 1:
+        where = 'where country_of_interest=%s'
+    elif len(countries) > 1:
+        where = 'where country_of_interest in (' + ','.join(
+            '%s' for i in range(len(countries))
+        ) + ')'
+    if len(sources) == 1:
+        where = where + ' and' if where != '' else 'where'
+        where = where + ' source=%s'
+    elif len(sources) > 1:
+        where = where + ' and' if where != '' else 'where'
+        where = where + ' source in (' + ','.join(
+            ['%s' for i in range(len(sectors))]
+        ) + ')'
+    if (next_source is not None and next_source_id is not None):
+        where = where + ' and' if where != '' else 'where'
+        where = where + ' (source, source_id) >= (%s, %s)'
+        values = values + [next_source, next_source_id]
+    
     sql_query = '''
 select
   company_id,
@@ -130,15 +192,64 @@ select
 
 from coi_countries_of_interest
 
-'''
+{where}
+
+order by (source, source_id)
+
+limit {pagination_size} + 1
+
+'''.format(pagination_size=pagination_size, where=where)
     with get_db() as connection:
-        df = query_database(connection, sql_query)
+        df = query_database(connection, sql_query, values)
     connection.close()
-    return to_web_dict(df)
+    if len(df) == pagination_size + 1:
+        next_ = '{}{}'.format(request.host_url[:-1], request.path)
+        next_ += '?'
+        next_ += '&'.join(['country={}'.format(country) for country in countries])
+        next_ += '&'.join(['source={}'.format(source) for source in sources])
+        next_ += '&' if next_[-1] != '?' else ''
+        next_ += 'next-source={}&next-source-id={}'.format(
+            df['source'].values[-1],
+            df['source_id'].values[-1],
+        )
+        df = df[:-1]
+    else:
+        next_ = None
+    web_dict = to_web_dict(df)
+    web_dict['next'] = next_
+    return web_dict
+
 
 @app.route('/api/v1/get-company-export-countries')
 @hawk_authentication
 def get_company_export_countries():
+    pagination_size = app.config['PAGINATION_SIZE']
+    next_source = request.args.get('next-source')
+    next_source_id = request.args.get('next-source-id')
+    countries = request.args.getlist('country')
+    sources = request.args.getlist('source')
+
+    values = countries + sources
+    where = ''
+    if len(countries) == 1:
+        where = 'where export_country=%s'
+    elif len(countries) > 1:
+        where = 'where export_country in (' + ','.join(
+            '%s' for i in range(len(countries))
+        ) + ')'
+    if len(sources) == 1:
+        where = where + ' and' if where != '' else 'where'
+        where = where + ' source=%s'
+    elif len(sources) > 1:
+        where = where + ' and' if where != '' else 'where'
+        where = where + ' source in (' + ','.join(
+            ['%s' for i in range(len(sectors))]
+        ) + ')'
+    if (next_source is not None and next_source_id is not None):
+        where = where + ' and' if where != '' else 'where'
+        where = where + ' (source, source_id) >= (%s, %s)'
+        values = values + [next_source, next_source_id]
+
     sql_query = '''
 select
   company_id,
@@ -149,15 +260,63 @@ select
 
 from coi_export_countries
 
-'''
+{where}
+
+order by (source, source_id)
+
+limit {pagination_size} + 1
+
+'''.format(where=where, pagination_size=pagination_size)
     with get_db() as connection:
-        df = query_database(connection, sql_query)
+        df = query_database(connection, sql_query, values)
     connection.close()
-    return to_web_dict(df)
+    if len(df) == pagination_size + 1:
+        next_ = '{}{}'.format(request.host_url[:-1], request.path)
+        next_ += '?'
+        next_ += '&'.join(['country={}'.format(country) for country in countries])
+        next_ += '&'.join(['source={}'.format(source) for source in sources])
+        next_ += '&' if next_[-1] != '?' else ''
+        next_ += 'next-source={}&next-source-id={}'.format(
+            df['source'].values[-1],
+            df['source_id'].values[-1],
+        )
+        df = df[:-1]
+    else:
+        next_ = None
+    web_dict = to_web_dict(df)
+    web_dict['next'] = next_
+    return web_dict
 
 @app.route('/api/v1/get-company-sectors-of-interest')
 @hawk_authentication
 def get_company_sectors_of_interest():
+    pagination_size = app.config['PAGINATION_SIZE']
+    next_source = request.args.get('next-source')
+    next_source_id = request.args.get('next-source-id')
+    sectors = request.args.getlist('sector')
+    sources = request.args.getlist('source')
+
+    values = sectors + sources
+    where = ''
+    if len(sectors) == 1:
+        where = 'where sector_of_interest=%s'
+    elif len(sectors) > 1:
+        where = 'where sector_of_interest in (' + ','.join(
+            '%s' for i in range(len(countries))
+        ) + ')'
+    if len(sources) == 1:
+        where = where + ' and' if where != '' else 'where'
+        where = where + ' source=%s'
+    elif len(sources) > 1:
+        where = where + ' and' if where != '' else 'where'
+        where = where + ' source in (' + ','.join(
+            ['%s' for i in range(len(sectors))]
+        ) + ')'
+    if (next_source is not None and next_source_id is not None):
+        where = where + ' and' if where != '' else 'where'
+        where = where + ' (source, source_id) >= (%s, %s)'
+        values = values + [next_source, next_source_id]
+    
     sql_query = '''
 select
   company_id,
@@ -168,12 +327,33 @@ select
 
 from coi_sectors_of_interest
 
-order by 1, 3, 2
-'''
+{where}
+
+order by (source, source_id)
+
+limit {pagination_size} + 1
+
+'''.format(where=where, pagination_size=pagination_size)
     with get_db() as connection:
-        df = query_database(connection, sql_query)
+        df = query_database(connection, sql_query, values)
     connection.close()
-    return to_web_dict(df)
+
+    if len(df) == pagination_size + 1:
+        next_ = '{}{}'.format(request.host_url[:-1], request.path)
+        next_ += '?'
+        next_ += '&'.join(['sector={}'.format(sector) for sector in sectors])
+        next_ += '&'.join(['source={}'.format(source) for source in sources])
+        next_ += '&' if next_[-1] != '?' else ''
+        next_ += 'next-source={}&next-source-id={}'.format(
+            df['source'].values[-1],
+            df['source_id'].values[-1],
+        )
+        df = df[:-1]
+    else:
+        next_ = None
+    web_dict = to_web_dict(df)
+    web_dict['next'] = next_
+    return web_dict
 
 @app.route('/data-report')
 @login_required
