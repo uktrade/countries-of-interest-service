@@ -54,7 +54,7 @@ elif app.config['ENV'] == 'test':
         '/test_countries_of_interest_service'
 else:
     raise Exception('unrecognised environment')
-app.config['PAGINATION_SIZE'] = config('PAGINATION_SIZE', 1, cast=int)
+app.config['PAGINATION_SIZE'] = config('PAGINATION_SIZE', 50, cast=int)
 
 # decorator for hawk authentication
 # when hawk is disabled the authentication is trivial, effectively all requests are authenticated
