@@ -29,10 +29,12 @@ class ETLTask:
             sql,
             table_fields,
             table_name,
-            drop_table=False
+            drop_table=False,
+            index=None,
     ):
         self.connection = connection
         self.drop_table = drop_table
+        self.index = index
         self.sql = sql
         self.table_fields = table_fields
         self.table_name = table_name
@@ -52,9 +54,12 @@ class ETLTask:
         # print('\033[31mingest data\033[0m')
         insert_data(df, self.connection, self.table_name)
 
+        if self.index != None:
+            create_index(self.connection, self.table_name, self.index)
+        
         # print('\033[31mcheck data\033[0m')
-        sql = ''' select * from {} limit 5 '''.format(self.table_name)
-        df = query_database(self.connection, sql)
+        # sql = ''' select * from {} limit 5 '''.format(self.table_name)
+        # df = query_database(self.connection, sql)
         # print(df.head())
 
         # print('\033[31mcheck data size\033[0m')

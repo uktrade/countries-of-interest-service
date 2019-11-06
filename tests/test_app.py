@@ -19,7 +19,6 @@ class TestCaseHawkAuthenticated(TestCase):
         to_web_dict.return_value = {'headers': ['header1', 'header2'], 'values': [[1, 2], [3, 4]]}
         hawk_authenticate.side_effect = Exception('asdf')
         urls = [
-            '/api/v1/get-companies-affected-by-trade-barrier/country/sector',
             '/api/v1/get-companies-house-company-numbers',
             '/api/v1/get-company-countries-and-sectors-of-interest',
             '/api/v1/get-company-countries-of-interest',
@@ -31,35 +30,9 @@ class TestCaseHawkAuthenticated(TestCase):
         ]
         for url in urls:
             response =  self.client.get(url)
-            self.assertEqual(response.status_code, 401)
+            self.assertEqual(response.status_code, 401, url)
 
-@patch('authentication.hawk_authenticate')
-class TestGetCompaniesAffectedByTradeBarrier(TestCase):
 
-    def test(self, hawk_authenticate):
-        schema = countries_and_sectors_of_interest.table_fields
-        table_name = countries_and_sectors_of_interest.table_name
-        url = '/api/v1/get-companies-affected-by-trade-barrier/CN/Aerospace'
-        values = [
-            ('asdf', 'CN', 'Aerospace', 'omis', '123', '2019-01-01'),
-            ('asdf33', 'US', 'Food', 'omis', '345', '2019-01-02'),
-        ]
-        with app.app.app_context():
-            connection = get_db()
-            connection.autocommit = True
-            cursor = connection.cursor()
-        sql = ''' create table {} {} '''.format(table_name, schema)
-        cursor.execute(sql)
-        sql = ''' insert into {} values (%s, %s, %s, %s, %s, %s) '''.format(table_name)
-        cursor.executemany(sql, values)
-        response = self.client.get(url)
-        
-        expected = {
-            'headers': ['companyId'],
-            'values': ['asdf']
-        }
-        self.assertEqual(response.json, expected)
-        
 @patch('authentication.hawk_authenticate')
 class TestGetCompanyCountriesAndSectorsOfInterest(TestCase):
 
@@ -103,6 +76,7 @@ class TestGetCompanyCountriesAndSectorsOfInterest(TestCase):
                 'sourceId',
                 'timestamp',
             ],
+            'next': None,
             'values': values
         }
         self.assertEqual(response.json, expected)
@@ -136,6 +110,7 @@ class TestGetCompanyCountriesOfInterest(TestCase):
                 'sourceId',
                 'timestamp',
             ],
+            'next': None,
             'values': values
         }
         self.assertEqual(response.json, expected)
@@ -169,6 +144,7 @@ class TestGetCompanyExportCountries(TestCase):
                 'sourceId',
                 'timestamp',
             ],
+            'next': None,
             'values': values
         }
         self.assertEqual(response.json, expected)        
