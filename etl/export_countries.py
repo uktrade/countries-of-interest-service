@@ -1,6 +1,7 @@
 from config import data_sources
 from etl.etl import ETLTask
 
+
 sql = '''
 select 
   company_id,

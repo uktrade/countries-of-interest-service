@@ -1,16 +1,18 @@
 from config import data_sources
 from etl.etl import ETLTask
 
+index = ('source', 'source_id')
+
 sql = '''
 select
   company_id,
   country,
-  l.sector,
+  sector,
   '{}' as source,
-  l.id as source_id,
-  l.created_on as timestamp
+  id as source_id,
+  created_on as timestamp
 
-from omis l
+from omis
 
 order by 1
 
