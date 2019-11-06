@@ -1,6 +1,10 @@
 import pandas as pd
 from utils.sql import execute_query, query_database
 
+
+def create_index(connection, index, table_name):
+    return
+    
 def create_table(connection, fields, table_name):
     sql = ''' create table if not exists {} {} '''.format(table_name, fields)
     execute_query(connection, sql)
@@ -55,7 +59,7 @@ class ETLTask:
         insert_data(df, self.connection, self.table_name)
 
         if self.index != None:
-            create_index(self.connection, self.table_name, self.index)
+            create_index(self.connection, self.index, self.table_name)
         
         # print('\033[31mcheck data\033[0m')
         # sql = ''' select * from {} limit 5 '''.format(self.table_name)

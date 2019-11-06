@@ -2,6 +2,17 @@ import psycopg2, unittest
 import app
 from db import get_db
 
+def kill_connections(cursor, database_name):
+    sql = '''
+select pg_terminate_backend(pid) 
+
+from pg_stat_activity 
+
+where pid<> pg_backend_pid() 
+    and datname = %s;
+'''
+    cursor.execute(sql, [database_name])
+    
 
 class TestCase(unittest.TestCase):
 
@@ -35,13 +46,14 @@ class TestCase(unittest.TestCase):
             cursor.execute(''' drop database {}; '''.format(self.database_name))
             cursor.execute(''' drop user {}; '''.format(self.user_name))
             raise Exception('failed to setup test')
-
-        connection.close()
+        finally:
+            connection.close()
 
     def tearDown(self):
-        # self.connection.close()
-        connection = psycopg2.connect('postgresql://postgres@localhost')
-        connection.autocommit = True
-        cursor = connection.cursor()
-        cursor.execute('''drop database if exists {};'''.format(self.database_name))
-        cursor.execute('''drop user if exists {};'''.format(self.user_name))
+
+        with psycopg2.connect('postgresql://postgres@localhost') as connection:
+            connection.autocommit = True
+            with connection.cursor() as cursor:
+                kill_connections(cursor, self.database_name)
+                cursor.execute('''drop database if exists {};'''.format(self.database_name))
+                cursor.execute('''drop user if exists {};'''.format(self.user_name))

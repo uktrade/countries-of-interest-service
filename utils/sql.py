@@ -1,9 +1,9 @@
 import pandas as pd, psycopg2
 
 def drop_table(connection, table_name, if_exists=True):
-    cursor = connection.cursor()
-    sql = '''drop table {} {}'''.format('if exists' if if_exists else '', table_name)
-    cursor.execute(sql)
+    with connection.cursor() as cursor:
+        sql = '''drop table {} {}'''.format('if exists' if if_exists else '', table_name)
+        cursor.execute(sql)
     connection.commit()
 
 def execute_query(connection, sql, commit=True, values=[]):
@@ -32,16 +32,14 @@ def query_database(connection, sql, values=[]):
     return df
 
 def rename_table(connection, table_name_1, table_name_2):
-    cursor = connection.cursor()
     sql = '''alter table {} rename to {}'''.format(table_name_1, table_name_2)
-    cursor.execute(sql)
+    with connection.cursor() as cursor:
+        cursor.execute(sql)
     connection.commit()
 
 def table_exists(connection, table_name, schema='public'):
-    cursor = connection.cursor()
-    table_name = table_name
     sql = '''select * from information_schema.tables where table_schema=%s and table_name=%s'''
-    cursor.execute(sql, [schema, table_name])
+    with connection.cursor() as cursor:
+        cursor.execute(sql, [schema, table_name])
     rows = cursor.fetchall()
     return len(rows) > 0
-    
