@@ -2,8 +2,12 @@ import pandas as pd
 from utils.sql import execute_query, query_database
 
 
-def create_index(connection, index, table_name):
-    return
+def create_index(connection, index, table_name, index_name=None):
+    index_name = index_name if index_name else '{}_index'.format(table_name)
+    sql = '''create index {} on {} {}'''
+    index_str = '(' + ','.join(index) + ')'
+    sql = sql.format(index_name, table_name, index_str)
+    execute_query(connection, sql, index)
     
 def create_table(connection, fields, table_name):
     sql = ''' create table if not exists {} {} '''.format(table_name, fields)

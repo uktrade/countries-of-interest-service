@@ -41,5 +41,5 @@ def table_exists(connection, table_name, schema='public'):
     sql = '''select * from information_schema.tables where table_schema=%s and table_name=%s'''
     with connection.cursor() as cursor:
         cursor.execute(sql, [schema, table_name])
-    rows = cursor.fetchall()
+        rows = cursor.fetchall()
     return len(rows) > 0
