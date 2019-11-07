@@ -1,6 +1,8 @@
 from config import data_sources
 from etl.etl import ETLTask
 
+index = ('company_id',)
+
 sql = '''
 with omis_sectors_of_interest as (
     select
@@ -35,6 +37,7 @@ class Task(ETLTask):
 
     def __init__(self, sql=sql, table_fields=table_fields, table_name=table_name, *args, **kwargs):
         super().__init__(
+            index=index,
             sql=sql,
             table_fields=table_fields,
             table_name=table_name,

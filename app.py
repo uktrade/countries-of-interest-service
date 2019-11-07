@@ -82,12 +82,13 @@ def get_company_countries_and_sectors_of_interest():
     pagination_size = app.config['PAGINATION_SIZE']
     next_source = request.args.get('next-source')
     next_source_id = request.args.get('next-source-id')
+    company_ids = request.args.getlist('company-id')
     countries = request.args.getlist('country')
     sectors = request.args.getlist('sector')
     sources = request.args.getlist('source')
 
     where = ''
-    values = countries + sectors + sources
+    values = countries + sectors + sources + company_ids
     if len(countries) == 1:
         where = 'where country_of_interest=%s'
     elif len(countries) > 1:
@@ -101,6 +102,14 @@ def get_company_countries_and_sectors_of_interest():
         where = where + ' and' if where != '' else 'where'
         where = where + ' sector_of_interest in (' + ','.join(
             ['%s' for i in range(len(sectors))]
+        ) + ')'
+    if len(company_ids) == 1:
+        where = where + ' and' if where != '' else 'where'
+        where = where + ' company_id=%s'
+    elif len(company_ids) > 1:
+        where = where + ' and' if where != '' else 'where'
+        where = where + ' company_id in (' + ','.join(
+            ['%s' for i in range(len(company_ids))]
         ) + ')'
     if len(sources) == 1:
         where = where + ' and' if where != '' else 'where'
@@ -158,16 +167,25 @@ def get_company_countries_of_interest():
     pagination_size = app.config['PAGINATION_SIZE']
     next_source = request.args.get('next-source')
     next_source_id = request.args.get('next-source-id')
+    company_ids = request.args.getlist('company-id')
     countries = request.args.getlist('country')
     sources = request.args.getlist('source')
 
-    values = countries + sources
+    values = countries + sources + company_ids
     where = ''
     if len(countries) == 1:
         where = 'where country_of_interest=%s'
     elif len(countries) > 1:
         where = 'where country_of_interest in (' + ','.join(
             '%s' for i in range(len(countries))
+        ) + ')'
+    if len(company_ids) == 1:
+        where = where + ' and' if where != '' else 'where'
+        where = where + ' company_id=%s'
+    elif len(company_ids) > 1:
+        where = where + ' and' if where != '' else 'where'
+        where = where + ' company_id in (' + ','.join(
+            ['%s' for i in range(len(company_ids))]
         ) + ')'
     if len(sources) == 1:
         where = where + ' and' if where != '' else 'where'
@@ -226,16 +244,25 @@ def get_company_export_countries():
     pagination_size = app.config['PAGINATION_SIZE']
     next_source = request.args.get('next-source')
     next_source_id = request.args.get('next-source-id')
+    company_ids = request.args.getlist('company-id')
     countries = request.args.getlist('country')
     sources = request.args.getlist('source')
 
-    values = countries + sources
+    values = countries + sources + company_ids
     where = ''
     if len(countries) == 1:
         where = 'where export_country=%s'
     elif len(countries) > 1:
         where = 'where export_country in (' + ','.join(
             '%s' for i in range(len(countries))
+        ) + ')'
+    if len(company_ids) == 1:
+        where = where + ' and' if where != '' else 'where'
+        where = where + ' company_id=%s'
+    elif len(company_ids) > 1:
+        where = where + ' and' if where != '' else 'where'
+        where = where + ' company_id in (' + ','.join(
+            ['%s' for i in range(len(company_ids))]
         ) + ')'
     if len(sources) == 1:
         where = where + ' and' if where != '' else 'where'
@@ -293,16 +320,25 @@ def get_company_sectors_of_interest():
     pagination_size = app.config['PAGINATION_SIZE']
     next_source = request.args.get('next-source')
     next_source_id = request.args.get('next-source-id')
+    company_ids = request.args.getlist('company-id')
     sectors = request.args.getlist('sector')
     sources = request.args.getlist('source')
 
-    values = sectors + sources
+    values = sectors + sources + company_ids
     where = ''
     if len(sectors) == 1:
         where = 'where sector_of_interest=%s'
     elif len(sectors) > 1:
         where = 'where sector_of_interest in (' + ','.join(
             '%s' for i in range(len(countries))
+        ) + ')'
+    if len(company_ids) == 1:
+        where = where + ' and' if where != '' else 'where'
+        where = where + ' company_id=%s'
+    elif len(company_ids) > 1:
+        where = where + ' and' if where != '' else 'where'
+        where = where + ' company_id in (' + ','.join(
+            ['%s' for i in range(len(company_ids))]
         ) + ')'
     if len(sources) == 1:
         where = where + ' and' if where != '' else 'where'

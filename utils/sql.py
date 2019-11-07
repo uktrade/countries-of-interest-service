@@ -7,6 +7,7 @@ def drop_table(connection, table_name, if_exists=True):
     connection.commit()
 
 def execute_query(connection, sql, commit=True, values=[]):
+    assert commit in [True, False]
     if connection.get_transaction_status() == psycopg2.extensions.TRANSACTION_STATUS_INERROR:
         connection.reset()
     cursor = connection.cursor()
