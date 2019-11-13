@@ -65,6 +65,7 @@ def response_orientation_decorator(view, *args, **kwargs):
         orientation = request.args.get('orientation', 'tabular')
         print('orientation:', orientation)
         return view(orientation, *args, **kwargs)
+    wrapper.__name__ = view.__name__
     return wrapper
 
 @app.route('/api/v1/get-companies-house-company-numbers')
