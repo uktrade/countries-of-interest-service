@@ -1,7 +1,18 @@
 def to_camel_case(word):
     return word.split('_')[0] + ''.join(x.capitalize() or '_' for x in word.split('_')[1:])
 
-def to_web_dict(df):
+def to_web_dict(df, orient='records'):
+    if orient == 'records':
+        return to_records_web_dict(df)
+    elif orient == 'tabular':
+        return to_tabular_web_dict(df)
+    else:
+        raise Exception('unrecognised orient: {}'.format(orient))
+
+def to_records_web_dict(df):
+    return {'results': df.to_dict(orient='records')}
+
+def to_tabular_web_dict(df):
     headers = [to_camel_case(c) for c in df.columns]
     values = df.values.tolist()
     if len(headers) == 1:

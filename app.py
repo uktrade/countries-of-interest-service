@@ -59,7 +59,14 @@ app.config['PAGINATION_SIZE'] = config('PAGINATION_SIZE', 50, cast=int)
 # decorator for hawk authentication
 # when hawk is disabled the authentication is trivial, effectively all requests are authenticated
 hawk_authentication = hawk_decorator_factory(app.config['HAWK_ENABLED'])
-    
+
+def response_orientation_decorator(view, *args, **kwargs):
+    def wrapper(*args, **kwargs):
+        orientation = request.args.get('orientation', 'tabular')
+        print('orientation:', orientation)
+        return view(orientation, *args, **kwargs)
+    return wrapper
+
 @app.route('/api/v1/get-companies-house-company-numbers')
 @hawk_authentication
 def get_companies_house_company_numbers():
@@ -78,7 +85,8 @@ order by 1
 
 @app.route('/api/v1/get-company-countries-and-sectors-of-interest')
 @hawk_authentication
-def get_company_countries_and_sectors_of_interest():
+@response_orientation_decorator
+def get_company_countries_and_sectors_of_interest(orientation):
     pagination_size = app.config['PAGINATION_SIZE']
     next_source = request.args.get('next-source')
     next_source_id = request.args.get('next-source-id')
@@ -157,13 +165,14 @@ limit {pagination_size} + 1
         df = df[:-1]
     else:
         next_ = None
-    web_dict = to_web_dict(df)
+    web_dict = to_web_dict(df, orientation)
     web_dict['next'] = next_
     return web_dict
 
 @app.route('/api/v1/get-company-countries-of-interest')
 @hawk_authentication
-def get_company_countries_of_interest():
+@response_orientation_decorator
+def get_company_countries_of_interest(orientation):
     pagination_size = app.config['PAGINATION_SIZE']
     next_source = request.args.get('next-source')
     next_source_id = request.args.get('next-source-id')
@@ -233,14 +242,15 @@ limit {pagination_size} + 1
         df = df[:-1]
     else:
         next_ = None
-    web_dict = to_web_dict(df)
+    web_dict = to_web_dict(df, orientation)
     web_dict['next'] = next_
     return web_dict
 
 
 @app.route('/api/v1/get-company-export-countries')
 @hawk_authentication
-def get_company_export_countries():
+@response_orientation_decorator
+def get_company_export_countries(orientation):
     pagination_size = app.config['PAGINATION_SIZE']
     next_source = request.args.get('next-source')
     next_source_id = request.args.get('next-source-id')
@@ -310,13 +320,14 @@ limit {pagination_size} + 1
         df = df[:-1]
     else:
         next_ = None
-    web_dict = to_web_dict(df)
+    web_dict = to_web_dict(df, orientation)
     web_dict['next'] = next_
     return web_dict
 
 @app.route('/api/v1/get-company-sectors-of-interest')
 @hawk_authentication
-def get_company_sectors_of_interest():
+@response_orientation_decorator
+def get_company_sectors_of_interest(orientation):
     pagination_size = app.config['PAGINATION_SIZE']
     next_source = request.args.get('next-source')
     next_source_id = request.args.get('next-source-id')
@@ -387,7 +398,7 @@ limit {pagination_size} + 1
         df = df[:-1]
     else:
         next_ = None
-    web_dict = to_web_dict(df)
+    web_dict = to_web_dict(df, orientation)
     web_dict['next'] = next_
     return web_dict
 
