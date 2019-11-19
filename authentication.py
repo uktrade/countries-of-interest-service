@@ -30,7 +30,7 @@ def lookup_hawk_credentials(client_id):
     try:
         df = query_database(connection, sql, values=(client_id,))
         client_key = df['client_key'].values[0]
-    except Exception as e:
+    except IndexError as e:
         raise LookupError()
     
     return {

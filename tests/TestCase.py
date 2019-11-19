@@ -18,6 +18,8 @@ class TestCase(unittest.TestCase):
 
     def setUp(self):
         self.config = app.app.config
+        if self.config['ENV'] != 'test':
+            raise Exception('run tests in test environment')
         self.client = app.app.test_client()
         self.database_name = 'test_countries_of_interest_service'
         self.user_name = 'test_countries_of_interest_service'

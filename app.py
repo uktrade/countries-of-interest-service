@@ -1,17 +1,18 @@
-import datetime, mohawk, numpy as np, os, sqlite3
+import datetime, os, sqlite3
+import mohawk, numpy as np
 from decouple import config
 from flask import current_app, Flask, render_template, request
 from flask.json import JSONEncoder
+from authbroker_client import authbroker_blueprint, login_required
+
+import data_report
+import etl.views
+import views
+from authentication import hawk_decorator_factory
+from db import get_db
 from etl.scheduler import Scheduler
 from utils.utils import to_web_dict
 from utils.sql import execute_query, query_database
-from authbroker_client import authbroker_blueprint, login_required
-from authentication import hawk_decorator_factory
-
-import views
-from db import get_db
-import etl.views
-import data_report
 
 class CustomJSONEncoder(JSONEncoder):
     
@@ -35,7 +36,9 @@ app.secret_key = config('APP_SECRET_KEY', 'the random string')
 app.register_blueprint(authbroker_blueprint)
 
 app.json_encoder = CustomJSONEncoder
-cf_port = os.getenv("PORT")
+
+assert app.config['ENV'] in ('production', 'dev', 'development', 'test'), \
+    'invalid environment: {}'.format(app.config['ENV'])
 
 if app.config['ENV'] == 'production':
     app.config['DATABASE'] = os.environ['DATABASE_URL']
@@ -499,6 +502,7 @@ scheduled_task = Scheduler()
 scheduled_task.start()
 
 if __name__ == '__main__':
+    cf_port = os.getenv("PORT")
     if cf_port is None:
         app.run(host='0.0.0.0', port=5000, debug=True)
     else:
