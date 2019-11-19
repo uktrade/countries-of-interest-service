@@ -51,6 +51,8 @@ elif app.config['ENV'] == 'test':
 else:
     raise Exception('unrecognised environment')
 
+app.config['DATAWORKSPACE_HOST'] = config('DATAWORKSPACE_HOST', 'localapps.com:8000')
+
 
 app.config['HAWK_ENABLED'] = config(
     'HAWK_ENABLED', app.config['ENV'] in ('production', 'test'),
@@ -58,6 +60,14 @@ app.config['HAWK_ENABLED'] = config(
 )
 app.config['DATAFLOW_HAWK_CLIENT_ID'] = config('DATAFLOW_HAWK_CLIENT_ID', 'dataflow_client_id')
 app.config['DATAFLOW_HAWK_CLIENT_KEY'] = config('DATAFLOW_HAWK_CLIENT_KEY', 'dataflow_client_key')
+app.config['DATAWORKSPACE_HAWK_CLIENT_ID'] = config(
+    'DATAWORKSPACE_HAWK_CLIENT_ID',
+    'dataworkspace_client_id'
+)
+app.config['DATAWORKSPACE_HAWK_CLIENT_KEY'] = config(
+    'DATAWORKSPACE_HAWK_CLIENT_KEY',
+    'dataworkspace_client_key'
+)
 # decorator for hawk authentication
 # when hawk is disabled the authentication is trivial, effectively all requests are authenticated
 hawk_authentication = hawk_decorator_factory(app.config['HAWK_ENABLED'])
