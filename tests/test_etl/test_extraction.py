@@ -6,7 +6,7 @@ from utils.sql import query_database
 from app import app
 from db import get_db
 
-class TestCase(TestCase):
+class TestExtractExportWins(TestCase):
 
     @patch('etl.extraction.requests')
     def test(self, requests):

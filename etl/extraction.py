@@ -73,7 +73,11 @@ def extract_datahub_future_interest_countries():
         ]
     }
     return populate_table(headers, schema, table_name, url, primary_key, stubbed_data=data)
-    
+
+
+def extract_datahub_interactions():
+    pass
+
 
 def extract_datahub_omis_dataset():
     endpoint = '/api/v1/omis-dataset'
