@@ -1,5 +1,8 @@
 import mohawk
 from flask import request
+from db import get_db
+from utils.sql import query_database
+
 
 def hawk_authenticate():
     url = request.url
@@ -21,18 +24,18 @@ def hawk_decorator_factory(hawk_enabled):
     else:
         return lambda view, *args, **kwargs: view
 
-def lookup_hawk_credentials(user_id):
-    sql = ''' select * from users where user_id='{user_id}' '''.format(user_id=user_id)
+def lookup_hawk_credentials(client_id):
+    sql = 'select * from users where client_id=%s'
     connection = get_db()
     try:
-        df = query_database(connection, sql)
-        user_key = df['user_key'].values[0]
+        df = query_database(connection, sql, values=(client_id,))
+        client_key = df['client_key'].values[0]
     except Exception as e:
         raise LookupError()
     
     return {
-        'id': user_id,
-        'key': user_key,
+        'id': client_id,
+        'key': client_key,
         'algorithm': 'sha256'
     }
 

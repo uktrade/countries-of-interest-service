@@ -4,11 +4,8 @@ from flask import current_app, Flask, render_template, request
 from flask.json import JSONEncoder
 from etl.scheduler import Scheduler
 from utils.utils import to_web_dict
-from utils.sql import query_database
+from utils.sql import execute_query, query_database
 from authbroker_client import authbroker_blueprint, login_required
-
-import os
-
 from authentication import hawk_decorator_factory
 
 import views
@@ -37,10 +34,6 @@ app.config['ABC_CLIENT_SECRET'] = config('ABC_CLIENT_SECRET', 'get this from you
 app.secret_key = config('APP_SECRET_KEY', 'the random string')
 app.register_blueprint(authbroker_blueprint)
 
-app.config['HAWK_ENABLED'] = config(
-    'HAWK_ENABLED', app.config['ENV'] in ('production', 'test'),
-    cast=bool
-)
 app.json_encoder = CustomJSONEncoder
 cf_port = os.getenv("PORT")
 
@@ -54,16 +47,49 @@ elif app.config['ENV'] == 'test':
         '/test_countries_of_interest_service'
 else:
     raise Exception('unrecognised environment')
-app.config['PAGINATION_SIZE'] = config('PAGINATION_SIZE', 50, cast=int)
 
+
+app.config['HAWK_ENABLED'] = config(
+    'HAWK_ENABLED', app.config['ENV'] in ('production', 'test'),
+    cast=bool
+)
+app.config['DATAFLOW_HAWK_CLIENT_ID'] = config('DATAFLOW_HAWK_CLIENT_ID', 'dataflow_client_id')
+app.config['DATAFLOW_HAWK_CLIENT_KEY'] = config('DATAFLOW_HAWK_CLIENT_KEY', 'dataflow_client_key')
 # decorator for hawk authentication
 # when hawk is disabled the authentication is trivial, effectively all requests are authenticated
 hawk_authentication = hawk_decorator_factory(app.config['HAWK_ENABLED'])
+users = [
+    (
+        config('DATAFLOW_HAWK_CLIENT_ID', 'dataflow_client_id'),
+        config('DATAFLOW_HAWK_CLIENT_KEY', 'dataflow_client_key'),
+    ),
+]
+def create_users_table(users):
+    with app.app_context():
+        sql = 'drop table if exists users'
+        
+        with get_db() as connection:
+            execute_query(connection, sql)
+        sql = 'create table users (' \
+            'client_id varchar(100) primary key,' \
+            'client_key varchar(100)' \
+            ')'
+        with get_db() as connection:
+            execute_query(connection, sql)
+        sql = 'insert into users values (%s, %s) ' 
+        with get_db() as connection:
+            cursor = connection.cursor()
+            cursor.executemany(sql, users)
+
+if app.config['ENV'] != 'test':
+    create_users_table(users)
+
+
+app.config['PAGINATION_SIZE'] = config('PAGINATION_SIZE', 50, cast=int)
 
 def response_orientation_decorator(view, *args, **kwargs):
     def wrapper(*args, **kwargs):
         orientation = request.args.get('orientation', 'tabular')
-        print('orientation:', orientation)
         return view(orientation, *args, **kwargs)
     wrapper.__name__ = view.__name__
     return wrapper

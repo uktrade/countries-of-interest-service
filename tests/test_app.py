@@ -1,5 +1,5 @@
 import app
-import datetime, psycopg2, os, tempfile, unittest
+import datetime, mohawk, os, pandas as pd, psycopg2, tempfile, unittest
 from db import get_db
 from unittest.mock import Mock, patch
 from tests.TestCase import TestCase
@@ -10,7 +10,52 @@ from etl import (
 )
 
 
-class TestCaseHawkAuthenticated(TestCase):
+class TestDataFlowRequest(TestCase):
+
+    def request_data(self, client_id, client_key):
+        url = 'http://localhost/api/v1/get-company-countries-and-sectors-of-interest'
+        algorithm = 'sha256'
+        method = 'GET'
+        content = ''
+        content_type = ''
+        credentials = {
+            'id': client_id,
+            'key': client_key,
+            'algorithm': algorithm,
+        }
+        sender = mohawk.Sender(
+            credentials=credentials,
+            url=url,
+            method=method,
+            content=content,
+            content_type=content_type
+        )
+        headers = {
+            'Authorization': sender.request_header,
+            'Content-Type': content_type,
+        }
+        return self.client.get(url, headers=headers)
+
+    @patch('app.query_database')
+    def test_hawk_authenticated_request(self, query_database):
+        users = [('dataflow_client_id', 'dataflow_client_key'),]
+        app.create_users_table(users)
+        client_id = 'dataflow_client_id'
+        client_key = 'dataflow_client_key'
+        query_database.return_value = pd.DataFrame([(0, 0), (1, 1)], columns=['a', 'b'])
+        response = self.request_data(client_id, client_key)
+        self.assertEqual(response.status_code, 200)
+
+    def test_hawk_unauthenticated_request(self):
+        users = [('dataflow_client_id', 'dataflow_client_key'),]
+        app.create_users_table(users)
+        client_id = 'dataflow_client_id'
+        client_key = 'wrong_key'
+        response = self.request_data(client_id, client_key)
+        self.assertEqual(response.status_code, 401)
+
+
+class TestHawkAuthentication(TestCase):
 
     @patch('app.query_database')
     @patch('app.to_web_dict')
@@ -81,7 +126,7 @@ class TestGetCompanyCountriesAndSectorsOfInterest(TestCase):
         }
         self.assertEqual(response.json, expected)
 
-        
+
 @patch('authentication.hawk_authenticate')
 class TestGetCompanyCountriesOfInterest(TestCase):
 
