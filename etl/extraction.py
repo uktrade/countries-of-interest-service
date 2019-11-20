@@ -5,14 +5,13 @@ from utils import sql as sql_utils
 
 
 def extract_datahub_company_dataset():
-    endpoint = '/api/v1/datahub-company-dataset'
+    endpoint = 'api/v1/dataset/datahub-company-dataset'
     table_name = 'datahub_company'
-    schema = ('id uuid', 'company_number varchar(50)', 'sector varchar(50)')
-    primary_key = 'id'
-    url = 'http://{}/{}'.format(dataworkspace_host, endpoint)
-    client_id = dataworkspace_client_id
-    client_key = dataworkspace_client_key
-    headers = get_hawk_headers(url, client_id, client_key)
+    schema = {
+        'columns': ('id uuid', 'company_number varchar(50)', 'sector varchar(50)'),
+        'primary_key': 'id',
+    }
+    url = 'http://{}/{}'.format(current_app.config['DATAWORKSPACE_HOST'], endpoint)
     # TODO: remove stubbed data
     data = {
         'headers': ['id', 'companyNumber', 'sector'],
@@ -21,19 +20,16 @@ def extract_datahub_company_dataset():
             ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'asdf2', 'Aerospace'],
         ]
     }
-    return populate_table(headers, schema, table_name, url, primary_key, stubbed_data=data)
+    return populate_table(schema, table_name, url, stub_data=data)
 
 def extract_datahub_export_countries():
-    endpoint = '/api/v1/export-countries-dataset'
-    primary_key = 'id'
-    schema = ('company_id uuid', 'country varchar(2)', 'id int', )
+    endpoint = 'api/v1/dataset/datahub-export-countries'
+    schema = {
+        'columns': ('company_id uuid', 'country varchar(2)', 'id int'),
+        'primary_key': 'id',
+    }
     table_name = 'datahub_export_countries'
-    url = 'http://{}/{}'.format(dataworkspace_host, endpoint)
-    client_id = dataworkspace_client_id
-    client_key = dataworkspace_client_key
-    headers = get_hawk_headers(url, client_id, client_key)
-    # TODO
-    # data = requests.get(url, headers=headers).json()
+    url = 'http://{}/{}'.format(current_app.config['DATAWORKSPACE_HOST'], endpoint)
     data = {
         'headers': ['company_id', 'country', 'id', ],
         'values': [
@@ -41,11 +37,11 @@ def extract_datahub_export_countries():
             ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'MY', 2]
         ]
     }
-    return populate_table(headers, schema, table_name, url, primary_key, stubbed_data=data)
+    return populate_table(schema, table_name, url, stub_data=data)
 
     
 def extract_datahub_future_interest_countries():
-    endpoint = '/api/v1/future-interest-countries-dataset'
+    endpoint = 'api/v1/dataset/datahub-future-interest-countries'
     schema = {
         'columns': (
             'company_id uuid',
@@ -55,7 +51,7 @@ def extract_datahub_future_interest_countries():
         'primary_key': 'id',
     }
     table_name = 'datahub_future_interest_countries'
-    url = 'http://{}/{}'.format(dataworkspace_host, endpoint)
+    url = 'http://{}/{}'.format(current_app.config['DATAWORKSPACE_HOST'], endpoint)
     data = {
         'headers': ['companyId', 'country', 'id', ],
         'values': [
@@ -63,11 +59,11 @@ def extract_datahub_future_interest_countries():
             ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'DE', 2]
         ]
     }
-    return populate_table(headers, schema, table_name, url, primary_key, stub_data=data)
+    return populate_table(schema, table_name, url, stub_data=data)
 
 
 def extract_datahub_interactions():
-    endpoint = '/api/v1/dataset/datahub-interactions'
+    endpoint = 'api/v1/dataset/datahub-interactions'
     # todo what does this schema look like
     schema = {
         'columns': (
@@ -78,8 +74,7 @@ def extract_datahub_interactions():
         'primary_key': 'id',
     }
     table_name = 'datahub_interactions'
-    dataworkspace_host = current_app.config['DATAWORKSPACE_HOST']
-    url = 'http://{}/{}'.format(dataworkspace_host, endpoint)
+    url = 'http://{}/{}'.format(current_app.config['DATAWORKSPACE_HOST'], endpoint)
     stub_data = {
         'headers': ['companyId', 'country', 'id', ],
         'values': [
@@ -91,22 +86,19 @@ def extract_datahub_interactions():
 
 
 def extract_datahub_omis_dataset():
-    endpoint = '/api/v1/omis-dataset'
-    primary_key = 'id'
-    schema = (
-        'company_id uuid',
-        'country varchar(2)',
-        'created_on timestamp',
-        'id uuid',
-        'sector varchar(200)',
-    )
+    endpoint = 'api/v1/omis-dataset'
+    schema = {
+        'columns': (
+            'company_id uuid',
+            'country varchar(2)',
+            'created_on timestamp',
+            'id uuid',
+            'sector varchar(200)',
+        ),
+        'primary_key': 'id'
+    }
     table_name = 'omis'
-    url = 'http://{}/{}'.format(dataworkspace_host, endpoint)
-    client_id = dataworkspace_client_id
-    client_key = dataworkspace_client_key
-    headers = get_hawk_headers(url, client_id, client_key)
-    # TODO
-    # data = requests.get(url, headers=headers).json()
+    url = 'http://{}/{}'.format(current_app.config['DATAWORKSPACE_HOST'], endpoint)
     data = {
         'headers': ['companyId', 'country', 'createdOn', 'id', 'sector'],
         'values': [
@@ -126,19 +118,16 @@ def extract_datahub_omis_dataset():
             ]
         ]
     }
-    return populate_table(headers, schema, table_name, url, primary_key, stubbed_data=data)
+    return populate_table(schema, table_name, url, stub_data=data)
 
 def extract_datahub_sectors():
-    endpoint = '/api/v1/datahub-sectors-dataset'
-    primary_key = 'id'
-    schema = ('id uuid', 'sector varchar(200)',)
+    endpoint = 'api/v1/datahub-sectors-dataset'
+    schema = {
+        'columns': ('id uuid', 'sector varchar(200)'),
+        'primary_key': 'id'
+    }
     table_name = 'datahub_sector'
-    url = 'http://{}/{}'.format(dataworkspace_host, endpoint)
-    client_id = dataworkspace_client_id
-    client_key = dataworkspace_client_key
-    headers = get_hawk_headers(url, client_id, client_key)
-    # TODO
-    # data = requests.get(url, headers=headers).json()
+    url = 'http://{}/{}'.format(current_app.config['DATAWORKSPACE_HOST'], endpoint)
     data = {
         'headers': ['id', 'sector'],
         'values': [
@@ -146,10 +135,10 @@ def extract_datahub_sectors():
             ['698d0cc3-ce8e-453b-b3c4-99818c5a9070', 'Food'],
         ]
     }
-    return populate_table(headers, schema, table_name, url, primary_key, stubbed_data=data)
+    return populate_table(schema, table_name, url, stub_data=data)
 
 def extract_export_wins():
-    endpoint = '/api/v1/datahub-sectors-dataset'
+    endpoint = 'api/v1/export-wins'
     schema = {
         'columns': (
             'id uuid',
@@ -247,11 +236,14 @@ def populate_table(schema, table_name, url, stub_data=None):
         output = {
             'table': table_name,
             'rows': n_rows,
-            'status': 'success'
+            'status': 200
         }
 
     except (Exception, psycopg2.Error) as error:
-        output = "Failed inserting record into {} table {}".format(table_name, error)
+        output = {
+            'status': 500,
+            'error': "Failed inserting record into {} table {}".format(table_name, error),
+        }
         if table_exists:
             sql_utils.rename_table(connection, table_name_backup, table_name)
 
