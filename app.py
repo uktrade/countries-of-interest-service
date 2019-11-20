@@ -40,20 +40,25 @@ app.json_encoder = CustomJSONEncoder
 assert app.config['ENV'] in ('production', 'dev', 'development', 'test'), \
     'invalid environment: {}'.format(app.config['ENV'])
 
+
+
 if app.config['ENV'] == 'production':
     app.config['DATABASE'] = os.environ['DATABASE_URL']
 elif app.config['ENV'] in ['dev', 'development']:
-    app.config['DATABASE'] = 'postgresql://countries_of_interest_service@localhost'\
-        '/countries_of_interest_service'
+    app.config['DATABASE'] = config(
+        'DATABASE_URL',
+        'postgresql://countries_of_interest_service@localhost/countries_of_interest_service'
+    )
 elif app.config['ENV'] == 'test':
-    app.config['DATABASE'] = 'postgresql://test_countries_of_interest_service@localhost'\
-        '/test_countries_of_interest_service'
+    app.config['DATABASE'] = config(
+        'DATABASE_URL',
+        'postgresql://test_countries_of_interest_service@localhost' \
+        '/test_countries_of_interest_service',
+    )
 else:
     raise Exception('unrecognised environment')
 
 app.config['DATAWORKSPACE_HOST'] = config('DATAWORKSPACE_HOST', 'localapps.com:8000')
-
-
 app.config['HAWK_ENABLED'] = config(
     'HAWK_ENABLED', app.config['ENV'] in ('production', 'test'),
     cast=bool

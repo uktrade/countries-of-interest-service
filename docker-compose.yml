@@ -1,0 +1,15 @@
+version: '3'
+services:
+  web:
+    build: .
+    environment:
+      - DATABASE_URL=postgresql://postgres@postgres/postgres
+    env_file:
+      - ${ENV_FILE:-.env}
+    ports:
+      - ${PORT:-5000}:5000
+    depends_on:
+      - postgres
+  postgres:
+    image: "postgres"
+    

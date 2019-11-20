@@ -44,7 +44,7 @@ def hawk_required(view, *args, **kwargs):
         try:
             hawk_authenticate()
         except Exception:
-            return 'Authentication failed', 401
+            return 'Hawk authentication failed', 401
         return view(*args, **kwargs)
     wrapper.__name__ = view.__name__
     return wrapper
