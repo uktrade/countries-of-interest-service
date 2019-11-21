@@ -9,6 +9,7 @@ to give the most informed view into a companies intereset in particular countrie
 ## Installation
 The backend is built in Python using the Flask framework. Authentication implemented using Hawk and OAUTH2(SSO) authentication. The majority of the functionality is through API calls but a light front end is provided for documentation and dashboarding. This front end uses React and d3 and uses the webpack javascript module bundler. 
 
+### local installation
 1. Create a python virtual environment. Below are instructions on how to do this with `Anaconda` but other virtual environments are possible.
     <br />`conda create -n countries_of_interest_service python=3`
 2. Activate the virtual environment
@@ -21,16 +22,20 @@ The backend is built in Python using the Flask framework. Authentication impleme
     <br />`npm install` # from the project base directory
 6. Build javascript bundles
     <br />`npm run build`
-7. Setup environment variables, the necessary environment variables can be found in the `envs/activate.d/env_vars.sh` file, you can either do this manually or if you're using `conda` environments you can create activate and deactivate scripts to set the environment variables, see below.
-    1. `mkdir -p ~/anaconda3/envs/countries_of_interest_service/etc/conda/activate.d`
-    2. `cp envs/activate.d/env_vars.sh ~/anaconda3/envs/countries_of_interest_service/etc/conda/activate.d/`
-    3. update the secret environment variables, you can get the credentials from an administrator
-    4. `mkdir -p ~/anaconda3/envs/countries_of_interest_service/etc/conda/deactivate.d`
-    5. `cp envs/activate.d/env_vars.sh ~/anaconda3/envs/countries_of_interest_service/etc/conda/deactivate.d/`
+7. Setup environment variables, an example environment variable file can be found in the `envs` directory. I recommend that the virtual environment sets the evnironemnts with this file when the environment is activated. For anaconda you can do this in the `env_vars.sh` script which is located at `${ANACONDA_HOME}/envs/countries_of_interest_service/etc/conda/activate.d`
 8. run the app
     <br />`python app.py`
 9. go to `http://localhost:5000`
-  
+
+### local Docker installation
+1. Move your environment variables file to `$PROJECT_HOME/.env`
+2. `docker-compose build`
+3. `docker-compose run`
+
+You can configure how `docker-compose` runs with environment variables,
+* change the port the application runs on with the `PORT` environment variable
+* change the environment file with the `ENV_FILE` environment variable
+* e.g. `PORT=8000 ENV_FILE=my_envs docker-compose build` and again when using `docker-compose up`
 
 ## Deployment (to development environment)
 The countries of interest service is nominally deployed in a Cloud Foundry instance. 
@@ -57,4 +62,7 @@ to run tests for a specific test module, do,
 to run tests in a specific directory do,
 
 `FLASK_ENV=test python -m unittest discover -s <test directory>`
+
+### running tests in Docker
+`docker-compose build; docker-compose run -e FLASK_ENV=test web python -m unittest`
 

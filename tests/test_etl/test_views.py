@@ -1,6 +1,8 @@
+from app import app
 from tests.TestCase import TestCase
 from unittest.mock import Mock, patch
 from etl.views import populate_database
+
 
 @patch('etl.views.extract_datahub_company_dataset')
 @patch('etl.views.extract_datahub_export_countries')
@@ -15,12 +17,14 @@ from etl.views import populate_database
 @patch('etl.views.PopulateCountriesOfInterestTask')
 @patch('etl.views.SectorsOfInterestTask')
 @patch('etl.views.get_db')
-@patch('etl.views.request')
 class TestPopulateDatabase(TestCase):
+
+    def setUp(self):
+        super().setUp()
+        self.request_context = app.test_request_context()
 
     def test_datahub_company_dataset(
             self,
-            request,
             get_db,
             SectorsOfInterestTask,
             PopulateCountriesOfInterestTask,
@@ -35,8 +39,13 @@ class TestPopulateDatabase(TestCase):
             extract_datahub_export_countries,
             extract_datahub_company_dataset,
     ):
+
+        request = Mock()
         request.args = {'drop-table': ''}
-        output = populate_database()
+        with patch("etl.views.request", request):
+            with app.app_context():
+                request.args = {'drop-table': ''}
+                output = populate_database()
         
         extract_datahub_company_dataset.assert_called_once()
         extract_datahub_export_countries.assert_called_once()
