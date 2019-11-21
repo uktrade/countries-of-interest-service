@@ -148,8 +148,8 @@ def get_data_report_data():
     df_omis_orders = get_omis_order_frequency()
     for c in df_summary_table.columns:
         data[to_camel_case(c)] = df_summary_table[c].values[0]
-    data['topSectors'] = to_web_dict(df_top_sectors)
-    data['omisOrderFrequency'] = to_web_dict(df_omis_orders)
+    data['topSectors'] = to_web_dict(df_top_sectors, orient='tabular')
+    data['omisOrderFrequency'] = to_web_dict(df_omis_orders, orient='tabular')
     return data
 
 if __name__ == '__main__':
