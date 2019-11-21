@@ -4,5 +4,7 @@ applications:
 - name: countries_of_interest_service
   memory: 512M
   instances: 1
-  buildpack: python_buildpack
-  command: gunicorn app:app
+  buildpacks:
+    - nodejs_buildpack
+    - python_buildpack # do python after node, issue with pip installing git modules
+  command: npm run build; gunicorn app:app
