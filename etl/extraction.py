@@ -232,7 +232,7 @@ def populate_table(schema, table_name, url, stub_data=None):
         values = data['values'] if len(schema['columns']) > 1 else [[d] for d in data['values']]
         result = cursor.executemany(sql, values)
         connection.commit()
-        n_rows = cursor.rowcount
+        n_rows = int(cursor.rowcount)
         output = {
             'table': table_name,
             'rows': n_rows,

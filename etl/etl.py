@@ -77,6 +77,6 @@ class ETLTask:
 
         return {
             'status': 'success',
-            'rows': df.values[0][0],
+            'rows': int(df.values[0][0]),
             'table': self.table_name
         }
