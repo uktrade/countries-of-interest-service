@@ -1,7 +1,7 @@
 import datetime
 from celery import Celery
 from decouple import config
-from app import app as flask_app
+from flask import current_app as flask_app
 from db import get_db
 from etl.extraction import (
     extract_datahub_company_dataset,
