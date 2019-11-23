@@ -1,10 +1,13 @@
+apscheduler==3.*
+-e git://github.com/uktrade/flask-authbroker-client#egg=authbroker_client
+celery==4.3.0
 flask==1.*
+flask_oauthlib==0.*
 gunicorn==19.*
 mohawk==1.*
 numpy==1.*
 pandas==0.*
 psycopg2==2.*
 python-decouple==3.*
--e git://github.com/uktrade/flask-authbroker-client#egg=authbroker_client
-flask_oauthlib==0.*
-apscheduler==3.*
+redis==3.3.11
+

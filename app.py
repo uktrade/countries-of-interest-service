@@ -40,8 +40,6 @@ app.json_encoder = CustomJSONEncoder
 assert app.config['ENV'] in ('production', 'dev', 'development', 'test'), \
     'invalid environment: {}'.format(app.config['ENV'])
 
-
-
 if app.config['ENV'] == 'production':
     app.config['DATABASE'] = os.environ['DATABASE_URL']
 elif app.config['ENV'] in ['dev', 'development']:
@@ -58,7 +56,10 @@ elif app.config['ENV'] == 'test':
 else:
     raise Exception('unrecognised environment')
 
+app.config['CELERY_BROKER'] = config('CELERY_BROKER', 'redis://localhost')
+
 app.config['DATAWORKSPACE_HOST'] = config('DATAWORKSPACE_HOST', 'localapps.com:8000')
+
 app.config['HAWK_ENABLED'] = config(
     'HAWK_ENABLED', app.config['ENV'] in ('production', 'test'),
     cast=bool

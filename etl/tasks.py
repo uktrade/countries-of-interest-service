@@ -1,5 +1,6 @@
 import datetime
 from celery import Celery
+from decouple import config
 from app import app as flask_app
 from db import get_db
 from etl.extraction import (
@@ -18,11 +19,10 @@ from etl.datahub_company_id_to_companies_house_company_number import Task \
 from etl.export_countries import Task as ExportCountriesTask
 from etl.sectors_of_interest import Task as SectorsOfInterestTask
 
-app = Celery('tasks', backend='redis://localhost', broker='redis://localhost')
 
-@app.task
-def add(x, y):
-    return x + y
+broker = config('CELERY_BROKER', 'redis://localhost')
+backend = config('CELERY_BACKEND', 'redis://localhost')
+app = Celery('tasks', backend=backend, broker=broker)
 
 @app.task
 def populate_database(drop_table=True):
