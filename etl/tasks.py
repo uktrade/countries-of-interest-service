@@ -1,7 +1,4 @@
 import datetime
-from celery import Celery
-from decouple import config
-from flask import current_app as flask_app
 from db import get_db
 from etl.extraction import (
     extract_datahub_company_dataset,
@@ -20,41 +17,34 @@ from etl.export_countries import Task as ExportCountriesTask
 from etl.sectors_of_interest import Task as SectorsOfInterestTask
 
 
-broker = config('CELERY_BROKER', 'redis://localhost')
-backend = config('CELERY_BACKEND', 'redis://localhost')
-app = Celery('tasks', backend=backend, broker=broker)
-
-@app.task
-def populate_database(drop_table=True):
+def populate_database(drop_table):
     output = []
-    with flask_app.app_context():
-        with get_db() as connection:
-            output.append(extract_datahub_company_dataset())
-            output.append(extract_datahub_export_countries())
-            output.append(extract_datahub_interactions())
-            output.append(extract_datahub_future_interest_countries())
-            output.append(extract_datahub_omis_dataset())
-            output.append(extract_datahub_sectors())
-            output.append(extract_export_wins())
-            output.extend(
-                [
-                    DatahubCompanyIDToCompaniesHouseCompanyNumberTask(
-                        connection=connection,
-                        drop_table=drop_table
-                    )(),
-                    ExportCountriesTask(connection=connection, drop_table=drop_table)(),
-                    PopulateCountriesAndSectorsOfInterestTask(
-                        connection=connection,
-                        drop_table=drop_table
-                    )(),
-                    PopulateCountriesOfInterestTask(connection=connection, drop_table=drop_table)(),
-                    SectorsOfInterestTask(connection=connection, drop_table=drop_table)(),
-                ]
-            )
-            with connection.cursor() as cursor:
-                sql = 'create table if not exists etl_runs (timestamp timestamp)'
-                cursor.execute(sql)
-                sql = 'insert into etl_runs values (%s)'
-                cursor.execute(sql, [datetime.datetime.now()])
+    with get_db() as connection:
+        output.append(extract_datahub_company_dataset())
+        output.append(extract_datahub_export_countries())
+        output.append(extract_datahub_interactions())
+        output.append(extract_datahub_future_interest_countries())
+        output.append(extract_datahub_omis_dataset())
+        output.append(extract_datahub_sectors())
+        output.append(extract_export_wins())
+        output.extend(
+            [
+                DatahubCompanyIDToCompaniesHouseCompanyNumberTask(
+                    connection=connection,
+                    drop_table=drop_table
+                )(),
+                ExportCountriesTask(connection=connection, drop_table=drop_table)(),
+                PopulateCountriesAndSectorsOfInterestTask(
+                    connection=connection,
+                    drop_table=drop_table
+                )(),
+                PopulateCountriesOfInterestTask(connection=connection, drop_table=drop_table)(),
+                SectorsOfInterestTask(connection=connection, drop_table=drop_table)(),
+            ]
+        )
+        with connection.cursor() as cursor:
+            sql = 'create table if not exists etl_runs (timestamp timestamp)'
+            cursor.execute(sql)
+            sql = 'insert into etl_runs values (%s)'
+            cursor.execute(sql, [datetime.datetime.now()])
     return {'output': output}
-    

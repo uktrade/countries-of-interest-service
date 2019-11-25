@@ -1,18 +1,21 @@
-import datetime, os, sqlite3
+import datetime, json, logging, os, sqlite3
 import mohawk, numpy as np
+from celery import Celery
 from decouple import config
 from flask import current_app, Flask, render_template, request
 from flask.json import JSONEncoder
 from authbroker_client import authbroker_blueprint, login_required
 
 import data_report
-import etl.views
+import etl.tasks
 import views
 from authentication import hawk_decorator_factory
 from db import get_db
 from etl.scheduler import Scheduler
+from utils import utils
 from utils.utils import to_web_dict
 from utils.sql import execute_query, query_database
+
 
 class CustomJSONEncoder(JSONEncoder):
     
@@ -29,17 +32,23 @@ class CustomJSONEncoder(JSONEncoder):
             return super(MyEncoder, self).default(obj)
 
 app = Flask(__name__)
+
+# sso
+app.register_blueprint(authbroker_blueprint)
 app.config['ABC_BASE_URL'] = config('ABC_BASE_URL', 'https://sso.trade.gov.uk')
 app.config['ABC_CLIENT_ID'] = config('ABC_CLIENT_ID', 'get this from your network admin')
 app.config['ABC_CLIENT_SECRET'] = config('ABC_CLIENT_SECRET', 'get this from your network admin')
+
+# other
 app.secret_key = config('APP_SECRET_KEY', 'the random string')
-app.register_blueprint(authbroker_blueprint)
-
 app.json_encoder = CustomJSONEncoder
-
 assert app.config['ENV'] in ('production', 'dev', 'development', 'test'), \
     'invalid environment: {}'.format(app.config['ENV'])
+app.config['DATAWORKSPACE_HOST'] = config('DATAWORKSPACE_HOST', 'localapps.com:8000')
+app.config['PAGINATION_SIZE'] = config('PAGINATION_SIZE', 50, cast=int)
+app.config['RUN_SCHEDULER'] = config('RUN_SCHEDULER', False, cast=bool)
 
+# app database
 if app.config['ENV'] == 'production':
     app.config['DATABASE'] = os.environ['DATABASE_URL']
 elif app.config['ENV'] in ['dev', 'development']:
@@ -56,10 +65,25 @@ elif app.config['ENV'] == 'test':
 else:
     raise Exception('unrecognised environment')
 
-app.config['CELERY_BROKER'] = config('CELERY_BROKER', 'redis://localhost')
+# celery & cloud foundry config
+vcap_services = os.environ.get('VCAP_SERVICES')
+if vcap_services:
+    vacap_services = json.loads(vcap_services)
+    redis_config = json.loads(vcap_services)
+    redis_uri = redis_config['redis'][0]['credentials']['uri']
+app.config['CELERY_BROKER'] = config(
+    'CELERY_BROKER',
+    redis_uri if vcap_services else 'redis://localhost'
+)
 
-app.config['DATAWORKSPACE_HOST'] = config('DATAWORKSPACE_HOST', 'localapps.com:8000')
+# celery, tasks config
+celery = Celery('app', broker=app.config['CELERY_BROKER'])
+@celery.task
+def populate_database_task(drop_table=True):
+    with app.app_context():
+        return etl.tasks.populate_database(drop_table)
 
+# hawk authentication
 app.config['HAWK_ENABLED'] = config(
     'HAWK_ENABLED', app.config['ENV'] in ('production', 'test'),
     cast=bool
@@ -86,7 +110,6 @@ users = [
 def create_users_table(users):
     with app.app_context():
         sql = 'drop table if exists users'
-        
         with get_db() as connection:
             execute_query(connection, sql)
         sql = 'create table users (' \
@@ -99,20 +122,10 @@ def create_users_table(users):
         with get_db() as connection:
             cursor = connection.cursor()
             cursor.executemany(sql, users)
-
 if app.config['ENV'] != 'test':
     create_users_table(users)
 
-
-app.config['PAGINATION_SIZE'] = config('PAGINATION_SIZE', 50, cast=int)
-
-def response_orientation_decorator(view, *args, **kwargs):
-    def wrapper(*args, **kwargs):
-        orientation = request.args.get('orientation', 'tabular')
-        return view(orientation, *args, **kwargs)
-    wrapper.__name__ = view.__name__
-    return wrapper
-
+# views
 @app.route('/api/v1/get-companies-house-company-numbers')
 @hawk_authentication
 def get_companies_house_company_numbers():
@@ -131,7 +144,7 @@ order by 1
 
 @app.route('/api/v1/get-company-countries-and-sectors-of-interest')
 @hawk_authentication
-@response_orientation_decorator
+@utils.response_orientation_decorator
 def get_company_countries_and_sectors_of_interest(orientation):
     pagination_size = app.config['PAGINATION_SIZE']
     next_source = request.args.get('next-source')
@@ -217,7 +230,7 @@ limit {pagination_size} + 1
 
 @app.route('/api/v1/get-company-countries-of-interest')
 @hawk_authentication
-@response_orientation_decorator
+@utils.response_orientation_decorator
 def get_company_countries_of_interest(orientation):
     pagination_size = app.config['PAGINATION_SIZE']
     next_source = request.args.get('next-source')
@@ -295,7 +308,7 @@ limit {pagination_size} + 1
 
 @app.route('/api/v1/get-company-export-countries')
 @hawk_authentication
-@response_orientation_decorator
+@utils.response_orientation_decorator
 def get_company_export_countries(orientation):
     pagination_size = app.config['PAGINATION_SIZE']
     next_source = request.args.get('next-source')
@@ -372,7 +385,7 @@ limit {pagination_size} + 1
 
 @app.route('/api/v1/get-company-sectors-of-interest')
 @hawk_authentication
-@response_orientation_decorator
+@utils.response_orientation_decorator
 def get_company_sectors_of_interest(orientation):
     pagination_size = app.config['PAGINATION_SIZE']
     next_source = request.args.get('next-source')
@@ -512,10 +525,14 @@ order by 1
 @app.route('/api/v1/populate-database')
 @hawk_authentication
 def populate_database():
-    return etl.views.populate_database()
+    drop_table = 'drop-table' in request.args
+    populate_database_task.delay(drop_table)
+    return {'status': 200}
 
-scheduled_task = Scheduler()
-scheduled_task.start()
+if app.config['RUN_SCHEDULER'] is True:
+    print('starting scheduler')
+    scheduled_task = Scheduler(populate_database_task)
+    scheduled_task.start()
 
 if __name__ == '__main__':
     cf_port = os.getenv("PORT")
@@ -523,3 +540,4 @@ if __name__ == '__main__':
         app.run(host='0.0.0.0', port=5000, debug=True)
     else:
         app.run(host='0.0.0.0', port=int(cf_port), debug=True)
+        

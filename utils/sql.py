@@ -34,9 +34,7 @@ def query_database(connection, sql, values=[]):
 
 def rename_table(connection, table_name_1, table_name_2):
     sql = '''alter table {} rename to {}'''.format(table_name_1, table_name_2)
-    with connection.cursor() as cursor:
-        cursor.execute(sql)
-    connection.commit()
+    execute_query(connection, sql)
 
 def table_exists(connection, table_name, schema='public'):
     sql = '''select * from information_schema.tables where table_schema=%s and table_name=%s'''

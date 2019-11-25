@@ -36,7 +36,7 @@ class TestPopulateDatabase(TestCase):
         extract_datahub_company_dataset,
     ):
         with app.app_context():
-            output = populate_database()
+            output = populate_database(drop_table=True)
 
         db_context = get_db.return_value.__enter__.return_value
         extract_datahub_company_dataset.assert_called_once()

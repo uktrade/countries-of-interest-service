@@ -195,3 +195,19 @@ class TestGetCompanyExportCountries(TestCase):
         self.assertEqual(response.json, expected)        
 
 
+@patch('authentication.hawk_authenticate')
+@patch('app.populate_database_task')
+class TestPopulateDatabase(TestCase):
+
+    def test_called_without_drop_table_in_request(self, populate_database_task, hawk_authenticate):
+        with app.app.test_request_context():
+            output = app.populate_database()
+        populate_database_task.delay.assert_called_once_with(False)
+        self.assertEqual(output, {'status': 200})
+
+    def test_called_with_drop_table_in_request(self, populate_database_task, hawk_authenticate):
+        with app.app.test_request_context() as request:
+            request.request.args = {'drop-table': ''}
+            output = app.populate_database()
+        populate_database_task.delay.assert_called_once_with(True)
+        self.assertEqual(output, {'status': 200})
