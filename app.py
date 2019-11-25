@@ -1,5 +1,5 @@
 import datetime, json, logging, os, sqlite3
-import mohawk, numpy as np
+import mohawk, numpy as np, pandas as pd, redis
 from celery import Celery
 from decouple import config
 from flask import current_app, Flask, render_template, request
@@ -69,8 +69,8 @@ else:
 vcap_services = os.environ.get('VCAP_SERVICES')
 if vcap_services:
     vacap_services = json.loads(vcap_services)
-    redis_config = json.loads(vcap_services)
-    redis_uri = redis_config['redis'][0]['credentials']['uri']
+    redis_config = json.loads(vcap_services)['redis'][0]
+    redis_uri = redis_config['credentials']['uri']
 app.config['CELERY_BROKER'] = config(
     'CELERY_BROKER',
     redis_uri if vcap_services else 'redis://localhost'
@@ -503,7 +503,15 @@ from coi_datahub_company_id_to_companies_house_company_number
 @app.route('/')
 @login_required
 def get_index():
-    return render_template('index.html')
+    with get_db() as connection:
+        sql = 'select max(timestamp) from etl_runs'
+        df = query_database(connection, sql)
+    last_updated = pd.to_datetime(df.values[0][0])
+    if last_updated is None:
+        last_updated = 'Database not yet initialised'
+    else:
+        last_updated = last_updated.strftime('%Y-%m-%d %H:%M:%S')
+    return render_template('index.html', last_updated=last_updated)
 
 @app.route('/api/v1/get-sectors')
 @hawk_authentication
@@ -526,9 +534,27 @@ order by 1
 @hawk_authentication
 def populate_database():
     drop_table = 'drop-table' in request.args
-    populate_database_task.delay(drop_table)
-    return {'status': 200}
-
+    force_update = 'force-update' in request.args
+    with get_db() as connection:
+        sql = 'create table if not exists etl_status (status varchar(100), timestamp timestamp)'
+        execute_query(connection, sql)
+        sql = 'select * from etl_status'
+        df = query_database(connection, sql)
+    if force_update is True or len(df) == 0 or df['status'].values[0] == 'SUCCESS':
+        populate_database_task.delay(drop_table)
+        sql = 'delete from etl_status'
+        execute_query(connection, sql)
+        sql = '''insert into etl_status values (%s, %s)'''
+        execute_query(connection, sql, values=['RUNNING', datetime.datetime.now()])
+        return {'status': 200, 'message': 'started populate_database task'}
+    else:
+        return {
+            'status': 200,
+            'message': 'populate_database task already running since: {}'.format(
+                df['timestamp'].values[0]
+            )
+        }
+    
 if app.config['RUN_SCHEDULER'] is True:
     print('starting scheduler')
     scheduled_task = Scheduler(populate_database_task)

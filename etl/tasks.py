@@ -19,7 +19,7 @@ from etl.sectors_of_interest import Task as SectorsOfInterestTask
 
 def populate_database(drop_table):
     output = []
-    with get_db() as connection:
+    with get_db() as connection:        
         output.append(extract_datahub_company_dataset())
         output.append(extract_datahub_export_countries())
         output.append(extract_datahub_interactions())
@@ -46,5 +46,10 @@ def populate_database(drop_table):
             sql = 'create table if not exists etl_runs (timestamp timestamp)'
             cursor.execute(sql)
             sql = 'insert into etl_runs values (%s)'
-            cursor.execute(sql, [datetime.datetime.now()])
+            ts_finish = datetime.datetime.now()
+            cursor.execute(sql, [ts_finish])
+            sql = 'delete from etl_status'
+            cursor.execute(sql)
+            sql = '''insert into etl_status values (%s, %s)'''
+            cursor.execute(sql, ['SUCCESS', ts_finish])
     return {'output': output}

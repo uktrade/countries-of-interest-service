@@ -9,8 +9,7 @@ class Scheduler:
         self.scheduler.add_job(
             populate_database_task.delay,
             'cron',
-            # hour='0',
-            second='0',
+            hour='0',
         )
         atexit.register(lambda: self.scheduler.shutdown(wait=False))
 
