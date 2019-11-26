@@ -14,7 +14,7 @@ from db import get_db
 from etl.scheduler import Scheduler
 from utils import utils
 from utils.utils import to_web_dict
-from utils.sql import execute_query, query_database
+from utils.sql import execute_query, query_database, table_exists
 
 
 class CustomJSONEncoder(JSONEncoder):
@@ -501,12 +501,14 @@ from coi_datahub_company_id_to_companies_house_company_number
     return to_web_dict(df)
 
 @app.route('/')
-@login_required
+#@login_required
 def get_index():
+    last_updated = None
     with get_db() as connection:
-        sql = 'select max(timestamp) from etl_runs'
-        df = query_database(connection, sql)
-    last_updated = pd.to_datetime(df.values[0][0])
+        if table_exists(connection, 'etl_runs'):
+            sql = 'select max(timestamp) from etl_runs'
+            df = query_database(connection, sql)
+            last_updated = pd.to_datetime(df.values[0][0])
     if last_updated is None:
         last_updated = 'Database not yet initialised'
     else:

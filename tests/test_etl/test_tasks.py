@@ -1,7 +1,10 @@
-from app import app
-from unittest import TestCase
+import datetime
 from unittest.mock import Mock, patch
+from flask import current_app
+from app import app
+from db import get_db
 from etl.tasks import populate_database
+from tests.TestCase import TestCase
 
 
 @patch('etl.tasks.extract_datahub_company_dataset')
@@ -16,24 +19,24 @@ from etl.tasks import populate_database
 @patch('etl.tasks.PopulateCountriesAndSectorsOfInterestTask')
 @patch('etl.tasks.PopulateCountriesOfInterestTask')
 @patch('etl.tasks.SectorsOfInterestTask')
-@patch('etl.tasks.get_db')
 class TestPopulateDatabase(TestCase):
 
-    def test(
-        self,
-        get_db,
-        SectorsOfInterestTask,
-        PopulateCountriesOfInterestTask,
-        PopulateCountriesAndSectorsOfInterestTask,
-        ExportCountriesTask,
-        DatahubCompanyIDToCompaniesHouseCompanyNumberTask,
-        extract_export_wins,
-        extract_datahub_sectors,
-        extract_datahub_omis_dataset,
-        extract_datahub_interactions,
-        extract_datahub_future_interest_countries,
-        extract_datahub_export_countries,
-        extract_datahub_company_dataset,
+    @patch('etl.tasks.get_db')
+    def test_tasks_are_run(
+            self,
+            get_db,
+            SectorsOfInterestTask,
+            PopulateCountriesOfInterestTask,
+            PopulateCountriesAndSectorsOfInterestTask,
+            ExportCountriesTask,
+            DatahubCompanyIDToCompaniesHouseCompanyNumberTask,
+            extract_export_wins,
+            extract_datahub_sectors,
+            extract_datahub_omis_dataset,
+            extract_datahub_interactions,
+            extract_datahub_future_interest_countries,
+            extract_datahub_export_countries,
+            extract_datahub_company_dataset,
     ):
         with app.app_context():
             output = populate_database(drop_table=True)
@@ -90,3 +93,41 @@ class TestPopulateDatabase(TestCase):
         }
 
         self.assertEqual(output, expected_output)
+
+    @patch('etl.tasks.datetime')
+    def test_updates_task_status_to_success(
+            self,
+            mock_datetime,
+            SectorsOfInterestTask,
+            PopulateCountriesOfInterestTask,
+            PopulateCountriesAndSectorsOfInterestTask,
+            ExportCountriesTask,
+            DatahubCompanyIDToCompaniesHouseCompanyNumberTask,
+            extract_export_wins,
+            extract_datahub_sectors,
+            extract_datahub_omis_dataset,
+            extract_datahub_interactions,
+            extract_datahub_future_interest_countries,
+            extract_datahub_export_countries,
+            extract_datahub_company_dataset,
+    ):
+
+        mock_datetime.datetime.now.return_value = datetime.datetime(2019, 1, 1, 2)
+        with app.app_context():
+            with get_db() as connection:
+                with connection.cursor() as cursor:
+                    sql = 'create table if not exists etl_status (' \
+                        'status varchar(100), timestamp timestamp)'
+                    cursor.execute(sql)
+                    sql = "insert into etl_status values ('RUNNING', '2019-01-01 01:00')"
+                    cursor.execute(sql)
+            output = populate_database(drop_table=True)
+            with get_db() as connection:
+                with connection.cursor() as cursor:
+                    sql = 'select * from etl_status'
+                    cursor.execute(sql)
+                    rows = cursor.fetchall()
+            self.assertEqual(len(rows), 1)
+            self.assertEqual(rows, [('SUCCESS', datetime.datetime(2019, 1, 1, 2))])
+
+            
