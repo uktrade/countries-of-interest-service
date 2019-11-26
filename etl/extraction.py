@@ -232,7 +232,7 @@ def populate_table(schema, table_name, url, stub_data=None):
         values = data['values'] if len(schema['columns']) > 1 else [[d] for d in data['values']]
         result = cursor.executemany(sql, values)
         connection.commit()
-        n_rows = cursor.rowcount
+        n_rows = int(cursor.rowcount)
         output = {
             'table': table_name,
             'rows': n_rows,
@@ -248,62 +248,3 @@ def populate_table(schema, table_name, url, stub_data=None):
             sql_utils.rename_table(connection, table_name_backup, table_name)
 
     return output
-    
-
-# def populate_table(headers, schema, table_name, url, primary_key=None, stubbed_data={}):
-    
-#     if len(stubbed_data) > 0:
-#         data = stubbed_data
-#     else:
-#         reponse = requests.get(url, headers=headers)
-#         data = response.json()
-
-#     connection = get_db()
-#     cursor = connection.cursor()
-#     table_exists = sql_utils.table_exists(connection, table_name)
-
-#     try:
-#         if table_exists:
-#             table_name_backup = '{}_backup'.format(table_name)
-#             sql_utils.drop_table(connection, table_name_backup)
-#             sql_utils.rename_table(connection, table_name, table_name_backup)
-
-#         schema_str = ','.join(schema)
-#         if primary_key is not None:
-#             if type(primary_key) in [list, tuple]:
-#                 schema_str += ', primary key ({})'.format(','.join(primary_key))
-#             else:
-#                 schema_str += ', primary key ({})'.format(primary_key)
-#         sql = '''create table {table_name} ({schema_str})'''.format(
-#             table_name=table_name,
-#             schema_str=schema_str
-#         )
-#         cursor.execute(sql)
-#         connection.commit()
-        
-#         sql = ''' insert into {} values ({}) '''.format(
-#             table_name,
-#             ','.join(['%s' for i in range(len(schema))])
-#         )
-#         values = data['values'] if len(schema) > 1 else [[d] for d in data['values']]
-#         result = cursor.executemany(sql, values)
-#         connection.commit()
-#         n_rows = cursor.rowcount
-#         output = {
-#             'table': table_name,
-#             'rows': n_rows,
-#             'status': 'success'
-#         }
-#         print(output)
-
-#     except (Exception, psycopg2.Error) as error:
-#         output = "Failed inserting record into {} table {}".format(table_name, error)
-#         print(output)
-
-#         if table_exists:
-#             sql = ''' alter table {} rename to {} '''.format(table_name_backup, table_name)
-#             cursor.execute(sql)
-#             connection.commit()
-
-#     return output
-    

@@ -247,6 +247,7 @@ class TestPopulateTable(TestCase):
     @patch('etl.extraction.sql_utils')
     def test_copies_table_to_backup_if_it_exists(self, sql_utils, get_db):
         get_db.return_value = self.connection
+        self.connection.cursor.return_value = Mock(rowcount=1)
         sql_utils.table_exists.return_value = True
         with app.app_context():
             output = populate_table(

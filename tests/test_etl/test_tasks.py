@@ -1,29 +1,28 @@
-from app import app
-from tests.TestCase import TestCase
+import datetime
 from unittest.mock import Mock, patch
-from etl.views import populate_database
+from flask import current_app
+from app import app
+from db import get_db
+from etl.tasks import populate_database
+from tests.TestCase import TestCase
 
 
-@patch('etl.views.extract_datahub_company_dataset')
-@patch('etl.views.extract_datahub_export_countries')
-@patch('etl.views.extract_datahub_future_interest_countries')
-@patch('etl.views.extract_datahub_interactions')
-@patch('etl.views.extract_datahub_omis_dataset')
-@patch('etl.views.extract_datahub_sectors')
-@patch('etl.views.extract_export_wins')
-@patch('etl.views.DatahubCompanyIDToCompaniesHouseCompanyNumberTask')
-@patch('etl.views.ExportCountriesTask')
-@patch('etl.views.PopulateCountriesAndSectorsOfInterestTask')
-@patch('etl.views.PopulateCountriesOfInterestTask')
-@patch('etl.views.SectorsOfInterestTask')
-@patch('etl.views.get_db')
+@patch('etl.tasks.extract_datahub_company_dataset')
+@patch('etl.tasks.extract_datahub_export_countries')
+@patch('etl.tasks.extract_datahub_future_interest_countries')
+@patch('etl.tasks.extract_datahub_interactions')
+@patch('etl.tasks.extract_datahub_omis_dataset')
+@patch('etl.tasks.extract_datahub_sectors')
+@patch('etl.tasks.extract_export_wins')
+@patch('etl.tasks.DatahubCompanyIDToCompaniesHouseCompanyNumberTask')
+@patch('etl.tasks.ExportCountriesTask')
+@patch('etl.tasks.PopulateCountriesAndSectorsOfInterestTask')
+@patch('etl.tasks.PopulateCountriesOfInterestTask')
+@patch('etl.tasks.SectorsOfInterestTask')
 class TestPopulateDatabase(TestCase):
 
-    def setUp(self):
-        super().setUp()
-        self.request_context = app.test_request_context()
-
-    def test_datahub_company_dataset(
+    @patch('etl.tasks.get_db')
+    def test_tasks_are_run(
             self,
             get_db,
             SectorsOfInterestTask,
@@ -39,14 +38,10 @@ class TestPopulateDatabase(TestCase):
             extract_datahub_export_countries,
             extract_datahub_company_dataset,
     ):
+        with app.app_context():
+            output = populate_database(drop_table=True)
 
-        request = Mock()
-        request.args = {'drop-table': ''}
-        with patch("etl.views.request", request):
-            with app.app_context():
-                request.args = {'drop-table': ''}
-                output = populate_database()
-        
+        db_context = get_db.return_value.__enter__.return_value
         extract_datahub_company_dataset.assert_called_once()
         extract_datahub_export_countries.assert_called_once()
         extract_datahub_future_interest_countries.assert_called_once()
@@ -55,27 +50,27 @@ class TestPopulateDatabase(TestCase):
         extract_datahub_sectors.assert_called_once()
         extract_export_wins.assert_called_once()
         DatahubCompanyIDToCompaniesHouseCompanyNumberTask.assert_called_once_with(
-            connection=get_db.return_value,
+            connection=db_context,
             drop_table=True
         )
         DatahubCompanyIDToCompaniesHouseCompanyNumberTask.return_value.assert_called_once()
         ExportCountriesTask.assert_called_once_with(
-            connection=get_db.return_value,
+            connection=db_context,
             drop_table=True
         )
         ExportCountriesTask.return_value.assert_called_once()
         PopulateCountriesAndSectorsOfInterestTask.assert_called_once_with(
-            connection=get_db.return_value,
+            connection=db_context,
             drop_table=True
         )
         PopulateCountriesAndSectorsOfInterestTask.return_value.assert_called_once()
         PopulateCountriesOfInterestTask.assert_called_once_with(
-            connection=get_db.return_value,
+            connection=db_context,
             drop_table=True
         )
         PopulateCountriesOfInterestTask.return_value.assert_called_once()
         SectorsOfInterestTask.assert_called_once_with(
-            connection=get_db.return_value,
+            connection=db_context,
             drop_table=True
         )
         SectorsOfInterestTask.return_value.assert_called_once()
@@ -98,3 +93,41 @@ class TestPopulateDatabase(TestCase):
         }
 
         self.assertEqual(output, expected_output)
+
+    @patch('etl.tasks.datetime')
+    def test_updates_task_status_to_success(
+            self,
+            mock_datetime,
+            SectorsOfInterestTask,
+            PopulateCountriesOfInterestTask,
+            PopulateCountriesAndSectorsOfInterestTask,
+            ExportCountriesTask,
+            DatahubCompanyIDToCompaniesHouseCompanyNumberTask,
+            extract_export_wins,
+            extract_datahub_sectors,
+            extract_datahub_omis_dataset,
+            extract_datahub_interactions,
+            extract_datahub_future_interest_countries,
+            extract_datahub_export_countries,
+            extract_datahub_company_dataset,
+    ):
+
+        mock_datetime.datetime.now.return_value = datetime.datetime(2019, 1, 1, 2)
+        with app.app_context():
+            with get_db() as connection:
+                with connection.cursor() as cursor:
+                    sql = 'create table if not exists etl_status (' \
+                        'status varchar(100), timestamp timestamp)'
+                    cursor.execute(sql)
+                    sql = "insert into etl_status values ('RUNNING', '2019-01-01 01:00')"
+                    cursor.execute(sql)
+            output = populate_database(drop_table=True)
+            with get_db() as connection:
+                with connection.cursor() as cursor:
+                    sql = 'select * from etl_status'
+                    cursor.execute(sql)
+                    rows = cursor.fetchall()
+            self.assertEqual(len(rows), 1)
+            self.assertEqual(rows, [('SUCCESS', datetime.datetime(2019, 1, 1, 2))])
+
+            

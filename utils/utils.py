@@ -1,3 +1,6 @@
+from flask import request
+
+
 def to_camel_case(word):
     return word.split('_')[0] + ''.join(x.capitalize() or '_' for x in word.split('_')[1:])
 
@@ -21,3 +24,10 @@ def to_tabular_web_dict(df):
         'headers': headers,
         'values': values
     }
+    
+def response_orientation_decorator(view, *args, **kwargs):
+    def wrapper(*args, **kwargs):
+        orientation = request.args.get('orientation', 'tabular')
+        return view(orientation, *args, **kwargs)
+    wrapper.__name__ = view.__name__
+    return wrapper

@@ -7,4 +7,4 @@ applications:
   buildpacks:
     - nodejs_buildpack
     - python_buildpack # do python after node, issue with pip installing git modules
-  command: npm run build; gunicorn app:app
+  command: ./entrypoint.sh
