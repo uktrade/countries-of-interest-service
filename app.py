@@ -7,7 +7,7 @@ from flask.json import JSONEncoder
 from authbroker_client import authbroker_blueprint, login_required
 
 import data_report
-import etl.tasks
+import etl.tasks.core
 from authentication import hawk_decorator_factory
 from db import get_db
 from etl.scheduler import Scheduler
@@ -80,7 +80,7 @@ celery = Celery('app', broker=app.config['CELERY_BROKER'])
 @celery.task
 def populate_database_task(drop_table=True):
     with app.app_context():
-        return etl.tasks.populate_database(drop_table)
+        return etl.tasks.core.populate_database(drop_table)
 
 # hawk authentication
 app.config['HAWK_ENABLED'] = config(
