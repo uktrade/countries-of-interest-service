@@ -4,7 +4,7 @@ from unittest.mock import Mock, patch
 from tests.TestCase import TestCase
 from app import app
 from db import get_db
-from etl.countries_and_sectors_of_interest import Task
+from etl.tasks.core.countries_and_sectors_of_interest import Task
 from utils.sql import query_database
 
 class TestCountriesAndSectorsOfInterest(TestCase):

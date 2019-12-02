@@ -2,7 +2,7 @@ from unittest.mock import Mock, patch
 from tests.TestCase import TestCase
 from app import app
 from db import get_db
-from etl.export_countries import Task
+from etl.tasks.core.export_countries import Task
 from utils.sql import query_database
 
 class TestExportCountries(TestCase):

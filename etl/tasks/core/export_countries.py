@@ -1,34 +1,33 @@
 from config import data_sources
-from etl.etl import ETLTask
+from etl import ETLTask
+
 
 index = ('company_id',)
 
 sql = '''
-select
+select 
   company_id,
   country,
-  sector,
-  '{}' as source,
-  id as source_id,
-  created_on as timestamp
-
-from omis
+  '{export_countries}' as source,
+  id::varchar(100) as source_id,
+  null::timestamp as timestamp
+  
+from datahub_export_countries
 
 order by 1
 
-'''.format(data_sources.omis)
+'''.format(export_countries=data_sources.datahub_export_countries)
 
 table_fields = '''(
-    company_id varchar(100), 
-    country_of_interest varchar(12), 
-    sector_of_interest varchar(50), 
-    source varchar(50), 
-    source_id varchar(100),
-    timestamp timestamp,
-    primary key (source, source_id)
+  company_id varchar(100), 
+  export_country varchar(12), 
+  source varchar(50),
+  source_id varchar(100), 
+  timestamp Timestamp,
+  primary key (source, source_id)
 )'''
 
-table_name = 'coi_countries_and_sectors_of_interest'
+table_name = 'coi_export_countries'
 
 class Task(ETLTask):
 
