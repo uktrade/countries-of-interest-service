@@ -8,7 +8,6 @@ from authbroker_client import authbroker_blueprint, login_required
 
 import data_report
 import etl.tasks
-import views
 from authentication import hawk_decorator_factory
 from db import get_db
 from etl.scheduler import Scheduler
