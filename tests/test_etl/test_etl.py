@@ -1,14 +1,14 @@
 import unittest
 from unittest.mock import Mock, patch
-from etl.etl import create_index, ETLTask
+from etl import create_index, ETLTask
 from tests.TestCase import TestCase
 from utils.sql import query_database
 
-@patch('etl.etl.create_index')
-@patch('etl.etl.create_table')
-@patch('etl.etl.drop_table')
-@patch('etl.etl.insert_data')
-@patch('etl.etl.query_database')
+@patch('etl.create_index')
+@patch('etl.create_table')
+@patch('etl.drop_table')
+@patch('etl.insert_data')
+@patch('etl.query_database')
 class TestEtlTask(unittest.TestCase):
 
     def test_creates_index(

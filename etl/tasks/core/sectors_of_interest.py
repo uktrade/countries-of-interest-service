@@ -1,5 +1,5 @@
 from config import data_sources
-from etl.etl import ETLTask
+from etl import ETLTask
 
 index = ('company_id',)
 

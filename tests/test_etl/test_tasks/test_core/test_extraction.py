@@ -1,8 +1,12 @@
 import pandas as pd
-import etl.extraction as extraction
+import etl.tasks.core.source_data_extraction as extraction
 from unittest.mock import Mock, patch
 from tests.TestCase import TestCase
-from etl.extraction import extract_datahub_interactions, extract_export_wins, populate_table
+from etl.tasks.core.source_data_extraction import (
+    extract_datahub_interactions,
+    extract_export_wins,
+    populate_table
+)
 from utils.sql import query_database
 from app import app
 from db import get_db
@@ -10,7 +14,7 @@ from db import get_db
 
 class TestExtractDatahubCompany(TestCase):
 
-    @patch('etl.extraction.populate_table')
+    @patch('etl.tasks.core.source_data_extraction.populate_table')
     def test(self, populate_table):
         schema = {
             'columns': ('id uuid', 'company_number varchar(50)', 'sector varchar(50)'),
@@ -36,7 +40,7 @@ class TestExtractDatahubCompany(TestCase):
 
 class TestExtractDatahubExportCountries(TestCase):
 
-    @patch('etl.extraction.populate_table')
+    @patch('etl.tasks.core.source_data_extraction.populate_table')
     def test(self, populate_table):
         data = {
             'headers': ['company_id', 'country', 'id', ],
@@ -66,9 +70,9 @@ class TestExtractDatahubExportCountries(TestCase):
 
 class TestExtractDatahubFutureInterestCountries(TestCase):
 
-    @patch('etl.extraction.get_hawk_headers')
-    @patch('etl.extraction.populate_table')
-    @patch('etl.extraction.requests')
+    @patch('etl.tasks.core.source_data_extraction.get_hawk_headers')
+    @patch('etl.tasks.core.source_data_extraction.populate_table')
+    @patch('etl.tasks.core.source_data_extraction.requests')
     def test(self, requests, populate_table, get_hawk_headers):
         data = {
             'headers': ['companyId', 'country', 'id', ],
@@ -98,9 +102,9 @@ class TestExtractDatahubFutureInterestCountries(TestCase):
 
 class TestExtractDatahubInteractions(TestCase):
 
-    @patch('etl.extraction.get_hawk_headers')
-    @patch('etl.extraction.populate_table')
-    @patch('etl.extraction.requests')
+    @patch('etl.tasks.core.source_data_extraction.get_hawk_headers')
+    @patch('etl.tasks.core.source_data_extraction.populate_table')
+    @patch('etl.tasks.core.source_data_extraction.requests')
     def test(self, requests, populate_table, get_hawk_headers):
         data = {
             'headers': ['companyId', 'country', 'id', ],
@@ -130,9 +134,9 @@ class TestExtractDatahubInteractions(TestCase):
 
 class TestExtractDatahubOmis(TestCase):
 
-    @patch('etl.extraction.get_hawk_headers')
-    @patch('etl.extraction.populate_table')
-    @patch('etl.extraction.requests')
+    @patch('etl.tasks.core.source_data_extraction.get_hawk_headers')
+    @patch('etl.tasks.core.source_data_extraction.populate_table')
+    @patch('etl.tasks.core.source_data_extraction.requests')
     def test(self, requests, populate_table, get_hawk_headers):
         data = {
             'headers': ['companyId', 'country', 'createdOn', 'id', 'sector'],
@@ -173,9 +177,9 @@ class TestExtractDatahubOmis(TestCase):
 
 class TestExtractDatahubSectors(TestCase):
 
-    @patch('etl.extraction.get_hawk_headers')
-    @patch('etl.extraction.populate_table')
-    @patch('etl.extraction.requests')
+    @patch('etl.tasks.core.source_data_extraction.get_hawk_headers')
+    @patch('etl.tasks.core.source_data_extraction.populate_table')
+    @patch('etl.tasks.core.source_data_extraction.requests')
     def test(self, requests, populate_table, get_hawk_headers):
         data = {
             'headers': ['id', 'sector'],
@@ -201,9 +205,9 @@ class TestExtractDatahubSectors(TestCase):
 
 class TestExtractExportWins(TestCase):
 
-    @patch('etl.extraction.get_hawk_headers')
-    @patch('etl.extraction.populate_table')
-    @patch('etl.extraction.requests')
+    @patch('etl.tasks.core.source_data_extraction.get_hawk_headers')
+    @patch('etl.tasks.core.source_data_extraction.populate_table')
+    @patch('etl.tasks.core.source_data_extraction.requests')
     def test(self, requests, populate_table, get_hawk_headers):
         data = {
             'headers': ['id', 'companyId', 'timestamp'],
@@ -243,8 +247,8 @@ class TestPopulateTable(TestCase):
         self.connection = Mock()
         
 
-    @patch('etl.extraction.get_db')
-    @patch('etl.extraction.sql_utils')
+    @patch('etl.tasks.core.source_data_extraction.get_db')
+    @patch('etl.tasks.core.source_data_extraction.sql_utils')
     def test_copies_table_to_backup_if_it_exists(self, sql_utils, get_db):
         get_db.return_value = self.connection
         self.connection.cursor.return_value = Mock(rowcount=1)
@@ -263,8 +267,8 @@ class TestPopulateTable(TestCase):
             'existing_table_backup'
         )
 
-    @patch('etl.extraction.get_db')        
-    @patch('etl.extraction.requests')
+    @patch('etl.tasks.core.source_data_extraction.get_db')        
+    @patch('etl.tasks.core.source_data_extraction.requests')
     def test_if_stubbed_data_passed_use_it_instead_of_real_data(self, requests, get_db):
         with app.app_context():
             output = populate_table(
@@ -275,9 +279,9 @@ class TestPopulateTable(TestCase):
             )
         requests.assert_not_called()
 
-    @patch('etl.extraction.get_db')        
-    @patch('etl.extraction.get_hawk_headers')
-    @patch('etl.extraction.requests')
+    @patch('etl.tasks.core.source_data_extraction.get_db')        
+    @patch('etl.tasks.core.source_data_extraction.get_hawk_headers')
+    @patch('etl.tasks.core.source_data_extraction.requests')
     def test_no_stubbed_data(self, requests, get_hawk_headers, get_db):
         headers = Mock()
         get_hawk_headers.return_value = headers
@@ -289,8 +293,8 @@ class TestPopulateTable(TestCase):
             )
         requests.get.assert_called_once_with(self.url, headers=headers)
 
-    @patch('etl.extraction.get_db')
-    @patch('etl.extraction.sql_utils')
+    @patch('etl.tasks.core.source_data_extraction.get_db')
+    @patch('etl.tasks.core.source_data_extraction.sql_utils')
     def test_if_table_exists_and_insert_fails_fallback(self, sql_utils, get_db):
         get_db.return_value = self.connection
         sql_utils.table_exists.return_value = True

@@ -3,25 +3,24 @@ from unittest.mock import Mock, patch
 from flask import current_app
 from app import app
 from db import get_db
-from etl.tasks import populate_database
+from etl.tasks.core import populate_database
 from tests.TestCase import TestCase
 
 
-@patch('etl.tasks.extract_datahub_company_dataset')
-@patch('etl.tasks.extract_datahub_export_countries')
-@patch('etl.tasks.extract_datahub_future_interest_countries')
-@patch('etl.tasks.extract_datahub_interactions')
-@patch('etl.tasks.extract_datahub_omis_dataset')
-@patch('etl.tasks.extract_datahub_sectors')
-@patch('etl.tasks.extract_export_wins')
-@patch('etl.tasks.DatahubCompanyIDToCompaniesHouseCompanyNumberTask')
-@patch('etl.tasks.ExportCountriesTask')
-@patch('etl.tasks.PopulateCountriesAndSectorsOfInterestTask')
-@patch('etl.tasks.PopulateCountriesOfInterestTask')
-@patch('etl.tasks.SectorsOfInterestTask')
+@patch('etl.tasks.core.extract_datahub_company_dataset')
+@patch('etl.tasks.core.extract_datahub_export_countries')
+@patch('etl.tasks.core.extract_datahub_future_interest_countries')
+@patch('etl.tasks.core.extract_datahub_interactions')
+@patch('etl.tasks.core.extract_datahub_omis_dataset')
+@patch('etl.tasks.core.extract_datahub_sectors')
+@patch('etl.tasks.core.extract_export_wins')
+@patch('etl.tasks.core.ExportCountriesTask')
+@patch('etl.tasks.core.PopulateCountriesAndSectorsOfInterestTask')
+@patch('etl.tasks.core.PopulateCountriesOfInterestTask')
+@patch('etl.tasks.core.SectorsOfInterestTask')
 class TestPopulateDatabase(TestCase):
 
-    @patch('etl.tasks.get_db')
+    @patch('etl.tasks.core.get_db')
     def test_tasks_are_run(
             self,
             get_db,
@@ -29,7 +28,6 @@ class TestPopulateDatabase(TestCase):
             PopulateCountriesOfInterestTask,
             PopulateCountriesAndSectorsOfInterestTask,
             ExportCountriesTask,
-            DatahubCompanyIDToCompaniesHouseCompanyNumberTask,
             extract_export_wins,
             extract_datahub_sectors,
             extract_datahub_omis_dataset,
@@ -49,11 +47,6 @@ class TestPopulateDatabase(TestCase):
         extract_datahub_omis_dataset.assert_called_once()
         extract_datahub_sectors.assert_called_once()
         extract_export_wins.assert_called_once()
-        DatahubCompanyIDToCompaniesHouseCompanyNumberTask.assert_called_once_with(
-            connection=db_context,
-            drop_table=True
-        )
-        DatahubCompanyIDToCompaniesHouseCompanyNumberTask.return_value.assert_called_once()
         ExportCountriesTask.assert_called_once_with(
             connection=db_context,
             drop_table=True
@@ -84,7 +77,6 @@ class TestPopulateDatabase(TestCase):
                 extract_datahub_omis_dataset.return_value,
                 extract_datahub_sectors.return_value,
                 extract_export_wins.return_value,
-                DatahubCompanyIDToCompaniesHouseCompanyNumberTask.return_value.return_value,
                 ExportCountriesTask.return_value.return_value,
                 PopulateCountriesAndSectorsOfInterestTask.return_value.return_value,
                 PopulateCountriesOfInterestTask.return_value.return_value,
@@ -94,7 +86,7 @@ class TestPopulateDatabase(TestCase):
 
         self.assertEqual(output, expected_output)
 
-    @patch('etl.tasks.datetime')
+    @patch('etl.tasks.core.datetime')
     def test_updates_task_status_to_success(
             self,
             mock_datetime,
@@ -102,7 +94,6 @@ class TestPopulateDatabase(TestCase):
             PopulateCountriesOfInterestTask,
             PopulateCountriesAndSectorsOfInterestTask,
             ExportCountriesTask,
-            DatahubCompanyIDToCompaniesHouseCompanyNumberTask,
             extract_export_wins,
             extract_datahub_sectors,
             extract_datahub_omis_dataset,

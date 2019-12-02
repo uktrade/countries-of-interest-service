@@ -3,7 +3,7 @@ import datetime, mohawk, os, pandas as pd, psycopg2, tempfile, unittest
 from db import get_db
 from unittest.mock import Mock, patch
 from tests.TestCase import TestCase
-from etl import (
+from etl.tasks.core import (
     countries_and_sectors_of_interest,
     countries_of_interest,
     export_countries,
