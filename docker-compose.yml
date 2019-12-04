@@ -12,6 +12,8 @@ services:
       - ${PORT:-5000}:5000
     depends_on:
       - postgres
+    volumes:
+      - .:/app
   postgres:
     image: "postgres"
   redis:
