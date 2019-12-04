@@ -113,7 +113,7 @@ def create_users_table(users):
             execute_query(connection, sql)
         sql = 'create table users (' \
             'client_id varchar(100) primary key,' \
-            'client_key varchar(100)' \
+            'client_key varchar(200)' \
             ')'
         with get_db() as connection:
             execute_query(connection, sql)
