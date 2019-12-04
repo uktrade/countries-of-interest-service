@@ -500,7 +500,7 @@ from coi_datahub_company_id_to_companies_house_company_number
     return to_web_dict(df)
 
 @app.route('/')
-#@login_required
+@login_required
 def get_index():
     last_updated = None
     with get_db() as connection:
@@ -555,7 +555,8 @@ def populate_database():
                 df['timestamp'].values[0]
             )
         }
-    
+
+
 if app.config['RUN_SCHEDULER'] is True:
     print('starting scheduler')
     scheduled_task = Scheduler(populate_database_task)
