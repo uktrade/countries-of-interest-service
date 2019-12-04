@@ -4,6 +4,7 @@ from celery import Celery
 from decouple import config
 from flask import current_app, Flask, render_template, request
 from flask.json import JSONEncoder
+from flask import jsonify
 from authbroker_client import authbroker_blueprint, login_required
 
 import data_report
@@ -557,15 +558,15 @@ def populate_database():
         }
 
 
+@app.route('/healthcheck/', methods=["GET"])
+def healthcheck():
+    return jsonify({
+        "status": "OK"
+    })
+
+
 if app.config['RUN_SCHEDULER'] is True:
     print('starting scheduler')
     scheduled_task = Scheduler(populate_database_task)
     scheduled_task.start()
 
-if __name__ == '__main__':
-    cf_port = os.getenv("PORT")
-    if cf_port is None:
-        app.run(host='0.0.0.0', port=5000, debug=True)
-    else:
-        app.run(host='0.0.0.0', port=int(cf_port), debug=True)
-        

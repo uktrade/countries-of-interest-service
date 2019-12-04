@@ -1,10 +1,7 @@
 # manifest.yml
 ---
 applications:
-- name: countries_of_interest_service
-  memory: 512M
-  instances: 1
-  buildpacks:
+-
+  buildpack:
+    - python_buildpack
     - nodejs_buildpack
-    - python_buildpack # do python after node, issue with pip installing git modules
-  command: ./entrypoint.sh

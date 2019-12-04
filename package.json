@@ -1,5 +1,5 @@
 {
-  "name": "countries_of_interest_service",
+  "name": "countries-of-interest-service",
   "version": "1.0.0",
   "description": "",
   "dependencies": {
@@ -24,15 +24,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/uktrade/countries_of_interest_service.git"
+    "url": "git+https://github.com/uktrade/countries-of-interest-service.git"
   },
   "scripts": {
-    "build": "webpack"
+    "build": "webpack",
+    "start": "npm run build"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/uktrade/countries_of_interest_service/issues"
+    "url": "https://github.com/uktrade/countries-of-interest-service/issues"
   },
-  "homepage": "https://github.com/uktrade/countries_of_interest_service#readme"
+  "homepage": "https://github.com/uktrade/countries-of-interest-service#readme"
 }
