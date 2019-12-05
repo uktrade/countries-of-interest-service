@@ -1,4 +1,5 @@
 import datetime
+
 from etl.etl import ETLTask
 
 now = datetime.datetime.now()
@@ -35,7 +36,7 @@ select
     segment,
     count(1) as n_companies,
     '{now}' as timestamp
-    
+
 from company_company l join segments r on l.sector_id = r.id
 
 where sector_id is not null
@@ -49,7 +50,7 @@ order by 2 desc
 )
 
 table_fields = '''(
-    sector varchar(200), 
+    sector varchar(200),
     count int,
     timestamp Timestamp
 )'''

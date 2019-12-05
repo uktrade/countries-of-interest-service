@@ -1,4 +1,5 @@
 from config import data_sources
+
 from etl import ETLTask
 
 index = ('company_id',)
@@ -21,10 +22,10 @@ order by 1
 )
 
 table_fields = '''(
-    company_id varchar(100), 
-    country_of_interest varchar(12), 
-    sector_of_interest varchar(50), 
-    source varchar(50), 
+    company_id varchar(100),
+    country_of_interest varchar(12),
+    sector_of_interest varchar(50),
+    source varchar(50),
     source_id varchar(100),
     timestamp timestamp,
     primary key (source, source_id)

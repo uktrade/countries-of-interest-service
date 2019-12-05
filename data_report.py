@@ -1,7 +1,7 @@
-import psycopg2
 from db import get_db
+
 from utils.sql import query_database
-from utils.utils import to_web_dict, to_camel_case
+from utils.utils import to_camel_case, to_web_dict
 
 summary_table_sql = '''
 with datahub_company_summary as (
@@ -15,9 +15,9 @@ with datahub_company_summary as (
     select
         id,
         company_number
-        
+
     from datahub_company
-    
+
     where company_number is not null
         and company_number not in ('', 'NotRegis', 'n/a', 'Not reg', 'N/A')
 
@@ -27,21 +27,21 @@ with datahub_company_summary as (
         count(1)
     from matched_companies
     group by 1
-    
+
     having count(1) > 1
 
 ), duplicate_summary as (
     select
         sum(count) as n_companies_matched_to_duplicate_companies_house
-        
+
     from duplicates
-    
+
 ), match_summary as (
     select
         count(1) as n_companies_matched_to_companies_house
-        
+
     from matched_companies
-    
+
 ), sector_summary as (
   select
     count(1) as n_sectors
@@ -67,11 +67,12 @@ with datahub_company_summary as (
   from datahub_future_interest_countries
 
 ), results as (
-  select 
+  select
     n_companies,
     n_companies_matched_to_companies_house,
     n_companies_matched_to_sector,
-    coalesce(n_companies_matched_to_duplicate_companies_house, 0::float) as n_companies_matched_to_duplicate_companies_house,
+    coalesce(n_companies_matched_to_duplicate_companies_house, 0::float)
+        as n_companies_matched_to_duplicate_companies_house,
     n_companies_with_export_countries,
     n_companies_with_future_interest_countries,
     n_companies_with_omis_orders,
@@ -158,10 +159,6 @@ def get_data_report_data():
 
 
 if __name__ == '__main__':
-
-    def get_db():
-        uri = 'postgres://countries_of_interest_service@localhost/countries_of_interest_service'
-        return psycopg2.connect(uri)
 
     data = get_data_report_data()
     print(data)

@@ -1,7 +1,14 @@
 import unittest
 from unittest.mock import Mock, patch
-from etl import create_index, ETLTask
+
+from app import app
+
+from db import get_db
+
+from etl import ETLTask, create_index
+
 from tests.TestCase import TestCase
+
 from utils.sql import query_database
 
 
@@ -35,18 +42,15 @@ class TestEtlTask(unittest.TestCase):
         create_index.assert_not_called()
 
 
-from app import app
-from db import get_db
-
-
 class TestCreateIndex(TestCase):
     def setUp(self):
         super().setUp()
         self.index = ['source', 'source_id']
         self.table_name = 'test_table'
-        sql_create = (
-            '''create table {} (source varchar(50), source_id varchar(100), val int)'''
-        )
+        sql_create = '''
+            create table {}
+                (source varchar(50), source_id varchar(100), val int)
+            '''
         sql_create = sql_create.format(self.table_name)
         with app.app_context():
             with get_db() as connection:
@@ -61,7 +65,7 @@ class TestCreateIndex(TestCase):
                     tablename,
                     indexname,
                     indexdef
-                
+
                 FROM pg_indexes
 
                 WHERE schemaname = 'public' and tablename = %s'''

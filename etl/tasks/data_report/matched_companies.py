@@ -1,4 +1,5 @@
 import datetime
+
 from etl.etl import ETLTask
 
 now = datetime.datetime.now()
@@ -8,18 +9,18 @@ with matched_companies as (
     select
         id,
         company_number
-        
+
     from company_company
-    
+
     where company_number is not null
         and company_number not in ('', 'NotRegis', 'n/a', 'Not reg', 'N/A')
 
 ), n_companies as (
     select
         count(id)
-        
+
     from company_company
-    
+
 ), duplicates as (
     select
         company_number,
@@ -28,21 +29,21 @@ with matched_companies as (
     from matched_companies
 
     group by 1
-    
+
     having count(1) > 1
 
 ), n_duplicates as (
     select
         sum(count) as count
-        
+
     from duplicates
-    
+
 ), n_matches as (
     select
         count(1)
-        
+
     from matched_companies
-    
+
 ), results as (
     select
         n_companies.count as n_companies,
@@ -50,10 +51,10 @@ with matched_companies as (
         n_duplicates.count as n_duplicates,
         n_matches.count - n_duplicates.count as n_unique_matches,
         '{now}' as timestamp
-      
+
     from n_companies join n_matches on 1=1
         join n_duplicates on 1=1
-        
+
 )
 
 select * from results
@@ -63,7 +64,7 @@ select * from results
 )
 
 table_fields = '''(
-    n_companies int, 
+    n_companies int,
     n_matches int,
     n_duplicates int,
     n_unique_matches int,

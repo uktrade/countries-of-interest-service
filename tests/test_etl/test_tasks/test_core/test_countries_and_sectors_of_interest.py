@@ -1,10 +1,13 @@
-import datetime
-import numpy as np
-from unittest.mock import Mock, patch
-from tests.TestCase import TestCase
 from app import app
+
 from db import get_db
+
 from etl.tasks.core.countries_and_sectors_of_interest import Task
+
+import numpy as np
+
+from tests.TestCase import TestCase
+
 from utils.sql import query_database
 
 
@@ -16,10 +19,10 @@ class TestCountriesAndSectorsOfInterest(TestCase):
                     sql = (
                         'create table omis '
                         '''(
-                             company_id uuid, 
-                             country varchar(2), 
-                             sector varchar(100), 
-                             created_on timestamp, 
+                             company_id uuid,
+                             country varchar(2),
+                             sector varchar(100),
+                             created_on timestamp,
                              id uuid
                         )'''
                     )
@@ -48,7 +51,7 @@ class TestCountriesAndSectorsOfInterest(TestCase):
                 task = Task(connection=connection)
                 task()
 
-                sql = ''' select * from coi_countries_and_sectors_of_interest '''
+                sql = '''select * from coi_countries_and_sectors_of_interest'''
                 df = query_database(connection, sql)
 
         self.assertEqual(len(df), 2)
@@ -78,11 +81,11 @@ class TestCountriesAndSectorsOfInterest(TestCase):
           tablename,
           indexname,
           indexdef
-        
+
         FROM pg_indexes
 
-        WHERE schemaname = 'public' 
-          and tablename = 'coi_countries_and_sectors_of_interest' 
+        WHERE schemaname = 'public'
+          and tablename = 'coi_countries_and_sectors_of_interest'
         '''
         df = query_database(connection, sql)
         self.assertTrue(len(df) >= 1)  # index created

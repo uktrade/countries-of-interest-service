@@ -1,4 +1,6 @@
-import pandas as pd, psycopg2
+import pandas as pd
+
+import psycopg2
 
 
 def drop_table(connection, table_name, if_exists=True):
@@ -53,7 +55,14 @@ def rename_table(connection, table_name_1, table_name_2):
 
 
 def table_exists(connection, table_name, schema='public'):
-    sql = '''select * from information_schema.tables where table_schema=%s and table_name=%s'''
+    sql = '''
+        select
+            *
+        from information_schema.tables
+
+        where table_schema=%s
+            and table_name=%s
+    '''
     with connection.cursor() as cursor:
         cursor.execute(sql, [schema, table_name])
         rows = cursor.fetchall()

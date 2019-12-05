@@ -1,8 +1,11 @@
-from unittest.mock import Mock, patch
-from tests.TestCase import TestCase
 from app import app
+
 from db import get_db
+
 from etl.tasks.core.export_countries import Task
+
+from tests.TestCase import TestCase
+
 from utils.sql import query_database
 
 
@@ -20,7 +23,7 @@ class TestExportCountries(TestCase):
                         ('a4881825-6c7c-46f3-b638-6a1346274a6b', 'CN', '0'),
                         ('f89d85d2-78c7-484d-bf63-228f32bf8d26', 'UK', '1'),
                     ]
-                    sql = 'insert into datahub_export_countries values (%s, %s, %s)'
+                    sql = 'insert into datahub_export_countries ' 'values (%s, %s, %s)'
                     cursor.executemany(sql, values)
 
         with app.app_context():

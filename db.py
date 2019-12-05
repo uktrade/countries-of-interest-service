@@ -1,6 +1,6 @@
-import sqlite3
-import psycopg2
 from flask import current_app, g
+
+import psycopg2
 
 
 def close_db(e=None):

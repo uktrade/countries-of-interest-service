@@ -1,17 +1,18 @@
 from config import data_sources
+
 from etl import ETLTask
 
 
 index = ('company_id',)
 
 sql = '''
-select 
+select
   company_id,
   country,
   '{export_countries}' as source,
   id::varchar(100) as source_id,
   null::timestamp as timestamp
-  
+
 from datahub_export_countries
 
 order by 1
@@ -21,10 +22,10 @@ order by 1
 )
 
 table_fields = '''(
-  company_id varchar(100), 
-  export_country varchar(12), 
+  company_id varchar(100),
+  export_country varchar(12),
   source varchar(50),
-  source_id varchar(100), 
+  source_id varchar(100),
   timestamp Timestamp,
   primary key (source, source_id)
 )'''

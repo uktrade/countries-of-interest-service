@@ -1,6 +1,8 @@
 apscheduler==3.*
 black==19.10b0
 celery==4.3.0
+flake8-import-order==0.18.1
+flake8==3.7.9
 flask==1.*
 flask_oauthlib==0.9.5
 git+git://github.com/uktrade/flask-authbroker-client

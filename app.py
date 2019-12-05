@@ -1,20 +1,32 @@
-import datetime, json, logging, os, sqlite3
-import mohawk, numpy as np, pandas as pd, redis
-from celery import Celery
-from decouple import config
-from flask import current_app, Flask, render_template, request
-from flask.json import JSONEncoder
-from flask import jsonify
+import datetime
+import json
+import os
+
 from authbroker_client import authbroker_blueprint, login_required
 
-import data_report
-import etl.tasks.core
 from authentication import hawk_decorator_factory
+
+from celery import Celery
+
+import data_report
+
 from db import get_db
+
+from decouple import config
+
+import etl.tasks.core
 from etl.scheduler import Scheduler
+
+from flask import Flask, jsonify, render_template, request
+from flask.json import JSONEncoder
+
+import numpy as np
+
+import pandas as pd
+
 from utils import utils
-from utils.utils import to_web_dict
 from utils.sql import execute_query, query_database, table_exists
+from utils.utils import to_web_dict
 
 
 class CustomJSONEncoder(JSONEncoder):
@@ -28,7 +40,7 @@ class CustomJSONEncoder(JSONEncoder):
         elif isinstance(obj, np.ndarray):
             return obj.tolist()
         else:
-            return super(MyEncoder, self).default(obj)
+            return str(obj)
 
 
 app = Flask(__name__)
@@ -62,7 +74,8 @@ if app.config['ENV'] == 'production':
 elif app.config['ENV'] in ['dev', 'development']:
     app.config['DATABASE'] = config(
         'DATABASE_URL',
-        'postgresql://countries_of_interest_service@localhost/countries_of_interest_service',
+        'postgresql://countries_of_interest_service@localhost'
+        '/countries_of_interest_service',
     )
 elif app.config['ENV'] == 'test':
     app.config['DATABASE'] = config(
@@ -110,7 +123,8 @@ app.config['DATAWORKSPACE_HAWK_CLIENT_KEY'] = config(
     'DATAWORKSPACE_HAWK_CLIENT_KEY', 'dataworkspace_client_key'
 )
 # decorator for hawk authentication
-# when hawk is disabled the authentication is trivial, effectively all requests are authenticated
+# when hawk is disabled the authentication is trivial,
+# effectively all requests are authenticated
 hawk_authentication = hawk_decorator_factory(app.config['HAWK_ENABLED'])
 users = [
     (
@@ -210,7 +224,7 @@ def get_company_countries_and_sectors_of_interest(orientation):
     elif len(sources) > 1:
         where = where + ' and' if where != '' else 'where'
         where = (
-            where + ' source in (' + ','.join(['%s' for i in range(len(sectors))]) + ')'
+            where + ' source in (' + ','.join(['%s' for i in range(len(sources))]) + ')'
         )
     if next_source is not None and next_source_id is not None:
         where = where + ' and' if where != '' else 'where'
@@ -294,7 +308,7 @@ def get_company_countries_of_interest(orientation):
     elif len(sources) > 1:
         where = where + ' and' if where != '' else 'where'
         where = (
-            where + ' source in (' + ','.join(['%s' for i in range(len(sectors))]) + ')'
+            where + ' source in (' + ','.join(['%s' for i in range(len(sources))]) + ')'
         )
     if next_source is not None and next_source_id is not None:
         where = where + ' and' if where != '' else 'where'
@@ -378,7 +392,7 @@ def get_company_export_countries(orientation):
     elif len(sources) > 1:
         where = where + ' and' if where != '' else 'where'
         where = (
-            where + ' source in (' + ','.join(['%s' for i in range(len(sectors))]) + ')'
+            where + ' source in (' + ','.join(['%s' for i in range(len(sources))]) + ')'
         )
     if next_source is not None and next_source_id is not None:
         where = where + ' and' if where != '' else 'where'
@@ -442,7 +456,7 @@ def get_company_sectors_of_interest(orientation):
     elif len(sectors) > 1:
         where = (
             'where sector_of_interest in ('
-            + ','.join('%s' for i in range(len(countries)))
+            + ','.join('%s' for i in range(len(sectors)))
             + ')'
         )
     if len(company_ids) == 1:
@@ -540,7 +554,7 @@ from coi_datahub_company_id_to_companies_house_company_number
 @hawk_authentication
 def get_datahub_company_ids_to_companies_house_company_numbers():
     sql_query = '''
-select 
+select
   datahub_company_id,
   companies_house_company_number
 
@@ -592,7 +606,10 @@ def populate_database():
     drop_table = 'drop-table' in request.args
     force_update = 'force-update' in request.args
     with get_db() as connection:
-        sql = 'create table if not exists etl_status (status varchar(100), timestamp timestamp)'
+        sql = (
+            'create table if not exists etl_status '
+            '(status varchar(100), timestamp timestamp)'
+        )
         execute_query(connection, sql)
         sql = 'select * from etl_status'
         df = query_database(connection, sql)
@@ -606,7 +623,7 @@ def populate_database():
     else:
         return {
             'status': 200,
-            'message': 'populate_database task already running since: {}'.format(
+            'message': ('populate_database task already running since: {}').format(
                 df['timestamp'].values[0]
             ),
         }

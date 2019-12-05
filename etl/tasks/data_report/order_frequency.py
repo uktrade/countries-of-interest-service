@@ -1,4 +1,5 @@
 import datetime
+
 from etl.etl import ETLTask
 
 now = datetime.datetime.now()
@@ -8,7 +9,7 @@ select
     date_trunc('day', created_on) as date,
     count(created_on) as count,
     '{now}' as timestamp
-    
+
 from order_order
 
 group by 1

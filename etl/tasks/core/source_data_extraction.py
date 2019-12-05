@@ -1,6 +1,13 @@
-import mohawk, os, psycopg2, requests
-from flask import current_app
 from db import get_db
+
+from flask import current_app
+
+import mohawk
+
+import psycopg2
+
+import requests
+
 from utils import sql as sql_utils
 
 
@@ -32,7 +39,7 @@ def extract_datahub_export_countries():
     table_name = 'datahub_export_countries'
     url = 'http://{}/{}'.format(current_app.config['DATAWORKSPACE_HOST'], endpoint)
     data = {
-        'headers': ['company_id', 'country', 'id',],
+        'headers': ['company_id', 'country', 'id'],
         'values': [
             ['c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'US', 1],
             ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'MY', 2],
@@ -44,13 +51,13 @@ def extract_datahub_export_countries():
 def extract_datahub_future_interest_countries():
     endpoint = 'api/v1/dataset/datahub-future-interest-countries'
     schema = {
-        'columns': ('company_id uuid', 'country varchar(2)', 'id int',),
+        'columns': ('company_id uuid', 'country varchar(2)', 'id int'),
         'primary_key': 'id',
     }
     table_name = 'datahub_future_interest_countries'
     url = 'http://{}/{}'.format(current_app.config['DATAWORKSPACE_HOST'], endpoint)
     data = {
-        'headers': ['companyId', 'country', 'id',],
+        'headers': ['companyId', 'country', 'id'],
         'values': [
             ['c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'CN', 1],
             ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'DE', 2],
@@ -63,13 +70,13 @@ def extract_datahub_interactions():
     endpoint = 'api/v1/dataset/datahub-interactions'
     # todo what does this schema look like
     schema = {
-        'columns': ('company_id uuid', 'country varchar(2)', 'id int',),
+        'columns': ('company_id uuid', 'country varchar(2)', 'id int'),
         'primary_key': 'id',
     }
     table_name = 'datahub_interactions'
     url = 'http://{}/{}'.format(current_app.config['DATAWORKSPACE_HOST'], endpoint)
     stub_data = {
-        'headers': ['companyId', 'country', 'id',],
+        'headers': ['companyId', 'country', 'id'],
         'values': [
             ['c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'CN', 1],
             ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'DE', 2],
@@ -173,7 +180,7 @@ def get_hawk_headers(
 
 def populate_table(schema, table_name, url, stub_data=None):
 
-    if stub_data != None:
+    if stub_data is not None:
         data = stub_data
     else:
         client_id = current_app.config['DATAWORKSPACE_HAWK_CLIENT_ID']
@@ -213,7 +220,7 @@ def populate_table(schema, table_name, url, stub_data=None):
             if len(schema['columns']) > 1
             else [[d] for d in data['values']]
         )
-        result = cursor.executemany(sql, values)
+        cursor.executemany(sql, values)
         connection.commit()
         n_rows = int(cursor.rowcount)
         output = {'table': table_name, 'rows': n_rows, 'status': 200}

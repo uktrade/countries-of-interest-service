@@ -1,15 +1,15 @@
-import pandas as pd
-import etl.tasks.core.source_data_extraction as extraction
 from unittest.mock import Mock, patch
-from tests.TestCase import TestCase
-from etl.tasks.core.source_data_extraction import (
-    extract_datahub_interactions,
-    extract_export_wins,
-    populate_table,
-)
-from utils.sql import query_database
+
 from app import app
+
 from db import get_db
+
+import etl.tasks.core.source_data_extraction as extraction
+from etl.tasks.core.source_data_extraction import populate_table
+
+from tests.TestCase import TestCase
+
+from utils.sql import query_database
 
 
 class TestExtractDatahubCompany(TestCase):
@@ -40,7 +40,7 @@ class TestExtractDatahubExportCountries(TestCase):
     @patch('etl.tasks.core.source_data_extraction.populate_table')
     def test(self, populate_table):
         data = {
-            'headers': ['company_id', 'country', 'id',],
+            'headers': ['company_id', 'country', 'id'],
             'values': [
                 ['c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'US', 1],
                 ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'MY', 2],
@@ -66,14 +66,14 @@ class TestExtractDatahubFutureInterestCountries(TestCase):
     @patch('etl.tasks.core.source_data_extraction.requests')
     def test(self, requests, populate_table, get_hawk_headers):
         data = {
-            'headers': ['companyId', 'country', 'id',],
+            'headers': ['companyId', 'country', 'id'],
             'values': [
                 ['c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'CN', 1],
                 ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'DE', 2],
             ],
         }
         schema = {
-            'columns': ('company_id uuid', 'country varchar(2)', 'id int',),
+            'columns': ('company_id uuid', 'country varchar(2)', 'id int'),
             'primary_key': 'id',
         }
         table_name = 'datahub_future_interest_countries'
@@ -93,7 +93,7 @@ class TestExtractDatahubInteractions(TestCase):
     @patch('etl.tasks.core.source_data_extraction.requests')
     def test(self, requests, populate_table, get_hawk_headers):
         data = {
-            'headers': ['companyId', 'country', 'id',],
+            'headers': ['companyId', 'country', 'id'],
             'values': [
                 ['c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'CN', 1],
                 ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'DE', 2],
@@ -243,7 +243,7 @@ class TestPopulateTable(TestCase):
         self.connection.cursor.return_value = Mock(rowcount=1)
         sql_utils.table_exists.return_value = True
         with app.app_context():
-            output = populate_table(
+            populate_table(
                 self.schema, self.table_name, self.url, stub_data=self.stub_data
             )
         sql_utils.drop_table.assert_called_once_with(
@@ -257,7 +257,7 @@ class TestPopulateTable(TestCase):
     @patch('etl.tasks.core.source_data_extraction.requests')
     def test_if_stubbed_data_passed_use_it_instead_of_real_data(self, requests, get_db):
         with app.app_context():
-            output = populate_table(
+            populate_table(
                 self.schema, self.table_name, self.url, stub_data=self.stub_data
             )
         requests.assert_not_called()
@@ -269,7 +269,9 @@ class TestPopulateTable(TestCase):
         headers = Mock()
         get_hawk_headers.return_value = headers
         with app.app_context():
-            output = populate_table(self.schema, self.table_name, self.url,)
+            populate_table(
+                self.schema, self.table_name, self.url,
+            )
         requests.get.assert_called_once_with(self.url, headers=headers)
 
     @patch('etl.tasks.core.source_data_extraction.get_db')
@@ -280,7 +282,7 @@ class TestPopulateTable(TestCase):
         cursor = self.connection.cursor.return_value
         cursor.execute.side_effect = Exception('asdf')
         with app.app_context():
-            output = populate_table(
+            populate_table(
                 self.schema, self.table_name, self.url, stub_data=self.stub_data,
             )
         sql_utils.rename_table.assert_called_with(
@@ -300,7 +302,7 @@ class TestPopulateTable(TestCase):
         }
 
         with app.app_context():
-            output = populate_table(schema, table_name, url, stub_data=stub_data)
+            populate_table(schema, table_name, url, stub_data=stub_data)
 
         with app.app_context():
             connection = get_db()

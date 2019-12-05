@@ -1,4 +1,5 @@
 from config import data_sources
+
 from etl import ETLTask
 
 index = ('company_id',)
@@ -23,9 +24,9 @@ select * from omis_sectors_of_interest
 )
 
 table_fields = '''(
-    company_id varchar(100), 
-    sector_of_interest varchar(200), 
-    source varchar(50), 
+    company_id varchar(100),
+    sector_of_interest varchar(200),
+    source varchar(50),
     source_id varchar(100),
     timestamp timestamp,
     primary key (source, source_id)

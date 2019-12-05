@@ -1,4 +1,5 @@
 import datetime
+
 from etl.etl import ETLTask
 
 now = datetime.datetime.now()
@@ -13,7 +14,7 @@ with n_companies as (
 ), n_companies_with_countries_of_interest as (
   select
     count(distinct id) as n_companies_with_countries_of_interest
-    
+
   from company_company_future_interest_countries
 
 )
