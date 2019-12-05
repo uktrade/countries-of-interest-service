@@ -57,10 +57,7 @@ assert app.config['ENV'] in (
     'development',
     'test',
 ), 'invalid environment: {}'.format(app.config['ENV'])
-app.config['DATAWORKSPACE_HOST'] = config(
-    'DATAWORKSPACE_HOST',
-    'localapps.com:8000'
-)
+app.config['DATAWORKSPACE_HOST'] = config('DATAWORKSPACE_HOST', 'localapps.com:8000')
 app.config['PAGINATION_SIZE'] = config('PAGINATION_SIZE', 50, cast=int)
 app.config['RUN_SCHEDULER'] = config('RUN_SCHEDULER', False, cast=bool)
 
@@ -220,9 +217,7 @@ def get_company_countries_and_sectors_of_interest(orientation):
     elif len(sources) > 1:
         where = where + ' and' if where != '' else 'where'
         where = (
-            where + ' source in (' + ','.join(
-                ['%s' for i in range(len(sources))]
-            ) + ')'
+            where + ' source in (' + ','.join(['%s' for i in range(len(sources))]) + ')'
         )
     if next_source is not None and next_source_id is not None:
         where = where + ' and' if where != '' else 'where'
@@ -254,9 +249,7 @@ limit {pagination_size} + 1
     connection.close()
     if len(df) == pagination_size + 1:
         next_ = '{}{}?'.format(request.host_url[:-1], request.path)
-        next_ += '&'.join(
-            ['country={}'.format(country) for country in countries]
-        )
+        next_ += '&'.join(['country={}'.format(country) for country in countries])
         next_ += '&'.join(['source={}'.format(source) for source in sources])
         next_ += '&' if next_[-1] != '?' else ''
         next_ += 'next-source={}&next-source-id={}'.format(
@@ -308,9 +301,7 @@ def get_company_countries_of_interest(orientation):
     elif len(sources) > 1:
         where = where + ' and' if where != '' else 'where'
         where = (
-            where + ' source in (' + ','.join(
-                ['%s' for i in range(len(sources))]
-            ) + ')'
+            where + ' source in (' + ','.join(['%s' for i in range(len(sources))]) + ')'
         )
     if next_source is not None and next_source_id is not None:
         where = where + ' and' if where != '' else 'where'
@@ -342,9 +333,7 @@ limit {pagination_size} + 1
     if len(df) == pagination_size + 1:
         next_ = '{}{}'.format(request.host_url[:-1], request.path)
         next_ += '?'
-        next_ += '&'.join(
-            ['country={}'.format(country) for country in countries]
-        )
+        next_ += '&'.join(['country={}'.format(country) for country in countries])
         next_ += '&'.join(['source={}'.format(source) for source in sources])
         next_ += '&' if next_[-1] != '?' else ''
         next_ += 'next-source={}&next-source-id={}'.format(
@@ -396,9 +385,7 @@ def get_company_export_countries(orientation):
     elif len(sources) > 1:
         where = where + ' and' if where != '' else 'where'
         where = (
-            where + ' source in (' + ','.join(
-                ['%s' for i in range(len(sources))]
-            ) + ')'
+            where + ' source in (' + ','.join(['%s' for i in range(len(sources))]) + ')'
         )
     if next_source is not None and next_source_id is not None:
         where = where + ' and' if where != '' else 'where'
@@ -430,9 +417,7 @@ limit {pagination_size} + 1
     if len(df) == pagination_size + 1:
         next_ = '{}{}'.format(request.host_url[:-1], request.path)
         next_ += '?'
-        next_ += '&'.join(
-            ['country={}'.format(country) for country in countries]
-        )
+        next_ += '&'.join(['country={}'.format(country) for country in countries])
         next_ += '&'.join(['source={}'.format(source) for source in sources])
         next_ += '&' if next_[-1] != '?' else ''
         next_ += 'next-source={}&next-source-id={}'.format(
@@ -484,9 +469,7 @@ def get_company_sectors_of_interest(orientation):
     elif len(sources) > 1:
         where = where + ' and' if where != '' else 'where'
         where = (
-            where + ' source in (' + ','.join(
-                ['%s' for i in range(len(sectors))]
-            ) + ')'
+            where + ' source in (' + ','.join(['%s' for i in range(len(sectors))]) + ')'
         )
     if next_source is not None and next_source_id is not None:
         where = where + ' and' if where != '' else 'where'
@@ -560,9 +543,7 @@ from coi_datahub_company_id_to_companies_house_company_number
     return to_web_dict(df)
 
 
-@app.route(
-    '/api/v1/get-datahub-company-ids-to-companies-house-company-numbers'
-)
+@app.route('/api/v1/get-datahub-company-ids-to-companies-house-company-numbers')
 @hawk_authentication
 def get_datahub_company_ids_to_companies_house_company_numbers():
     sql_query = '''
@@ -618,30 +599,24 @@ def populate_database():
     drop_table = 'drop-table' in request.args
     force_update = 'force-update' in request.args
     with get_db() as connection:
-        sql = 'create table if not exists etl_status ' \
+        sql = (
+            'create table if not exists etl_status '
             '(status varchar(100), timestamp timestamp)'
+        )
         execute_query(connection, sql)
         sql = 'select * from etl_status'
         df = query_database(connection, sql)
-    if (
-            force_update is True or len(df) == 0 or
-            df['status'].values[0] == 'SUCCESS'
-    ):
+    if force_update is True or len(df) == 0 or df['status'].values[0] == 'SUCCESS':
         populate_database_task.delay(drop_table)
         sql = 'delete from etl_status'
         execute_query(connection, sql)
         sql = '''insert into etl_status values (%s, %s)'''
-        execute_query(
-            connection,
-            sql,
-            values=['RUNNING', datetime.datetime.now()]
-        )
+        execute_query(connection, sql, values=['RUNNING', datetime.datetime.now()])
         return {'status': 200, 'message': 'started populate_database task'}
     else:
         return {
             'status': 200,
-            'message': ('populate_database task already running since: {}')
-            .format(
+            'message': ('populate_database task already running since: {}').format(
                 df['timestamp'].values[0]
             ),
         }

@@ -15,12 +15,7 @@ from db import get_db
 @patch('etl.query_database')
 class TestEtlTask(unittest.TestCase):
     def test_creates_index(
-            self,
-            query_database,
-            insert_data,
-            drop_table,
-            create_table,
-            create_index
+        self, query_database, insert_data, drop_table, create_table, create_index
     ):
         connection = Mock(name='connection')
         index = Mock(name='index')
@@ -32,12 +27,7 @@ class TestEtlTask(unittest.TestCase):
         create_index.assert_called_once_with(connection, index, table_name)
 
     def test_doesnt_create_index_if_no_index_argument(
-            self,
-            query_database,
-            insert_data,
-            drop_table,
-            create_table,
-            create_index
+        self, query_database, insert_data, drop_table, create_table, create_index
     ):
         connection = Mock(name='connection')
         sql = Mock(name='sql')
@@ -53,12 +43,10 @@ class TestCreateIndex(TestCase):
         super().setUp()
         self.index = ['source', 'source_id']
         self.table_name = 'test_table'
-        sql_create = (
-            '''
+        sql_create = '''
             create table {}
                 (source varchar(50), source_id varchar(100), val int)
             '''
-        )
         sql_create = sql_create.format(self.table_name)
         with app.app_context():
             with get_db() as connection:
@@ -86,20 +74,14 @@ class TestCreateIndex(TestCase):
         df = self.get_indices()
         self.assertEqual(len(df), 1)
         self.assertEqual(df['tablename'].values[0], self.table_name)
-        self.assertEqual(
-            df['indexname'].values[0],
-            '{}_index'.format(self.table_name)
-        )
+        self.assertEqual(df['indexname'].values[0], '{}_index'.format(self.table_name))
 
     def test_index_name_argument(self):
         index_name = 'index_name'
         with app.app_context():
             with get_db() as connection:
                 create_index(
-                    connection,
-                    self.index,
-                    self.table_name,
-                    index_name=index_name
+                    connection, self.index, self.table_name, index_name=index_name
                 )
         df = self.get_indices()
         self.assertEqual(df['indexname'].values[0], index_name)

@@ -30,17 +30,8 @@ table_name = 'order_frequency_by_date'
 
 class Task(ETLTask):
     def __init__(
-            self,
-            sql=sql,
-            table_fields=table_fields,
-            table_name=table_name,
-            *args,
-            **kwargs
+        self, sql=sql, table_fields=table_fields, table_name=table_name, *args, **kwargs
     ):
         super().__init__(
-            sql=sql,
-            table_fields=table_fields,
-            table_name=table_name,
-            *args,
-            **kwargs
+            sql=sql, table_fields=table_fields, table_name=table_name, *args, **kwargs
         )

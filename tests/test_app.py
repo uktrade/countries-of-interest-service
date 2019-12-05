@@ -16,8 +16,7 @@ from etl.tasks.core import (
 
 class TestDataFlowRequest(TestCase):
     def request_data(self, client_id, client_key):
-        url = 'http://localhost/api/v1/' \
-            'get-company-countries-and-sectors-of-interest'
+        url = 'http://localhost/api/v1/' 'get-company-countries-and-sectors-of-interest'
         algorithm = 'sha256'
         method = 'GET'
         content = ''
@@ -48,10 +47,7 @@ class TestDataFlowRequest(TestCase):
         app.create_users_table(users)
         client_id = 'dataflow_client_id'
         client_key = 'dataflow_client_key'
-        query_database.return_value = pd.DataFrame(
-            [(0, 0), (1, 1)],
-            columns=['a', 'b']
-        )
+        query_database.return_value = pd.DataFrame([(0, 0), (1, 1)], columns=['a', 'b'])
         response = self.request_data(client_id, client_key)
         self.assertEqual(response.status_code, 200)
 
@@ -70,12 +66,7 @@ class TestHawkAuthentication(TestCase):
     @patch('app.query_database')
     @patch('app.to_web_dict')
     @patch('authentication.hawk_authenticate')
-    def test_hawk_authentication(
-            self,
-            hawk_authenticate,
-            to_web_dict,
-            query_database
-    ):
+    def test_hawk_authentication(self, hawk_authenticate, to_web_dict, query_database):
         to_web_dict.return_value = {
             'headers': ['header1', 'header2'],
             'values': [[1, 2], [3, 4]],
@@ -88,8 +79,7 @@ class TestHawkAuthentication(TestCase):
             '/api/v1/get-company-export-countries',
             '/api/v1/get-company-sectors-of-interest',
             '/api/v1/get-datahub-company-ids',
-            '/api/v1/'
-            'get-datahub-company-ids-to-companies-house-company-numbers',
+            '/api/v1/' 'get-datahub-company-ids-to-companies-house-company-numbers',
             '/api/v1/get-sectors',
         ]
         for url in urls:
@@ -127,9 +117,7 @@ class TestGetCompanyCountriesAndSectorsOfInterest(TestCase):
             cursor = connection.cursor()
         sql = ''' create table {} {} '''.format(table_name, schema)
         cursor.execute(sql)
-        sql = ''' insert into {} values (%s, %s, %s, %s, %s, %s) '''.format(
-            table_name
-        )
+        sql = ''' insert into {} values (%s, %s, %s, %s, %s, %s) '''.format(table_name)
         cursor.executemany(sql, values)
         response = self.client.get(url)
         expected = {
@@ -163,9 +151,7 @@ class TestGetCompanyCountriesOfInterest(TestCase):
             cursor = connection.cursor()
         sql = ''' create table {} {} '''.format(table_name, schema)
         cursor.execute(sql)
-        sql = ''' insert into {} values (%s, %s, %s, %s, %s) '''.format(
-            table_name
-        )
+        sql = ''' insert into {} values (%s, %s, %s, %s, %s) '''.format(table_name)
         cursor.executemany(sql, values)
         response = self.client.get(url)
         expected = {
@@ -198,9 +184,7 @@ class TestGetCompanyExportCountries(TestCase):
             cursor = connection.cursor()
         sql = ''' create table {} {} '''.format(table_name, schema)
         cursor.execute(sql)
-        sql = ''' insert into {} values (%s, %s, %s, %s, %s) '''.format(
-            table_name
-        )
+        sql = ''' insert into {} values (%s, %s, %s, %s, %s) '''.format(table_name)
         cursor.executemany(sql, values)
         response = self.client.get(url)
         expected = {
@@ -221,16 +205,11 @@ class TestGetCompanyExportCountries(TestCase):
 class TestGetIndex(TestCase):
     @patch('app.login_required')
     @patch('app.render_template')
-    def test_last_updated_passed_to_template(
-            self,
-            render_template,
-            login_required
-    ):
+    def test_last_updated_passed_to_template(self, render_template, login_required):
         with app.app.app_context():
             with get_db() as connection:
                 with connection.cursor() as cursor:
-                    sql = 'create table if not exists ' \
-                        'etl_runs (timestamp timestamp)'
+                    sql = 'create table if not exists ' 'etl_runs (timestamp timestamp)'
                     cursor.execute(sql)
                     sql = 'insert into etl_runs values (%s)'
                     values = [
@@ -267,11 +246,7 @@ class TestPopulateDatabase(TestCase):
             output = app.populate_database()
         populate_database_task.delay.assert_called_once_with(False)
         self.assertEqual(
-            output,
-            {
-                'status': 200,
-                'message': 'started populate_database task'
-            }
+            output, {'status': 200, 'message': 'started populate_database task'}
         )
 
     def test_called_with_drop_table_in_request(
@@ -282,19 +257,14 @@ class TestPopulateDatabase(TestCase):
             output = app.populate_database()
         populate_database_task.delay.assert_called_once_with(True)
         self.assertEqual(
-            output,
-            {
-                'status': 200,
-                'message': 'started populate_database task'
-            }
+            output, {'status': 200, 'message': 'started populate_database task'}
         )
 
     @patch('app.datetime')
     def test_creates_etl_status_table_if_it_does_not_exist(
         self, mock_datetime, populate_database_task, hawk_authenticate
     ):
-        mock_datetime.datetime.now.return_value = \
-            datetime.datetime(2019, 1, 1, 1)
+        mock_datetime.datetime.now.return_value = datetime.datetime(2019, 1, 1, 1)
         with app.app.test_request_context() as request:
             request.request.args = {'drop-table': ''}
             app.populate_database()

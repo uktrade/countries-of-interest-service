@@ -16,9 +16,7 @@ def create_table(connection, fields, table_name):
 
 
 def drop_table(connection, table_name):
-    sql = ''' drop table if exists {table_name} '''.format(
-        table_name=table_name
-    )
+    sql = ''' drop table if exists {table_name} '''.format(table_name=table_name)
     execute_query(connection, sql)
 
 
@@ -40,13 +38,7 @@ def insert_data(df, output_connection, table_name):
 
 class ETLTask:
     def __init__(
-            self,
-            connection,
-            sql,
-            table_fields,
-            table_name,
-            drop_table=False,
-            index=None,
+        self, connection, sql, table_fields, table_name, drop_table=False, index=None,
     ):
         self.connection = connection
         self.drop_table = drop_table

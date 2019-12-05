@@ -11,11 +11,7 @@ class TestExtractDatahubCompany(TestCase):
     @patch('etl.tasks.core.source_data_extraction.populate_table')
     def test(self, populate_table):
         schema = {
-            'columns': (
-                'id uuid',
-                'company_number varchar(50)',
-                'sector varchar(50)'
-            ),
+            'columns': ('id uuid', 'company_number varchar(50)', 'sector varchar(50)'),
             'primary_key': 'id',
         }
         data = {
@@ -27,17 +23,11 @@ class TestExtractDatahubCompany(TestCase):
         }
         table_name = 'datahub_company'
         url = 'http://{}/{}'.format(
-            app.config['DATAWORKSPACE_HOST'],
-            'api/v1/dataset/datahub-company-dataset'
+            app.config['DATAWORKSPACE_HOST'], 'api/v1/dataset/datahub-company-dataset'
         )
         with app.app_context():
             output = extraction.extract_datahub_company_dataset()
-        populate_table.assert_called_once_with(
-            schema,
-            table_name,
-            url,
-            stub_data=data
-        )
+        populate_table.assert_called_once_with(schema, table_name, url, stub_data=data)
         self.assertEqual(output, populate_table.return_value)
 
 
@@ -57,17 +47,11 @@ class TestExtractDatahubExportCountries(TestCase):
         }
         table_name = 'datahub_export_countries'
         url = 'http://{}/{}'.format(
-            app.config['DATAWORKSPACE_HOST'],
-            'api/v1/dataset/datahub-export-countries'
+            app.config['DATAWORKSPACE_HOST'], 'api/v1/dataset/datahub-export-countries'
         )
         with app.app_context():
             output = extraction.extract_datahub_export_countries()
-        populate_table.assert_called_once_with(
-            schema,
-            table_name,
-            url,
-            stub_data=data
-        )
+        populate_table.assert_called_once_with(schema, table_name, url, stub_data=data)
         self.assertEqual(output, populate_table.return_value)
 
 
@@ -94,12 +78,7 @@ class TestExtractDatahubFutureInterestCountries(TestCase):
         )
         with app.app_context():
             output = extraction.extract_datahub_future_interest_countries()
-        populate_table.assert_called_once_with(
-            schema,
-            table_name,
-            url,
-            stub_data=data
-        )
+        populate_table.assert_called_once_with(schema, table_name, url, stub_data=data)
         self.assertEqual(output, populate_table.return_value)
 
 
@@ -121,17 +100,11 @@ class TestExtractDatahubInteractions(TestCase):
         }
         table_name = 'datahub_interactions'
         url = 'http://{}/{}'.format(
-            app.config['DATAWORKSPACE_HOST'],
-            'api/v1/dataset/datahub-interactions'
+            app.config['DATAWORKSPACE_HOST'], 'api/v1/dataset/datahub-interactions'
         )
         with app.app_context():
             output = extraction.extract_datahub_interactions()
-        populate_table.assert_called_once_with(
-            schema,
-            table_name,
-            url,
-            stub_data=data
-        )
+        populate_table.assert_called_once_with(schema, table_name, url, stub_data=data)
         self.assertEqual(output, populate_table.return_value)
 
 
@@ -175,12 +148,7 @@ class TestExtractDatahubOmis(TestCase):
         )
         with app.app_context():
             output = extraction.extract_datahub_omis_dataset()
-        populate_table.assert_called_once_with(
-            schema,
-            table_name,
-            url,
-            stub_data=data
-        )
+        populate_table.assert_called_once_with(schema, table_name, url, stub_data=data)
         self.assertEqual(output, populate_table.return_value)
 
 
@@ -206,12 +174,7 @@ class TestExtractDatahubSectors(TestCase):
         )
         with app.app_context():
             output = extraction.extract_datahub_sectors()
-        populate_table.assert_called_once_with(
-            schema,
-            table_name,
-            url,
-            stub_data=data
-        )
+        populate_table.assert_called_once_with(schema, table_name, url, stub_data=data)
         self.assertEqual(output, populate_table.return_value)
 
 
@@ -252,12 +215,7 @@ class TestExtractExportWins(TestCase):
         )
         with app.app_context():
             output = extraction.extract_export_wins()
-        populate_table.assert_called_once_with(
-            schema,
-            table_name,
-            url,
-            stub_data=data
-        )
+        populate_table.assert_called_once_with(schema, table_name, url, stub_data=data)
         self.assertEqual(output, populate_table.return_value)
 
 
@@ -281,10 +239,7 @@ class TestPopulateTable(TestCase):
         sql_utils.table_exists.return_value = True
         with app.app_context():
             populate_table(
-                self.schema,
-                self.table_name,
-                self.url,
-                stub_data=self.stub_data
+                self.schema, self.table_name, self.url, stub_data=self.stub_data
             )
         sql_utils.drop_table.assert_called_once_with(
             self.connection, 'existing_table_backup'
@@ -295,17 +250,10 @@ class TestPopulateTable(TestCase):
 
     @patch('etl.tasks.core.source_data_extraction.get_db')
     @patch('etl.tasks.core.source_data_extraction.requests')
-    def test_if_stubbed_data_passed_use_it_instead_of_real_data(
-            self,
-            requests,
-            get_db
-    ):
+    def test_if_stubbed_data_passed_use_it_instead_of_real_data(self, requests, get_db):
         with app.app_context():
             populate_table(
-                self.schema,
-                self.table_name,
-                self.url,
-                stub_data=self.stub_data
+                self.schema, self.table_name, self.url, stub_data=self.stub_data
             )
         requests.assert_not_called()
 
@@ -316,31 +264,24 @@ class TestPopulateTable(TestCase):
         headers = Mock()
         get_hawk_headers.return_value = headers
         with app.app_context():
-            populate_table(self.schema, self.table_name, self.url,)
+            populate_table(
+                self.schema, self.table_name, self.url,
+            )
         requests.get.assert_called_once_with(self.url, headers=headers)
 
     @patch('etl.tasks.core.source_data_extraction.get_db')
     @patch('etl.tasks.core.source_data_extraction.sql_utils')
-    def test_if_table_exists_and_insert_fails_fallback(
-            self,
-            sql_utils,
-            get_db
-    ):
+    def test_if_table_exists_and_insert_fails_fallback(self, sql_utils, get_db):
         get_db.return_value = self.connection
         sql_utils.table_exists.return_value = True
         cursor = self.connection.cursor.return_value
         cursor.execute.side_effect = Exception('asdf')
         with app.app_context():
             populate_table(
-                self.schema,
-                self.table_name,
-                self.url,
-                stub_data=self.stub_data,
+                self.schema, self.table_name, self.url, stub_data=self.stub_data,
             )
         sql_utils.rename_table.assert_called_with(
-            self.connection,
-            '{}_backup'.format(self.table_name),
-            self.table_name,
+            self.connection, '{}_backup'.format(self.table_name), self.table_name,
         )
 
     def test_populates_table_correctly(self):
@@ -356,12 +297,7 @@ class TestPopulateTable(TestCase):
         }
 
         with app.app_context():
-            populate_table(
-                schema,
-                table_name,
-                url,
-                stub_data=stub_data
-            )
+            populate_table(schema, table_name, url, stub_data=stub_data)
 
         with app.app_context():
             connection = get_db()

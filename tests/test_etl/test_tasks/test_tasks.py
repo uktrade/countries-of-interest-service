@@ -52,8 +52,7 @@ class TestPopulateDatabase(TestCase):
         PopulateCountriesAndSectorsOfInterestTask.assert_called_once_with(
             connection=db_context, drop_table=True
         )
-        (PopulateCountriesAndSectorsOfInterestTask
-         .return_value.assert_called_once())
+        (PopulateCountriesAndSectorsOfInterestTask.return_value.assert_called_once())
         PopulateCountriesOfInterestTask.assert_called_once_with(
             connection=db_context, drop_table=True
         )
@@ -73,8 +72,7 @@ class TestPopulateDatabase(TestCase):
                 extract_datahub_sectors.return_value,
                 extract_export_wins.return_value,
                 ExportCountriesTask.return_value.return_value,
-                (PopulateCountriesAndSectorsOfInterestTask
-                 .return_value.return_value),
+                (PopulateCountriesAndSectorsOfInterestTask.return_value.return_value),
                 PopulateCountriesOfInterestTask.return_value.return_value,
                 SectorsOfInterestTask.return_value.return_value,
             ]
@@ -99,8 +97,7 @@ class TestPopulateDatabase(TestCase):
         extract_datahub_company_dataset,
     ):
 
-        mock_datetime.datetime.now.return_value = \
-            datetime.datetime(2019, 1, 1, 2)
+        mock_datetime.datetime.now.return_value = datetime.datetime(2019, 1, 1, 2)
         with app.app_context():
             with get_db() as connection:
                 with connection.cursor() as cursor:
@@ -121,7 +118,4 @@ class TestPopulateDatabase(TestCase):
                     cursor.execute(sql)
                     rows = cursor.fetchall()
             self.assertEqual(len(rows), 1)
-            self.assertEqual(
-                rows,
-                [('SUCCESS', datetime.datetime(2019, 1, 1, 2))]
-            )
+            self.assertEqual(rows, [('SUCCESS', datetime.datetime(2019, 1, 1, 2))])

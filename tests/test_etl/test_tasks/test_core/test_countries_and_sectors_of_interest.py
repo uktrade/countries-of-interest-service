@@ -59,9 +59,7 @@ class TestCountriesAndSectorsOfInterest(TestCase):
         self.assertEqual(
             df['source_id'].values[0], '1ee5a16b-1a4b-4c84-838f-0d043579c9ba'
         )
-        self.assertEqual(
-            df['timestamp'].values[0],
-            np.datetime64('2019-01-01 01:00'))
+        self.assertEqual(df['timestamp'].values[0], np.datetime64('2019-01-01 01:00'))
         self.assertEqual(
             df['company_id'].values[1], 'f89d85d2-78c7-484d-bf63-228f32bf8d26'
         )
@@ -71,10 +69,7 @@ class TestCountriesAndSectorsOfInterest(TestCase):
         self.assertEqual(
             df['source_id'].values[1], 'c0794724-c070-4c7e-a52c-89c0006bf7e6'
         )
-        self.assertEqual(
-            df['timestamp'].values[1],
-            np.datetime64('2019-02-02 02:00')
-        )
+        self.assertEqual(df['timestamp'].values[1], np.datetime64('2019-02-02 02:00'))
 
         sql = '''
         select

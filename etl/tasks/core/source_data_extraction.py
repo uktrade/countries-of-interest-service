@@ -10,17 +10,10 @@ def extract_datahub_company_dataset():
     endpoint = 'api/v1/dataset/datahub-company-dataset'
     table_name = 'datahub_company'
     schema = {
-        'columns': (
-            'id uuid',
-            'company_number varchar(50)',
-            'sector varchar(50)'
-        ),
+        'columns': ('id uuid', 'company_number varchar(50)', 'sector varchar(50)'),
         'primary_key': 'id',
     }
-    url = 'http://{}/{}'.format(
-        current_app.config['DATAWORKSPACE_HOST'],
-        endpoint
-    )
+    url = 'http://{}/{}'.format(current_app.config['DATAWORKSPACE_HOST'], endpoint)
     # TODO: remove stubbed data
     data = {
         'headers': ['id', 'companyNumber', 'sector'],
@@ -39,10 +32,7 @@ def extract_datahub_export_countries():
         'primary_key': 'id',
     }
     table_name = 'datahub_export_countries'
-    url = 'http://{}/{}'.format(
-        current_app.config['DATAWORKSPACE_HOST'],
-        endpoint
-    )
+    url = 'http://{}/{}'.format(current_app.config['DATAWORKSPACE_HOST'], endpoint)
     data = {
         'headers': ['company_id', 'country', 'id'],
         'values': [
@@ -60,10 +50,7 @@ def extract_datahub_future_interest_countries():
         'primary_key': 'id',
     }
     table_name = 'datahub_future_interest_countries'
-    url = 'http://{}/{}'.format(
-        current_app.config['DATAWORKSPACE_HOST'],
-        endpoint
-    )
+    url = 'http://{}/{}'.format(current_app.config['DATAWORKSPACE_HOST'], endpoint)
     data = {
         'headers': ['companyId', 'country', 'id'],
         'values': [
@@ -82,10 +69,7 @@ def extract_datahub_interactions():
         'primary_key': 'id',
     }
     table_name = 'datahub_interactions'
-    url = 'http://{}/{}'.format(
-        current_app.config['DATAWORKSPACE_HOST'],
-        endpoint
-    )
+    url = 'http://{}/{}'.format(current_app.config['DATAWORKSPACE_HOST'], endpoint)
     stub_data = {
         'headers': ['companyId', 'country', 'id'],
         'values': [
@@ -109,10 +93,7 @@ def extract_datahub_omis_dataset():
         'primary_key': 'id',
     }
     table_name = 'omis'
-    url = 'http://{}/{}'.format(
-        current_app.config['DATAWORKSPACE_HOST'],
-        endpoint
-    )
+    url = 'http://{}/{}'.format(current_app.config['DATAWORKSPACE_HOST'], endpoint)
     data = {
         'headers': ['companyId', 'country', 'createdOn', 'id', 'sector'],
         'values': [
@@ -137,15 +118,9 @@ def extract_datahub_omis_dataset():
 
 def extract_datahub_sectors():
     endpoint = 'api/v1/datahub-sectors-dataset'
-    schema = {
-        'columns': ('id uuid', 'sector varchar(200)'),
-        'primary_key': 'id'
-    }
+    schema = {'columns': ('id uuid', 'sector varchar(200)'), 'primary_key': 'id'}
     table_name = 'datahub_sector'
-    url = 'http://{}/{}'.format(
-        current_app.config['DATAWORKSPACE_HOST'],
-        endpoint
-    )
+    url = 'http://{}/{}'.format(current_app.config['DATAWORKSPACE_HOST'], endpoint)
     data = {
         'headers': ['id', 'sector'],
         'values': [
@@ -173,18 +148,8 @@ def extract_export_wins():
     data = {
         'headers': ['id', 'companyId', 'timestamp'],
         'values': [
-            [
-                '23f66b0e-05be-40a5-9bf2-fa44dc7714a8',
-                'asdf',
-                'IT',
-                '2019-01-01 1:00'
-            ],
-            [
-                'f50d892d-388a-405b-9e30-16b9971ac0d4',
-                'ffff',
-                'GO',
-                '2019-01-02 18:00'
-            ],
+            ['23f66b0e-05be-40a5-9bf2-fa44dc7714a8', 'asdf', 'IT', '2019-01-01 1:00'],
+            ['f50d892d-388a-405b-9e30-16b9971ac0d4', 'ffff', 'GO', '2019-01-02 18:00'],
         ],
     }
 
@@ -204,10 +169,7 @@ def get_hawk_headers(
         content=content,
         content_type=content_type,
     )
-    headers = {
-        'Authorization': sender.request_header,
-        'Content-Type': content_type
-    }
+    headers = {'Authorization': sender.request_header, 'Content-Type': content_type}
     return headers
 
 
@@ -236,9 +198,7 @@ def populate_table(schema, table_name, url, stub_data=None):
         primary_key = schema.get('primary_key')
         if primary_key is not None:
             if type(primary_key) in [list, tuple]:
-                schema_str += ', primary key ({})'.format(
-                    ','.join(primary_key)
-                )
+                schema_str += ', primary key ({})'.format(','.join(primary_key))
             else:
                 schema_str += ', primary key ({})'.format(primary_key)
         sql = '''create table {table_name} ({schema_str})'''.format(
