@@ -14,6 +14,7 @@ where pid<> pg_backend_pid()
 '''
     cursor.execute(sql)
 
+
 def flush_database(database_uri):
     with psycopg2.connect(database_uri) as connection:
         connection.autocommit = True
@@ -29,9 +30,9 @@ def flush_database(database_uri):
             cursor.execute(sql)
             sql = 'GRANT ALL ON SCHEMA public TO {};'.format(current_user)
             cursor.execute(sql)
-    
-class TestCase(unittest.TestCase):
 
+
+class TestCase(unittest.TestCase):
     def setUp(self):
         self.config = app.app.config
         if self.config['ENV'] != 'test':
@@ -39,7 +40,7 @@ class TestCase(unittest.TestCase):
         self.client = app.app.test_client()
         self.database_uri = app.app.config['DATABASE']
         self.database_name = '/'.split(self.database_uri)[-1]
-        
+
     def tearDown(self):
         # with psycopg2.connect(self.database_uri) as connection:
         #     connection.autocommit = True

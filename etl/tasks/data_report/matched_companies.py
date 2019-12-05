@@ -58,7 +58,9 @@ with matched_companies as (
 
 select * from results
 
-'''.format(now=now)
+'''.format(
+    now=now
+)
 
 table_fields = '''(
     n_companies int, 
@@ -70,13 +72,11 @@ table_fields = '''(
 
 table_name = 'matched_companies'
 
-class Task(ETLTask):
 
-    def __init__(self, sql=sql, table_fields=table_fields, table_name=table_name, *args, **kwargs):
+class Task(ETLTask):
+    def __init__(
+        self, sql=sql, table_fields=table_fields, table_name=table_name, *args, **kwargs
+    ):
         super().__init__(
-            sql=sql,
-            table_fields=table_fields,
-            table_name=table_name,
-            *args,
-            **kwargs
+            sql=sql, table_fields=table_fields, table_name=table_name, *args, **kwargs
         )

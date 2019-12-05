@@ -9,8 +9,9 @@ from etl.tasks.core.source_data_extraction import (
     extract_export_wins,
     extract_datahub_interactions,
 )
-from etl.tasks.core.countries_and_sectors_of_interest import \
-    Task as PopulateCountriesAndSectorsOfInterestTask
+from etl.tasks.core.countries_and_sectors_of_interest import (
+    Task as PopulateCountriesAndSectorsOfInterestTask,
+)
 from etl.tasks.core.countries_of_interest import Task as PopulateCountriesOfInterestTask
 from etl.tasks.core.export_countries import Task as ExportCountriesTask
 from etl.tasks.core.sectors_of_interest import Task as SectorsOfInterestTask
@@ -18,7 +19,7 @@ from etl.tasks.core.sectors_of_interest import Task as SectorsOfInterestTask
 
 def populate_database(drop_table):
     output = []
-    with get_db() as connection:        
+    with get_db() as connection:
         output.append(extract_datahub_company_dataset())
         output.append(extract_datahub_export_countries())
         output.append(extract_datahub_interactions())
@@ -30,10 +31,11 @@ def populate_database(drop_table):
             [
                 ExportCountriesTask(connection=connection, drop_table=drop_table)(),
                 PopulateCountriesAndSectorsOfInterestTask(
-                    connection=connection,
-                    drop_table=drop_table
+                    connection=connection, drop_table=drop_table
                 )(),
-                PopulateCountriesOfInterestTask(connection=connection, drop_table=drop_table)(),
+                PopulateCountriesOfInterestTask(
+                    connection=connection, drop_table=drop_table
+                )(),
                 SectorsOfInterestTask(connection=connection, drop_table=drop_table)(),
             ]
         )

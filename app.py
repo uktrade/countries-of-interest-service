@@ -18,7 +18,6 @@ from utils.sql import execute_query, query_database, table_exists
 
 
 class CustomJSONEncoder(JSONEncoder):
-    
     def default(self, obj):
         if isinstance(obj, datetime.datetime):
             return obj.isoformat()
@@ -31,19 +30,28 @@ class CustomJSONEncoder(JSONEncoder):
         else:
             return super(MyEncoder, self).default(obj)
 
+
 app = Flask(__name__)
 
 # sso
 app.register_blueprint(authbroker_blueprint)
 app.config['ABC_BASE_URL'] = config('ABC_BASE_URL', 'https://sso.trade.gov.uk')
-app.config['ABC_CLIENT_ID'] = config('ABC_CLIENT_ID', 'get this from your network admin')
-app.config['ABC_CLIENT_SECRET'] = config('ABC_CLIENT_SECRET', 'get this from your network admin')
+app.config['ABC_CLIENT_ID'] = config(
+    'ABC_CLIENT_ID', 'get this from your network admin'
+)
+app.config['ABC_CLIENT_SECRET'] = config(
+    'ABC_CLIENT_SECRET', 'get this from your network admin'
+)
 
 # other
 app.secret_key = config('APP_SECRET_KEY', 'the random string')
 app.json_encoder = CustomJSONEncoder
-assert app.config['ENV'] in ('production', 'dev', 'development', 'test'), \
-    'invalid environment: {}'.format(app.config['ENV'])
+assert app.config['ENV'] in (
+    'production',
+    'dev',
+    'development',
+    'test',
+), 'invalid environment: {}'.format(app.config['ENV'])
 app.config['DATAWORKSPACE_HOST'] = config('DATAWORKSPACE_HOST', 'localapps.com:8000')
 app.config['PAGINATION_SIZE'] = config('PAGINATION_SIZE', 50, cast=int)
 app.config['RUN_SCHEDULER'] = config('RUN_SCHEDULER', False, cast=bool)
@@ -54,12 +62,12 @@ if app.config['ENV'] == 'production':
 elif app.config['ENV'] in ['dev', 'development']:
     app.config['DATABASE'] = config(
         'DATABASE_URL',
-        'postgresql://countries_of_interest_service@localhost/countries_of_interest_service'
+        'postgresql://countries_of_interest_service@localhost/countries_of_interest_service',
     )
 elif app.config['ENV'] == 'test':
     app.config['DATABASE'] = config(
         'DATABASE_URL',
-        'postgresql://test_countries_of_interest_service@localhost' \
+        'postgresql://test_countries_of_interest_service@localhost'
         '/test_countries_of_interest_service',
     )
 else:
@@ -72,31 +80,34 @@ if vcap_services:
     redis_config = json.loads(vcap_services)['redis'][0]
     redis_uri = redis_config['credentials']['uri']
 app.config['CELERY_BROKER'] = config(
-    'CELERY_BROKER',
-    redis_uri if vcap_services else 'redis://localhost'
+    'CELERY_BROKER', redis_uri if vcap_services else 'redis://localhost'
 )
 
 # celery, tasks config
 celery = Celery('app', broker=app.config['CELERY_BROKER'])
+
+
 @celery.task
 def populate_database_task(drop_table=True):
     with app.app_context():
         return etl.tasks.core.populate_database(drop_table)
 
+
 # hawk authentication
 app.config['HAWK_ENABLED'] = config(
-    'HAWK_ENABLED', app.config['ENV'] in ('production', 'test'),
-    cast=bool
+    'HAWK_ENABLED', app.config['ENV'] in ('production', 'test'), cast=bool
 )
-app.config['DATAFLOW_HAWK_CLIENT_ID'] = config('DATAFLOW_HAWK_CLIENT_ID', 'dataflow_client_id')
-app.config['DATAFLOW_HAWK_CLIENT_KEY'] = config('DATAFLOW_HAWK_CLIENT_KEY', 'dataflow_client_key')
+app.config['DATAFLOW_HAWK_CLIENT_ID'] = config(
+    'DATAFLOW_HAWK_CLIENT_ID', 'dataflow_client_id'
+)
+app.config['DATAFLOW_HAWK_CLIENT_KEY'] = config(
+    'DATAFLOW_HAWK_CLIENT_KEY', 'dataflow_client_key'
+)
 app.config['DATAWORKSPACE_HAWK_CLIENT_ID'] = config(
-    'DATAWORKSPACE_HAWK_CLIENT_ID',
-    'dataworkspace_client_id'
+    'DATAWORKSPACE_HAWK_CLIENT_ID', 'dataworkspace_client_id'
 )
 app.config['DATAWORKSPACE_HAWK_CLIENT_KEY'] = config(
-    'DATAWORKSPACE_HAWK_CLIENT_KEY',
-    'dataworkspace_client_key'
+    'DATAWORKSPACE_HAWK_CLIENT_KEY', 'dataworkspace_client_key'
 )
 # decorator for hawk authentication
 # when hawk is disabled the authentication is trivial, effectively all requests are authenticated
@@ -107,21 +118,27 @@ users = [
         config('DATAFLOW_HAWK_CLIENT_KEY', 'dataflow_client_key'),
     ),
 ]
+
+
 def create_users_table(users):
     with app.app_context():
         sql = 'drop table if exists users'
         with get_db() as connection:
             execute_query(connection, sql)
-        sql = 'create table users (' \
-            'client_id varchar(100) primary key,' \
-            'client_key varchar(200)' \
+        sql = (
+            'create table users ('
+            'client_id varchar(100) primary key,'
+            'client_key varchar(200)'
             ')'
+        )
         with get_db() as connection:
             execute_query(connection, sql)
-        sql = 'insert into users values (%s, %s) ' 
+        sql = 'insert into users values (%s, %s) '
         with get_db() as connection:
             cursor = connection.cursor()
             cursor.executemany(sql, users)
+
+
 if app.config['ENV'] != 'test':
     create_users_table(users)
 
@@ -142,6 +159,7 @@ order by 1
     connection.close()
     return to_web_dict(df)
 
+
 @app.route('/api/v1/get-company-countries-and-sectors-of-interest')
 @hawk_authentication
 @utils.response_orientation_decorator
@@ -159,34 +177,42 @@ def get_company_countries_and_sectors_of_interest(orientation):
     if len(countries) == 1:
         where = 'where country_of_interest=%s'
     elif len(countries) > 1:
-        where = 'where country_of_interest in (' + ','.join(
-            '%s' for i in range(len(countries))
-        ) + ')'
+        where = (
+            'where country_of_interest in ('
+            + ','.join('%s' for i in range(len(countries)))
+            + ')'
+        )
     if len(sectors) == 1:
         where = where + ' and' if where != '' else 'where'
         where = where + ' sector_of_interest=%s'
     elif len(sectors) > 1:
         where = where + ' and' if where != '' else 'where'
-        where = where + ' sector_of_interest in (' + ','.join(
-            ['%s' for i in range(len(sectors))]
-        ) + ')'
+        where = (
+            where
+            + ' sector_of_interest in ('
+            + ','.join(['%s' for i in range(len(sectors))])
+            + ')'
+        )
     if len(company_ids) == 1:
         where = where + ' and' if where != '' else 'where'
         where = where + ' company_id=%s'
     elif len(company_ids) > 1:
         where = where + ' and' if where != '' else 'where'
-        where = where + ' company_id in (' + ','.join(
-            ['%s' for i in range(len(company_ids))]
-        ) + ')'
+        where = (
+            where
+            + ' company_id in ('
+            + ','.join(['%s' for i in range(len(company_ids))])
+            + ')'
+        )
     if len(sources) == 1:
         where = where + ' and' if where != '' else 'where'
         where = where + ' source=%s'
     elif len(sources) > 1:
         where = where + ' and' if where != '' else 'where'
-        where = where + ' source in (' + ','.join(
-            ['%s' for i in range(len(sectors))]
-        ) + ')'
-    if (next_source is not None and next_source_id is not None):
+        where = (
+            where + ' source in (' + ','.join(['%s' for i in range(len(sectors))]) + ')'
+        )
+    if next_source is not None and next_source_id is not None:
         where = where + ' and' if where != '' else 'where'
         where = where + ' (source, source_id) >= (%s, %s)'
         values = values + [next_source, next_source_id]
@@ -208,7 +234,9 @@ order by (source, source_id)
 
 limit {pagination_size} + 1
 
-'''.format(where=where, pagination_size=pagination_size)
+'''.format(
+        where=where, pagination_size=pagination_size
+    )
     with get_db() as connection:
         df = query_database(connection, sql_query, values)
     connection.close()
@@ -218,8 +246,7 @@ limit {pagination_size} + 1
         next_ += '&'.join(['source={}'.format(source) for source in sources])
         next_ += '&' if next_[-1] != '?' else ''
         next_ += 'next-source={}&next-source-id={}'.format(
-            df['source'].values[-1],
-            df['source_id'].values[-1],
+            df['source'].values[-1], df['source_id'].values[-1],
         )
         df = df[:-1]
     else:
@@ -227,6 +254,7 @@ limit {pagination_size} + 1
     web_dict = to_web_dict(df, orientation)
     web_dict['next'] = next_
     return web_dict
+
 
 @app.route('/api/v1/get-company-countries-of-interest')
 @hawk_authentication
@@ -244,30 +272,35 @@ def get_company_countries_of_interest(orientation):
     if len(countries) == 1:
         where = 'where country_of_interest=%s'
     elif len(countries) > 1:
-        where = 'where country_of_interest in (' + ','.join(
-            '%s' for i in range(len(countries))
-        ) + ')'
+        where = (
+            'where country_of_interest in ('
+            + ','.join('%s' for i in range(len(countries)))
+            + ')'
+        )
     if len(company_ids) == 1:
         where = where + ' and' if where != '' else 'where'
         where = where + ' company_id=%s'
     elif len(company_ids) > 1:
         where = where + ' and' if where != '' else 'where'
-        where = where + ' company_id in (' + ','.join(
-            ['%s' for i in range(len(company_ids))]
-        ) + ')'
+        where = (
+            where
+            + ' company_id in ('
+            + ','.join(['%s' for i in range(len(company_ids))])
+            + ')'
+        )
     if len(sources) == 1:
         where = where + ' and' if where != '' else 'where'
         where = where + ' source=%s'
     elif len(sources) > 1:
         where = where + ' and' if where != '' else 'where'
-        where = where + ' source in (' + ','.join(
-            ['%s' for i in range(len(sectors))]
-        ) + ')'
-    if (next_source is not None and next_source_id is not None):
+        where = (
+            where + ' source in (' + ','.join(['%s' for i in range(len(sectors))]) + ')'
+        )
+    if next_source is not None and next_source_id is not None:
         where = where + ' and' if where != '' else 'where'
         where = where + ' (source, source_id) >= (%s, %s)'
         values = values + [next_source, next_source_id]
-    
+
     sql_query = '''
 select
   company_id,
@@ -284,7 +317,9 @@ order by (source, source_id)
 
 limit {pagination_size} + 1
 
-'''.format(pagination_size=pagination_size, where=where)
+'''.format(
+        pagination_size=pagination_size, where=where
+    )
     with get_db() as connection:
         df = query_database(connection, sql_query, values)
     connection.close()
@@ -295,8 +330,7 @@ limit {pagination_size} + 1
         next_ += '&'.join(['source={}'.format(source) for source in sources])
         next_ += '&' if next_[-1] != '?' else ''
         next_ += 'next-source={}&next-source-id={}'.format(
-            df['source'].values[-1],
-            df['source_id'].values[-1],
+            df['source'].values[-1], df['source_id'].values[-1],
         )
         df = df[:-1]
     else:
@@ -322,26 +356,31 @@ def get_company_export_countries(orientation):
     if len(countries) == 1:
         where = 'where export_country=%s'
     elif len(countries) > 1:
-        where = 'where export_country in (' + ','.join(
-            '%s' for i in range(len(countries))
-        ) + ')'
+        where = (
+            'where export_country in ('
+            + ','.join('%s' for i in range(len(countries)))
+            + ')'
+        )
     if len(company_ids) == 1:
         where = where + ' and' if where != '' else 'where'
         where = where + ' company_id=%s'
     elif len(company_ids) > 1:
         where = where + ' and' if where != '' else 'where'
-        where = where + ' company_id in (' + ','.join(
-            ['%s' for i in range(len(company_ids))]
-        ) + ')'
+        where = (
+            where
+            + ' company_id in ('
+            + ','.join(['%s' for i in range(len(company_ids))])
+            + ')'
+        )
     if len(sources) == 1:
         where = where + ' and' if where != '' else 'where'
         where = where + ' source=%s'
     elif len(sources) > 1:
         where = where + ' and' if where != '' else 'where'
-        where = where + ' source in (' + ','.join(
-            ['%s' for i in range(len(sectors))]
-        ) + ')'
-    if (next_source is not None and next_source_id is not None):
+        where = (
+            where + ' source in (' + ','.join(['%s' for i in range(len(sectors))]) + ')'
+        )
+    if next_source is not None and next_source_id is not None:
         where = where + ' and' if where != '' else 'where'
         where = where + ' (source, source_id) >= (%s, %s)'
         values = values + [next_source, next_source_id]
@@ -362,7 +401,9 @@ order by (source, source_id)
 
 limit {pagination_size} + 1
 
-'''.format(where=where, pagination_size=pagination_size)
+'''.format(
+        where=where, pagination_size=pagination_size
+    )
     with get_db() as connection:
         df = query_database(connection, sql_query, values)
     connection.close()
@@ -373,8 +414,7 @@ limit {pagination_size} + 1
         next_ += '&'.join(['source={}'.format(source) for source in sources])
         next_ += '&' if next_[-1] != '?' else ''
         next_ += 'next-source={}&next-source-id={}'.format(
-            df['source'].values[-1],
-            df['source_id'].values[-1],
+            df['source'].values[-1], df['source_id'].values[-1],
         )
         df = df[:-1]
     else:
@@ -382,6 +422,7 @@ limit {pagination_size} + 1
     web_dict = to_web_dict(df, orientation)
     web_dict['next'] = next_
     return web_dict
+
 
 @app.route('/api/v1/get-company-sectors-of-interest')
 @hawk_authentication
@@ -399,30 +440,35 @@ def get_company_sectors_of_interest(orientation):
     if len(sectors) == 1:
         where = 'where sector_of_interest=%s'
     elif len(sectors) > 1:
-        where = 'where sector_of_interest in (' + ','.join(
-            '%s' for i in range(len(countries))
-        ) + ')'
+        where = (
+            'where sector_of_interest in ('
+            + ','.join('%s' for i in range(len(countries)))
+            + ')'
+        )
     if len(company_ids) == 1:
         where = where + ' and' if where != '' else 'where'
         where = where + ' company_id=%s'
     elif len(company_ids) > 1:
         where = where + ' and' if where != '' else 'where'
-        where = where + ' company_id in (' + ','.join(
-            ['%s' for i in range(len(company_ids))]
-        ) + ')'
+        where = (
+            where
+            + ' company_id in ('
+            + ','.join(['%s' for i in range(len(company_ids))])
+            + ')'
+        )
     if len(sources) == 1:
         where = where + ' and' if where != '' else 'where'
         where = where + ' source=%s'
     elif len(sources) > 1:
         where = where + ' and' if where != '' else 'where'
-        where = where + ' source in (' + ','.join(
-            ['%s' for i in range(len(sectors))]
-        ) + ')'
-    if (next_source is not None and next_source_id is not None):
+        where = (
+            where + ' source in (' + ','.join(['%s' for i in range(len(sectors))]) + ')'
+        )
+    if next_source is not None and next_source_id is not None:
         where = where + ' and' if where != '' else 'where'
         where = where + ' (source, source_id) >= (%s, %s)'
         values = values + [next_source, next_source_id]
-    
+
     sql_query = '''
 select
   company_id,
@@ -439,7 +485,9 @@ order by (source, source_id)
 
 limit {pagination_size} + 1
 
-'''.format(where=where, pagination_size=pagination_size)
+'''.format(
+        where=where, pagination_size=pagination_size
+    )
     with get_db() as connection:
         df = query_database(connection, sql_query, values)
     connection.close()
@@ -451,8 +499,7 @@ limit {pagination_size} + 1
         next_ += '&'.join(['source={}'.format(source) for source in sources])
         next_ += '&' if next_[-1] != '?' else ''
         next_ += 'next-source={}&next-source-id={}'.format(
-            df['source'].values[-1],
-            df['source_id'].values[-1],
+            df['source'].values[-1], df['source_id'].values[-1],
         )
         df = df[:-1]
     else:
@@ -461,15 +508,18 @@ limit {pagination_size} + 1
     web_dict['next'] = next_
     return web_dict
 
+
 @app.route('/data-report')
 @login_required
 def get_data_report():
     return render_template('data_report.html')
 
+
 @app.route('/api/v1/get-data-report-data')
 @hawk_authentication
 def get_data_report_data():
     return data_report.get_data_report_data()
+
 
 @app.route('/api/v1/get-datahub-company-ids')
 @hawk_authentication
@@ -484,6 +534,7 @@ from coi_datahub_company_id_to_companies_house_company_number
         df = query_database(connection, sql_query)
     connection.close()
     return to_web_dict(df)
+
 
 @app.route('/api/v1/get-datahub-company-ids-to-companies-house-company-numbers')
 @hawk_authentication
@@ -500,6 +551,7 @@ from coi_datahub_company_id_to_companies_house_company_number
     connection.close()
     return to_web_dict(df)
 
+
 @app.route('/')
 @login_required
 def get_index():
@@ -514,6 +566,7 @@ def get_index():
     else:
         last_updated = last_updated.strftime('%Y-%m-%d %H:%M:%S')
     return render_template('index.html', last_updated=last_updated)
+
 
 @app.route('/api/v1/get-sectors')
 @hawk_authentication
@@ -531,6 +584,7 @@ order by 1
         df = query_database(connection, sql_query)
     connection.close()
     return to_web_dict(df)
+
 
 @app.route('/api/v1/populate-database')
 @hawk_authentication
@@ -554,19 +608,16 @@ def populate_database():
             'status': 200,
             'message': 'populate_database task already running since: {}'.format(
                 df['timestamp'].values[0]
-            )
+            ),
         }
 
 
 @app.route('/healthcheck/', methods=["GET"])
 def healthcheck():
-    return jsonify({
-        "status": "OK"
-    })
+    return jsonify({"status": "OK"})
 
 
 if app.config['RUN_SCHEDULER'] is True:
     print('starting scheduler')
     scheduled_task = Scheduler(populate_database_task)
     scheduled_task.start()
-

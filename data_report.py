@@ -126,20 +126,24 @@ with results as (
 select * from results
 '''
 
+
 def get_summary_table():
     connection = get_db()
     df = query_database(connection, summary_table_sql)
     return df
+
 
 def get_top_sectors():
     connection = get_db()
     df = query_database(connection, top_sectors_sql)
     return df
 
+
 def get_omis_order_frequency():
     connection = get_db()
     df = query_database(connection, omis_orders_sql)
     return df
+
 
 def get_data_report_data():
     data = {}
@@ -152,11 +156,12 @@ def get_data_report_data():
     data['omisOrderFrequency'] = to_web_dict(df_omis_orders, orient='tabular')
     return data
 
+
 if __name__ == '__main__':
+
     def get_db():
         uri = 'postgres://countries_of_interest_service@localhost/countries_of_interest_service'
         return psycopg2.connect(uri)
 
     data = get_data_report_data()
     print(data)
-        

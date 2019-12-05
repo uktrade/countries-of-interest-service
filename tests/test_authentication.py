@@ -4,8 +4,8 @@ from db import get_db
 from tests.TestCase import TestCase
 from authentication import seen_nonce
 
-class TestSeenNonce(TestCase):
 
+class TestSeenNonce(TestCase):
     def test_nonce_not_seen(self):
         client_id = 'client_id'
         nonce = 'asdf'
@@ -31,11 +31,13 @@ class TestSeenNonce(TestCase):
         with app.app_context():
             with get_db() as connection:
                 with connection.cursor() as cursor:
-                    sql = 'create table hawk_nonce (' \
-                        'client_id varchar(100), ' \
-                        'nonce varchar(100), ' \
-                        'timestamp timestamp' \
+                    sql = (
+                        'create table hawk_nonce ('
+                        'client_id varchar(100), '
+                        'nonce varchar(100), '
+                        'timestamp timestamp'
                         ')'
+                    )
                     cursor.execute(sql)
             with get_db() as connection:
                 with connection.cursor() as cursor:
