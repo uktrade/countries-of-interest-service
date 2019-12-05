@@ -35,7 +35,7 @@ select
     segment,
     count(1) as n_companies,
     '{now}' as timestamp
-    
+
 from company_company l join segments r on l.sector_id = r.id
 
 where sector_id is not null
@@ -49,7 +49,7 @@ order by 2 desc
 )
 
 table_fields = '''(
-    sector varchar(200), 
+    sector varchar(200),
     count int,
     timestamp Timestamp
 )'''
@@ -59,8 +59,17 @@ table_name = 'top_sectors'
 
 class Task(ETLTask):
     def __init__(
-        self, sql=sql, table_fields=table_fields, table_name=table_name, *args, **kwargs
+            self,
+            sql=sql,
+            table_fields=table_fields,
+            table_name=table_name,
+            *args,
+            **kwargs
     ):
         super().__init__(
-            sql=sql, table_fields=table_fields, table_name=table_name, *args, **kwargs
+            sql=sql,
+            table_fields=table_fields,
+            table_name=table_name,
+            *args,
+            **kwargs
         )

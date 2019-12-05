@@ -13,7 +13,7 @@ with n_companies as (
 ), n_companies_with_orders as (
   select
     count(distinct id) as n_companies_with_orders
-    
+
   from order_order
 
 )
@@ -40,8 +40,17 @@ table_name = 'companies_with_orders'
 
 class Task(ETLTask):
     def __init__(
-        self, sql=sql, table_fields=table_fields, table_name=table_name, *args, **kwargs
+            self,
+            sql=sql,
+            table_fields=table_fields,
+            table_name=table_name,
+            *args,
+            **kwargs
     ):
         super().__init__(
-            sql=sql, table_fields=table_fields, table_name=table_name, *args, **kwargs
+            sql=sql,
+            table_fields=table_fields,
+            table_name=table_name,
+            *args,
+            **kwargs
         )

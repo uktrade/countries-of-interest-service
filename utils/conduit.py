@@ -1,10 +1,19 @@
-import os, psycopg2, re, signal, socket, subprocess, time
+import os
+import psycopg2
+import re
+import signal
+import socket
+import subprocess
+import time
 from subprocess import PIPE, DEVNULL
 
 
 def conduit_connect(service, space, conduit_process_filepath=None):
-    if conduit_process_filepath == None:
-        conduit_process_filepath = '/tmp/cf_conduit/{}_{}.txt'.format(service, space)
+    if conduit_process_filepath is None:
+        conduit_process_filepath = '/tmp/cf_conduit/{}_{}.txt'.format(
+            service,
+            space
+        )
     directory = os.path.split(conduit_process_filepath)[0]
     if not os.path.exists(directory):
         os.makedirs(directory)
@@ -14,31 +23,11 @@ def conduit_connect(service, space, conduit_process_filepath=None):
     uri = get_conduit_uri(conduit_process_filepath)
     try:
         connection = connect_to_database(uri)
-    except Exception as e:
+    except Exception:
         kill_conduit(service, space)
         start_conduit(conduit_process_filepath, service, space)
         uri = get_conduit_uri(conduit_process_filepath)
         connection = connect_to_database(uri)
-    return connection
-
-
-def connect_to_database(uri, max_retries=3):
-    retries = max_retries
-    connection = None
-    while retries > 0:
-        print('trying to connect, attempt: {}'.format(max_retries - retries + 1))
-        try:
-            connection = psycopg2.connect(uri)
-            print('connection was successful')
-            break
-        except Exception as e:
-            print(e)
-        time.sleep(1)
-        retries -= 1
-
-    if retries == 0:
-        raise Exception('failed to connect')
-
     return connection
 
 
@@ -66,7 +55,7 @@ def get_conduit_uri(conduit_process_filepath):
                 print()
                 print('uri: {}'.format(uri))
             break
-        except AttributeError as e:
+        except AttributeError:
             if retries == 10:
                 print('waiting for conduit process to initialise')
         print('.', end='', flush=True),
@@ -75,17 +64,21 @@ def get_conduit_uri(conduit_process_filepath):
 
     if retries == 0:
         with open(conduit_process_filepath) as f:
-            raise Exception('did not find a conduit process, \n{}'.format(f.read()))
+            raise Exception('did not find a conduit process, \n{}'.format(
+                f.read())
+            )
 
     return uri
 
 
 def kill_conduit(service, space):
     pgrep = subprocess.run(
-        ['pgrep', '-f', 'conduit {} -s {}'.format(service, space)], stdout=PIPE
+        ['pgrep', '-f', 'conduit {} -s {}'.format(service, space)],
+        stdout=PIPE
     )
     processes = pgrep.stdout.decode('utf-8').strip()
-    processes = [int(pid) for pid in processes.split('\n')] if processes != '' else []
+    processes = [int(pid) for pid in processes.split('\n')] \
+        if processes != '' else []
 
     print('killing conduit processes: {}'.format(processes))
     for pid in processes:
@@ -141,7 +134,8 @@ def start_conduit(conduit_process_filepath, service, space, port=7080):
         ['pgrep', '-f', 'conduit {} -s {}'.format(service, space)], stdout=PIPE
     )
     processes = pgrep.stdout.decode('utf-8').strip()
-    processes = [int(pid) for pid in processes.split('\n')] if processes != '' else []
+    processes = [int(pid) for pid in processes.split('\n')] \
+        if processes != '' else []
 
     if len(processes) == 2 and os.path.exists(conduit_process_filepath):
         print('conduit is already running')
@@ -151,14 +145,18 @@ def start_conduit(conduit_process_filepath, service, space, port=7080):
             print('conduit is not running')
             print('starting conduit process')
         with open(conduit_process_filepath, "wb") as err:
-            conduit = subprocess.Popen(
-                ['cf', 'conduit', service, '-s', space, '-p', str(port)], stderr=err
+            subprocess.Popen(
+                ['cf', 'conduit', service, '-s', space, '-p',
+                 str(port)],
+                stderr=err
             )
 
     pgrep = subprocess.run(
         ['pgrep', '-f', 'conduit {} -s {}'.format(service, space)], stdout=PIPE
     )
-    processes = [int(pid) for pid in pgrep.stdout.decode('utf-8').strip().split('\n')]
+    processes = [int(pid) for pid in pgrep.stdout.decode(
+        'utf-8'
+    ).strip().split('\n')]
     print('processes:', processes)
 
 

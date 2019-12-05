@@ -13,7 +13,7 @@ with n_companies as (
 ), n_companies_with_export_countries as (
   select
     count(distinct id) as n_companies_with_export_countries
-    
+
   from company_company_export_to_countries
 
 )
@@ -40,8 +40,17 @@ table_name = 'companies_with_export_countries'
 
 class Task(ETLTask):
     def __init__(
-        self, sql=sql, table_fields=table_fields, table_name=table_name, *args, **kwargs
+            self,
+            sql=sql,
+            table_fields=table_fields,
+            table_name=table_name,
+            *args,
+            **kwargs
     ):
         super().__init__(
-            sql=sql, table_fields=table_fields, table_name=table_name, *args, **kwargs
+            sql=sql,
+            table_fields=table_fields,
+            table_name=table_name,
+            *args,
+            **kwargs
         )

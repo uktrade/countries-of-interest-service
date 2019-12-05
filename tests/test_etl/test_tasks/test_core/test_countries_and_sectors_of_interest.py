@@ -1,6 +1,4 @@
-import datetime
 import numpy as np
-from unittest.mock import Mock, patch
 from tests.TestCase import TestCase
 from app import app
 from db import get_db
@@ -16,10 +14,10 @@ class TestCountriesAndSectorsOfInterest(TestCase):
                     sql = (
                         'create table omis '
                         '''(
-                             company_id uuid, 
-                             country varchar(2), 
-                             sector varchar(100), 
-                             created_on timestamp, 
+                             company_id uuid,
+                             country varchar(2),
+                             sector varchar(100),
+                             created_on timestamp,
                              id uuid
                         )'''
                     )
@@ -48,7 +46,7 @@ class TestCountriesAndSectorsOfInterest(TestCase):
                 task = Task(connection=connection)
                 task()
 
-                sql = ''' select * from coi_countries_and_sectors_of_interest '''
+                sql = '''select * from coi_countries_and_sectors_of_interest'''
                 df = query_database(connection, sql)
 
         self.assertEqual(len(df), 2)
@@ -61,7 +59,9 @@ class TestCountriesAndSectorsOfInterest(TestCase):
         self.assertEqual(
             df['source_id'].values[0], '1ee5a16b-1a4b-4c84-838f-0d043579c9ba'
         )
-        self.assertEqual(df['timestamp'].values[0], np.datetime64('2019-01-01 01:00'))
+        self.assertEqual(
+            df['timestamp'].values[0],
+            np.datetime64('2019-01-01 01:00'))
         self.assertEqual(
             df['company_id'].values[1], 'f89d85d2-78c7-484d-bf63-228f32bf8d26'
         )
@@ -71,18 +71,21 @@ class TestCountriesAndSectorsOfInterest(TestCase):
         self.assertEqual(
             df['source_id'].values[1], 'c0794724-c070-4c7e-a52c-89c0006bf7e6'
         )
-        self.assertEqual(df['timestamp'].values[1], np.datetime64('2019-02-02 02:00'))
+        self.assertEqual(
+            df['timestamp'].values[1],
+            np.datetime64('2019-02-02 02:00')
+        )
 
         sql = '''
         select
           tablename,
           indexname,
           indexdef
-        
+
         FROM pg_indexes
 
-        WHERE schemaname = 'public' 
-          and tablename = 'coi_countries_and_sectors_of_interest' 
+        WHERE schemaname = 'public'
+          and tablename = 'coi_countries_and_sectors_of_interest'
         '''
         df = query_database(connection, sql)
         self.assertTrue(len(df) >= 1)  # index created

@@ -9,7 +9,7 @@ def hawk_authenticate():
     method = request.method
     content = request.data
     content_type = request.content_type
-    receiver = mohawk.Receiver(
+    mohawk.Receiver(
         lookup_hawk_credentials,
         request_header=request.headers['Authorization'],
         url=url,
@@ -45,7 +45,7 @@ def lookup_hawk_credentials(client_id):
     try:
         df = query_database(connection, sql, values=(client_id,))
         client_key = df['client_key'].values[0]
-    except IndexError as e:
+    except IndexError:
         raise LookupError()
 
     return {'id': client_id, 'key': client_key, 'algorithm': 'sha256'}
@@ -62,7 +62,8 @@ def seen_nonce(client_id, nonce, timestamp):
 
     with get_db() as connection:
         sql = (
-            'select * from hawk_nonce where client_id=%s and nonce=%s and timestamp=%s'
+            'select * from hawk_nonce where '
+            'client_id=%s and nonce=%s and timestamp=%s'
         )
         with connection.cursor() as cursor:
             cursor.execute(sql, [client_id, nonce, timestamp])

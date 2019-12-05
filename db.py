@@ -1,4 +1,3 @@
-import sqlite3
 import psycopg2
 from flask import current_app, g
 

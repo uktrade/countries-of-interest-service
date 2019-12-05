@@ -1,19 +1,23 @@
+import datetime
+import mohawk
+import pandas as pd
+import pytest
+from unittest.mock import patch
+
 import app
-import datetime, mohawk, os, pandas as pd, psycopg2, tempfile, unittest
 from db import get_db
-from unittest.mock import Mock, patch
 from tests.TestCase import TestCase
 from etl.tasks.core import (
     countries_and_sectors_of_interest,
     countries_of_interest,
     export_countries,
 )
-import pytest
 
 
 class TestDataFlowRequest(TestCase):
     def request_data(self, client_id, client_key):
-        url = 'http://localhost/api/v1/get-company-countries-and-sectors-of-interest'
+        url = 'http://localhost/api/v1/' \
+            'get-company-countries-and-sectors-of-interest'
         algorithm = 'sha256'
         method = 'GET'
         content = ''
@@ -44,7 +48,10 @@ class TestDataFlowRequest(TestCase):
         app.create_users_table(users)
         client_id = 'dataflow_client_id'
         client_key = 'dataflow_client_key'
-        query_database.return_value = pd.DataFrame([(0, 0), (1, 1)], columns=['a', 'b'])
+        query_database.return_value = pd.DataFrame(
+            [(0, 0), (1, 1)],
+            columns=['a', 'b']
+        )
         response = self.request_data(client_id, client_key)
         self.assertEqual(response.status_code, 200)
 
@@ -63,7 +70,12 @@ class TestHawkAuthentication(TestCase):
     @patch('app.query_database')
     @patch('app.to_web_dict')
     @patch('authentication.hawk_authenticate')
-    def test_hawk_authentication(self, hawk_authenticate, to_web_dict, query_database):
+    def test_hawk_authentication(
+            self,
+            hawk_authenticate,
+            to_web_dict,
+            query_database
+    ):
         to_web_dict.return_value = {
             'headers': ['header1', 'header2'],
             'values': [[1, 2], [3, 4]],
@@ -76,7 +88,8 @@ class TestHawkAuthentication(TestCase):
             '/api/v1/get-company-export-countries',
             '/api/v1/get-company-sectors-of-interest',
             '/api/v1/get-datahub-company-ids',
-            '/api/v1/get-datahub-company-ids-to-companies-house-company-numbers',
+            '/api/v1/'
+            'get-datahub-company-ids-to-companies-house-company-numbers',
             '/api/v1/get-sectors',
         ]
         for url in urls:
@@ -114,7 +127,9 @@ class TestGetCompanyCountriesAndSectorsOfInterest(TestCase):
             cursor = connection.cursor()
         sql = ''' create table {} {} '''.format(table_name, schema)
         cursor.execute(sql)
-        sql = ''' insert into {} values (%s, %s, %s, %s, %s, %s) '''.format(table_name)
+        sql = ''' insert into {} values (%s, %s, %s, %s, %s, %s) '''.format(
+            table_name
+        )
         cursor.executemany(sql, values)
         response = self.client.get(url)
         expected = {
@@ -148,7 +163,9 @@ class TestGetCompanyCountriesOfInterest(TestCase):
             cursor = connection.cursor()
         sql = ''' create table {} {} '''.format(table_name, schema)
         cursor.execute(sql)
-        sql = ''' insert into {} values (%s, %s, %s, %s, %s) '''.format(table_name)
+        sql = ''' insert into {} values (%s, %s, %s, %s, %s) '''.format(
+            table_name
+        )
         cursor.executemany(sql, values)
         response = self.client.get(url)
         expected = {
@@ -181,7 +198,9 @@ class TestGetCompanyExportCountries(TestCase):
             cursor = connection.cursor()
         sql = ''' create table {} {} '''.format(table_name, schema)
         cursor.execute(sql)
-        sql = ''' insert into {} values (%s, %s, %s, %s, %s) '''.format(table_name)
+        sql = ''' insert into {} values (%s, %s, %s, %s, %s) '''.format(
+            table_name
+        )
         cursor.executemany(sql, values)
         response = self.client.get(url)
         expected = {
@@ -202,11 +221,16 @@ class TestGetCompanyExportCountries(TestCase):
 class TestGetIndex(TestCase):
     @patch('app.login_required')
     @patch('app.render_template')
-    def test_last_updated_passed_to_template(self, render_template, login_required):
+    def test_last_updated_passed_to_template(
+            self,
+            render_template,
+            login_required
+    ):
         with app.app.app_context():
             with get_db() as connection:
                 with connection.cursor() as cursor:
-                    sql = 'create table if not exists etl_runs (timestamp timestamp)'
+                    sql = 'create table if not exists ' \
+                        'etl_runs (timestamp timestamp)'
                     cursor.execute(sql)
                     sql = 'insert into etl_runs values (%s)'
                     values = [
@@ -216,7 +240,7 @@ class TestGetIndex(TestCase):
                     cursor.executemany(sql, values)
 
             with app.app.test_request_context():
-                response = app.get_index()
+                app.get_index()
         render_template.assert_called_once_with(
             'index.html', last_updated='2019-01-01 02:00:00',
         )
@@ -227,7 +251,7 @@ class TestGetIndex(TestCase):
         self, render_template, login_required
     ):
         with app.app.test_request_context():
-            response = app.get_index()
+            app.get_index()
         render_template.assert_called_once_with(
             'index.html', last_updated='Database not yet initialised',
         )
@@ -243,7 +267,11 @@ class TestPopulateDatabase(TestCase):
             output = app.populate_database()
         populate_database_task.delay.assert_called_once_with(False)
         self.assertEqual(
-            output, {'status': 200, 'message': 'started populate_database task'}
+            output,
+            {
+                'status': 200,
+                'message': 'started populate_database task'
+            }
         )
 
     def test_called_with_drop_table_in_request(
@@ -254,17 +282,22 @@ class TestPopulateDatabase(TestCase):
             output = app.populate_database()
         populate_database_task.delay.assert_called_once_with(True)
         self.assertEqual(
-            output, {'status': 200, 'message': 'started populate_database task'}
+            output,
+            {
+                'status': 200,
+                'message': 'started populate_database task'
+            }
         )
 
     @patch('app.datetime')
     def test_creates_etl_status_table_if_it_does_not_exist(
         self, mock_datetime, populate_database_task, hawk_authenticate
     ):
-        mock_datetime.datetime.now.return_value = datetime.datetime(2019, 1, 1, 1)
+        mock_datetime.datetime.now.return_value = \
+            datetime.datetime(2019, 1, 1, 1)
         with app.app.test_request_context() as request:
             request.request.args = {'drop-table': ''}
-            output = app.populate_database()
+            app.populate_database()
         with app.app.app_context():
             with get_db() as connection:
                 with connection.cursor() as cursor:
@@ -279,7 +312,7 @@ class TestPopulateDatabase(TestCase):
     ):
         with app.app.test_request_context() as request:
             request.request.args = {'force-update': ''}
-            output = app.populate_database()
+            app.populate_database()
         populate_database_task.delay.assert_called_once()
 
     def test_if_force_update_rerun_while_another_task_is_running(
@@ -297,7 +330,7 @@ class TestPopulateDatabase(TestCase):
                     cursor.execute(sql, ['RUNNING', '2019-01-01 01:00'])
         with app.app.test_request_context() as request:
             request.request.args = {'force-update': ''}
-            output = app.populate_database()
+            app.populate_database()
         populate_database_task.delay.assert_called_once()
 
     def test_does_not_rerun_while_another_task_is_running(
@@ -313,8 +346,8 @@ class TestPopulateDatabase(TestCase):
                     cursor.execute(sql)
                     sql = 'insert into etl_status values (%s, %s)'
                     cursor.execute(sql, ['RUNNING', '2019-01-01 01:00'])
-        with app.app.test_request_context() as request:
-            output = app.populate_database()
+        with app.app.test_request_context():
+            app.populate_database()
         populate_database_task.delay.assert_not_called()
 
     def test_reruns_task_if_last_was_succesful(
@@ -330,6 +363,6 @@ class TestPopulateDatabase(TestCase):
                     cursor.execute(sql)
                     sql = 'insert into etl_status values (%s, %s)'
                     cursor.execute(sql, ['SUCCESS', '2019-01-01 01:00'])
-        with app.app.test_request_context() as request:
-            output = app.populate_database()
+        with app.app.test_request_context():
+            app.populate_database()
         populate_database_task.delay.assert_called_once()

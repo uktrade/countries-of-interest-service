@@ -12,7 +12,8 @@ from etl.tasks.core.source_data_extraction import (
 from etl.tasks.core.countries_and_sectors_of_interest import (
     Task as PopulateCountriesAndSectorsOfInterestTask,
 )
-from etl.tasks.core.countries_of_interest import Task as PopulateCountriesOfInterestTask
+from etl.tasks.core.countries_of_interest import Task as \
+    PopulateCountriesOfInterestTask
 from etl.tasks.core.export_countries import Task as ExportCountriesTask
 from etl.tasks.core.sectors_of_interest import Task as SectorsOfInterestTask
 
@@ -29,14 +30,20 @@ def populate_database(drop_table):
         output.append(extract_export_wins())
         output.extend(
             [
-                ExportCountriesTask(connection=connection, drop_table=drop_table)(),
+                ExportCountriesTask(
+                    connection=connection,
+                    drop_table=drop_table
+                )(),
                 PopulateCountriesAndSectorsOfInterestTask(
                     connection=connection, drop_table=drop_table
                 )(),
                 PopulateCountriesOfInterestTask(
                     connection=connection, drop_table=drop_table
                 )(),
-                SectorsOfInterestTask(connection=connection, drop_table=drop_table)(),
+                SectorsOfInterestTask(
+                    connection=connection,
+                    drop_table=drop_table
+                )(),
             ]
         )
         with connection.cursor() as cursor:

@@ -1,17 +1,18 @@
-import psycopg2, unittest
+import psycopg2
+import unittest
+
 import app
-from db import get_db
 
 
 def kill_connections(cursor):
     sql = '''
-select pg_terminate_backend(pid) 
+        select pg_terminate_backend(pid)
 
-from pg_stat_activity 
+        from pg_stat_activity
 
-where pid<> pg_backend_pid() 
-    and datname = (select current_database());
-'''
+        where pid<> pg_backend_pid()
+            and datname = (select current_database());
+    '''
     cursor.execute(sql)
 
 

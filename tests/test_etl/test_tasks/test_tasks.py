@@ -1,6 +1,5 @@
 import datetime
-from unittest.mock import Mock, patch
-from flask import current_app
+from unittest.mock import patch
 from app import app
 from db import get_db
 from etl.tasks.core import populate_database
@@ -53,7 +52,8 @@ class TestPopulateDatabase(TestCase):
         PopulateCountriesAndSectorsOfInterestTask.assert_called_once_with(
             connection=db_context, drop_table=True
         )
-        PopulateCountriesAndSectorsOfInterestTask.return_value.assert_called_once()
+        (PopulateCountriesAndSectorsOfInterestTask
+         .return_value.assert_called_once())
         PopulateCountriesOfInterestTask.assert_called_once_with(
             connection=db_context, drop_table=True
         )
@@ -73,7 +73,8 @@ class TestPopulateDatabase(TestCase):
                 extract_datahub_sectors.return_value,
                 extract_export_wins.return_value,
                 ExportCountriesTask.return_value.return_value,
-                PopulateCountriesAndSectorsOfInterestTask.return_value.return_value,
+                (PopulateCountriesAndSectorsOfInterestTask
+                 .return_value.return_value),
                 PopulateCountriesOfInterestTask.return_value.return_value,
                 SectorsOfInterestTask.return_value.return_value,
             ]
@@ -98,7 +99,8 @@ class TestPopulateDatabase(TestCase):
         extract_datahub_company_dataset,
     ):
 
-        mock_datetime.datetime.now.return_value = datetime.datetime(2019, 1, 1, 2)
+        mock_datetime.datetime.now.return_value = \
+            datetime.datetime(2019, 1, 1, 2)
         with app.app_context():
             with get_db() as connection:
                 with connection.cursor() as cursor:
@@ -108,14 +110,18 @@ class TestPopulateDatabase(TestCase):
                     )
                     cursor.execute(sql)
                     sql = (
-                        "insert into etl_status values ('RUNNING', '2019-01-01 01:00')"
+                        "insert into etl_status values"
+                        "('RUNNING', '2019-01-01 01:00')"
                     )
                     cursor.execute(sql)
-            output = populate_database(drop_table=True)
+            populate_database(drop_table=True)
             with get_db() as connection:
                 with connection.cursor() as cursor:
                     sql = 'select * from etl_status'
                     cursor.execute(sql)
                     rows = cursor.fetchall()
             self.assertEqual(len(rows), 1)
-            self.assertEqual(rows, [('SUCCESS', datetime.datetime(2019, 1, 1, 2))])
+            self.assertEqual(
+                rows,
+                [('SUCCESS', datetime.datetime(2019, 1, 1, 2))]
+            )

@@ -16,7 +16,9 @@ def create_table(connection, fields, table_name):
 
 
 def drop_table(connection, table_name):
-    sql = ''' drop table if exists {table_name} '''.format(table_name=table_name)
+    sql = ''' drop table if exists {table_name} '''.format(
+        table_name=table_name
+    )
     execute_query(connection, sql)
 
 
@@ -38,7 +40,13 @@ def insert_data(df, output_connection, table_name):
 
 class ETLTask:
     def __init__(
-        self, connection, sql, table_fields, table_name, drop_table=False, index=None,
+            self,
+            connection,
+            sql,
+            table_fields,
+            table_name,
+            drop_table=False,
+            index=None,
     ):
         self.connection = connection
         self.drop_table = drop_table
@@ -62,7 +70,8 @@ class ETLTask:
         # print('\033[31mingest data\033[0m')
         insert_data(df, self.connection, self.table_name)
 
-        if self.index != None:
+        print('self.index:', self.index)
+        if self.index is not None:
             create_index(self.connection, self.index, self.table_name)
 
         # print('\033[31mcheck data\033[0m')
