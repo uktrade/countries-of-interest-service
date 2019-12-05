@@ -2,24 +2,31 @@ import datetime
 import json
 import os
 
-import numpy as np
-import pandas as pd
-from celery import Celery
-from decouple import config
-from flask import Flask, render_template, request
-from flask.json import JSONEncoder
-from flask import jsonify
-
 from authbroker_client import authbroker_blueprint, login_required
 
-import data_report
-import etl.tasks.core
 from authentication import hawk_decorator_factory
+
+from celery import Celery
+
+import data_report
+
 from db import get_db
+
+from decouple import config
+
+import etl.tasks.core
 from etl.scheduler import Scheduler
+
+from flask import Flask, jsonify, render_template, request
+from flask.json import JSONEncoder
+
+import numpy as np
+
+import pandas as pd
+
 from utils import utils
-from utils.utils import to_web_dict
 from utils.sql import execute_query, query_database, table_exists
+from utils.utils import to_web_dict
 
 
 class CustomJSONEncoder(JSONEncoder):

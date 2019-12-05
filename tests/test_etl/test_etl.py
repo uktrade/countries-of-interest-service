@@ -1,11 +1,15 @@
 import unittest
 from unittest.mock import Mock, patch
-from etl import create_index, ETLTask
-from tests.TestCase import TestCase
-from utils.sql import query_database
 
 from app import app
+
 from db import get_db
+
+from etl import ETLTask, create_index
+
+from tests.TestCase import TestCase
+
+from utils.sql import query_database
 
 
 @patch('etl.create_index')

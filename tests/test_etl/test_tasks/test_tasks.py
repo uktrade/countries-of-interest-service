@@ -1,8 +1,12 @@
 import datetime
 from unittest.mock import patch
+
 from app import app
+
 from db import get_db
+
 from etl.tasks.core import populate_database
+
 from tests.TestCase import TestCase
 
 

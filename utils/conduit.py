@@ -1,11 +1,12 @@
 import os
-import psycopg2
 import re
 import signal
 import socket
 import subprocess
 import time
-from subprocess import PIPE, DEVNULL
+from subprocess import DEVNULL, PIPE
+
+import psycopg2
 
 
 def conduit_connect(service, space, conduit_process_filepath=None):

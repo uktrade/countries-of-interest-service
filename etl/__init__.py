@@ -1,4 +1,5 @@
 import pandas as pd
+
 from utils.sql import execute_query, query_database
 
 

@@ -1,8 +1,13 @@
-import numpy as np
-from tests.TestCase import TestCase
 from app import app
+
 from db import get_db
+
 from etl.tasks.core.countries_and_sectors_of_interest import Task
+
+import numpy as np
+
+from tests.TestCase import TestCase
+
 from utils.sql import query_database
 
 

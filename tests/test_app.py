@@ -1,17 +1,23 @@
 import datetime
-import mohawk
-import pandas as pd
-import pytest
 from unittest.mock import patch
 
 import app
+
 from db import get_db
-from tests.TestCase import TestCase
+
 from etl.tasks.core import (
     countries_and_sectors_of_interest,
     countries_of_interest,
     export_countries,
 )
+
+import mohawk
+
+import pandas as pd
+
+import pytest
+
+from tests.TestCase import TestCase
 
 
 class TestDataFlowRequest(TestCase):

@@ -1,10 +1,15 @@
-import etl.tasks.core.source_data_extraction as extraction
 from unittest.mock import Mock, patch
-from tests.TestCase import TestCase
-from etl.tasks.core.source_data_extraction import populate_table
-from utils.sql import query_database
+
 from app import app
+
 from db import get_db
+
+import etl.tasks.core.source_data_extraction as extraction
+from etl.tasks.core.source_data_extraction import populate_table
+
+from tests.TestCase import TestCase
+
+from utils.sql import query_database
 
 
 class TestExtractDatahubCompany(TestCase):

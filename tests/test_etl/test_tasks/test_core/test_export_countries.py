@@ -1,7 +1,11 @@
-from tests.TestCase import TestCase
 from app import app
+
 from db import get_db
+
 from etl.tasks.core.export_countries import Task
+
+from tests.TestCase import TestCase
+
 from utils.sql import query_database
 
 

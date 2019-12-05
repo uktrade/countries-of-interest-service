@@ -1,7 +1,10 @@
 from app import app
-from db import get_db
-from tests.TestCase import TestCase
+
 from authentication import seen_nonce
+
+from db import get_db
+
+from tests.TestCase import TestCase
 
 
 class TestSeenNonce(TestCase):
