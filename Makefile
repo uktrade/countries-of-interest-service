@@ -21,6 +21,7 @@ run_tests:
 
 .PHONY: check
 check:
+	flake8 . --max-line-length=88
 	black --exclude=venv --skip-string-normalization --check .
 
 
