@@ -143,6 +143,8 @@ class TestGetCompanyCountriesAndSectorsOfInterest(TestCase):
 
 @patch('authentication.hawk_authenticate')
 class TestGetCompanyCountriesOfInterest(TestCase):
+    maxDiff = None
+
     def test(self, hawk_authenticate):
         schema = countries_of_interest.table_fields
         table_name = countries_of_interest.table_name

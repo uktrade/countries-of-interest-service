@@ -2,10 +2,6 @@ version: '3'
 services:
   web:
     build: .
-    environment:
-      - DATABASE_URL=postgresql://postgres@postgres/postgres
-      - CELERY_BACKEND=redis://redis
-      - CELERY_BROKER=redis://redis
     env_file:
       - ${ENV_FILE:-.env}
     ports:

@@ -6,7 +6,7 @@ from authbroker_client import authbroker_blueprint, login_required
 
 from celery import Celery
 
-from decouple import config
+import config
 
 from flask import Flask, jsonify, render_template, request
 from flask.json import JSONEncoder
@@ -14,6 +14,7 @@ from flask.json import JSONEncoder
 import numpy as np
 
 import pandas as pd
+
 
 from authentication import hawk_decorator_factory
 
@@ -44,47 +45,17 @@ class CustomJSONEncoder(JSONEncoder):
 
 
 app = Flask(__name__)
+app.config.update(config.get_config())
 
 # sso
 app.register_blueprint(authbroker_blueprint)
-app.config['ABC_BASE_URL'] = config('ABC_BASE_URL', 'https://sso.trade.gov.uk')
-app.config['ABC_CLIENT_ID'] = config(
-    'ABC_CLIENT_ID', 'get this from your network admin'
-)
-app.config['ABC_CLIENT_SECRET'] = config(
-    'ABC_CLIENT_SECRET', 'get this from your network admin'
-)
+app.config['ABC_BASE_URL'] = app.config['sso']['host']
+app.config['ABC_CLIENT_ID'] = app.config['sso']['abc_client_id']
+app.config['ABC_CLIENT_SECRET'] = app.config['sso']['abc_client_secret']
 
-# other
-app.secret_key = config('APP_SECRET_KEY', 'the random string')
+app.secret_key = app.config['app']['secret_key']
 app.json_encoder = CustomJSONEncoder
-assert app.config['ENV'] in (
-    'production',
-    'dev',
-    'development',
-    'test',
-), 'invalid environment: {}'.format(app.config['ENV'])
-app.config['DATAWORKSPACE_HOST'] = config('DATAWORKSPACE_HOST', 'localapps.com:8000')
-app.config['PAGINATION_SIZE'] = config('PAGINATION_SIZE', 50, cast=int)
-app.config['RUN_SCHEDULER'] = config('RUN_SCHEDULER', False, cast=bool)
 
-# app database
-if app.config['ENV'] == 'production':
-    app.config['DATABASE'] = os.environ['DATABASE_URL']
-elif app.config['ENV'] in ['dev', 'development']:
-    app.config['DATABASE'] = config(
-        'DATABASE_URL',
-        'postgresql://countries_of_interest_service@localhost'
-        '/countries_of_interest_service',
-    )
-elif app.config['ENV'] == 'test':
-    app.config['DATABASE'] = config(
-        'DATABASE_URL',
-        'postgresql://test_countries_of_interest_service@localhost'
-        '/test_countries_of_interest_service',
-    )
-else:
-    raise Exception('unrecognised environment')
 
 # celery & cloud foundry config
 vcap_services = os.environ.get('VCAP_SERVICES')
@@ -92,12 +63,11 @@ if vcap_services:
     vacap_services = json.loads(vcap_services)
     redis_config = json.loads(vcap_services)['redis'][0]
     redis_uri = redis_config['credentials']['uri']
-app.config['CELERY_BROKER'] = config(
-    'CELERY_BROKER', redis_uri if vcap_services else 'redis://localhost'
-)
+    if redis_uri:
+        app.config['cache']['host'] = redis_uri
 
 # celery, tasks config
-celery = Celery('app', broker=app.config['CELERY_BROKER'])
+celery = Celery('app', broker=app.config['cache']['host'])
 
 
 @celery.task
@@ -106,30 +76,14 @@ def populate_database_task(drop_table=True):
         return etl.tasks.core.populate_database(drop_table)
 
 
-# hawk authentication
-app.config['HAWK_ENABLED'] = config(
-    'HAWK_ENABLED', app.config['ENV'] in ('production', 'test'), cast=bool
-)
-app.config['DATAFLOW_HAWK_CLIENT_ID'] = config(
-    'DATAFLOW_HAWK_CLIENT_ID', 'dataflow_client_id'
-)
-app.config['DATAFLOW_HAWK_CLIENT_KEY'] = config(
-    'DATAFLOW_HAWK_CLIENT_KEY', 'dataflow_client_key'
-)
-app.config['DATAWORKSPACE_HAWK_CLIENT_ID'] = config(
-    'DATAWORKSPACE_HAWK_CLIENT_ID', 'dataworkspace_client_id'
-)
-app.config['DATAWORKSPACE_HAWK_CLIENT_KEY'] = config(
-    'DATAWORKSPACE_HAWK_CLIENT_KEY', 'dataworkspace_client_key'
-)
 # decorator for hawk authentication
 # when hawk is disabled the authentication is trivial,
 # effectively all requests are authenticated
-hawk_authentication = hawk_decorator_factory(app.config['HAWK_ENABLED'])
+hawk_authentication = hawk_decorator_factory(app.config['app']['hawk_enabled'])
 users = [
     (
-        config('DATAFLOW_HAWK_CLIENT_ID', 'dataflow_client_id'),
-        config('DATAFLOW_HAWK_CLIENT_KEY', 'dataflow_client_key'),
+        app.config['dataflow']['hawk_client_id'],
+        app.config['dataflow']['hawk_client_key'],
     ),
 ]
 
@@ -153,7 +107,7 @@ def create_users_table(users):
             cursor.executemany(sql, users)
 
 
-if app.config['ENV'] != 'test':
+if app.config['flask']['env'] != 'test':
     create_users_table(users)
 
 # views
@@ -178,7 +132,7 @@ order by 1
 @hawk_authentication
 @utils.response_orientation_decorator
 def get_company_countries_and_sectors_of_interest(orientation):
-    pagination_size = app.config['PAGINATION_SIZE']
+    pagination_size = app.config['app']['pagination_size']
     next_source = request.args.get('next-source')
     next_source_id = request.args.get('next-source-id')
     company_ids = request.args.getlist('company-id')
@@ -274,7 +228,7 @@ limit {pagination_size} + 1
 @hawk_authentication
 @utils.response_orientation_decorator
 def get_company_countries_of_interest(orientation):
-    pagination_size = app.config['PAGINATION_SIZE']
+    pagination_size = app.config['app']['pagination_size']
     next_source = request.args.get('next-source')
     next_source_id = request.args.get('next-source-id')
     company_ids = request.args.getlist('company-id')
@@ -358,7 +312,7 @@ limit {pagination_size} + 1
 @hawk_authentication
 @utils.response_orientation_decorator
 def get_company_export_countries(orientation):
-    pagination_size = app.config['PAGINATION_SIZE']
+    pagination_size = app.config['app']['pagination_size']
     next_source = request.args.get('next-source')
     next_source_id = request.args.get('next-source-id')
     company_ids = request.args.getlist('company-id')
@@ -442,7 +396,7 @@ limit {pagination_size} + 1
 @hawk_authentication
 @utils.response_orientation_decorator
 def get_company_sectors_of_interest(orientation):
-    pagination_size = app.config['PAGINATION_SIZE']
+    pagination_size = app.config['app']['pagination_size']
     next_source = request.args.get('next-source')
     next_source_id = request.args.get('next-source-id')
     company_ids = request.args.getlist('company-id')
@@ -634,7 +588,7 @@ def healthcheck():
     return jsonify({"status": "OK"})
 
 
-if app.config['RUN_SCHEDULER'] is True:
+if app.config['app']['run_scheduler'] is True:
     print('starting scheduler')
     scheduled_task = Scheduler(populate_database_task)
     scheduled_task.start()

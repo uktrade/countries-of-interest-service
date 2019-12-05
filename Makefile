@@ -17,7 +17,7 @@ run_celery:
 
 .PHONY: run_tests
 run_tests:
-	FLASK_ENV=test python -m pytest -p no:sugar --cov
+	TESTING=1 python -m pytest -p no:sugar --cov
 
 .PHONY: check
 check:

@@ -18,7 +18,7 @@ def extract_datahub_company_dataset():
         'columns': ('id uuid', 'company_number varchar(50)', 'sector varchar(50)'),
         'primary_key': 'id',
     }
-    url = 'http://{}/{}'.format(current_app.config['DATAWORKSPACE_HOST'], endpoint)
+    url = 'http://{}/{}'.format(current_app.config['dataworkspace']['host'], endpoint)
     # TODO: remove stubbed data
     data = {
         'headers': ['id', 'companyNumber', 'sector'],
@@ -37,7 +37,7 @@ def extract_datahub_export_countries():
         'primary_key': 'id',
     }
     table_name = 'datahub_export_countries'
-    url = 'http://{}/{}'.format(current_app.config['DATAWORKSPACE_HOST'], endpoint)
+    url = 'http://{}/{}'.format(current_app.config['dataworkspace']['host'], endpoint)
     data = {
         'headers': ['company_id', 'country', 'id'],
         'values': [
@@ -55,7 +55,7 @@ def extract_datahub_future_interest_countries():
         'primary_key': 'id',
     }
     table_name = 'datahub_future_interest_countries'
-    url = 'http://{}/{}'.format(current_app.config['DATAWORKSPACE_HOST'], endpoint)
+    url = 'http://{}/{}'.format(current_app.config['dataworkspace']['host'], endpoint)
     data = {
         'headers': ['companyId', 'country', 'id'],
         'values': [
@@ -74,7 +74,7 @@ def extract_datahub_interactions():
         'primary_key': 'id',
     }
     table_name = 'datahub_interactions'
-    url = 'http://{}/{}'.format(current_app.config['DATAWORKSPACE_HOST'], endpoint)
+    url = 'http://{}/{}'.format(current_app.config['dataworkspace']['host'], endpoint)
     stub_data = {
         'headers': ['companyId', 'country', 'id'],
         'values': [
@@ -98,7 +98,7 @@ def extract_datahub_omis_dataset():
         'primary_key': 'id',
     }
     table_name = 'omis'
-    url = 'http://{}/{}'.format(current_app.config['DATAWORKSPACE_HOST'], endpoint)
+    url = 'http://{}/{}'.format(current_app.config['dataworkspace']['host'], endpoint)
     data = {
         'headers': ['companyId', 'country', 'createdOn', 'id', 'sector'],
         'values': [
@@ -125,7 +125,7 @@ def extract_datahub_sectors():
     endpoint = 'api/v1/datahub-sectors-dataset'
     schema = {'columns': ('id uuid', 'sector varchar(200)'), 'primary_key': 'id'}
     table_name = 'datahub_sector'
-    url = 'http://{}/{}'.format(current_app.config['DATAWORKSPACE_HOST'], endpoint)
+    url = 'http://{}/{}'.format(current_app.config['dataworkspace']['host'], endpoint)
     data = {
         'headers': ['id', 'sector'],
         'values': [
@@ -148,7 +148,7 @@ def extract_export_wins():
         'primary_key': 'id',
     }
     table_name = 'export_wins'
-    dataworkspace_host = current_app.config['DATAWORKSPACE_HOST']
+    dataworkspace_host = current_app.config['dataworkspace']['host']
     url = 'http://{}/{}'.format(dataworkspace_host, endpoint)
     data = {
         'headers': ['id', 'companyId', 'timestamp'],
@@ -183,8 +183,8 @@ def populate_table(schema, table_name, url, stub_data=None):
     if stub_data is not None:
         data = stub_data
     else:
-        client_id = current_app.config['DATAWORKSPACE_HAWK_CLIENT_ID']
-        client_key = current_app.config['DATAWORKSPACE_HAWK_CLIENT_KEY']
+        client_id = current_app.config['dataworkspace']['hawk_client_id']
+        client_key = current_app.config['dataworkspace']['hawk_client_key']
         headers = get_hawk_headers(url, client_id, client_key)
         response = requests.get(url, headers=headers)
         data = response.json()

@@ -12,5 +12,5 @@ def close_db(e=None):
 
 def get_db():
     if 'db' not in g:
-        g.db = psycopg2.connect(current_app.config['DATABASE'])
+        g.db = psycopg2.connect(current_app.config['app']['database_url'])
     return g.db
