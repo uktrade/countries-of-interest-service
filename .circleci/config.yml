@@ -1,0 +1,98 @@
+version: 2.1
+
+job_defaults: &job_defaults
+  parameters:
+    python_image:
+      type: string
+
+    postgres_image:
+      type: string
+
+    redis_image:
+      type: string
+
+    publish_coverage:
+      type: boolean
+      default: false
+
+  environment:
+    FLASK_ENV: test
+    DATABASE_URL: postgresql://postgres@localhost/
+    ABC_CLIENT_ID: client_id
+    ABC_CLIENT_SECRET: client_secret
+    APP_SECRET_KEY: app_secret
+    DATAWORKSPACE_HOST: localhost:8000
+    DATAWORKSPACE_HAWK_CLIENT_KEY: dataworkspace_client_key
+    DATAFLOW_HAWK_CLIENT_ID: dataflow_client_id
+    DATAFLOW_HAWK_CLIENT_KEY: dataflow_client_key
+
+  working_directory: ~/app
+
+  docker:
+    - image: <<parameters.python_image>>
+
+    - image: <<parameters.postgres_image>>
+
+    - image: <<parameters.redis_image>>
+
+  steps:
+    - checkout
+    - restore_cache:
+        name: Restore pip cache
+        keys:
+          - v2-<< parameters.python_image >>-{{ checksum "requirements.txt" }}
+        paths:
+          - ~/cache/pip
+    - run:
+        name: Install dependencies
+        command: python -m pip install --cache-dir ~/cache/pip --progress-bar off -r requirements.txt
+
+    - save_cache:
+        name: Save pip cache
+        key: v2-<< parameters.python_image >>-{{ checksum "requirements.txt" }}
+        paths:
+          - ~/cache/pip
+    - run:
+        name: Install node
+        command: curl -sL https://deb.nodesource.com/setup_10.x | bash && apt-get install -y nodejs
+
+    - run:
+        name: Install packages
+        command: npm install
+
+    - run:
+        name: Compile assets
+        command: npm run-script build
+
+    - run:
+        name: Check node packages
+        command: npm audit
+
+    - run:
+        name: Run tests
+        command: make run_tests
+
+    - when:
+        condition: <<parameters.publish_coverage>>
+        steps:
+          - run:
+              name: Publish coverage
+              command: |
+                wget -O codecov.sh https://codecov.io/bash
+                bash ./codecov.sh -t ${COV_TOKEN}
+
+
+jobs:
+  build:
+    <<: *job_defaults
+
+workflows:
+  version: 2
+
+  Default build:
+    jobs:
+      - build:
+          publish_coverage: true
+          python_image: python:3.6.8
+          postgres_image: postgres:10.5
+          redis_image: redis:3.2

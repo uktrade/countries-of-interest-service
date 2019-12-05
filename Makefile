@@ -14,3 +14,7 @@ run_dev_server:
 .PHONY: run_celery
 run_celery:
 	celery worker -A app.celery -l info -O fair --prefetch-multiplier 1 -Q celery
+
+.PHONY: run_tests
+run_tests:
+	FLASK_ENV=test python -m pytest -p no:sugar --cov
