@@ -37,19 +37,6 @@ You can configure how `docker-compose` runs with environment variables,
 * change the environment file with the `ENV_FILE` environment variable
 * e.g. `PORT=8000 ENV_FILE=my_envs docker-compose build` and again when using `docker-compose up`
 
-## Deployment (to development environment)
-The countries of interest service is nominally deployed in a Cloud Foundry instance. 
-
-1. Install Cloud Foundry
-    <br />https://docs.cloudfoundry.org/cf-cli/install-go-cli.html
-2. Request a Government PaaS account from the web devops team
-3. Request access to the `datahub-dev` and `data-workspace-apps-dev` spaces
-4. Login to cloud foundry
-    <br /> `cf login -u <username> -p <password>`
-5. Set the cloud foundry target
-    <br /> `cf target -o dit-staging -s data-workspace-apps-dev`
-6. Push the application
-    <br />`cf push`
 ## Testing
 From the project base directory use the command,
 
