@@ -1,8 +1,8 @@
-from db import get_db
-
 from flask import request
 
 import mohawk
+
+from db import get_db
 
 from utils.sql import query_database
 

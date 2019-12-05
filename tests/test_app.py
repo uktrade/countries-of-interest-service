@@ -1,6 +1,12 @@
 import datetime
 from unittest.mock import patch
 
+import mohawk
+
+import pandas as pd
+
+import pytest
+
 import app
 
 from db import get_db
@@ -10,12 +16,6 @@ from etl.tasks.core import (
     countries_of_interest,
     export_countries,
 )
-
-import mohawk
-
-import pandas as pd
-
-import pytest
 
 from tests.TestCase import TestCase
 

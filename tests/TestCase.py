@@ -1,8 +1,8 @@
 import unittest
 
-import app
-
 import psycopg2
+
+import app
 
 
 def kill_connections(cursor):
