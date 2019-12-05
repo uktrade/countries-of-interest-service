@@ -38,13 +38,11 @@ table_fields = '''(
 
 table_name = 'segments'
 
-class Task(ETLTask):
 
-    def __init__(self, sql=sql, table_fields=table_fields, table_name=table_name, *args, **kwargs):
+class Task(ETLTask):
+    def __init__(
+        self, sql=sql, table_fields=table_fields, table_name=table_name, *args, **kwargs
+    ):
         super().__init__(
-            sql=sql,
-            table_fields=table_fields,
-            table_name=table_name,
-            *args,
-            **kwargs
+            sql=sql, table_fields=table_fields, table_name=table_name, *args, **kwargs
         )

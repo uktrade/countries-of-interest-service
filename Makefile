@@ -18,3 +18,12 @@ run_celery:
 .PHONY: run_tests
 run_tests:
 	FLASK_ENV=test python -m pytest -p no:sugar --cov
+
+.PHONY: check
+check:
+	black --exclude=venv --skip-string-normalization --check .
+
+
+.PHONY: format
+format:
+	black --exclude=venv --skip-string-normalization .

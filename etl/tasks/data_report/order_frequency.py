@@ -15,7 +15,9 @@ group by 1
 
 order by 1
 
-'''.format(now=now)
+'''.format(
+    now=now
+)
 
 table_fields = '''(
     date Timestamp,
@@ -25,13 +27,11 @@ table_fields = '''(
 
 table_name = 'order_frequency_by_date'
 
-class Task(ETLTask):
 
-    def __init__(self, sql=sql, table_fields=table_fields, table_name=table_name, *args, **kwargs):
+class Task(ETLTask):
+    def __init__(
+        self, sql=sql, table_fields=table_fields, table_name=table_name, *args, **kwargs
+    ):
         super().__init__(
-            sql=sql,
-            table_fields=table_fields,
-            table_name=table_name,
-            *args,
-            **kwargs
+            sql=sql, table_fields=table_fields, table_name=table_name, *args, **kwargs
         )

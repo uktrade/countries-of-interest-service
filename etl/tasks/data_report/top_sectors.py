@@ -44,7 +44,9 @@ group by 1
 
 order by 2 desc
 
-'''.format(now=now)
+'''.format(
+    now=now
+)
 
 table_fields = '''(
     sector varchar(200), 
@@ -54,13 +56,11 @@ table_fields = '''(
 
 table_name = 'top_sectors'
 
-class Task(ETLTask):
 
-    def __init__(self, sql=sql, table_fields=table_fields, table_name=table_name, *args, **kwargs):
+class Task(ETLTask):
+    def __init__(
+        self, sql=sql, table_fields=table_fields, table_name=table_name, *args, **kwargs
+    ):
         super().__init__(
-            sql=sql,
-            table_fields=table_fields,
-            table_name=table_name,
-            *args,
-            **kwargs
+            sql=sql, table_fields=table_fields, table_name=table_name, *args, **kwargs
         )

@@ -52,6 +52,11 @@ job_defaults: &job_defaults
         key: v2-<< parameters.python_image >>-{{ checksum "requirements.txt" }}
         paths:
           - ~/cache/pip
+
+    - run:
+        name: Run format checks
+        command: make check
+
     - run:
         name: Install node
         command: curl -sL https://deb.nodesource.com/setup_10.x | bash && apt-get install -y nodejs
