@@ -1,5 +1,3 @@
-from db import get_db
-
 from flask import current_app
 
 import mohawk
@@ -7,6 +5,8 @@ import mohawk
 import psycopg2
 
 import requests
+
+from db import get_db
 
 from utils import sql as sql_utils
 

@@ -4,18 +4,9 @@ import os
 
 from authbroker_client import authbroker_blueprint, login_required
 
-from authentication import hawk_decorator_factory
-
 from celery import Celery
 
-import data_report
-
-from db import get_db
-
 from decouple import config
-
-import etl.tasks.core
-from etl.scheduler import Scheduler
 
 from flask import Flask, jsonify, render_template, request
 from flask.json import JSONEncoder
@@ -23,6 +14,15 @@ from flask.json import JSONEncoder
 import numpy as np
 
 import pandas as pd
+
+from authentication import hawk_decorator_factory
+
+import data_report
+
+from db import get_db
+
+import etl.tasks.core
+from etl.scheduler import Scheduler
 
 from utils import utils
 from utils.sql import execute_query, query_database, table_exists
