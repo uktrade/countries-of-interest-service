@@ -37,10 +37,10 @@ def flush_database(database_uri):
 class TestCase(unittest.TestCase):
     def setUp(self):
         self.config = app.app.config
-        if self.config['ENV'] != 'test':
+        if self.config['flask']['env'] != 'test':
             raise Exception('run tests in test environment')
         self.client = app.app.test_client()
-        self.database_uri = app.app.config['DATABASE']
+        self.database_uri = app.app.config['app']['database_url']
         self.database_name = '/'.split(self.database_uri)[-1]
 
     def tearDown(self):

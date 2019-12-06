@@ -28,7 +28,8 @@ class TestExtractDatahubCompany(TestCase):
         }
         table_name = 'datahub_company'
         url = 'http://{}/{}'.format(
-            app.config['DATAWORKSPACE_HOST'], 'api/v1/dataset/datahub-company-dataset'
+            app.config['dataworkspace']['host'],
+            'api/v1/dataset/datahub-company-dataset',
         )
         with app.app_context():
             output = extraction.extract_datahub_company_dataset()
@@ -52,7 +53,8 @@ class TestExtractDatahubExportCountries(TestCase):
         }
         table_name = 'datahub_export_countries'
         url = 'http://{}/{}'.format(
-            app.config['DATAWORKSPACE_HOST'], 'api/v1/dataset/datahub-export-countries'
+            app.config['dataworkspace']['host'],
+            'api/v1/dataset/datahub-export-countries',
         )
         with app.app_context():
             output = extraction.extract_datahub_export_countries()
@@ -78,7 +80,7 @@ class TestExtractDatahubFutureInterestCountries(TestCase):
         }
         table_name = 'datahub_future_interest_countries'
         url = 'http://{}/{}'.format(
-            app.config['DATAWORKSPACE_HOST'],
+            app.config['dataworkspace']['host'],
             'api/v1/dataset/datahub-future-interest-countries',
         )
         with app.app_context():
@@ -105,7 +107,7 @@ class TestExtractDatahubInteractions(TestCase):
         }
         table_name = 'datahub_interactions'
         url = 'http://{}/{}'.format(
-            app.config['DATAWORKSPACE_HOST'], 'api/v1/dataset/datahub-interactions'
+            app.config['dataworkspace']['host'], 'api/v1/dataset/datahub-interactions'
         )
         with app.app_context():
             output = extraction.extract_datahub_interactions()
@@ -149,7 +151,7 @@ class TestExtractDatahubOmis(TestCase):
         }
         table_name = 'omis'
         url = 'http://{}/{}'.format(
-            app.config['DATAWORKSPACE_HOST'], 'api/v1/omis-dataset'
+            app.config['dataworkspace']['host'], 'api/v1/omis-dataset'
         )
         with app.app_context():
             output = extraction.extract_datahub_omis_dataset()
@@ -175,7 +177,7 @@ class TestExtractDatahubSectors(TestCase):
         }
         table_name = 'datahub_sector'
         url = 'http://{}/{}'.format(
-            app.config['DATAWORKSPACE_HOST'], 'api/v1/datahub-sectors-dataset'
+            app.config['dataworkspace']['host'], 'api/v1/datahub-sectors-dataset'
         )
         with app.app_context():
             output = extraction.extract_datahub_sectors()
@@ -216,7 +218,7 @@ class TestExtractExportWins(TestCase):
         }
         table_name = 'export_wins'
         url = 'http://{}/{}'.format(
-            app.config['DATAWORKSPACE_HOST'], 'api/v1/export-wins'
+            app.config['dataworkspace']['host'], 'api/v1/export-wins'
         )
         with app.app_context():
             output = extraction.extract_export_wins()
