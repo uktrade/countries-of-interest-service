@@ -1,118 +1,34 @@
 import datetime
-import json
-import os
 
-from authbroker_client import authbroker_blueprint, login_required
+from authbroker_client import login_required
 
-from celery import Celery
+from flask import jsonify, render_template, request
 
-import config
+from flask.blueprints import Blueprint
 
-from flask import Flask, jsonify, render_template, request
-from flask.json import JSONEncoder
-
-import numpy as np
+from flask import current_app as flask_app
 
 import pandas as pd
 
-
-from authentication import hawk_decorator_factory
 
 import data_report
 
 from db import get_db
 
-import etl.tasks.core
-from etl.scheduler import Scheduler
-
 from utils import utils
 from utils.sql import execute_query, query_database, table_exists
 from utils.utils import to_web_dict
 
+from app.api.tasks import populate_database_task
 
-class CustomJSONEncoder(JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, datetime.datetime):
-            return obj.isoformat()
-        elif isinstance(obj, np.integer):
-            return int(obj)
-        elif isinstance(obj, np.floating):
-            return float(obj)
-        elif isinstance(obj, np.ndarray):
-            return obj.tolist()
-        else:
-            return str(obj)
+api = Blueprint(
+    name="api",
+    import_name=__name__
+)
 
-
-app = Flask(__name__)
-app.config.update(config.get_config())
-
-# sso
-app.register_blueprint(authbroker_blueprint)
-app.config['ABC_BASE_URL'] = app.config['sso']['host']
-app.config['ABC_CLIENT_ID'] = app.config['sso']['abc_client_id']
-app.config['ABC_CLIENT_SECRET'] = app.config['sso']['abc_client_secret']
-
-app.secret_key = app.config['app']['secret_key']
-app.json_encoder = CustomJSONEncoder
-
-
-# celery & cloud foundry config
-vcap_services = os.environ.get('VCAP_SERVICES')
-if vcap_services:
-    vacap_services = json.loads(vcap_services)
-    redis_config = json.loads(vcap_services)['redis'][0]
-    redis_uri = redis_config['credentials']['uri']
-    if redis_uri:
-        app.config['cache']['host'] = redis_uri
-
-# celery, tasks config
-celery = Celery('app', broker=app.config['cache']['host'])
-
-
-@celery.task
-def populate_database_task(drop_table=True):
-    with app.app_context():
-        return etl.tasks.core.populate_database(drop_table)
-
-
-# decorator for hawk authentication
-# when hawk is disabled the authentication is trivial,
-# effectively all requests are authenticated
-hawk_authentication = hawk_decorator_factory(app.config['app']['hawk_enabled'])
-users = [
-    (
-        app.config['dataflow']['hawk_client_id'],
-        app.config['dataflow']['hawk_client_key'],
-    ),
-]
-
-
-def create_users_table(users):
-    with app.app_context():
-        sql = 'drop table if exists users'
-        with get_db() as connection:
-            execute_query(connection, sql)
-        sql = (
-            'create table users ('
-            'client_id varchar(100) primary key,'
-            'client_key varchar(200)'
-            ')'
-        )
-        with get_db() as connection:
-            execute_query(connection, sql)
-        sql = 'insert into users values (%s, %s) '
-        with get_db() as connection:
-            cursor = connection.cursor()
-            cursor.executemany(sql, users)
-
-
-if app.config['flask']['env'] != 'test':
-    create_users_table(users)
 
 # views
-@app.route('/api/v1/get-companies-house-company-numbers')
-@hawk_authentication
+@api.route('/api/v1/get-companies-house-company-numbers')
 def get_companies_house_company_numbers():
     sql_query = '''
 select distinct
@@ -128,11 +44,10 @@ order by 1
     return to_web_dict(df)
 
 
-@app.route('/api/v1/get-company-countries-and-sectors-of-interest')
-@hawk_authentication
+@api.route('/api/v1/get-company-countries-and-sectors-of-interest')
 @utils.response_orientation_decorator
 def get_company_countries_and_sectors_of_interest(orientation):
-    pagination_size = app.config['app']['pagination_size']
+    pagination_size = flask_app.config['app']['pagination_size']
     next_source = request.args.get('next-source')
     next_source_id = request.args.get('next-source-id')
     company_ids = request.args.getlist('company-id')
@@ -224,11 +139,10 @@ limit {pagination_size} + 1
     return web_dict
 
 
-@app.route('/api/v1/get-company-countries-of-interest')
-@hawk_authentication
+@api.route('/api/v1/get-company-countries-of-interest')
 @utils.response_orientation_decorator
 def get_company_countries_of_interest(orientation):
-    pagination_size = app.config['app']['pagination_size']
+    pagination_size = flask_app.config['app']['pagination_size']
     next_source = request.args.get('next-source')
     next_source_id = request.args.get('next-source-id')
     company_ids = request.args.getlist('company-id')
@@ -308,11 +222,10 @@ limit {pagination_size} + 1
     return web_dict
 
 
-@app.route('/api/v1/get-company-export-countries')
-@hawk_authentication
+@api.route('/api/v1/get-company-export-countries')
 @utils.response_orientation_decorator
 def get_company_export_countries(orientation):
-    pagination_size = app.config['app']['pagination_size']
+    pagination_size = flask_app.config['app']['pagination_size']
     next_source = request.args.get('next-source')
     next_source_id = request.args.get('next-source-id')
     company_ids = request.args.getlist('company-id')
@@ -392,11 +305,10 @@ limit {pagination_size} + 1
     return web_dict
 
 
-@app.route('/api/v1/get-company-sectors-of-interest')
-@hawk_authentication
+@api.route('/api/v1/get-company-sectors-of-interest')
 @utils.response_orientation_decorator
 def get_company_sectors_of_interest(orientation):
-    pagination_size = app.config['app']['pagination_size']
+    pagination_size = flask_app.config['app']['pagination_size']
     next_source = request.args.get('next-source')
     next_source_id = request.args.get('next-source-id')
     company_ids = request.args.getlist('company-id')
@@ -477,20 +389,18 @@ limit {pagination_size} + 1
     return web_dict
 
 
-@app.route('/data-report')
+@api.route('/data-report')
 @login_required
 def get_data_report():
     return render_template('data_report.html')
 
 
-@app.route('/api/v1/get-data-report-data')
-@hawk_authentication
+@api.route('/api/v1/get-data-report-data')
 def get_data_report_data():
     return data_report.get_data_report_data()
 
 
-@app.route('/api/v1/get-datahub-company-ids')
-@hawk_authentication
+@api.route('/api/v1/get-datahub-company-ids')
 def get_datahub_company_ids():
     sql_query = '''
 select distinct
@@ -504,8 +414,7 @@ from coi_datahub_company_id_to_companies_house_company_number
     return to_web_dict(df)
 
 
-@app.route('/api/v1/get-datahub-company-ids-to-companies-house-company-numbers')
-@hawk_authentication
+@api.route('/api/v1/get-datahub-company-ids-to-companies-house-company-numbers')
 def get_datahub_company_ids_to_companies_house_company_numbers():
     sql_query = '''
 select
@@ -520,7 +429,7 @@ from coi_datahub_company_id_to_companies_house_company_number
     return to_web_dict(df)
 
 
-@app.route('/')
+@api.route('/')
 @login_required
 def get_index():
     last_updated = None
@@ -536,8 +445,7 @@ def get_index():
     return render_template('index.html', last_updated=last_updated)
 
 
-@app.route('/api/v1/get-sectors')
-@hawk_authentication
+@api.route('/api/v1/get-sectors')
 def get_sectors():
     sql_query = '''
 select distinct
@@ -554,8 +462,7 @@ order by 1
     return to_web_dict(df)
 
 
-@app.route('/api/v1/populate-database')
-@hawk_authentication
+@api.route('/api/v1/populate-database')
 def populate_database():
     drop_table = 'drop-table' in request.args
     force_update = 'force-update' in request.args
@@ -583,12 +490,6 @@ def populate_database():
         }
 
 
-@app.route('/healthcheck/', methods=["GET"])
+@api.route('/healthcheck/', methods=["GET"])
 def healthcheck():
     return jsonify({"status": "OK"})
-
-
-if app.config['app']['run_scheduler'] is True:
-    print('starting scheduler')
-    scheduled_task = Scheduler(populate_database_task)
-    scheduled_task.start()

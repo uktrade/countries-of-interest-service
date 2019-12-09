@@ -1,4 +1,4 @@
-from config import data_sources
+from app.config import data_sources
 
 from etl import ETLTask
 
