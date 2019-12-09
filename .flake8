@@ -2,3 +2,7 @@
 application-import-names=app,authentication,data_report,db,etl,tests,utils
 
 application-package-names=authbroker_client
+
+exclude =
+    venv,
+    .venv

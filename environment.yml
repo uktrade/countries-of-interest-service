@@ -1,0 +1,28 @@
+name: countries-of-interest-service
+channels:
+- defaults
+dependencies:
+- flask=1.1.1
+- psycopg2=2.8.4
+- pyyaml=5.1.2
+- werkzeug=0.16.0
+- yaml
+- curl
+- openssl=1.1.1
+- pytest=5.3.1
+- pytest-cov=2.8.1
+- python=3.6.8
+- pip:
+  - APScheduler==3.*
+  - black==19.10b0
+  - celery==4.3.0
+  - flake8-import-order==0.18.1
+  - flake8==3.7.9
+  - flask-oauthlib==0.9.5
+  - gunicorn==19.*
+  - mohawk==1.1.0
+  - numpy==1.*
+  - pandas==0.*
+  - requests-oauthlib==0.6.2
+  - redis==3.3.11
+  - git+git://github.com/uktrade/flask-authbroker-client
