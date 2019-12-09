@@ -38,24 +38,31 @@ job_defaults: &job_defaults
   steps:
     - checkout
     - restore_cache:
-        name: Restore pip cache
-        keys:
-          - v2-<< parameters.python_image >>-{{ checksum "requirements.txt" }}
-        paths:
-          - ~/cache/pip
+          keys:
+          - coi-{{ .Branch }}-{{ checksum "environment.yml" }}-{{ .Environment.CACHE_VERSION }}
     - run:
-        name: Install dependencies
-        command: python -m pip install --cache-dir ~/cache/pip --progress-bar off -r requirements.txt
-
+        name: install dependencies
+        command: |
+          python3 -m venv venv
+          . venv/bin/activate
+          wget https://repo.continuum.io/miniconda/Miniconda3-4.5.12-Linux-x86_64.sh -O ~/miniconda.sh
+          bash ~/miniconda.sh -b -u -p ~/miniconda
+          source ~/miniconda/bin/activate
+          conda env create -q --force -f environment.yml
     - save_cache:
-        name: Save pip cache
-        key: v2-<< parameters.python_image >>-{{ checksum "requirements.txt" }}
         paths:
-          - ~/cache/pip
+          - venv
+          - ../miniconda
+          - ../.conda
+        key: coi-{{ .Branch }}-{{ checksum "environment.yml" }}-{{ .Environment.CACHE_VERSION }}
 
     - run:
         name: Run format checks
-        command: make check
+        command: |
+          . venv/bin/activate
+          source ~/miniconda/bin/activate
+          source activate countries-of-interest-service
+          make check
 
     - run:
         name: Install node
@@ -75,7 +82,11 @@ job_defaults: &job_defaults
 
     - run:
         name: Run tests
-        command: make run_tests
+        command: |
+          . venv/bin/activate
+          source ~/miniconda/bin/activate
+          source activate countries-of-interest-service
+          make run_tests
 
     - when:
         condition: <<parameters.publish_coverage>>

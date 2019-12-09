@@ -1,5 +1,6 @@
 
 PORT ?= 5000
+TEST ?=.
 
 .PHONY: run_server
 run_server:
@@ -17,7 +18,7 @@ run_celery:
 
 .PHONY: run_tests
 run_tests:
-	TESTING=1 python -m pytest -p no:sugar --cov
+	TESTING=1 pytest -p no:sugar ${TEST} --cov
 
 .PHONY: check
 check:
