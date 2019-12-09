@@ -1,8 +1,6 @@
-from flask import current_app as flask_app
+import celery
 
 import etl.tasks.core
-
-import celery
 
 
 @celery.task

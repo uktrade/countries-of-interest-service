@@ -1,8 +1,10 @@
-from flask.json import JSONEncoder
 import datetime
-import numpy as np
 
 from flask import current_app as flask_app
+from flask.json import JSONEncoder
+
+import numpy as np
+
 from db import get_db
 
 from utils.sql import execute_query
@@ -46,5 +48,3 @@ def create_users_table():
             with get_db() as connection:
                 cursor = connection.cursor()
                 cursor.executemany(sql, users)
-
-

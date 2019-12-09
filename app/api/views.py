@@ -2,14 +2,13 @@ import datetime
 
 from authbroker_client import login_required
 
-from flask import jsonify, render_template, request
-
-from flask.blueprints import Blueprint
-
 from flask import current_app as flask_app
+from flask import jsonify, render_template, request
+from flask.blueprints import Blueprint
 
 import pandas as pd
 
+from app.api.tasks import populate_database_task
 
 import data_report
 
@@ -19,12 +18,8 @@ from utils import utils
 from utils.sql import execute_query, query_database, table_exists
 from utils.utils import to_web_dict
 
-from app.api.tasks import populate_database_task
 
-api = Blueprint(
-    name="api",
-    import_name=__name__
-)
+api = Blueprint(name="api", import_name=__name__)
 
 
 # views

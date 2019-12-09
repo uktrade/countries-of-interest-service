@@ -5,9 +5,12 @@ This module provides API access control based on Hawk scheme
 """
 from functools import wraps
 
-from flask import request, current_app
+from flask import current_app, request
+
 from mohawk.util import parse_authorization_header
+
 from werkzeug.exceptions import BadRequest, Unauthorized
+
 try:
     import mohawk
 except ImportError:
@@ -17,7 +20,6 @@ __all__ = ('AccessControl',)
 
 
 class AccessControl:
-
     def __init__(self):
         self._client_key_loader_func = None
         self._nonce_checker_func = None
@@ -28,13 +30,14 @@ class AccessControl:
         :param f: The callback for retrieving a client key.
 
         """
+
         @wraps(f)
         def wrapped_f(client_id):
             client_key = f(client_id)
             return {
                 'id': client_id,
                 'key': client_key,
-                'algorithm': current_app.config['access_control']['hawk_algorithm']
+                'algorithm': current_app.config['access_control']['hawk_algorithm'],
             }
 
         self._client_key_loader_func = wrapped_f
@@ -48,6 +51,7 @@ class AccessControl:
         :param f: The callback for checking a nonce.
 
         """
+
         @wraps(f)
         def wrapped_f(sender_id, nonce, timestamp):
             return f(sender_id, nonce, timestamp)
@@ -59,20 +63,22 @@ class AccessControl:
         """ Decorator that provides an access to view function for
         authenticated users only.
         """
+
         @wraps(view_func)
         def wrapped_view_func(*args, **kwargs):
             hawk_enabled = current_app.config['access_control']['hawk_enabled']
-            hawk_response_header = current_app.config['access_control']['hawk_response_header']
+            hawk_response_header = current_app.config['access_control'][
+                'hawk_response_header'
+            ]
             if hawk_enabled:
                 receiver = self._auth_by_signature()
             response = view_func(*args, **kwargs)
             if hawk_enabled and hawk_response_header:
-                response.headers['Server-Authorization'] = \
-                    receiver.respond(
-                        content=response.get_data(),
-                        content_type=response.mimetype
-                    )
+                response.headers['Server-Authorization'] = receiver.respond(
+                    content=response.get_data(), content_type=response.mimetype
+                )
             return response
+
         return wrapped_view_func
 
     def _auth_by_signature(self):
@@ -84,16 +90,23 @@ class AccessControl:
         try:
             return mohawk.Receiver(
                 credentials_map=self._client_key_loader_func,
-                seen_nonce=
-                    self._nonce_checker_func if current_app.config['access_control']['hawk_nonce_enabled'] else None,
+                seen_nonce=self._nonce_checker_func
+                if current_app.config['access_control']['hawk_nonce_enabled']
+                else None,
                 request_header=request.headers['Authorization'],
                 url=request.url,
                 method=request.method,
                 content=request.get_data(),
                 content_type=request.mimetype,
-                accept_untrusted_content=current_app.config['access_control']['hawk_accept_untrusted_content'],
-                localtime_offset_in_seconds=current_app.config['access_control']['hawk_localtime_offset_in_seconds'],
-                timestamp_skew_in_seconds=current_app.config['access_control']['hawk_timestamp_skew_in_seconds']
+                accept_untrusted_content=current_app.config['access_control'][
+                    'hawk_accept_untrusted_content'
+                ],
+                localtime_offset_in_seconds=current_app.config['access_control'][
+                    'hawk_localtime_offset_in_seconds'
+                ],
+                timestamp_skew_in_seconds=current_app.config['access_control'][
+                    'hawk_timestamp_skew_in_seconds'
+                ],
             )
         except mohawk.exc.MacMismatch:
             raise Unauthorized()
@@ -101,7 +114,7 @@ class AccessControl:
             mohawk.exc.CredentialsLookupError,
             mohawk.exc.AlreadyProcessed,
             mohawk.exc.MisComputedContentHash,
-            mohawk.exc.TokenExpired
+            mohawk.exc.TokenExpired,
         ) as e:
             raise Unauthorized(str(e))
         except mohawk.exc.HawkFail as e:
@@ -113,6 +126,7 @@ class AccessControl:
         """ Decorator that provides access to view function for authorized users only.
         i.e the endpoint needs to be part of the issuer access scope.
         """
+
         @wraps(view_func)
         def handler(*args, **kwargs):
             if current_app.config['access_control']['hawk_enabled']:

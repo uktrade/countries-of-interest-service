@@ -1,18 +1,17 @@
 import os
 
-from flask import Flask, json
-
-from app import config
-
 from authbroker_client import authbroker_blueprint
-from app.api.views import api
-from app.api.settings import CustomJSONEncoder
 
 from celery import Celery, Task
 
+from flask import Flask, json
+
+from app import config
+from app.api.settings import CustomJSONEncoder
+from app.api.views import api
+
 
 def make_celery(flask_app):
-
     class ContextTask(Task):
         def __call__(self, *args, **kwargs):
             with flask_app.app_context():
@@ -29,6 +28,7 @@ def make_celery(flask_app):
 
 def get_or_create():
     from flask import current_app as flask_app
+
     if not flask_app:
         flask_app = _create_base_app()
     return flask_app
