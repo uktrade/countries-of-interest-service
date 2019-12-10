@@ -2,7 +2,7 @@ import os
 
 from authbroker_client import authbroker_blueprint
 
-from celery import Celery, Task
+from celery import Celery
 
 from flask import Flask, json
 
@@ -11,18 +11,27 @@ from app.api.settings import CustomJSONEncoder
 from app.api.views import api
 
 
-def make_celery(flask_app):
-    class ContextTask(Task):
+def make_celery(app):
+    app.config['CELERY_BROKER_URL'] = 'redis://redis:6379/0'
+    app.config['result_backend'] = 'redis://redis:6379/0'
+    # create context tasks in celery
+    celery = Celery('application', broker=app.config['CELERY_BROKER_URL'])
+
+    celery.conf.broker_transport_options = {
+        'max_retries': 3,
+        'interval_start': 0,
+        'interval_step': 0.2,
+        'interval_max': 0.2,
+    }
+    celery.conf.result_backend_transport_options = {'visibility_timeout': 18000}
+    TaskBase = celery.Task
+
+    class ContextTask(TaskBase):
+        abstract = True
         def __call__(self, *args, **kwargs):
-            with flask_app.app_context():
-                return self.run(*args, **kwargs)
-
-    celery = Celery(
-        flask_app.import_name,
-        broker=flask_app.config['cache']['host'],
-        task_cls=ContextTask,
-    )
-
+            with app.app_context():
+                return TaskBase.__call__(self, *args, **kwargs)
+    celery.Task = ContextTask
     return celery
 
 
