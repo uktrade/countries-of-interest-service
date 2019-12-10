@@ -3,12 +3,12 @@ const path = require('path');
 module.exports = {
     devtool: 'source-map',
     entry: {
-	'vendors': './static/vendors.js',
-	'data_report': './static/data_report.js',
+	'vendors': './app/static/vendors.js',
+	'data_report': './app/static/data_report.js',
     },
     mode: 'development',
     output: {
-	path: path.resolve(__dirname, 'static/dist'),
+	path: path.resolve(__dirname, 'app/static/dist'),
 	filename: '[name].bundle.js'
     },
     module: {

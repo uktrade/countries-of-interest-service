@@ -12,7 +12,6 @@ WORKDIR /app
 COPY package.json .
 COPY webpack.config.js .
 RUN npm install
-COPY static static
-RUN npm run build
 COPY . /app
+RUN npm run build
 ENTRYPOINT ["/bin/bash", "entrypoint.sh"]
