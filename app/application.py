@@ -48,6 +48,7 @@ def _create_base_app():
 
 def _register_components(flask_app):
     from app.api.views import api
+
     flask_app.register_blueprint(api)
     return flask_app
 
@@ -63,6 +64,7 @@ def _load_uri_from_vcap_services(service_type):
                     if 'uri' in service['credentials']:
                         return service['credentials']['uri']
     return None
+
 
 app = get_or_create()
 celery_app = app.celery

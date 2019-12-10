@@ -1,7 +1,8 @@
-import etl.tasks.core
-
 import celery
+
 import app.application
+
+import etl.tasks.core
 
 
 @celery.task(ignore_result=True)
