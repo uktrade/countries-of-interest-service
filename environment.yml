@@ -12,6 +12,7 @@ dependencies:
 - pytest=5.3.1
 - pytest-cov=2.8.1
 - python=3.6.8
+- pip==19.3.1
 - pip:
   - APScheduler==3.*
   - black==19.10b0

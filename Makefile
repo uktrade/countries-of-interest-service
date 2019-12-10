@@ -14,7 +14,7 @@ run_dev_server:
 
 .PHONY: run_celery
 run_celery:
-	celery worker -A app.application.celery_app  --loglevel=debug -c 1
+	celery worker -A app.application.celery_app
 
 .PHONY: run_tests
 run_tests:

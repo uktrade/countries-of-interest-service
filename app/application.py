@@ -1,21 +1,16 @@
 import os
 
-from authbroker_client import authbroker_blueprint
-
 from celery import Celery
 
 from flask import Flask, json
 
 from app import config
-from app.api.settings import CustomJSONEncoder
-from app.api.views import api
 
 
 def make_celery(app):
-    app.config['CELERY_BROKER_URL'] = 'redis://redis:6379/0'
+    app.config['broker_url'] = 'redis://redis:6379/0'
     app.config['result_backend'] = 'redis://redis:6379/0'
-    # create context tasks in celery
-    celery = Celery('application', broker=app.config['CELERY_BROKER_URL'])
+    celery = Celery('application')
 
     celery.conf.broker_transport_options = {
         'max_retries': 3,
@@ -23,15 +18,7 @@ def make_celery(app):
         'interval_step': 0.2,
         'interval_max': 0.2,
     }
-    celery.conf.result_backend_transport_options = {'visibility_timeout': 18000}
-    TaskBase = celery.Task
-
-    class ContextTask(TaskBase):
-        abstract = True
-        def __call__(self, *args, **kwargs):
-            with app.app_context():
-                return TaskBase.__call__(self, *args, **kwargs)
-    celery.Task = ContextTask
+    celery.conf.update(app.config)
     return celery
 
 
@@ -50,6 +37,8 @@ def _create_base_app():
     flask_app.config['ABC_CLIENT_ID'] = flask_app.config['sso']['abc_client_id']
     flask_app.config['ABC_CLIENT_SECRET'] = flask_app.config['sso']['abc_client_secret']
     flask_app.secret_key = flask_app.config['app']['secret_key']
+    from app.api.settings import CustomJSONEncoder
+
     flask_app.json_encoder = CustomJSONEncoder
     celery = make_celery(flask_app)
     flask_app.celery = celery
@@ -58,8 +47,8 @@ def _create_base_app():
 
 
 def _register_components(flask_app):
+    from app.api.views import api
     flask_app.register_blueprint(api)
-    flask_app.register_blueprint(authbroker_blueprint)
     return flask_app
 
 
@@ -75,5 +64,5 @@ def _load_uri_from_vcap_services(service_type):
                         return service['credentials']['uri']
     return None
 
-
-celery_app = get_or_create().celery
+app = get_or_create()
+celery_app = app.celery
