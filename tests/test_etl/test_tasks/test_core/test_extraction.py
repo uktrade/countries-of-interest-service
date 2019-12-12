@@ -478,7 +478,11 @@ class TestPopulateTable(TestCase):
         with app.app_context():
             with db.get_db() as connection:
                 with connection.cursor() as cursor:
-                    sql = 'create table {} (a varchar(100), b integer, primary key (a))'.format(
+                    sql = '''
+                    create table {} (
+                        a varchar(100), 
+                        b integer, primary key (a)
+                    )'''.format(
                         self.table_name
                     )
                     cursor.execute(sql)
