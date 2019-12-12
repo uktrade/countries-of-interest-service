@@ -12,7 +12,7 @@ from db import get_db
 import utils
 
 
-class SourceDataExtracter:
+class SourceDataExtractor:
     def __call__(self):
         if current_app.config['app']['stub_source_data']:
             return populate_table(self.stub_data, self.schema, self.table_name)
@@ -25,7 +25,7 @@ class SourceDataExtracter:
             return populate_table_paginated(self.schema, self.table_name, url)
 
 
-class ExtractDatahubCompanyDataset(SourceDataExtracter):
+class ExtractDatahubCompanyDataset(SourceDataExtractor):
     dataset_id_config_key = 'datahub_company_dataset_id'
     source_table_id_config_key = 'datahub_company_source_table_id'
     schema = {
@@ -46,7 +46,7 @@ class ExtractDatahubCompanyDataset(SourceDataExtracter):
     table_name = 'datahub_company'
 
 
-class ExtractDatahubExportCountries(SourceDataExtracter):
+class ExtractDatahubExportCountries(SourceDataExtractor):
     dataset_id_config_key = 'datahub_export_countries_dataset_id'
     source_table_id_config_key = 'datahub_export_countries_source_table_id'
     schema = {
@@ -67,7 +67,7 @@ class ExtractDatahubExportCountries(SourceDataExtracter):
     table_name = 'datahub_export_countries'
 
 
-class ExtractDatahubFutureInterestCountries(SourceDataExtracter):
+class ExtractDatahubFutureInterestCountries(SourceDataExtractor):
     dataset_id_config_key = 'datahub_future_interest_countries_dataset_id'
     source_table_id_config_key = 'datahub_future_interest_countries_source_table_id'
     schema = {
@@ -88,7 +88,7 @@ class ExtractDatahubFutureInterestCountries(SourceDataExtracter):
     table_name = 'datahub_future_interest_countries'
 
 
-class ExtractDatahubInteractions(SourceDataExtracter):
+class ExtractDatahubInteractions(SourceDataExtractor):
     dataset_id_config_key = 'datahub_interactions_dataset_id'
     source_table_id_config_key = 'datahub_interactions_source_table_id'
     schema = {
@@ -109,7 +109,7 @@ class ExtractDatahubInteractions(SourceDataExtracter):
     table_name = 'datahub_interactions'
 
 
-class ExtractDatahubOmis(SourceDataExtracter):
+class ExtractDatahubOmis(SourceDataExtractor):
     dataset_id_config_key = 'datahub_omis_dataset_id'
     source_table_id_config_key = 'datahub_omis_source_table_id'
     schema = {
@@ -144,7 +144,7 @@ class ExtractDatahubOmis(SourceDataExtracter):
     table_name = 'datahub_omis'
 
 
-class ExtractDatahubSectors(SourceDataExtracter):
+class ExtractDatahubSectors(SourceDataExtractor):
     dataset_id_config_key = 'datahub_sectors_dataset_id'
     source_table_id_config_key = 'datahub_sectors_source_table_id'
     schema = {
@@ -164,7 +164,7 @@ class ExtractDatahubSectors(SourceDataExtracter):
     table_name = 'datahub_sectors'
 
 
-class ExtractExportWins(SourceDataExtracter):
+class ExtractExportWins(SourceDataExtractor):
     dataset_id_config_key = 'export_wins_dataset_id'
     source_table_id_config_key = 'export_wins_source_table_id'
     schema = {

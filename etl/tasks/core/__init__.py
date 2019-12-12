@@ -21,26 +21,45 @@ from etl.tasks.core.source_data_extraction import (
 
 def populate_database(drop_table):
     output = []
+
+    source_data_extractors = [
+        extract_datahub_company_dataset,
+        extract_datahub_export_countries,
+        extract_datahub_interactions,
+        extract_datahub_future_interest_countries,
+        extract_datahub_omis,
+        extract_datahub_sectors,
+        extract_export_wins,
+    ]
+
+    for extractor in source_data_extractors:
+        try:
+            output.append(extractor())
+        except Exception as e:
+            output.append(
+                {'table': extractor.table_name, 'status': 'failed', 'error': str(e)}
+            )
+
     with get_db() as connection:
-        output.append(extract_datahub_company_dataset())
-        output.append(extract_datahub_export_countries())
-        output.append(extract_datahub_interactions())
-        output.append(extract_datahub_future_interest_countries())
-        output.append(extract_datahub_omis())
-        output.append(extract_datahub_sectors())
-        output.append(extract_export_wins())
-        output.extend(
-            [
-                ExportCountriesTask(connection=connection, drop_table=drop_table)(),
-                PopulateCountriesAndSectorsOfInterestTask(
-                    connection=connection, drop_table=drop_table
-                )(),
-                PopulateCountriesOfInterestTask(
-                    connection=connection, drop_table=drop_table
-                )(),
-                SectorsOfInterestTask(connection=connection, drop_table=drop_table)(),
-            ]
-        )
+        tasks = [
+            ExportCountriesTask(connection=connection, drop_table=drop_table),
+            PopulateCountriesAndSectorsOfInterestTask(
+                connection=connection, drop_table=drop_table
+            ),
+            PopulateCountriesOfInterestTask(
+                connection=connection, drop_table=drop_table
+            ),
+            SectorsOfInterestTask(connection=connection, drop_table=drop_table),
+        ]
+
+        for task in tasks:
+            try:
+                output.append(task())
+            except Exception as e:
+                output.append(
+                    {'table': task.table_name, 'status': 'failed', 'error': str(e)}
+                )
+
         with connection.cursor() as cursor:
             sql = 'create table if not exists etl_runs (timestamp timestamp)'
             cursor.execute(sql)
