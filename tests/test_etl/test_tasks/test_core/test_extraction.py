@@ -480,7 +480,7 @@ class TestPopulateTable(TestCase):
                 with connection.cursor() as cursor:
                     sql = '''
                     create table {} (
-                        a varchar(100), 
+                        a varchar(100),
                         b integer, primary key (a)
                     )'''.format(
                         self.table_name
