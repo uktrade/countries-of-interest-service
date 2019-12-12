@@ -13,7 +13,7 @@ with omis_sectors_of_interest as (
       id::varchar(100) as source_id,
       created_on as timestamp
 
-    from omis
+    from datahub_omis
 
 )
 

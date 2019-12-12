@@ -63,7 +63,6 @@ class ETLTask:
         # print('\033[31mingest data\033[0m')
         insert_data(df, self.connection, self.table_name)
 
-        print('self.index:', self.index)
         if self.index is not None:
             create_index(self.connection, self.index, self.table_name)
 

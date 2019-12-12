@@ -1,7 +1,7 @@
 from db import get_db
 
+from utils import to_camel_case, to_web_dict
 from utils.sql import query_database
-from utils.utils import to_camel_case, to_web_dict
 
 summary_table_sql = '''
 with datahub_company_summary as (

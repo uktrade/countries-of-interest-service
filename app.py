@@ -25,9 +25,9 @@ from db import get_db
 import etl.tasks.core
 from etl.scheduler import Scheduler
 
-from utils import utils
+import utils
+from utils import to_web_dict
 from utils.sql import execute_query, query_database, table_exists
-from utils.utils import to_web_dict
 
 
 class CustomJSONEncoder(JSONEncoder):

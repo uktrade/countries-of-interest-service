@@ -13,7 +13,7 @@ select
   id as source_id,
   created_on as timestamp
 
-from omis
+from datahub_omis
 
 order by 1
 

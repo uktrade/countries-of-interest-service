@@ -1,4 +1,5 @@
 import datetime
+import unittest
 from unittest.mock import patch
 
 import mohawk
@@ -210,6 +211,7 @@ class TestGetCompanyExportCountries(TestCase):
 
 
 @pytest.mark.skip(reason="Need to fix mock login")
+@unittest.skip("Need to fix mock login")
 class TestGetIndex(TestCase):
     @patch('app.login_required')
     @patch('app.render_template')

@@ -17,7 +17,7 @@ class TestCountriesAndSectorsOfInterest(TestCase):
             with get_db() as connection:
                 with connection.cursor() as cursor:
                     sql = (
-                        'create table omis '
+                        'create table datahub_omis '
                         '''(
                              company_id uuid,
                              country varchar(2),
@@ -43,7 +43,7 @@ class TestCountriesAndSectorsOfInterest(TestCase):
                             'c0794724-c070-4c7e-a52c-89c0006bf7e6',
                         ),
                     ]
-                    sql = 'insert into omis values (%s, %s, %s, %s, %s)'
+                    sql = 'insert into datahub_omis values (%s, %s, %s, %s, %s)'
                     cursor.executemany(sql, values)
 
         with app.app_context():

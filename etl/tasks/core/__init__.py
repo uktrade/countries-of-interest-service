@@ -13,7 +13,7 @@ from etl.tasks.core.source_data_extraction import (
     extract_datahub_export_countries,
     extract_datahub_future_interest_countries,
     extract_datahub_interactions,
-    extract_datahub_omis_dataset,
+    extract_datahub_omis,
     extract_datahub_sectors,
     extract_export_wins,
 )
@@ -26,7 +26,7 @@ def populate_database(drop_table):
         output.append(extract_datahub_export_countries())
         output.append(extract_datahub_interactions())
         output.append(extract_datahub_future_interest_countries())
-        output.append(extract_datahub_omis_dataset())
+        output.append(extract_datahub_omis())
         output.append(extract_datahub_sectors())
         output.append(extract_export_wins())
         output.extend(
