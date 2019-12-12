@@ -5,6 +5,7 @@ from app import app
 import db
 
 import etl.tasks.core.source_data_extraction
+from etl.tasks.core import source_data_extraction
 
 from tests.TestCase import TestCase
 
@@ -133,9 +134,7 @@ class TestExtractDatahubFutureInterestCountries(TestCase):
 
     @staticmethod
     def view():
-        return (
-            etl.tasks.core.source_data_extraction.extract_datahub_future_interest_countries()
-        )
+        return source_data_extraction.extract_datahub_future_interest_countries()
 
     @patch('etl.tasks.core.source_data_extraction.current_app')
     def test_stub_data(self, current_app):
