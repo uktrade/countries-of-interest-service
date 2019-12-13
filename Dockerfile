@@ -1,18 +1,23 @@
-FROM continuumio/miniconda3
+FROM python:3.6
 
 RUN apt-get update -y
-RUN apt-get install -y curl build-essential gcc
+
+ENV PATH="/root/miniconda3/bin:${PATH}"
+ARG PATH="/root/miniconda3/bin:${PATH}"
+
+ADD scripts scripts
+RUN scripts/install_miniconda.sh
+RUN scripts/install_node.sh
 
 ADD environment.yml /tmp/environment.yml
 RUN conda env create -f /tmp/environment.yml
+
 # Pull the environment name out of the environment.yml
 RUN echo "source activate $(head -1 /tmp/environment.yml | cut -d' ' -f2)" > ~/.bashrc
 
-RUN curl -sL https://deb.nodesource.com/setup_10.x | bash && apt-get install -y nodejs
 WORKDIR /app
-COPY package.json .
-COPY webpack.config.js .
-RUN npm install
+
 COPY . /app
-RUN npm run build
-ENTRYPOINT ["/bin/bash", "entrypoint.sh"]
+
+RUN /app/scripts/compile_assets.sh
+CMD /app/scripts/entrypoint.sh
