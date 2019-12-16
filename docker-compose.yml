@@ -8,10 +8,13 @@ services:
       - ${PORT:-5000}:5000
     depends_on:
       - postgres
+      - redis
     volumes:
       - .:/app
   postgres:
     image: "postgres"
   redis:
-    image: "redis"
-  
+    image: redis:3.2
+    restart: always
+    ports:
+      - "6378:6379"

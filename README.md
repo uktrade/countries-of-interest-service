@@ -52,4 +52,3 @@ to run tests in a specific directory do,
 
 ### running tests in Docker
 `docker-compose build; docker-compose run -e FLASK_ENV=test web python -m unittest`
-
