@@ -10,8 +10,51 @@ from etl.tasks.core import source_data_extraction
 from tests.TestCase import TestCase
 
 
-class TestExtractDatahubCompany(TestCase):
+import unittest
 
+class SourceDataExtractBaseTestCase(TestCase):
+
+    __test__ = False
+
+    @patch('etl.tasks.core.source_data_extraction.current_app')
+    def test_stub_data(self, current_app):
+        current_app.config = {'app': {'stub_source_data': True}}
+        with app.app_context():
+            self.extractor.__call__()
+            with db.get_db() as connection:
+                with connection.cursor() as cursor:
+                    sql = 'select * from {}'.format(self.table_name)
+                    cursor.execute(sql)
+                    self.assertTrue(len(cursor.fetchall()) > 0)
+
+    @patch('etl.tasks.core.source_data_extraction.requests')
+    @patch('etl.tasks.core.source_data_extraction.current_app')
+    def test_data(self, current_app, requests):
+        current_app.config = {
+            'app': {'stub_source_data': False},
+            'dataworkspace': {
+                self.dataset_id_config_key: '1',
+                self.source_table_id_config_key: '2',
+                'host': 'asdf',
+                'hawk_client_id': 'hawk_client_id',
+                'hawk_client_key': 'hawk_client_key',
+            },
+        }
+        response = Mock()
+        response.json.return_value = self.source_data
+        requests.get.return_value = response
+        with app.app_context():
+            response = self.extractor.__call__()
+            with db.get_db() as connection:
+                with connection.cursor() as cursor:
+                    sql = 'select * from {}'.format(self.table_name)
+                    cursor.execute(sql)
+                    self.assertTrue(len(cursor.fetchall()) > 0)
+
+
+class TestExtractDatahubCompany(SourceDataExtractBaseTestCase):
+
+    __test__ = True
     dataset_id_config_key = 'datahub_company_dataset_id'
     source_data = {
         'headers': ['id', 'companyNumber', 'sector', 'extraField'],
@@ -23,49 +66,11 @@ class TestExtractDatahubCompany(TestCase):
     }
     source_table_id_config_key = 'datahub_company_source_table_id'
     table_name = 'datahub_company'
-
-    @staticmethod
-    def view():
-        return etl.tasks.core.source_data_extraction.extract_datahub_company_dataset()
-
-    @patch('etl.tasks.core.source_data_extraction.current_app')
-    def test_stub_data(self, current_app):
-        current_app.config = {'app': {'stub_source_data': True}}
-        with app.app_context():
-            self.view()
-            with db.get_db() as connection:
-                with connection.cursor() as cursor:
-                    sql = 'select * from {}'.format(self.table_name)
-                    cursor.execute(sql)
-                    self.assertTrue(len(cursor.fetchall()) > 0)
-
-    @patch('etl.tasks.core.source_data_extraction.requests')
-    @patch('etl.tasks.core.source_data_extraction.current_app')
-    def test_data(self, current_app, requests):
-        current_app.config = {
-            'app': {'stub_source_data': False},
-            'dataworkspace': {
-                self.dataset_id_config_key: '1',
-                self.source_table_id_config_key: '2',
-                'host': 'asdf',
-                'hawk_client_id': 'hawk_client_id',
-                'hawk_client_key': 'hawk_client_key',
-            },
-        }
-        response = Mock()
-        response.json.return_value = self.source_data
-        requests.get.return_value = response
-        with app.app_context():
-            response = self.view()
-            with db.get_db() as connection:
-                with connection.cursor() as cursor:
-                    sql = 'select * from {}'.format(self.table_name)
-                    cursor.execute(sql)
-                    self.assertTrue(len(cursor.fetchall()) > 0)
+    extractor = etl.tasks.core.source_data_extraction.extract_datahub_company_dataset
 
 
-class TestExtractDatahubExportCountries(TestCase):
-
+class TestExtractDatahubExportCountries(SourceDataExtractBaseTestCase):
+    __test__ = True
     dataset_id_config_key = 'datahub_export_countries_dataset_id'
     source_data = {
         'headers': ['id', 'companyId', 'country', 'extraField'],
@@ -77,49 +82,11 @@ class TestExtractDatahubExportCountries(TestCase):
     }
     source_table_id_config_key = 'datahub_export_countries_source_table_id'
     table_name = 'datahub_export_countries'
-
-    @staticmethod
-    def view():
-        return etl.tasks.core.source_data_extraction.extract_datahub_export_countries()
-
-    @patch('etl.tasks.core.source_data_extraction.current_app')
-    def test_stub_data(self, current_app):
-        current_app.config = {'app': {'stub_source_data': True}}
-        with app.app_context():
-            self.view()
-            with db.get_db() as connection:
-                with connection.cursor() as cursor:
-                    sql = 'select * from {}'.format(self.table_name)
-                    cursor.execute(sql)
-                    self.assertTrue(len(cursor.fetchall()) > 0)
-
-    @patch('etl.tasks.core.source_data_extraction.requests')
-    @patch('etl.tasks.core.source_data_extraction.current_app')
-    def test_data(self, current_app, requests):
-        current_app.config = {
-            'app': {'stub_source_data': False},
-            'dataworkspace': {
-                self.dataset_id_config_key: '1',
-                self.source_table_id_config_key: '2',
-                'host': 'asdf',
-                'hawk_client_id': 'hawk_client_id',
-                'hawk_client_key': 'hawk_client_key',
-            },
-        }
-        response = Mock()
-        response.json.return_value = self.source_data
-        requests.get.return_value = response
-        with app.app_context():
-            response = self.view()
-            with db.get_db() as connection:
-                with connection.cursor() as cursor:
-                    sql = 'select * from {}'.format(self.table_name)
-                    cursor.execute(sql)
-                    self.assertTrue(len(cursor.fetchall()) > 0)
+    extractor = etl.tasks.core.source_data_extraction.extract_datahub_export_countries
 
 
-class TestExtractDatahubFutureInterestCountries(TestCase):
-
+class TestExtractDatahubFutureInterestCountries(SourceDataExtractBaseTestCase):
+    __test__ = True
     dataset_id_config_key = 'datahub_future_interest_countries_dataset_id'
     source_data = {
         'headers': ['id', 'companyId', 'country', 'extraField'],
@@ -131,49 +98,11 @@ class TestExtractDatahubFutureInterestCountries(TestCase):
     }
     source_table_id_config_key = 'datahub_future_interest_countries_source_table_id'
     table_name = 'datahub_future_interest_countries'
-
-    @staticmethod
-    def view():
-        return source_data_extraction.extract_datahub_future_interest_countries()
-
-    @patch('etl.tasks.core.source_data_extraction.current_app')
-    def test_stub_data(self, current_app):
-        current_app.config = {'app': {'stub_source_data': True}}
-        with app.app_context():
-            self.view()
-            with db.get_db() as connection:
-                with connection.cursor() as cursor:
-                    sql = 'select * from {}'.format(self.table_name)
-                    cursor.execute(sql)
-                    self.assertTrue(len(cursor.fetchall()) > 0)
-
-    @patch('etl.tasks.core.source_data_extraction.requests')
-    @patch('etl.tasks.core.source_data_extraction.current_app')
-    def test_data(self, current_app, requests):
-        current_app.config = {
-            'app': {'stub_source_data': False},
-            'dataworkspace': {
-                self.dataset_id_config_key: '1',
-                self.source_table_id_config_key: '2',
-                'host': 'asdf',
-                'hawk_client_id': 'hawk_client_id',
-                'hawk_client_key': 'hawk_client_key',
-            },
-        }
-        response = Mock()
-        response.json.return_value = self.source_data
-        requests.get.return_value = response
-        with app.app_context():
-            response = self.view()
-            with db.get_db() as connection:
-                with connection.cursor() as cursor:
-                    sql = 'select * from {}'.format(self.table_name)
-                    cursor.execute(sql)
-                    self.assertTrue(len(cursor.fetchall()) > 0)
+    extractor = source_data_extraction.extract_datahub_future_interest_countries
 
 
-class TestExtractDatahubInteractions(TestCase):
-
+class TestExtractDatahubInteractions(SourceDataExtractBaseTestCase):
+    __test__ = True
     dataset_id_config_key = 'datahub_interactions_dataset_id'
     source_data = {
         'headers': ['companyId', 'country', 'id'],
@@ -185,49 +114,11 @@ class TestExtractDatahubInteractions(TestCase):
     }
     source_table_id_config_key = 'datahub_interactions_source_table_id'
     table_name = 'datahub_interactions'
-
-    @staticmethod
-    def view():
-        return etl.tasks.core.source_data_extraction.extract_datahub_interactions()
-
-    @patch('etl.tasks.core.source_data_extraction.current_app')
-    def test_stub_data(self, current_app):
-        current_app.config = {'app': {'stub_source_data': True}}
-        with app.app_context():
-            self.view()
-            with db.get_db() as connection:
-                with connection.cursor() as cursor:
-                    sql = 'select * from {}'.format(self.table_name)
-                    cursor.execute(sql)
-                    self.assertTrue(len(cursor.fetchall()) > 0)
-
-    @patch('etl.tasks.core.source_data_extraction.requests')
-    @patch('etl.tasks.core.source_data_extraction.current_app')
-    def test_data(self, current_app, requests):
-        current_app.config = {
-            'app': {'stub_source_data': False},
-            'dataworkspace': {
-                self.dataset_id_config_key: '1',
-                self.source_table_id_config_key: '2',
-                'host': 'asdf',
-                'hawk_client_id': 'hawk_client_id',
-                'hawk_client_key': 'hawk_client_key',
-            },
-        }
-        response = Mock()
-        response.json.return_value = self.source_data
-        requests.get.return_value = response
-        with app.app_context():
-            response = self.view()
-            with db.get_db() as connection:
-                with connection.cursor() as cursor:
-                    sql = 'select * from {}'.format(self.table_name)
-                    cursor.execute(sql)
-                    self.assertTrue(len(cursor.fetchall()) > 0)
+    extractor = etl.tasks.core.source_data_extraction.extract_datahub_interactions
 
 
-class TestExtractDatahubOmis(TestCase):
-
+class TestExtractDatahubOmis(SourceDataExtractBaseTestCase):
+    __test__ = True
     dataset_id_config_key = 'datahub_omis_dataset_id'
     source_data = {
         'headers': ['companyId', 'country', 'createdOn', 'id', 'sector'],
@@ -251,49 +142,11 @@ class TestExtractDatahubOmis(TestCase):
     }
     source_table_id_config_key = 'datahub_omis_source_table_id'
     table_name = 'datahub_omis'
-
-    @staticmethod
-    def view():
-        etl.tasks.core.source_data_extraction.extract_datahub_omis()
-
-    @patch('etl.tasks.core.source_data_extraction.current_app')
-    def test_stub_data(self, current_app):
-        current_app.config = {'app': {'stub_source_data': True}}
-        with app.app_context():
-            self.view()
-            with db.get_db() as connection:
-                with connection.cursor() as cursor:
-                    sql = 'select * from {}'.format(self.table_name)
-                    cursor.execute(sql)
-                    self.assertTrue(len(cursor.fetchall()) > 0)
-
-    @patch('etl.tasks.core.source_data_extraction.requests')
-    @patch('etl.tasks.core.source_data_extraction.current_app')
-    def test_data(self, current_app, requests):
-        current_app.config = {
-            'app': {'stub_source_data': False},
-            'dataworkspace': {
-                self.dataset_id_config_key: '1',
-                self.source_table_id_config_key: '2',
-                'host': 'asdf',
-                'hawk_client_id': 'hawk_client_id',
-                'hawk_client_key': 'hawk_client_key',
-            },
-        }
-        response = Mock()
-        response.json.return_value = self.source_data
-        requests.get.return_value = response
-        with app.app_context():
-            response = self.view()
-            with db.get_db() as connection:
-                with connection.cursor() as cursor:
-                    sql = 'select * from {}'.format(self.table_name)
-                    cursor.execute(sql)
-                    self.assertTrue(len(cursor.fetchall()) > 0)
+    extractor = etl.tasks.core.source_data_extraction.extract_datahub_omis
 
 
-class TestExtractDatahubSectors(TestCase):
-
+class TestExtractDatahubSectors(SourceDataExtractBaseTestCase):
+    __test__ = True
     dataset_id_config_key = 'datahub_sectors_dataset_id'
     source_data = {
         'headers': ['id', 'sector'],
@@ -305,49 +158,11 @@ class TestExtractDatahubSectors(TestCase):
     }
     source_table_id_config_key = 'datahub_sectors_source_table_id'
     table_name = 'datahub_sectors'
-
-    @staticmethod
-    def view():
-        return etl.tasks.core.source_data_extraction.extract_datahub_sectors()
-
-    @patch('etl.tasks.core.source_data_extraction.current_app')
-    def test_stub_data(self, current_app):
-        current_app.config = {'app': {'stub_source_data': True}}
-        with app.app_context():
-            self.view()
-            with db.get_db() as connection:
-                with connection.cursor() as cursor:
-                    sql = 'select * from {}'.format(self.table_name)
-                    cursor.execute(sql)
-                    self.assertTrue(len(cursor.fetchall()) > 0)
-
-    @patch('etl.tasks.core.source_data_extraction.requests')
-    @patch('etl.tasks.core.source_data_extraction.current_app')
-    def test_data(self, current_app, requests):
-        current_app.config = {
-            'app': {'stub_source_data': False},
-            'dataworkspace': {
-                self.dataset_id_config_key: '1',
-                self.source_table_id_config_key: '2',
-                'host': 'asdf',
-                'hawk_client_id': 'hawk_client_id',
-                'hawk_client_key': 'hawk_client_key',
-            },
-        }
-        response = Mock()
-        response.json.return_value = self.source_data
-        requests.get.return_value = response
-        with app.app_context():
-            response = self.view()
-            with db.get_db() as connection:
-                with connection.cursor() as cursor:
-                    sql = 'select * from {}'.format(self.table_name)
-                    cursor.execute(sql)
-                    self.assertTrue(len(cursor.fetchall()) > 0)
+    extractor = etl.tasks.core.source_data_extraction.extract_datahub_sectors
 
 
-class TestExtractExportWins(TestCase):
-
+class TestExtractExportWins(SourceDataExtractBaseTestCase):
+    __test__ = True
     dataset_id_config_key = 'export_wins_dataset_id'
     source_data = {
         'headers': ['id', 'companyId', 'country', 'timestamp'],
@@ -359,45 +174,7 @@ class TestExtractExportWins(TestCase):
     }
     source_table_id_config_key = 'export_wins_source_table_id'
     table_name = 'export_wins'
-
-    @staticmethod
-    def view():
-        return etl.tasks.core.source_data_extraction.extract_export_wins()
-
-    @patch('etl.tasks.core.source_data_extraction.current_app')
-    def test_stub_data(self, current_app):
-        current_app.config = {'app': {'stub_source_data': True}}
-        with app.app_context():
-            self.view()
-            with db.get_db() as connection:
-                with connection.cursor() as cursor:
-                    sql = 'select * from {}'.format(self.table_name)
-                    cursor.execute(sql)
-                    self.assertTrue(len(cursor.fetchall()) > 0)
-
-    @patch('etl.tasks.core.source_data_extraction.requests')
-    @patch('etl.tasks.core.source_data_extraction.current_app')
-    def test_data(self, current_app, requests):
-        current_app.config = {
-            'app': {'stub_source_data': False},
-            'dataworkspace': {
-                self.dataset_id_config_key: '1',
-                self.source_table_id_config_key: '2',
-                'host': 'asdf',
-                'hawk_client_id': 'hawk_client_id',
-                'hawk_client_key': 'hawk_client_key',
-            },
-        }
-        response = Mock()
-        response.json.return_value = self.source_data
-        requests.get.return_value = response
-        with app.app_context():
-            response = self.view()
-            with db.get_db() as connection:
-                with connection.cursor() as cursor:
-                    sql = 'select * from {}'.format(self.table_name)
-                    cursor.execute(sql)
-                    self.assertTrue(len(cursor.fetchall()) > 0)
+    extractor =  etl.tasks.core.source_data_extraction.extract_export_wins
 
 
 class TestPopulateTable(TestCase):
