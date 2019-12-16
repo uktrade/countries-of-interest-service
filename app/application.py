@@ -4,6 +4,8 @@ from authbroker_client import authbroker_blueprint
 
 from celery import Celery
 
+import certifi
+
 from flask import Flask, json
 
 import redis
@@ -14,10 +16,11 @@ from app import config
 
 
 def make_celery(flask_app):
-    cache_backend = _get_redis_url(flask_app)
-    flask_app.config['broker_url'] = f"{cache_backend}/0"
-    flask_app.config['result_backend'] = f"{cache_backend}/0"
-    celery = Celery('application')
+    backend_url = _get_redis_url(flask_app) or ""
+    flask_app.config['broker_url'] = f"{backend_url}/0"
+    flask_app.config['result_backend'] = f"{backend_url}/0"
+
+    celery = Celery('application', broker=backend_url)
 
     celery.conf.broker_transport_options = {
         'max_retries': 3,
@@ -25,7 +28,6 @@ def make_celery(flask_app):
         'interval_step': 0.2,
         'interval_max': 0.2,
     }
-    celery.conf.update(flask_app.config)
     return celery
 
 
@@ -105,7 +107,8 @@ def _register_components(flask_app):
     flask_app.register_blueprint(authbroker_blueprint)
 
     # Cache
-    flask_app.cache = redis.from_url(_get_redis_url(flask_app))
+    redis_uri = _get_redis_url(flask_app)
+    flask_app.cache = redis.from_url(redis_uri)
     return flask_app
 
 
@@ -120,6 +123,8 @@ def _get_redis_url(flask_app):
             f"{flask_app.config['cache']['host']}:"
             f"{flask_app.config['cache']['port']}"
         )
+    if redis_uri.startswith('rediss://'):
+        return f"{redis_uri}?ssl_ca_certs={certifi.where()}&ssl_cert_reqs=CERT_REQUIRED"
     return redis_uri
 
 

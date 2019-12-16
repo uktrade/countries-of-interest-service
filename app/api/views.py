@@ -463,7 +463,6 @@ def get_datahub_company_ids_to_companies_house_company_numbers():
 
 
 @api.route('/')
-@login_required
 def get_index():
     last_updated = None
     if table_exists('etl_runs'):
@@ -505,6 +504,7 @@ def populate_database():
     )
     execute_statement(sql)
     sql = 'select * from etl_status'
+
     df = execute_query(sql)
     if force_update is True or len(df) == 0 or df['status'].values[0] == 'SUCCESS':
         populate_database_task.delay(drop_table)

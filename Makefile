@@ -9,12 +9,17 @@ run_server:
 
 .PHONY: run_dev_server
 run_dev_server:
-	make run_celery &
+	make run_dev_celery &
 	FLASK_DEBUG=1 FLASK_APP='app.application:get_or_create()' flask run --host 0.0.0.0 --port ${PORT}
 
 .PHONY: run_celery
 run_celery:
 	celery worker -A app.application.celery_app
+
+.PHONY: run_dev_celery
+run_dev_celery:
+	watchmedo auto-restart -d . -R -p '*.py' -- celery worker -A app.application.celery_app -l info -Q celery
+
 
 .PHONY: run_tests
 run_tests:
