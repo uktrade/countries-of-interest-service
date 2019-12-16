@@ -1,4 +1,0 @@
-flask:
-  env: test
-app:
-  hawk_enabled: True
