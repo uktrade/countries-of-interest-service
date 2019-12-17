@@ -31,3 +31,4 @@ dependencies:
   - sqlalchemy==1.3.10
   - sqlalchemy-utils==0.33.9
   - git+git://github.com/uktrade/flask-authbroker-client
+  - watchdog==0.9.0
