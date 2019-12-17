@@ -16,7 +16,6 @@ class SourceDataExtractBaseTestCase:
     @patch('app.etl.tasks.core.source_data_extraction.current_app')
     def test_stub_data(self, current_app, app_with_db):
         current_app.config = {'app': {'stub_source_data': True}}
-        # with app.app_context():
         self.extractor.__call__()
         sql = 'select * from {}'.format(self.table_name)
         status = execute_statement(sql, raise_if_fail=True)

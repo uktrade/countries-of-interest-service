@@ -18,7 +18,7 @@ class SourceDataExtractor:
             dataset_id = dataworkspace_config[self.dataset_id_config_key]
             source_table_id = dataworkspace_config[self.source_table_id_config_key]
             endpoint = f'api/v1/dataset/{dataset_id}/{source_table_id}'
-            url = 'http://{}/{}'.format(dataworkspace_config['host'], endpoint)
+            url = f'http://{dataworkspace_config["host"]}/{endpoint}'
             return populate_table_paginated(self.schema, self.table_name, url)
 
 
