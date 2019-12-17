@@ -4,7 +4,7 @@ import mohawk
 
 import requests
 
-from app.db.db_utils import execute_statement
+from app.db.models import sql_alchemy
 
 import utils
 
@@ -217,12 +217,14 @@ def populate_table_paginated(schema, table_name, url):
 
 
 def populate_table(data, schema, table_name, overwrite=True):
+    connection = sql_alchemy.engine.connect()
+    transaction = connection.begin()
 
     if overwrite is True:
         # drop table
         sql = 'drop table if exists {}'.format(table_name)
         print('\033[33m drop table \033[0m')
-        status = execute_statement(sql, raise_if_fail=True)
+        connection.execute(sql)
 
     # create table
     schema_str = ','.join(
@@ -238,7 +240,7 @@ def populate_table(data, schema, table_name, overwrite=True):
         else:
             schema_str += ', primary key ({})'.format(primary_key)
     sql = 'create table if not exists {} ({})'.format(table_name, schema_str)
-    status = execute_statement(sql, raise_if_fail=True)
+    connection.execute(sql)
 
     # insert into table
     column_names = [column['name'] for column in schema['columns']]
@@ -258,8 +260,10 @@ def populate_table(data, schema, table_name, overwrite=True):
     column_names_camel = list(map(utils.to_camel_case, column_names))
     column_indices = list(map(data['headers'].index, list(column_names_camel)))
     values = list(map(lambda row: 2 * [row[i] for i in column_indices], data['values']))
-    status = execute_statement(sql, values, raise_if_fail=True)
+    status = connection.execute(sql, values)
     n_rows = int(status.rowcount)
+    transaction.commit()
+    connection.close()
 
     return {'table': table_name, 'rows': n_rows, 'status': 200}
 

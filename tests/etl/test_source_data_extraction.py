@@ -235,15 +235,18 @@ class TestPopulateTable:
         self.url = 'some_url'
         self.stub_data = {'headers': ['a', 'b'], 'values': [(0, 0), (1, 1)]}
 
-    @patch('app.etl.tasks.core.source_data_extraction.execute_statement')
-    def test_rollback_when_there_is_an_error(self, mock_execute_statement, app_with_db):
-        mock_execute_statement.side_effect = Exception('some exception')
+    @patch('app.etl.tasks.core.source_data_extraction.sql_alchemy')
+    def test_rollback_when_there_is_an_error(self, mock_alchemy, app_with_db):
+        connection = Mock()
+        transaction = Mock()
+        connection.begin.return_value = transaction
+        mock_alchemy.engine.connect.return_value = connection
+        transaction.commit.side_effect = Exception('some exception')
         sql = 'create table {} (a varchar(100), b integer)'.format(self.table_name)
         execute_statement(sql, raise_if_fail=True)
         sql = '''insert into {} values ('x', 3)'''.format(self.table_name)
         execute_statement(sql, raise_if_fail=True)
 
-        # with self.assertRaises(Exception):
         with pytest.raises(Exception):
             source_data_extraction.populate_table(
                 self.stub_data, self.schema, self.table_name, overwrite=True,
