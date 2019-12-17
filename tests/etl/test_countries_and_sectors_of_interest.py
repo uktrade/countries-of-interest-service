@@ -7,7 +7,7 @@ from app.etl.tasks.core.countries_and_sectors_of_interest import Task
 class TestCountriesAndSectorsOfInterest:
     def test(self, app_with_db):
         sql = (
-            'create table omis '
+            'create table datahub_omis '
             '''(
                  company_id uuid,
                  country varchar(2),
@@ -33,7 +33,7 @@ class TestCountriesAndSectorsOfInterest:
                 'c0794724-c070-4c7e-a52c-89c0006bf7e6',
             ),
         ]
-        sql = 'insert into omis values (%s, %s, %s, %s, %s)'
+        sql = 'insert into datahub_omis values (%s, %s, %s, %s, %s)'
         execute_statement(sql, values)
 
         task = Task()

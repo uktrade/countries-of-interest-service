@@ -9,7 +9,7 @@ from app.etl.tasks.core import populate_database
 @patch('app.etl.tasks.core.extract_datahub_export_countries')
 @patch('app.etl.tasks.core.extract_datahub_future_interest_countries')
 @patch('app.etl.tasks.core.extract_datahub_interactions')
-@patch('app.etl.tasks.core.extract_datahub_omis_dataset')
+@patch('app.etl.tasks.core.extract_datahub_omis')
 @patch('app.etl.tasks.core.extract_datahub_sectors')
 @patch('app.etl.tasks.core.extract_export_wins')
 @patch('app.etl.tasks.core.ExportCountriesTask')
@@ -27,7 +27,7 @@ class TestPopulateDatabase:
         ExportCountriesTask,
         extract_export_wins,
         extract_datahub_sectors,
-        extract_datahub_omis_dataset,
+        extract_datahub_omis,
         extract_datahub_interactions,
         extract_datahub_future_interest_countries,
         extract_datahub_export_countries,
@@ -39,7 +39,7 @@ class TestPopulateDatabase:
         extract_datahub_export_countries.assert_called_once()
         extract_datahub_future_interest_countries.assert_called_once()
         extract_datahub_interactions.assert_called_once()
-        extract_datahub_omis_dataset.assert_called_once()
+        extract_datahub_omis.assert_called_once()
         extract_datahub_sectors.assert_called_once()
         extract_export_wins.assert_called_once()
         ExportCountriesTask.assert_called_once_with(drop_table=True)
@@ -59,7 +59,7 @@ class TestPopulateDatabase:
                 extract_datahub_export_countries.return_value,
                 extract_datahub_interactions.return_value,
                 extract_datahub_future_interest_countries.return_value,
-                extract_datahub_omis_dataset.return_value,
+                extract_datahub_omis.return_value,
                 extract_datahub_sectors.return_value,
                 extract_export_wins.return_value,
                 ExportCountriesTask.return_value.return_value,
@@ -81,7 +81,7 @@ class TestPopulateDatabase:
         ExportCountriesTask,
         extract_export_wins,
         extract_datahub_sectors,
-        extract_datahub_omis_dataset,
+        extract_datahub_omis,
         extract_datahub_interactions,
         extract_datahub_future_interest_countries,
         extract_datahub_export_countries,

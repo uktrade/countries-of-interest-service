@@ -2,19 +2,11 @@ from flask import current_app
 
 import mohawk
 
-import psycopg2
-import psycopg2.sql
-
-
 import requests
 
+from app.db.db_utils import execute_statement
+
 import utils
-from app.db.db_utils import (
-    drop_table,
-    execute_statement,
-    rename_table,
-    table_exists,
-)
 
 
 class SourceDataExtractor:
@@ -226,74 +218,48 @@ def populate_table_paginated(schema, table_name, url):
 
 def populate_table(data, schema, table_name, overwrite=True):
 
-    with get_db() as connection:
-        with connection.cursor() as cursor:
-            if overwrite is True:
-                # drop table
-                sql = psycopg2.sql.SQL('drop table if exists {}').format(
-                    psycopg2.sql.Identifier(table_name)
-                )
-                cursor.execute(sql)
+    if overwrite is True:
+        # drop table
+        sql = 'drop table if exists {}'.format(table_name)
+        print('\033[33m drop table \033[0m')
+        status = execute_statement(sql, raise_if_fail=True)
 
-            # create table
-            schema_str = psycopg2.sql.SQL(',').join(
-                map(
-                    lambda column: psycopg2.sql.SQL("{} {}").format(
-                        psycopg2.sql.Identifier(column['name']),
-                        psycopg2.sql.SQL(column['type']),
-                    ),
-                    schema['columns'],
-                )
-            )
-            primary_key = schema.get('primary_key')
-            if primary_key is not None:
-                if type(primary_key) in [list, tuple]:
-                    schema_str += psycopg2.sql.SQL(', primary key ({})').format(
-                        psycopg2.sql.SQL(',').join(
-                            map(psycopg2.sql.Identifier, primary_key)
-                        )
-                    )
-                else:
-                    schema_str += psycopg2.sql.SQL(', primary key ({})').format(
-                        psycopg2.sql.Identifier(primary_key)
-                    )
-            sql = psycopg2.sql.SQL('create table if not exists {} ({})').format(
-                psycopg2.sql.Identifier(table_name), schema_str
-            )
-            cursor.execute(sql)
+    # create table
+    schema_str = ','.join(
+        map(
+            lambda column: "{} {}".format(column['name'], column['type']),
+            schema['columns'],
+        ),
+    )
+    primary_key = schema.get('primary_key')
+    if primary_key is not None:
+        if type(primary_key) in [list, tuple]:
+            schema_str += ', primary key ({})'.format(','.join(primary_key))
+        else:
+            schema_str += ', primary key ({})'.format(primary_key)
+    sql = 'create table if not exists {} ({})'.format(table_name, schema_str)
+    status = execute_statement(sql, raise_if_fail=True)
 
-            # insert into table
-            column_names = [column['name'] for column in schema['columns']]
-            sql = psycopg2.sql.SQL(
-                'insert into {} ({}) values ({}) on conflict ({}) do update set {}'
-            ).format(
-                psycopg2.sql.Identifier(table_name),
-                psycopg2.sql.SQL(',').join(map(psycopg2.sql.Identifier, column_names)),
-                psycopg2.sql.SQL(',').join(
-                    psycopg2.sql.Placeholder() * len(column_names)
-                ),
-                psycopg2.sql.SQL(',').join(
-                    map(
-                        psycopg2.sql.Identifier,
-                        [schema['primary_key']]
-                        if type(schema['primary_key']) == str
-                        else schema['primary_key'],
-                    )
-                ),
-                psycopg2.sql.SQL(',').join(
-                    [
-                        psycopg2.sql.SQL('{}=%s').format(psycopg2.sql.Identifier(c))
-                        for c in column_names
-                    ]
-                ),
-            )
-            column_names_camel = list(map(utils.to_camel_case, column_names))
-            column_indices = list(map(data['headers'].index, list(column_names_camel)))
-            values = list(
-                map(lambda row: 2 * [row[i] for i in column_indices], data['values'])
-            )
-            cursor.executemany(sql, values)
-            n_rows = int(cursor.rowcount)
+    # insert into table
+    column_names = [column['name'] for column in schema['columns']]
+    sql = '''
+    insert into {} ({}) values ({}) on conflict ({}) do update set {}
+    '''.format(
+        table_name,
+        ','.join(column_names),
+        ','.join(['%s' for i in column_names]),
+        (
+            schema['primary_key']
+            if type(schema['primary_key']) == str
+            else ','.join(schema['primary_key'])
+        ),
+        ','.join(['{}=%s'.format(c) for c in column_names]),
+    )
+    column_names_camel = list(map(utils.to_camel_case, column_names))
+    column_indices = list(map(data['headers'].index, list(column_names_camel)))
+    values = list(map(lambda row: 2 * [row[i] for i in column_indices], data['values']))
+    status = execute_statement(sql, values, raise_if_fail=True)
+    n_rows = int(status.rowcount)
 
     return {'table': table_name, 'rows': n_rows, 'status': 200}
 
