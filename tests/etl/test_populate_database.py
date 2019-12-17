@@ -10,8 +10,8 @@ from app.etl.tasks.core import populate_database
 @patch('app.etl.tasks.core.extract_datahub_future_interest_countries')
 @patch('app.etl.tasks.core.extract_datahub_interactions')
 @patch('app.etl.tasks.core.extract_datahub_omis')
-@patch('app.etl.tasks.core.extract_datahub_sectors')
-@patch('app.etl.tasks.core.extract_export_wins')
+# @patch('app.etl.tasks.core.extract_datahub_sectors')
+# @patch('app.etl.tasks.core.extract_export_wins')
 @patch('app.etl.tasks.core.ExportCountriesTask')
 @patch('app.etl.tasks.core.PopulateCountriesAndSectorsOfInterestTask')
 @patch('app.etl.tasks.core.PopulateCountriesOfInterestTask')
@@ -25,8 +25,8 @@ class TestPopulateDatabase:
         PopulateCountriesOfInterestTask,
         PopulateCountriesAndSectorsOfInterestTask,
         ExportCountriesTask,
-        extract_export_wins,
-        extract_datahub_sectors,
+        # extract_export_wins,
+        # extract_datahub_sectors,
         extract_datahub_omis,
         extract_datahub_interactions,
         extract_datahub_future_interest_countries,
@@ -79,8 +79,8 @@ class TestPopulateDatabase:
         PopulateCountriesOfInterestTask,
         PopulateCountriesAndSectorsOfInterestTask,
         ExportCountriesTask,
-        extract_export_wins,
-        extract_datahub_sectors,
+        # extract_export_wins,
+        # extract_datahub_sectors,
         extract_datahub_omis,
         extract_datahub_interactions,
         extract_datahub_future_interest_countries,
