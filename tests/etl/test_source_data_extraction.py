@@ -255,7 +255,6 @@ class TestExtractExportWins(SourceDataExtractBaseTestCase):
 
 
 class TestGetHawkHeaders:
-
     @patch('app.etl.tasks.core.source_data_extraction.mohawk')
     def test_if_https_is_false_change_url_to_http(self, mohawk):
         url = 'https://something'
@@ -268,10 +267,10 @@ class TestGetHawkHeaders:
             url='http://something',
             method='GET',
             content='',
-            content_type=''
+            content_type='',
         )
-        
-    
+
+
 class TestPopulateTable:
     @pytest.fixture(autouse=True)
     def setup(self):
