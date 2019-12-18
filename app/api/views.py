@@ -251,7 +251,7 @@ def get_company_countries_of_interest(orientation):
     sql_query = f'''
         select
           company_id,
-          country_iso_alpha2_code,
+          country_of_interest,
           source,
           source_id,
           timestamp

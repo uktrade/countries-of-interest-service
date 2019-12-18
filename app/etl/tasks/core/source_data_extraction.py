@@ -6,8 +6,6 @@ import requests
 
 from app.db.models import sql_alchemy
 
-import utils
-
 
 class SourceDataExtractor:
     def __call__(self):
@@ -34,7 +32,7 @@ class ExtractDatahubCompanyDataset(SourceDataExtractor):
         'primary_key': 'id',
     }
     stub_data = {
-        'headers': ['id', 'companyNumber', 'sector'],
+        'headers': ['id', 'company_number', 'sector'],
         'values': [
             ['c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'asdf', 'Food'],
             ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'asdf2', 'Aerospace'],
@@ -55,7 +53,7 @@ class ExtractDatahubExportCountries(SourceDataExtractor):
         'primary_key': 'id',
     }
     stub_data = {
-        'headers': ['companyId', 'country_iso_alpha2_code', 'id'],
+        'headers': ['company_id', 'country_iso_alpha2_code', 'id'],
         'values': [
             ['c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'US', 1],
             ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'MY', 2],
@@ -76,7 +74,7 @@ class ExtractDatahubFutureInterestCountries(SourceDataExtractor):
         'primary_key': 'id',
     }
     stub_data = {
-        'headers': ['companyId', 'country', 'id'],
+        'headers': ['company_id', 'country_iso_alpha2_code', 'id'],
         'values': [
             ['c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'CN', 1],
             ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'DE', 2],
@@ -99,10 +97,22 @@ class ExtractDatahubInteractions(SourceDataExtractor):
         'primary_key': 'id',
     }
     stub_data = {
-        'headers': ['companyId', 'country', 'id'],
+        'headers': ['id', 'event_id', 'company_id', 'created_on', 'interaction_date'],
         'values': [
-            ['c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'CN', 1],
-            ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'DE', 2],
+            [
+                'a8cb910f-51df-4d8e-a953-01c0be435d36',
+                '7cd493ec-8e1c-4bbc-a0ba-ebd8fd118381',
+                '05b2acd6-21cb-4a98-a857-d5ff773db4ff',
+                '2019-01-01 01:00:00',
+                '2019-01-01',
+            ],
+            [
+                'c31e4492-1f16-48a2-8c5e-8c0334d959a3',
+                '0774cc83-11e7-4100-8631-3b8b0998c514',
+                '8ef278b1-0bde-4f25-8279-36f9ba05198d',
+                '2019-01-02 02:00:00',
+                '2019-01-02',
+            ],
         ],
     }
     table_name = 'datahub_interactions'
@@ -114,7 +124,7 @@ class ExtractDatahubOmis(SourceDataExtractor):
     schema = {
         'columns': [
             {'name': 'company_id', 'type': 'uuid'},
-            {'name': 'country', 'type': 'varchar(2)', 'source_name': 'market'},
+            {'name': 'market', 'type': 'varchar(2)'},
             {'name': 'created_date', 'type': 'timestamp'},
             {'name': 'id', 'type': 'uuid'},
             {'name': 'sector', 'type': 'varchar(200)'},
@@ -122,7 +132,7 @@ class ExtractDatahubOmis(SourceDataExtractor):
         'primary_key': 'id',
     }
     stub_data = {
-        'headers': ['companyId', 'country', 'createdOn', 'id', 'sector'],
+        'headers': ['company_id', 'market', 'created_date', 'id', 'sector'],
         'values': [
             [
                 'c31e4492-1f16-48a2-8c5e-8c0334d959a3',
@@ -176,7 +186,7 @@ class ExtractExportWins(SourceDataExtractor):
         'primary_key': 'id',
     }
     stub_data = {
-        'headers': ['id', 'companyId', 'country', 'timestamp'],
+        'headers': ['id', 'company_id', 'country', 'timestamp'],
         'values': [
             ['23f66b0e-05be-40a5-9bf2-fa44dc7714a8', 'asdf', 'IT', '2019-01-01 1:00'],
             ['f50d892d-388a-405b-9e30-16b9971ac0d4', 'ffff', 'GO', '2019-01-02 18:00'],
@@ -186,13 +196,7 @@ class ExtractExportWins(SourceDataExtractor):
 
 
 def get_hawk_headers(
-        url,
-        client_id,
-        client_key,
-        content='',
-        content_type='',
-        https=False,
-        method='GET', 
+    url, client_id, client_key, content='', content_type='', https=False, method='GET',
 ):
 
     if https is False:
@@ -254,8 +258,7 @@ def populate_table(data, schema, table_name, overwrite=True):
     # insert into table
     column_names_destination = [column['name'] for column in schema['columns']]
     column_names_source = [
-        column.get('source_name', column['name'])
-        for column in schema['columns']
+        column.get('source_name', column['name']) for column in schema['columns']
     ]
     sql = '''
     insert into {} ({}) values ({}) on conflict ({}) do update set {}

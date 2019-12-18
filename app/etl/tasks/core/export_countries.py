@@ -35,7 +35,7 @@ table_name = 'coi_export_countries'
 class Task(ETLTask):
 
     name = 'export_countries'
-    
+
     def __init__(
         self, sql=sql, table_fields=table_fields, table_name=table_name, *args, **kwargs
     ):

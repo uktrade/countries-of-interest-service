@@ -29,7 +29,7 @@ class SourceDataExtractBaseTestCase:
             'dataworkspace': {
                 self.dataset_id_config_key: '1',
                 self.source_table_id_config_key: '2',
-                'host': 'asdf',
+                'base_url': 'asdf',
                 'hawk_client_id': 'hawk_client_id',
                 'hawk_client_key': 'hawk_client_key',
             },
@@ -59,20 +59,20 @@ class SourceDataExtractBaseTestCase:
 class TestExtractDatahubCompany(SourceDataExtractBaseTestCase):
 
     __test__ = True
-    dataset_id_config_key = 'datahub_company_dataset_id'
+    dataset_id_config_key = 'datahub_companies_dataset_id'
     expected_data = [
         ['c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'asdf', 'Food'],
         ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'asdf2', 'Aerospace'],
     ]
     source_data = {
-        'headers': ['id', 'companyNumber', 'sector', 'extraField'],
+        'headers': ['id', 'company_number', 'sector', 'extra_field'],
         'next': None,
         'values': [
             ['c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'asdf', 'Food', 'extra'],
             ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'asdf2', 'Aerospace', 'extra'],
         ],
     }
-    source_table_id_config_key = 'datahub_company_source_table_id'
+    source_table_id_config_key = 'datahub_companies_source_table_id'
     table_name = 'datahub_company'
     extractor = source_data_extraction.extract_datahub_company_dataset
 
@@ -85,7 +85,7 @@ class TestExtractDatahubExportCountries(SourceDataExtractBaseTestCase):
         ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'SD', 1],
     ]
     source_data = {
-        'headers': ['id', 'companyId', 'country', 'extraField'],
+        'headers': ['id', 'company_id', 'country_iso_alpha2_code', 'extraField'],
         'next': None,
         'values': [
             [0, 'c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'SK', 'extra'],
@@ -105,7 +105,7 @@ class TestExtractDatahubFutureInterestCountries(SourceDataExtractBaseTestCase):
         ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'SD', 1],
     ]
     source_data = {
-        'headers': ['id', 'companyId', 'country', 'extraField'],
+        'headers': ['id', 'company_id', 'country_iso_alpha2_code', 'extra_field'],
         'next': None,
         'values': [
             [0, 'c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'SK', 'extra'],
@@ -121,14 +121,47 @@ class TestExtractDatahubInteractions(SourceDataExtractBaseTestCase):
     __test__ = True
     dataset_id_config_key = 'datahub_interactions_dataset_id'
     expected_data = [
-        ['c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'CN', 1],
-        ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'DE', 2],
+        [
+            'a8cb910f-51df-4d8e-a953-01c0be435d36',
+            '7cd493ec-8e1c-4bbc-a0ba-ebd8fd118381',
+            '05b2acd6-21cb-4a98-a857-d5ff773db4ff',
+            '2019-01-01 01:00:00',
+            '2019-01-01 00:00:00',
+        ],
+        [
+            'c31e4492-1f16-48a2-8c5e-8c0334d959a3',
+            '0774cc83-11e7-4100-8631-3b8b0998c514',
+            '8ef278b1-0bde-4f25-8279-36f9ba05198d',
+            '2019-01-02 02:00:00',
+            '2019-01-02 00:00:00',
+        ],
     ]
     source_data = {
-        'headers': ['companyId', 'country', 'id'],
+        'headers': [
+            'id',
+            'event_id',
+            'company_id',
+            'created_on',
+            'interaction_date',
+            'extra_field',
+        ],
         'values': [
-            ['c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'CN', 1],
-            ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'DE', 2],
+            [
+                'a8cb910f-51df-4d8e-a953-01c0be435d36',
+                '7cd493ec-8e1c-4bbc-a0ba-ebd8fd118381',
+                '05b2acd6-21cb-4a98-a857-d5ff773db4ff',
+                '2019-01-01 01:00:00',
+                '2019-01-01',
+                'extra',
+            ],
+            [
+                'c31e4492-1f16-48a2-8c5e-8c0334d959a3',
+                '0774cc83-11e7-4100-8631-3b8b0998c514',
+                '8ef278b1-0bde-4f25-8279-36f9ba05198d',
+                '2019-01-02 02:00:00',
+                '2019-01-02',
+                'extra',
+            ],
         ],
         'next': None,
     }
@@ -157,7 +190,7 @@ class TestExtractDatahubOmis(SourceDataExtractBaseTestCase):
         ],
     ]
     source_data = {
-        'headers': ['companyId', 'country', 'createdOn', 'id', 'sector'],
+        'headers': ['company_id', 'market', 'created_date', 'id', 'sector'],
         'values': [
             [
                 'c31e4492-1f16-48a2-8c5e-8c0334d959a3',
@@ -209,7 +242,7 @@ class TestExtractExportWins(SourceDataExtractBaseTestCase):
         ['f50d892d-388a-405b-9e30-16b9971ac0d4', 'ffff', 'GO', '2019-01-02 18:00:00'],
     ]
     source_data = {
-        'headers': ['id', 'companyId', 'country', 'timestamp'],
+        'headers': ['id', 'company_id', 'country', 'timestamp'],
         'values': [
             ['23f66b0e-05be-40a5-9bf2-fa44dc7714a8', 'asdf', 'IT', '2019-01-01 1:00'],
             ['f50d892d-388a-405b-9e30-16b9971ac0d4', 'ffff', 'GO', '2019-01-02 18:00'],

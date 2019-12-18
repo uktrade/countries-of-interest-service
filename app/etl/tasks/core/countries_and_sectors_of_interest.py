@@ -6,8 +6,8 @@ index = ('company_id',)
 sql = '''
     select
       company_id::text,
-      country,
-      sector,
+      market as country_of_interest,
+      sector as sector_of_interest,
       '{}' as source,
       id::text as source_id,
       created_date as timestamp
@@ -33,7 +33,7 @@ table_name = 'coi_countries_and_sectors_of_interest'
 class Task(ETLTask):
 
     name = 'countries_and_sectors_of_interest'
-    
+
     def __init__(
         self, sql=sql, table_fields=table_fields, table_name=table_name, *args, **kwargs
     ):
