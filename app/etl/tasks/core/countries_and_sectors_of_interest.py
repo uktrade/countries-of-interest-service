@@ -11,7 +11,7 @@ sql = '''
       '{}' as source,
       id::text as source_id,
       created_on as timestamp
-    from omis
+    from datahub_omis
     order by 1
 '''.format(
     data_sources.omis

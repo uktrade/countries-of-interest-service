@@ -5,6 +5,7 @@ app:
   database_url: $ENV{DATABASE_URL, postgresql://postgres@postgres/postgres}
   pagination_size: $ENV{PAGINATION_SIZE, 50}
   run_scheduler: $ENV{RUN_SCHEDULER, False}
+  stub_source_data: $ENV{STUB_SOURCE_DATA, True}
 sso:
   host: $ENV{ABC_BASE_URL, https://sso.trade.gov.uk}
   abc_client_id: $ENV{ABC_CLIENT_ID, sso_client_id}
@@ -13,6 +14,16 @@ dataworkspace:
   host: $ENV{DATAWORKSPACE_HOST, localapps.com:8000}
   hawk_client_id: $ENV{DATAWORKSPACE_HAWK_CLIENT_ID, dataworkspace_client_id}
   hawk_client_key: $ENV{DATAWORKSPACE_HAWK_CLIENT_KEY, dataworkspace_client_key}
+  datahub_companies_dataset_id: $ENV{DATAHUB_COMPANIES_DATASET_ID}
+  datahub_companies_source_table_id: $ENV{DATAHUB_COMPANIES_SOURCE_TABLE_ID}
+  datahub_export_countries_dataset_id: $ENV{DATAHUB_EXPORT_COUNTRIES_DATASET_ID}
+  datahub_export_countries_source_table_id: $ENV{DATAHUB_EXPORT_COUNTRIES_SOURCE_TABLE_ID}
+  datahub_future_interest_countries_dataset_id: $ENV{DATAHUB_FUTURE_INTEREST_COUNTRIES_DATASET_ID}
+  datahub_future_interest_countries_source_table_id: $ENV{DATAHUB_FUTURE_INTEREST_COUNTRIES_SOURCE_TABLE_ID}
+  datahub_interactions_dataset_id: $ENV{DATAHUB_INTERACTIONS_DATASET_ID}
+  datahub_interactions_source_table_id: $ENV{DATAHUB_INTERACTIONS_SOURCE_TABLE_ID}
+  datahub_omis_dataset_id: $ENV{DATAHUB_OMIS_DATASET_ID}
+  datahub_omis_source_table_id: $ENV{DATAHUB_OMIS_SOURCE_TABLE_ID}
 dataflow:
   host: $ENV{DATAFLOW_HOST, }
   hawk_client_id: $ENV{DATAFLOW_HAWK_CLIENT_ID, dataflow_client_id}

@@ -14,9 +14,9 @@ from app.etl.tasks.core.source_data_extraction import (
     extract_datahub_export_countries,
     extract_datahub_future_interest_countries,
     extract_datahub_interactions,
-    extract_datahub_omis_dataset,
-    extract_datahub_sectors,
-    extract_export_wins,
+    extract_datahub_omis,
+    # extract_datahub_sectors,
+    # extract_export_wins,
 )
 
 
@@ -26,9 +26,9 @@ def populate_database(drop_table):
         extract_datahub_export_countries(),
         extract_datahub_interactions(),
         extract_datahub_future_interest_countries(),
-        extract_datahub_omis_dataset(),
-        extract_datahub_sectors(),
-        extract_export_wins(),
+        extract_datahub_omis(),
+        # extract_datahub_sectors(),
+        # extract_export_wins(),
     ]
     output.extend(
         [
