@@ -2,9 +2,12 @@ from flask import current_app as app
 
 from flask_script import Manager
 
+from sqlalchemy import create_engine
+
 import sqlalchemy_utils
 
-from app.db.models import HawkUsers, sql_alchemy
+from app.db.db_utils import create_schemas
+from app.db.models import HawkUsers
 
 DevCommand = Manager(app=app, usage='Development commands')
 
@@ -27,17 +30,20 @@ DevCommand = Manager(app=app, usage='Development commands')
 def db(create=False, drop=False, tables=False):
     if not drop and not create and not tables:
         print('please choose an option (--drop, --create or --create_tables)')
-    db_url = app.config['SQLALCHEMY_DATABASE_URI']
-    db_name = db_url.database
-    if drop:
-        print(f'Dropping {db_name} database')
-        sqlalchemy_utils.drop_database(db_url)
-    if create:
-        print(f'Creating {db_name} database')
-        sqlalchemy_utils.create_database(db_url, encoding='utf8')
-    if create or tables:
-        print('Creating DB tables')
-        HawkUsers.__table__.create(sql_alchemy.engine, checkfirst=True)
+    else:
+        db_url = app.config['SQLALCHEMY_DATABASE_URI']
+        db_name = db_url.database
+        if drop:
+            print(f'Dropping {db_name} database')
+            sqlalchemy_utils.drop_database(db_url)
+        if create:
+            print(f'Creating {db_name} database')
+            sqlalchemy_utils.create_database(db_url, encoding='utf8')
+        if create or tables:
+            engine = create_engine(db_url)
+            create_schemas(engine)
+            print('Creating DB tables')
+            app.db.create_all()
 
 
 @DevCommand.option(
@@ -70,10 +76,11 @@ def add_hawk_user(client_id, client_key, client_scope, description):
             '(--client_id, --client_key and --client_scope, --description)'
             ' are mandatory parameter'
         )
-    client_scope_list = client_scope.split(',')
-    HawkUsers.add_user(
-        client_id=client_id,
-        client_key=client_key,
-        client_scope=client_scope_list,
-        description=description,
-    )
+    else:
+        client_scope_list = client_scope.split(',')
+        HawkUsers.add_user(
+            client_id=client_id,
+            client_key=client_key,
+            client_scope=client_scope_list,
+            description=description,
+        )

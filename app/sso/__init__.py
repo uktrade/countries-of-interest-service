@@ -4,17 +4,15 @@ from flask import Blueprint, redirect, request, session, url_for
 
 from flask_oauthlib.client import OAuth
 
-from flask_security import login_user, logout_user
 
 import werkzeug
 from werkzeug.exceptions import abort
 
-from app.db.models import Role
 
 sso = Blueprint('sso', __name__)
 
 
-class SSOClient:
+class BaseSSOClient:
     def __init__(
         self,
         app,
@@ -26,14 +24,18 @@ class SSOClient:
         logout_url,
         client_id,
         client_secret,
+        user_datastore,
     ):
         self.sso_session_token_key = sso_session_token_key
-        self.user_datastore = app.user_datastore
+        self.user_datastore = user_datastore
         self.db = app.db
         self.profile_url = profile_url
         self.logout_url = logout_url
 
         # add routes to blueprint
+        sso.add_url_rule('/login', view_func=self.login, methods=['GET'])
+        sso.add_url_rule('/logout', view_func=self.logout, methods=['GET'])
+        sso.add_url_rule('/login/authorised', view_func=self.callback, methods=['GET'])
 
         # initialize oauth broker
         oauth = OAuth(app)
@@ -60,7 +62,7 @@ class SSOClient:
 
     def logout(self):
         session.pop(self.sso_session_token_key, None)
-        logout_user()
+        self.process_logout()
         return redirect(self.logout_url)
 
     def callback(self):
@@ -74,25 +76,14 @@ class SSOClient:
             )
         else:
             session[self.sso_session_token_key] = (resp['access_token'], '')
-
-            # Retrieve user profile from broker
-            profile = self.get_profile()
-
-            # Add/Update user in local DB
-            user = self.user_datastore.get_user(profile['user_id'])
-            if not user:
-                user_role = Role(name='user')
-                self.user_datastore.create_user(
-                    first_name=profile['first_name'],
-                    last_name=profile['last_name'],
-                    email=profile['email'],
-                    user_id=profile['user_id'],
-                    roles=[user_role],
-                )
-                user = self.user_datastore.get_user(profile['user_id'])
-            login_user(user)
-            self.user_datastore.commit()
+            self.process_login(resp)
             return redirect(self._get_next_url())
+
+    def process_login(self, resp):
+        raise NotImplementedError('Process login required')
+
+    def process_logout(self):
+        raise NotImplementedError('Process logout required')
 
     def get_profile(self):
         response = self.oauth_broker.get(self.profile_url)
@@ -108,5 +99,5 @@ class SSOClient:
         elif 'next' in session:
             next_url = session.pop('next', None)
         else:
-            next_url = None
+            next_url = '/'
         return next_url

@@ -4,6 +4,7 @@ from sqlalchemy import PrimaryKeyConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import ClauseElement
 
+
 db = SQLAlchemy()
 sql_alchemy = db
 

@@ -1,6 +1,7 @@
 
 PORT ?= 5000
 TEST ?=.
+COV ?= --cov
 
 .PHONY: run_server
 run_server:
@@ -14,16 +15,16 @@ run_dev_server:
 
 .PHONY: run_celery
 run_celery:
-	celery worker -A app.application.celery_app
+	celery worker -A app.worker.celery_app
 
 .PHONY: run_dev_celery
 run_dev_celery:
-	watchmedo auto-restart -d . -R -p '*.py' -- celery worker -A app.application.celery_app -l info -Q celery
+	watchmedo auto-restart -d . -R -p '*.py' -- celery worker -A app.worker.celery_app -l info -Q celery
 
 
 .PHONY: run_tests
 run_tests:
-	TESTING=1 pytest -p no:sugar ${TEST} --cov
+	TESTING=1 pytest -p no:sugar ${TEST} ${COV}
 
 .PHONY: check
 check:
