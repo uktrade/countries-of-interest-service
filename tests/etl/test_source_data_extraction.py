@@ -254,6 +254,24 @@ class TestExtractExportWins(SourceDataExtractBaseTestCase):
     extractor = app.etl.tasks.core.source_data_extraction.extract_export_wins
 
 
+class TestGetHawkHeaders:
+
+    @patch('app.etl.tasks.core.source_data_extraction.mohawk')
+    def test_if_https_is_false_change_url_to_http(self, mohawk):
+        url = 'https://something'
+        client_id = 'client_id'
+        client_key = 'client_key'
+        credentials = {'id': client_id, 'key': client_key, 'algorithm': 'sha256'}
+        source_data_extraction.get_hawk_headers(url, client_id, client_key, https=False)
+        mohawk.Sender.assert_called_once_with(
+            credentials=credentials,
+            url='http://something',
+            method='GET',
+            content='',
+            content_type=''
+        )
+        
+    
 class TestPopulateTable:
     @pytest.fixture(autouse=True)
     def setup(self):
