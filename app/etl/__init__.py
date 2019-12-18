@@ -16,6 +16,7 @@ class ETLTask:
         self.table_name = table_name
 
     def __call__(self):
+
         if self.drop_table is True:
             drop_table(self.table_name)
 

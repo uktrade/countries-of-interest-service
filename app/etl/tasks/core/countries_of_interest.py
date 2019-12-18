@@ -7,7 +7,7 @@ sql = '''
 with omis_countries_of_interest as (
     select
       company_id::text,
-      country,
+      market,
       '{omis}' as source,
       id::varchar(100) as source_id,
       created_date as timestamp
@@ -35,7 +35,7 @@ with omis_countries_of_interest as (
 
 select
   company_id::text,
-  country,
+  market as country_of_interest,
   source,
   source_id,
   timestamp
@@ -51,7 +51,7 @@ order by 1
 
 table_fields = '''(
     company_id varchar(100),
-    country_iso_alpha2_code varchar(2),
+    country_of_interest varchar(2),
     source varchar(50),
     source_id varchar(100),
     timestamp timestamp,
