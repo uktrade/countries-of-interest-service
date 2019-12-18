@@ -10,14 +10,14 @@ with omis_countries_of_interest as (
       country,
       '{omis}' as source,
       id::varchar(100) as source_id,
-      created_on as timestamp
+      created_date as timestamp
 
     from datahub_omis
 
 ), datahub_countries_of_interest as (
     select
       company_id::text,
-      country,
+      country_iso_alpha2_code,
       '{future_interest}' as source,
       id::varchar(100) as source_id,
       null::timestamp as timestamp
@@ -51,7 +51,7 @@ order by 1
 
 table_fields = '''(
     company_id varchar(100),
-    country_of_interest varchar(2),
+    country_iso_alpha2_code varchar(2),
     source varchar(50),
     source_id varchar(100),
     timestamp timestamp,
@@ -62,6 +62,9 @@ table_name = 'coi_countries_of_interest'
 
 
 class Task(ETLTask):
+
+    name = 'countries_of_interest'
+    
     def __init__(
         self, sql=sql, table_fields=table_fields, table_name=table_name, *args, **kwargs
     ):
