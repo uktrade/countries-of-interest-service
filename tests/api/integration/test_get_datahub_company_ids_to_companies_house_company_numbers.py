@@ -30,8 +30,8 @@ def test_get_datahub_company_ids(app):
                 {
                     'results': [
                         {
-                            'companies_house_company_number': 'ch1',
-                            'datahub_company_id': (
+                            'companiesHouseCompanyNumber': 'ch1',
+                            'datahubCompanyId': (
                                 '40e6215d-b5c6-4896-987c-f30f3678f608'
                             ),
                         }

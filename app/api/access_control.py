@@ -71,6 +71,7 @@ class AccessControl:
             hawk_response_header = current_app.config['access_control'][
                 'hawk_response_header'
             ]
+
             if hawk_enabled:
                 receiver = self._auth_by_signature()
             response = view_func(*args, **kwargs)
