@@ -90,13 +90,19 @@ class AccessControl:
             raise Unauthorized()
 
         try:
+            convert_https_to_http = True
+            if convert_https_to_http:
+                if request.url.startswith('https'):
+                    url = 'http' + request.url[5:]
+                else:
+                    url = request.url
             return mohawk.Receiver(
                 credentials_map=self._client_key_loader_func,
                 seen_nonce=self._nonce_checker_func
                 if current_app.config['access_control']['hawk_nonce_enabled']
                 else None,
                 request_header=request.headers['Authorization'],
-                url=request.url,
+                url=url,
                 method=request.method,
                 content=request.get_data(),
                 content_type=request.mimetype,
