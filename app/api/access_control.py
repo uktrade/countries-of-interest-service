@@ -90,15 +90,10 @@ class AccessControl:
             raise Unauthorized()
 
         try:
-            convert_http_to_https = True
-            print('convert_http_to_https:', convert_http_to_https)
-            print('request.url:', request.url)
-            if convert_http_to_https:
-                if request.url.startswith('http') and not request.url.startswith('https'):
-                    url = 'https' + request.url[4:]
-                else:
-                    url = request.url
-            print('mohawk.Receiver.url:', url)
+            if request.url.startswith('http') and not request.url.startswith('https'):
+                url = 'https' + request.url[4:]
+            else:
+                url = request.url
             return mohawk.Receiver(
                 credentials_map=self._client_key_loader_func,
                 seen_nonce=self._nonce_checker_func
