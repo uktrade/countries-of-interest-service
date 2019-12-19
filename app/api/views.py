@@ -46,7 +46,6 @@ def get_client_scope(client_id):
 @ac.nonce_checker
 def seen_nonce(sender_id, nonce, timestamp):
     key = f'{sender_id}:{nonce}:{timestamp}'
-    check = flask_app.cache.get(key)
     try:
         if flask_app.cache.get(key):
             # We have already processed this nonce + timestamp.
