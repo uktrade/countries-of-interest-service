@@ -23,6 +23,6 @@ def test_get_companies_house_company_numbers(app):
             api='http://localhost:80/api/v1/get-companies-house-company-numbers',
             expected_response=(
                 200,
-                {'results': [{'companies_house_company_number': 'ch1'}]},
+                {'results': [{'companiesHouseCompanyNumber': 'ch1'}]},
             ),
         )

@@ -26,7 +26,7 @@ def test_get_datahub_company_ids(app):
                 200,
                 {
                     'results': [
-                        {'datahub_company_id': '40e6215d-b5c6-4896-987c-f30f3678f608'}
+                        {'datahubCompanyId': '40e6215d-b5c6-4896-987c-f30f3678f608'}
                     ]
                 },
             ),
