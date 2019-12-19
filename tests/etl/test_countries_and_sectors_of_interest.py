@@ -10,9 +10,9 @@ class TestCountriesAndSectorsOfInterest:
             'create table datahub_omis '
             '''(
                  company_id uuid,
-                 country varchar(2),
+                 market varchar(2),
                  sector varchar(100),
-                 created_on timestamp,
+                 created_date timestamp,
                  id uuid
             )'''
         )

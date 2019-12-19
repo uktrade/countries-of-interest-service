@@ -7,7 +7,7 @@ index = ('company_id',)
 sql = '''
 select
   company_id::text,
-  country,
+  country_iso_alpha2_code,
   '{export_countries}' as source,
   id::varchar(100) as source_id,
   null::timestamp as timestamp
@@ -33,6 +33,9 @@ table_name = 'coi_export_countries'
 
 
 class Task(ETLTask):
+
+    name = 'export_countries'
+
     def __init__(
         self, sql=sql, table_fields=table_fields, table_name=table_name, *args, **kwargs
     ):

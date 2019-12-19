@@ -68,16 +68,17 @@ def create_index(index, table_name, index_name=None):
 
 
 def insert_data(df, table_name):
-    sql = f'insert into {table_name} values'
-    for i, values in enumerate(df.values):
-        # quote string values
-        values = [
-            "'{}'".format(val) if type(val) in [str, pd.Timestamp] else val
-            for val in values
-        ]
-        values = ['Null' if pd.isnull(val) else val for val in values]
-        values = ['{}'.format(val) for val in values]
-        sql += f"\n\t({', '.join(values)})"
-        sql += ', ' if i != len(df) - 1 else ''
-    sql += '\n\ton conflict do nothing'
-    execute_statement(sql)
+    if len(df):
+        sql = f'insert into {table_name} values'
+        for i, values in enumerate(df.values):
+            # quote string values
+            values = [
+                "'{}'".format(val) if type(val) in [str, pd.Timestamp] else val
+                for val in values
+            ]
+            values = ['Null' if pd.isnull(val) else val for val in values]
+            values = ['{}'.format(val) for val in values]
+            sql += f"\n\t({', '.join(values)})"
+            sql += ', ' if i != len(df) - 1 else ''
+        sql += '\n\ton conflict do nothing'
+        execute_statement(sql)
