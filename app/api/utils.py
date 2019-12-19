@@ -17,6 +17,8 @@ def to_web_dict(df, orient='records'):
 
 
 def to_records_web_dict(df):
+    headers = [to_camel_case(c) for c in df.columns]
+    df.columns = headers
     return {'results': df.to_dict(orient='records')}
 
 

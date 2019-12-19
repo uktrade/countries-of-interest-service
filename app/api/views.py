@@ -46,13 +46,14 @@ def get_client_scope(client_id):
 @ac.nonce_checker
 def seen_nonce(sender_id, nonce, timestamp):
     key = f'{sender_id}:{nonce}:{timestamp}'
+    check = flask_app.cache.get(key)
     try:
         if flask_app.cache.get(key):
             # We have already processed this nonce + timestamp.
             return True
         else:
             # Save this nonce + timestamp for later.
-            flask_app.cache.set(key, True, ex=300)
+            flask_app.cache.set(key, 'True', ex=300)
             return False
     except redis.exceptions.ConnectionError as e:
         logging.error(f'failed to connect to caching server: {str(e)}')
@@ -95,7 +96,7 @@ def get_companies_house_company_numbers():
         order by 1
     '''
     df = execute_query(sql_query)
-    return to_web_dict(df)
+    return flask_app.make_response(to_web_dict(df))
 
 
 @api.route('/api/v1/get-datahub-company-ids')
@@ -109,7 +110,7 @@ def get_datahub_company_ids():
         from coi_datahub_company_id_to_companies_house_company_number
     '''
     df = execute_query(sql_query)
-    return to_web_dict(df)
+    return flask_app.make_response(to_web_dict(df))
 
 
 @api.route('/api/v1/get-company-countries-and-sectors-of-interest')
@@ -198,7 +199,7 @@ def get_company_countries_and_sectors_of_interest(orientation):
         next_ = None
     web_dict = to_web_dict(df, orientation)
     web_dict['next'] = next_
-    return web_dict
+    return flask_app.make_response(web_dict)
 
 
 @api.route('/api/v1/get-company-countries-of-interest')
@@ -275,7 +276,7 @@ def get_company_countries_of_interest(orientation):
         next_ = None
     web_dict = to_web_dict(df, orientation)
     web_dict['next'] = next_
-    return web_dict
+    return flask_app.make_response(web_dict)
 
 
 @api.route('/api/v1/get-company-export-countries')
@@ -352,7 +353,7 @@ def get_company_export_countries(orientation):
         next_ = None
     web_dict = to_web_dict(df, orientation)
     web_dict['next'] = next_
-    return web_dict
+    return flask_app.make_response(web_dict)
 
 
 @api.route('/api/v1/get-company-sectors-of-interest')
@@ -430,7 +431,7 @@ def get_company_sectors_of_interest(orientation):
         next_ = None
     web_dict = to_web_dict(df, orientation)
     web_dict['next'] = next_
-    return web_dict
+    return flask_app.make_response(web_dict)
 
 
 @api.route('/data-report')
@@ -459,7 +460,7 @@ def get_datahub_company_ids_to_companies_house_company_numbers():
         from coi_datahub_company_id_to_companies_house_company_number
     '''
     df = execute_query(sql_query)
-    return to_web_dict(df)
+    return flask_app.make_response(to_web_dict(df))
 
 
 @api.route('/')
