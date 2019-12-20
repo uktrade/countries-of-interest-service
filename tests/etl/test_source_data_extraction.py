@@ -13,6 +13,15 @@ class SourceDataExtractBaseTestCase:
 
     __test__ = False
 
+    def get_dataworkspace_config(self):
+        return {
+            self.dataset_id_config_key: '1',
+            self.source_table_id_config_key: '2',
+            'base_url': 'asdf',
+            'hawk_client_id': 'hawk_client_id',
+            'hawk_client_key': 'hawk_client_key',
+        }
+
     @patch('app.etl.tasks.core.source_data_extraction.current_app')
     def test_stub_data(self, current_app, app_with_db):
         current_app.config = {'app': {'stub_source_data': True}}
@@ -26,13 +35,7 @@ class SourceDataExtractBaseTestCase:
     def test_data(self, current_app, requests, app_with_db):
         current_app.config = {
             'app': {'stub_source_data': False},
-            'dataworkspace': {
-                self.dataset_id_config_key: '1',
-                self.source_table_id_config_key: '2',
-                'base_url': 'asdf',
-                'hawk_client_id': 'hawk_client_id',
-                'hawk_client_key': 'hawk_client_key',
-            },
+            'dataworkspace': self.get_dataworkspace_config(),
         }
         response = Mock()
         response.json.return_value = self.source_data
@@ -54,6 +57,48 @@ class SourceDataExtractBaseTestCase:
             )
         )
         assert data == self.expected_data
+
+
+class ReferenceDatasetExtractBaseTestCase(SourceDataExtractBaseTestCase):
+
+    __test__ = False
+
+    def get_dataworkspace_config(self):
+        return {
+            self.group_slug_config_key: 'group-slug',
+            self.reference_slug_config_key: 'reference-slug',
+            'base_url': 'asdf',
+            'hawk_client_id': 'hawk_client_id',
+            'hawk_client_key': 'hawk_client_key',
+        }
+
+
+class TestExtractCountriesAndTerritoriesReferenceDataset(
+    ReferenceDatasetExtractBaseTestCase
+):
+
+    __test__ = True
+    group_slug_config_key = 'countries_and_territories_group_slug'
+    reference_slug_config_key = 'countries_and_territories_reference_slug'
+    expected_data = [
+        ['AE-AZ', 'Abu Dhabi', 'Territory', None, None],
+        ['AF', 'Afghanistan', 'Country', None, None],
+        ['AO', 'Angola', 'Country', '1975-11-11', None],
+    ]
+    source_data = {
+        'headers': ['ID', 'Name', 'Type', 'Start Date', 'End Date'],
+        'next': None,
+        'values': [
+            ['AE-AZ', 'Abu Dhabi', 'Territory', None, None],
+            ['AF', 'Afghanistan', 'Country', None, None],
+            ['AO', 'Angola', 'Country', '1975-11-11', None],
+        ],
+    }
+
+    table_name = 'reference_countries_and_territories'
+    extractor = (
+        source_data_extraction.extract_countries_and_territories_reference_dataset
+    )
 
 
 class TestExtractDatahubCompany(SourceDataExtractBaseTestCase):
