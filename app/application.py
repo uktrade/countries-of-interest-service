@@ -125,7 +125,6 @@ def _get_redis_url(flask_app):
         )
     if redis_uri.startswith('rediss://'):
         return f"{redis_uri}?ssl_ca_certs={certifi.where()}"
-    # return f"{redis_uri}?ssl_ca_certs={certifi.where()}&ssl_cert_reqs=CERT_REQUIRED"
     return redis_uri
 
 
