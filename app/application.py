@@ -124,7 +124,7 @@ def _get_redis_url(flask_app):
             f"{flask_app.config['cache']['port']}"
         )
     if redis_uri.startswith('rediss://'):
-        return f"{redis_uri}?ssl_ca_certs={certifi.where()}&ssl_cert_reqs=CERT_REQUIRED"
+        return f"{redis_uri}?ssl_ca_certs={certifi.where()}"
     return redis_uri
 
 

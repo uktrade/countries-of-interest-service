@@ -4,7 +4,7 @@ TEST ?=.
 
 .PHONY: run_server
 run_server:
-	exec gunicorn 'app.application:get_or_create()' -b 0.0.0.0:${PORT}
+	exec gunicorn 'app.application:get_or_create()' -b 0.0.0.0:${PORT} --config 'app/config/gunicorn.conf'
 
 
 .PHONY: run_dev_server
