@@ -12,12 +12,51 @@ class SourceDataExtractor:
         if current_app.config['app']['stub_source_data']:
             return populate_table(self.stub_data, self.schema, self.table_name)
         else:
-            dataworkspace_config = current_app.config['dataworkspace']
-            dataset_id = dataworkspace_config[self.dataset_id_config_key]
-            source_table_id = dataworkspace_config[self.source_table_id_config_key]
-            endpoint = f'api/v1/dataset/{dataset_id}/{source_table_id}'
-            url = f'{dataworkspace_config["base_url"]}/{endpoint}'
+            url = self.get_url()
             return populate_table_paginated(self.schema, self.table_name, url)
+
+    def get_url(self):
+        dataworkspace_config = current_app.config['dataworkspace']
+        dataset_id = dataworkspace_config[self.dataset_id_config_key]
+        source_table_id = dataworkspace_config[self.source_table_id_config_key]
+        endpoint = f'api/v1/dataset/{dataset_id}/{source_table_id}'
+        url = f'{dataworkspace_config["base_url"]}/{endpoint}'
+        return url
+
+
+class ReferenceDatasetExtractor(SourceDataExtractor):
+    def get_url(self):
+        dataworkspace_config = current_app.config['dataworkspace']
+        group_slug = dataworkspace_config[self.group_slug]
+        reference_slug = dataworkspace_config[self.reference_slug]
+        endpoint = f'api/v1/reference-dataset/{group_slug}/reference/{reference_slug}'
+        url = f'{dataworkspace_config["base_url"]}/{endpoint}'
+        return url
+
+
+class ExtractCountriesAndTerritoriesReferenceDataset(ReferenceDatasetExtractor):
+
+    group_slug = 'countries_and_territories_group_slug'
+    reference_slug = 'countries_and_territories_reference_slug'
+    schema = {
+        'columns': [
+            {'name': 'id', 'type': 'varchar(50)', 'source_name': 'ID'},
+            {'name': 'name', 'type': 'varchar(200)', 'source_name': 'Name'},
+            {'name': 'type', 'type': 'varchar(100)', 'source_name': 'Type'},
+            {'name': 'start_date', 'type': 'date', 'source_name': 'Start Date'},
+            {'name': 'end_date', 'type': 'date', 'source_name': 'End Date'},
+        ],
+        'primary_key': 'id',
+    }
+    stub_data = {
+        'headers': ['ID', 'Name', 'Type', 'Start Date', 'End Date'],
+        'values': [
+            ['AE-AZ', 'Abu Dhabi', 'Territory', None, None],
+            ['AF', 'Afghanistan', 'Country', None, None],
+            ['AO', 'Angola', 'Country', '1975-11-11', None],
+        ],
+    }
+    table_name = 'reference_countries_and_territories'
 
 
 class ExtractDatahubCompanyDataset(SourceDataExtractor):
@@ -286,6 +325,9 @@ def populate_table(data, schema, table_name, overwrite=True):
     return {'table': table_name, 'rows': n_rows, 'status': 200}
 
 
+extract_countries_and_territories_reference_dataset = (
+    ExtractCountriesAndTerritoriesReferenceDataset()
+)
 extract_datahub_company_dataset = ExtractDatahubCompanyDataset()
 extract_datahub_export_countries = ExtractDatahubExportCountries()
 extract_datahub_future_interest_countries = ExtractDatahubFutureInterestCountries()

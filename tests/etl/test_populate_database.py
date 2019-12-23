@@ -5,6 +5,7 @@ from app.db.db_utils import execute_query, execute_statement
 from app.etl.tasks.core import populate_database
 
 
+@patch('app.etl.tasks.core.extract_countries_and_territories_reference_dataset')
 @patch('app.etl.tasks.core.extract_datahub_company_dataset')
 @patch('app.etl.tasks.core.extract_datahub_export_countries')
 @patch('app.etl.tasks.core.extract_datahub_future_interest_countries')
@@ -32,9 +33,11 @@ class TestPopulateDatabase:
         extract_datahub_future_interest_countries,
         extract_datahub_export_countries,
         extract_datahub_company_dataset,
+        extract_countries_and_territories_reference_dataset,
     ):
         output = populate_database(drop_table=True)
 
+        extract_countries_and_territories_reference_dataset.assert_called_once()
         extract_datahub_company_dataset.assert_called_once()
         extract_datahub_export_countries.assert_called_once()
         extract_datahub_future_interest_countries.assert_called_once()
@@ -55,6 +58,7 @@ class TestPopulateDatabase:
 
         expected_output = {
             'output': [
+                extract_countries_and_territories_reference_dataset.return_value,
                 extract_datahub_company_dataset.return_value,
                 extract_datahub_export_countries.return_value,
                 extract_datahub_interactions.return_value,
@@ -86,6 +90,7 @@ class TestPopulateDatabase:
         extract_datahub_future_interest_countries,
         extract_datahub_export_countries,
         extract_datahub_company_dataset,
+        extract_countries_and_territories_reference,
         app_with_db,
     ):
         mock_datetime.datetime.now.return_value = datetime.datetime(2019, 1, 1, 2)
