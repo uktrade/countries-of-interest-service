@@ -1,7 +1,5 @@
 import os
 
-from authbroker_client import authbroker_blueprint
-
 from celery import Celery
 
 import certifi
@@ -13,6 +11,7 @@ import redis
 from sqlalchemy.engine.url import make_url
 
 from app import config
+from app.sso.register import register_sso_component
 
 
 def make_celery(flask_app):
@@ -79,9 +78,6 @@ def _create_base_app():
         }
     )
 
-    flask_app.config['ABC_BASE_URL'] = flask_app.config['sso']['host']
-    flask_app.config['ABC_CLIENT_ID'] = flask_app.config['sso']['abc_client_id']
-    flask_app.config['ABC_CLIENT_SECRET'] = flask_app.config['sso']['abc_client_secret']
     flask_app.secret_key = flask_app.config['app']['secret_key']
     from app.api.settings import CustomJSONEncoder
 
@@ -89,6 +85,7 @@ def _create_base_app():
     celery = make_celery(flask_app)
     flask_app.celery = celery
     flask_app = _register_components(flask_app)
+    flask_app = register_sso_component(flask_app, role_based=False)
     return flask_app
 
 
@@ -104,7 +101,6 @@ def _register_components(flask_app):
 
     # API
     flask_app.register_blueprint(api)
-    flask_app.register_blueprint(authbroker_blueprint)
 
     # Cache
     redis_uri = _get_redis_url(flask_app)
@@ -146,7 +142,3 @@ def _create_sql_alchemy_connection_str(cfg, db_name=None):
     if db_name:
         url.database = db_name
     return url
-
-
-app = get_or_create()
-celery_app = app.celery

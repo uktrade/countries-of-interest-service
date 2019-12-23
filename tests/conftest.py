@@ -5,6 +5,8 @@ import pytest
 import sqlalchemy_utils
 
 from app import application
+from app.db.db_utils import create_schemas
+
 
 pytest_plugins = [
     "tests.api.fixtures.add_to_db",
@@ -34,7 +36,7 @@ def app_with_db(app):
     app.db.session.close_all()
     app.db.engine.dispose()
     sqlalchemy_utils.create_database(app.config['SQLALCHEMY_DATABASE_URI'],)
-    app.db.create_all()
+    create_tables(app)
     yield app
     app.db.session.close()
     app.db.session.remove()
@@ -47,7 +49,7 @@ def app_with_db_module(app):
     app.db.session.close_all()
     app.db.engine.dispose()
     sqlalchemy_utils.create_database(app.config['SQLALCHEMY_DATABASE_URI'],)
-    app.db.create_all()
+    create_tables(app)
     yield app
     app.db.session.close()
     app.db.session.remove()
@@ -63,3 +65,8 @@ def _create_testing_db_name():
 def _create_current_time_str():
     now = datetime.datetime.now()
     return now.strftime('%Y%m%d_%H%M%S_%f')
+
+
+def create_tables(app):
+    create_schemas(app.db.engine)
+    app.db.create_all()

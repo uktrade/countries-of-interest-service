@@ -2,8 +2,6 @@ import datetime
 import logging
 from functools import wraps
 
-from authbroker_client import login_required
-
 from flask import current_app as flask_app, make_response
 from flask import jsonify, render_template, request
 from flask.blueprints import Blueprint
@@ -20,6 +18,7 @@ from app.api.utils import response_orientation_decorator, to_web_dict
 from app.db.db_utils import execute_query, execute_statement, table_exists
 from app.db.models import HawkUsers
 from app.reporting import data_report
+from app.sso.token import login_required
 
 api = Blueprint(name="api", import_name=__name__)
 ac = AccessControl()
@@ -463,6 +462,7 @@ def get_datahub_company_ids_to_companies_house_company_numbers():
 
 
 @api.route('/')
+@login_required
 def get_index():
     last_updated = None
     if table_exists('etl_runs'):

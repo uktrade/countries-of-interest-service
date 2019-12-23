@@ -87,15 +87,15 @@ class TestPopulateDatabase:
         populate_database_task.delay.assert_called_once()
 
 
-@pytest.mark.skip(reason="Need to fix mock login")
 class TestGetIndex:
     @pytest.fixture(autouse=True)
     def setup(self, app_with_db):
         self.app = app_with_db
 
-    @patch('app.api.views.login_required')
+    @patch('app.sso.token.is_authenticated')
     @patch('app.api.views.render_template')
-    def test_last_updated_passed_to_template(self, render_template, login_required):
+    def test_last_updated_passed_to_template(self, render_template, is_authenticated):
+        is_authenticated.return_value = True
         sql = 'create table if not exists ' 'etl_runs (timestamp timestamp)'
         execute_statement(sql)
         sql = 'insert into etl_runs values (%s)'
@@ -104,19 +104,25 @@ class TestGetIndex:
             ('2019-01-01 02:00',),
         ]
         execute_statement(sql, values)
-        with self.app.test_request_context():
-            get_index()
+        with self.app.test_client() as c:
+            with c.session_transaction() as sess:
+                sess['_authbroker_token'] = 'Test'
+                with self.app.test_request_context():
+                    get_index()
+        assert is_authenticated.called
         render_template.assert_called_once_with(
             'index.html', last_updated='2019-01-01 02:00:00',
         )
 
-    @patch('app.api.views.login_required')
+    @patch('app.sso.token.is_authenticated')
     @patch('app.api.views.render_template')
     def test_returns_message_if_there_are_no_prior_runs(
-        self, render_template, login_required
+        self, render_template, is_authenticated
     ):
+        is_authenticated.return_value = True
         with self.app.test_request_context():
             get_index()
+        assert is_authenticated.called
         render_template.assert_called_once_with(
             'index.html', last_updated='Database not yet initialised',
         )

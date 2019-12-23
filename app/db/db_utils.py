@@ -1,8 +1,11 @@
 import pandas as pd
 
 import sqlalchemy
+from sqlalchemy.schema import CreateSchema
 
 from app.db.models import sql_alchemy
+
+SCHEMAS = ['public', 'admin']
 
 
 def execute_query(query, data=None, df=True, raise_if_fail=False):
@@ -82,3 +85,13 @@ def insert_data(df, table_name):
             sql += ', ' if i != len(df) - 1 else ''
         sql += '\n\ton conflict do nothing'
         execute_statement(sql)
+
+
+def create_schemas(engine):
+    for schema_name in SCHEMAS:
+        _create_schema_if_not_exists(engine, schema_name)
+
+
+def _create_schema_if_not_exists(engine, schema_name):
+    if not engine.dialect.has_schema(engine, schema_name):
+        engine.execute(CreateSchema(schema_name))

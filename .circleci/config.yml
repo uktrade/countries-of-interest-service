@@ -86,7 +86,7 @@ job_defaults: &job_defaults
           . venv/bin/activate
           source ~/miniconda/bin/activate
           source activate countries-of-interest-service
-          make run_tests
+          make run_tests COV='--cov=. --cov-report=html'
 
     - when:
         condition: <<parameters.publish_coverage>>
@@ -94,6 +94,9 @@ job_defaults: &job_defaults
           - run:
               name: Publish coverage
               command: |
+                . venv/bin/activate
+                source ~/miniconda/bin/activate
+                source activate countries-of-interest-service
                 wget -O codecov.sh https://codecov.io/bash
                 bash ./codecov.sh -t ${COV_TOKEN}
 

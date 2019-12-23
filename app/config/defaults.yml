@@ -7,9 +7,13 @@ app:
   run_scheduler: $ENV{RUN_SCHEDULER, False}
   stub_source_data: $ENV{STUB_SOURCE_DATA, True}
 sso:
-  host: $ENV{ABC_BASE_URL, https://sso.trade.gov.uk}
-  abc_client_id: $ENV{ABC_CLIENT_ID, sso_client_id}
-  abc_client_secret: $ENV{ABC_CLIENT_SECRET, sso_client_secret}
+  base_url: $ENV{SSO_URL, https://sso.trade.gov.uk}
+  profile_path: $ENV{ACCESS_TOKEN_PATH, /api/v1/user/me/}
+  authorize_path: $ENV{AUTHORIZE_PATH, /o/authorize/}
+  access_token_path: $ENV{SSO_PATH_USER, /o/token/}
+  logout_path: $ENV{SSO_PATH_LOGOUT, /logout/}
+  client_id: $ENV{ABC_CLIENT_ID, sso_client_id}
+  client_secret: $ENV{ABC_CLIENT_SECRET, sso_client_secret}
 dataworkspace:
   base_url: $ENV{DATAWORKSPACE_BASE_URL, localapps.com:8000}
   hawk_client_id: $ENV{DATAWORKSPACE_HAWK_CLIENT_ID, dataworkspace_client_id}
@@ -41,6 +45,7 @@ access_control:
   hawk_accept_untrusted_content: $ENV{AC_HAWK_ACCEPT_UNTRUSTED_CONTENT, False}
   hawk_localtime_offset_in_seconds: $ENV{AC_HAWK_LOCALTIME_OFFSET_IN_SECONDS, 0}
   hawk_timestamp_skew_in_seconds: $ENV{AC_HAWK_TIMESTAMP_SKEW_IN_SECONDS, 60}
-
+session:
+  secret_key: $ENV{SESSION_SECRET_KEY, _authbroker_token}
 
 
