@@ -5,6 +5,8 @@ from flask import redirect, request, url_for
 
 from flask_oauthlib.client import OAuthException
 
+from werkzeug.exceptions import HTTPException
+
 from . import BaseSSOClient
 
 
@@ -32,6 +34,6 @@ def is_authenticated():
 
     try:
         flask_app.sso_client.get_profile()
-    except (URLError, OAuthException):
+    except (URLError, OAuthException, HTTPException):
         return False
     return True
