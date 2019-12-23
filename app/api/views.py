@@ -94,7 +94,7 @@ def get_companies_house_company_numbers():
         order by 1
     '''
     df = execute_query(sql_query)
-    return flask_app.make_response(to_web_dict(df))
+    return to_web_dict(df)
 
 
 @api.route('/api/v1/get-datahub-company-ids')
@@ -108,7 +108,7 @@ def get_datahub_company_ids():
         from coi_datahub_company_id_to_companies_house_company_number
     '''
     df = execute_query(sql_query)
-    return flask_app.make_response(to_web_dict(df))
+    return to_web_dict(df)
 
 
 @api.route('/api/v1/get-company-countries-and-sectors-of-interest')
@@ -197,7 +197,7 @@ def get_company_countries_and_sectors_of_interest(orientation):
         next_ = None
     web_dict = to_web_dict(df, orientation)
     web_dict['next'] = next_
-    return flask_app.make_response(web_dict)
+    return web_dict
 
 
 @api.route('/api/v1/get-company-countries-of-interest')
@@ -274,7 +274,7 @@ def get_company_countries_of_interest(orientation):
         next_ = None
     web_dict = to_web_dict(df, orientation)
     web_dict['next'] = next_
-    return flask_app.make_response(web_dict)
+    return web_dict
 
 
 @api.route('/api/v1/get-company-export-countries')
@@ -351,7 +351,7 @@ def get_company_export_countries(orientation):
         next_ = None
     web_dict = to_web_dict(df, orientation)
     web_dict['next'] = next_
-    return flask_app.make_response(web_dict)
+    return web_dict
 
 
 @api.route('/api/v1/get-company-sectors-of-interest')
@@ -429,7 +429,7 @@ def get_company_sectors_of_interest(orientation):
         next_ = None
     web_dict = to_web_dict(df, orientation)
     web_dict['next'] = next_
-    return flask_app.make_response(web_dict)
+    return web_dict
 
 
 @api.route('/data-report')
@@ -458,7 +458,7 @@ def get_datahub_company_ids_to_companies_house_company_numbers():
         from coi_datahub_company_id_to_companies_house_company_number
     '''
     df = execute_query(sql_query)
-    return flask_app.make_response(to_web_dict(df))
+    return to_web_dict(df)
 
 
 @api.route('/')
