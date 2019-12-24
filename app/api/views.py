@@ -403,20 +403,6 @@ def get_company_sectors_of_interest(orientation):
     return flask_app.make_response(web_dict)
 
 
-@api.route('/data-report')
-@login_required
-def get_data_report():
-    return render_template('data_report.html')
-
-
-@api.route('/api/v1/get-data-report-data')
-@json_error
-@ac.authentication_required
-@ac.authorization_required
-def get_data_report_data():
-    return flask_app.make_response(data_report.get_data_report_data())
-
-
 @api.route('/')
 @login_required
 def get_index():
