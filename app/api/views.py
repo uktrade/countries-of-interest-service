@@ -443,9 +443,7 @@ def get_data_report():
 @ac.authentication_required
 @ac.authorization_required
 def get_data_report_data():
-    return flask_app.make_response(
-        data_report.get_data_report_data()
-    )
+    return flask_app.make_response(data_report.get_data_report_data())
 
 
 @api.route('/api/v1/get-datahub-company-ids-to-companies-house-company-numbers')
