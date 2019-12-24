@@ -75,8 +75,6 @@ class AccessControl:
             if hawk_enabled:
                 receiver = self._auth_by_signature()
             response = view_func(*args, **kwargs)
-            if type(response) == type(dict):
-                response = current_app.make_response(response)
             if hawk_enabled and hawk_response_header:
                 response.headers['Server-Authorization'] = receiver.respond(
                     content=response.get_data(), content_type=response.mimetype
