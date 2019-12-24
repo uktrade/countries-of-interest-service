@@ -1,7 +1,9 @@
 import unittest
 import unittest.mock
 
-import utils
+import pandas as pd
+
+import app.api.utils as utils
 
 
 class TestToCamelCase(unittest.TestCase):
@@ -31,13 +33,13 @@ class TestToCamelCase(unittest.TestCase):
 
 
 class TestToWebDict(unittest.TestCase):
-    @unittest.mock.patch('utils.to_records_web_dict')
+    @unittest.mock.patch('app.api.utils.to_records_web_dict')
     def test_if_record_orientation(self, to_records_web_dict):
         df = unittest.mock.Mock()
         utils.to_web_dict(df, orient='records')
         to_records_web_dict.assert_called_once_with(df)
 
-    @unittest.mock.patch('utils.to_tabular_web_dict')
+    @unittest.mock.patch('app.api.utils.to_tabular_web_dict')
     def test_if_tabular_orientation(self, to_tabular_web_dict):
         df = unittest.mock.Mock()
         utils.to_web_dict(df, orient='tabular')
@@ -51,14 +53,27 @@ class TestToWebDict(unittest.TestCase):
 
 class TestToRecordsWebDict(unittest.TestCase):
     def test(self):
-        df = unittest.mock.Mock()
+        df = pd.DataFrame([[0, 1, 2], [3, 4, 5]], columns=['col_1', 'col_2', 'col_3'])
         output = utils.to_records_web_dict(df)
-        df.to_dict.assert_called_once_with(orient='records')
-        self.assertEqual(output, {'results': df.to_dict.return_value})
+        expected = {
+            'results': [
+                {
+                    'col1': 0,
+                    'col2': 1,
+                    'col3': 2,
+                },
+                {
+                    'col1': 3,
+                    'col2': 4,
+                    'col3': 5,
+                }
+            ]
+        }
+        self.assertEqual(output, expected)
 
 
 class TestToTabularWebDict(unittest.TestCase):
-    @unittest.mock.patch('utils.to_camel_case')
+    @unittest.mock.patch('app.api.utils.to_camel_case')
     def test(self, to_camel_case):
         df = unittest.mock.Mock(columns=['a', 'b', 'c'])
         df.values.tolist.return_value = [[0, 1, 2], [3, 4, 5]]
@@ -69,7 +84,7 @@ class TestToTabularWebDict(unittest.TestCase):
         }
         self.assertEqual(output, expected)
 
-    @unittest.mock.patch('utils.to_camel_case')
+    @unittest.mock.patch('app.api.utils.to_camel_case')
     def test_when_dataframe_has_only_one_column_make_values_a_list_not_of_list_of_lists(
         self, to_camel_case
     ):
@@ -84,7 +99,7 @@ class TestToTabularWebDict(unittest.TestCase):
 
 
 class TestResponseOrientationDecorator(unittest.TestCase):
-    @unittest.mock.patch('utils.request')
+    @unittest.mock.patch('app.api.utils.request')
     def test(self, request):
         request.args.get.return_value = 'your orientation'
         view = unittest.mock.Mock(__name__='asdf')
