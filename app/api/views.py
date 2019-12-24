@@ -443,7 +443,7 @@ def get_data_report():
 @ac.authentication_required
 @ac.authorization_required
 def get_data_report_data():
-    return data_report.get_data_report_data()
+    return flask_app.make_response(data_report.get_data_report_data())
 
 
 @api.route('/api/v1/get-datahub-company-ids-to-companies-house-company-numbers')
@@ -515,10 +515,11 @@ def populate_database():
         return {'status': 200, 'message': 'started populate_database task'}
     else:
         timestamp = df['timestamp'].values[0]
-        return {
+        response = {
             'status': 200,
             'message': f"populate_database task already running since: {timestamp}",
         }
+        return flask_app.make_response(response)
 
 
 @api.route('/healthcheck/', methods=["GET"])
