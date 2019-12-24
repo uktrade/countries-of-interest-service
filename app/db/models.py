@@ -14,9 +14,11 @@ _col = db.Column
 _text = db.Text
 _int = db.Integer
 _dt = db.DateTime
+_bigint = _sa.BigInteger
 _bool = db.Boolean
 _num = db.Numeric
 _array = _sa.ARRAY
+_date = _sa.Date
 
 
 class BaseModel(db.Model):
@@ -149,3 +151,16 @@ class SectorsOfInterest(BaseModel):
     timestamp = _col(_dt)
 
     __table_args__ = (PrimaryKeyConstraint(source, source_id),)
+
+
+class DITCountryTerritoryRegister(BaseModel):
+    __tablename__ = 'dit_country_territory_register'
+    __table_args__ = {'schema': 'public'}
+
+    id = _col(_int, primary_key=True)
+    key = _col(_text)
+    start_date = _col(_date)
+    end_date = _col(_date)
+    name = _col(_text)
+    official_name = _col(_text)
+    type = _col(_text)

@@ -3,6 +3,7 @@ import pytest
 from app.db.models import (
     CountriesAndSectorsOfInterest,
     CountriesOfInterest,
+    DITCountryTerritoryRegister,
     DatahubCompanyIDToCompaniesHouseCompanyNumber,
     ExportCountries,
     SectorsOfInterest,
@@ -94,6 +95,25 @@ def add_sectors_of_interest(app_with_db_module):
                 source=record.get('source', None),
                 source_id=record.get('source_id', None),
                 defaults=defaults,
+            )
+
+    return _method
+
+
+@pytest.fixture(scope='module')
+def add_country_territory_registry(app_with_db_module):
+    def _method(records):
+        for record in records:
+            defaults = {
+                'key': record.get('key', None),
+                'start_date': record.get('start_date', None),
+                'end_date': record.get('end_date', None),
+                'name': record.get('name', None),
+                'official_name': record.get('official_name', None),
+                'type': record.get('type', None),
+            }
+            DITCountryTerritoryRegister.get_or_create(
+                id=record.get('id', None), defaults=defaults,
             )
 
     return _method
