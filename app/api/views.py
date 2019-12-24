@@ -82,35 +82,6 @@ def json_error(f):
 
 
 # views
-@api.route('/api/v1/get-companies-house-company-numbers')
-@json_error
-@ac.authentication_required
-@ac.authorization_required
-def get_companies_house_company_numbers():
-    sql_query = '''
-        select distinct
-          companies_house_company_number
-        from coi_datahub_company_id_to_companies_house_company_number
-        order by 1
-    '''
-    df = execute_query(sql_query)
-    return flask_app.make_response(to_web_dict(df))
-
-
-@api.route('/api/v1/get-datahub-company-ids')
-@json_error
-@ac.authentication_required
-@ac.authorization_required
-def get_datahub_company_ids():
-    sql_query = '''
-        select distinct
-            datahub_company_id
-        from coi_datahub_company_id_to_companies_house_company_number
-    '''
-    df = execute_query(sql_query)
-    return flask_app.make_response(to_web_dict(df))
-
-
 @api.route('/api/v1/get-company-countries-and-sectors-of-interest')
 @json_error
 @response_orientation_decorator
@@ -446,21 +417,6 @@ def get_data_report_data():
     return flask_app.make_response(data_report.get_data_report_data())
 
 
-@api.route('/api/v1/get-datahub-company-ids-to-companies-house-company-numbers')
-@json_error
-@ac.authentication_required
-@ac.authorization_required
-def get_datahub_company_ids_to_companies_house_company_numbers():
-    sql_query = '''
-        select
-            datahub_company_id,
-            companies_house_company_number
-        from coi_datahub_company_id_to_companies_house_company_number
-    '''
-    df = execute_query(sql_query)
-    return flask_app.make_response(to_web_dict(df))
-
-
 @api.route('/')
 @login_required
 def get_index():
@@ -474,21 +430,6 @@ def get_index():
     else:
         last_updated = last_updated.strftime('%Y-%m-%d %H:%M:%S')
     return render_template('index.html', last_updated=last_updated)
-
-
-@api.route('/api/v1/get-sectors')
-@json_error
-@ac.authentication_required
-@ac.authorization_required
-def get_sectors():
-    sql_query = '''
-        select distinct
-          sector
-        from datahub_sector
-        order by 1
-    '''
-    df = execute_query(sql_query)
-    return to_web_dict(df)
 
 
 @api.route('/api/v1/populate-database')
