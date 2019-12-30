@@ -1,7 +1,7 @@
 import numpy as np
 
 from app.db.db_utils import execute_query, execute_statement
-from app.etl.tasks.core.countries_and_sectors_of_interest import Task
+from app.etl.tasks.countries_and_sectors_of_interest import Task
 
 
 class TestCountriesAndSectorsOfInterest:

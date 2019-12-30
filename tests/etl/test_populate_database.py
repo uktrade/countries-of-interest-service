@@ -2,23 +2,23 @@ import datetime
 from unittest.mock import patch
 
 from app.db.db_utils import execute_query, execute_statement
-from app.etl.tasks.core import populate_database
+from app.etl.tasks import populate_database
 
 
-@patch('app.etl.tasks.core.extract_countries_and_territories_reference_dataset')
-@patch('app.etl.tasks.core.extract_datahub_company_dataset')
-@patch('app.etl.tasks.core.extract_datahub_export_countries')
-@patch('app.etl.tasks.core.extract_datahub_future_interest_countries')
-@patch('app.etl.tasks.core.extract_datahub_interactions')
-@patch('app.etl.tasks.core.extract_datahub_omis')
-# @patch('app.etl.tasks.core.extract_datahub_sectors')
-# @patch('app.etl.tasks.core.extract_export_wins')
-@patch('app.etl.tasks.core.ExportCountriesTask')
-@patch('app.etl.tasks.core.PopulateCountriesAndSectorsOfInterestTask')
-@patch('app.etl.tasks.core.PopulateCountriesOfInterestTask')
-@patch('app.etl.tasks.core.SectorsOfInterestTask')
+@patch('app.etl.tasks.extract_countries_and_territories_reference_dataset')
+@patch('app.etl.tasks.extract_datahub_company_dataset')
+@patch('app.etl.tasks.extract_datahub_export_countries')
+@patch('app.etl.tasks.extract_datahub_future_interest_countries')
+@patch('app.etl.tasks.extract_datahub_interactions')
+@patch('app.etl.tasks.extract_datahub_omis')
+# @patch('app.etl.tasks.extract_datahub_sectors')
+# @patch('app.etl.tasks.extract_export_wins')
+@patch('app.etl.tasks.ExportCountriesTask')
+@patch('app.etl.tasks.PopulateCountriesAndSectorsOfInterestTask')
+@patch('app.etl.tasks.PopulateCountriesOfInterestTask')
+@patch('app.etl.tasks.SectorsOfInterestTask')
 class TestPopulateDatabase:
-    @patch('app.etl.tasks.core.execute_statement')
+    @patch('app.etl.tasks.execute_statement')
     def test_tasks_are_run(
         self,
         execute_statement,
@@ -75,7 +75,7 @@ class TestPopulateDatabase:
 
         assert output == expected_output
 
-    @patch('app.etl.tasks.core.datetime')
+    @patch('app.etl.tasks.datetime')
     def test_updates_task_status_to_success(
         self,
         mock_datetime,

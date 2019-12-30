@@ -1,5 +1,5 @@
 from app.db.db_utils import execute_query, execute_statement
-from app.etl.tasks.core.export_countries import Task
+from app.etl.tasks.export_countries import Task
 
 
 class TestExportCountries:

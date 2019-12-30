@@ -4,8 +4,8 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-import app.etl.tasks.core.source_data_extraction
-import app.etl.tasks.core.source_data_extraction as source_data_extraction
+import app.etl.tasks.source_data_extraction
+import app.etl.tasks.source_data_extraction as source_data_extraction
 from app.db.db_utils import execute_statement
 
 
@@ -22,7 +22,7 @@ class SourceDataExtractBaseTestCase:
             'hawk_client_key': 'hawk_client_key',
         }
 
-    @patch('app.etl.tasks.core.source_data_extraction.current_app')
+    @patch('app.etl.tasks.source_data_extraction.current_app')
     def test_stub_data(self, current_app, app_with_db):
         current_app.config = {'app': {'stub_source_data': True}}
         self.extractor.__call__()
@@ -30,8 +30,8 @@ class SourceDataExtractBaseTestCase:
         status = execute_statement(sql, raise_if_fail=True)
         assert int(status.rowcount) > 0
 
-    @patch('app.etl.tasks.core.source_data_extraction.requests')
-    @patch('app.etl.tasks.core.source_data_extraction.current_app')
+    @patch('app.etl.tasks.source_data_extraction.requests')
+    @patch('app.etl.tasks.source_data_extraction.current_app')
     def test_data(self, current_app, requests, app_with_db):
         current_app.config = {
             'app': {'stub_source_data': False},
@@ -256,7 +256,7 @@ class TestExtractDatahubOmis(SourceDataExtractBaseTestCase):
     }
     source_table_id_config_key = 'datahub_omis_source_table_id'
     table_name = 'datahub_omis'
-    extractor = app.etl.tasks.core.source_data_extraction.extract_datahub_omis
+    extractor = app.etl.tasks.source_data_extraction.extract_datahub_omis
 
 
 class TestExtractDatahubSectors(SourceDataExtractBaseTestCase):
@@ -276,7 +276,7 @@ class TestExtractDatahubSectors(SourceDataExtractBaseTestCase):
     }
     source_table_id_config_key = 'datahub_sectors_source_table_id'
     table_name = 'datahub_sectors'
-    extractor = app.etl.tasks.core.source_data_extraction.extract_datahub_sectors
+    extractor = app.etl.tasks.source_data_extraction.extract_datahub_sectors
 
 
 class TestExtractExportWins(SourceDataExtractBaseTestCase):
@@ -296,11 +296,11 @@ class TestExtractExportWins(SourceDataExtractBaseTestCase):
     }
     source_table_id_config_key = 'export_wins_source_table_id'
     table_name = 'export_wins'
-    extractor = app.etl.tasks.core.source_data_extraction.extract_export_wins
+    extractor = app.etl.tasks.source_data_extraction.extract_export_wins
 
 
 class TestGetHawkHeaders:
-    @patch('app.etl.tasks.core.source_data_extraction.mohawk')
+    @patch('app.etl.tasks.source_data_extraction.mohawk')
     def test_if_https_is_false_change_url_to_http(self, mohawk):
         url = 'https://something'
         client_id = 'client_id'
@@ -330,7 +330,7 @@ class TestPopulateTable:
         self.url = 'some_url'
         self.stub_data = {'headers': ['a', 'b'], 'values': [(0, 0), (1, 1)]}
 
-    @patch('app.etl.tasks.core.source_data_extraction.sql_alchemy')
+    @patch('app.etl.tasks.source_data_extraction.sql_alchemy')
     def test_rollback_when_there_is_an_error(self, mock_alchemy, app_with_db):
         connection = Mock()
         transaction = Mock()
