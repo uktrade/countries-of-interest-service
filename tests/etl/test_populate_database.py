@@ -47,7 +47,7 @@ class TestPopulateDatabase:
         extract_datahub_omis.assert_called_once()
         # extract_datahub_sectors.assert_called_once()
         # extract_export_wins.assert_called_once()
-        PopulateStandardisedCountriesTask.assert_called_once_with(drop_table=True)
+        PopulateStandardisedCountriesTask.assert_called_once_with()
         PopulateStandardisedCountriesTask.return_value.assert_called_once()
         ExportCountriesTask.assert_called_once_with(drop_table=True)
         ExportCountriesTask.return_value.assert_called_once()

@@ -144,6 +144,7 @@ def get_company_countries_and_sectors_of_interest(orientation):
         select
           company_id,
           country_of_interest,
+          standardised_country,
           sector_of_interest,
           source,
           source_id,

@@ -41,7 +41,7 @@ def create_standardised_interested_exported_country_table(
     tsv_lines = []
     output_row_count = 1
     for country in countries:
-        mappings = _standardize_country(country, choices, lower_choices)
+        mappings = _standardise_country(country, choices, lower_choices)
         for standardised_country, similarity in mappings:
             line = [
                 str(output_row_count),
@@ -79,7 +79,7 @@ replacements = {
 }
 
 
-def _standardize_country(country, choices, lower_choices):
+def _standardise_country(country, choices, lower_choices):
     lower_value = country.lower()
     # ignore regions
     for region in regions:

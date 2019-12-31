@@ -1,12 +1,11 @@
-import app.db.models as db
 import app.algorithm.country_standardisation.sql_statements as country_standardisation
+import app.db.models as db
+from app.db.db_utils import drop_table
 
 
 class PopulateStandardisedCountriesTask:
-    def __call__(drop_table=True):
-        if drop_table is True:
-            # todo
-            pass
+    def __call__(self):
+        drop_table(db.StandardisedCountries.__tablename__)
         countries = country_standardisation.extract_interested_exported_countries()
         country_standardisation.create_standardised_interested_exported_country_table(
             countries,

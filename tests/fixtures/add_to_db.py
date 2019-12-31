@@ -3,14 +3,15 @@ import pytest
 from app.db.models import (
     CountriesAndSectorsOfInterest,
     CountriesOfInterest,
+    DITCountryTerritoryRegister,
     DatahubCompanyIDToCompaniesHouseCompanyNumber,
     DatahubExportToCountries,
     DatahubFutureInterestCountries,
     DatahubOmis,
-    DITCountryTerritoryRegister,
     ExportCountries,
     ExportWins,
     SectorsOfInterest,
+    StandardisedCountries,
 )
 
 
@@ -38,6 +39,7 @@ def add_countries_and_sectors_of_interest(app_with_db_module):
             defaults = {
                 'company_id': record.get('company_id', None),
                 'country_of_interest': record.get('country_of_interest', None),
+                'standardised_country': record.get('standardised_country', None),
                 'sector_of_interest': record.get('sector_of_interest', None),
                 'timestamp': record.get('timestamp', None),
             }
@@ -157,11 +159,10 @@ def add_country_territory_registry(app_with_db_module):
     def _method(records):
         for record in records:
             defaults = {
-                'key': record.get('key', None),
-                'start_date': record.get('start_date', None),
                 'end_date': record.get('end_date', None),
+                'id': record.get('id', None),
                 'name': record.get('name', None),
-                'official_name': record.get('official_name', None),
+                'start_date': record.get('start_date', None),
                 'type': record.get('type', None),
             }
             DITCountryTerritoryRegister.get_or_create(
@@ -182,5 +183,22 @@ def add_export_wins(app_with_db_module):
                 'timestamp': record.get('timestamp', None),
             }
             ExportWins.get_or_create(id=record.get('id', None), defaults=defaults)
+
+    return _method
+
+
+@pytest.fixture(scope='module')
+def add_standardised_countries(app_with_db_module):
+    def _method(records):
+        for record in records:
+            defaults = {
+                'id': record.get('id', None),
+                'country': record.get('country', None),
+                'standardised_country': record.get('standardised_country', None),
+                'similarity': record.get('similarity', None),
+            }
+            StandardisedCountries.get_or_create(
+                id=record.get('id', None), defaults=defaults
+            )
 
     return _method

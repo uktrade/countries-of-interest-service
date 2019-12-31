@@ -5,7 +5,7 @@ from app.etl.tasks.export_countries import Task
 class TestExportCountries:
     def test(self, app_with_db):
         sql = (
-            'create table datahub_export_countries '
+            'create table if not exists datahub_export_countries '
             '(company_id uuid, country_iso_alpha2_code varchar(2), id int)'
         )
         execute_statement(sql)

@@ -11,6 +11,7 @@ def setup_function(app, add_countries_and_sectors_of_interest):
             {
                 'company_id': '1',
                 'country_of_interest': 'country1',
+                'standardised_country': 'country1',
                 'sector_of_interest': 'sector1',
                 'source': 'source1',
                 'source_id': 'source_id',
@@ -33,6 +34,7 @@ def test_get_company_countries_and_sectors_of_interest(app):
                     'headers': [
                         'companyId',
                         'countryOfInterest',
+                        'standardisedCountry',
                         'sectorOfInterest',
                         'source',
                         'sourceId',
@@ -42,6 +44,7 @@ def test_get_company_countries_and_sectors_of_interest(app):
                     'values': [
                         [
                             '1',
+                            'country1',
                             'country1',
                             'sector1',
                             'source1',
