@@ -94,8 +94,8 @@ def test_country_mapping(
     mapper.standardise_countries()
 
     expected_rows = [
-        (1, 'Andorra', 'Andorra', 100),
-        (2, 'afganistan', 'Afghanistan', 91),
+        (1, 'afganistan', 'Afghanistan', 91),
+        (2, 'Andorra', 'Andorra', 100),
         (3, 'uae', 'United Arab Emirates', 100),
         (4, 'unknown', 'Angola', 27),
         (5, 'usa', 'United States', 100),

@@ -12,6 +12,7 @@ from app.utils import log
 @log('Step 1/2 - extract all market interested/exported country sources')
 def extract_interested_exported_countries():
     stmt = f"""
+    with countries as (
     select distinct country from (
     select trim(country_iso_alpha2_code) as country from datahub_export_countries
     union
@@ -21,7 +22,10 @@ def extract_interested_exported_countries():
     select trim(market) as country from datahub_omis
     union
     select trim(country) as country from export_wins
-    ) u where country is not null order by country
+    ) u where country is not null
+    )
+
+    select country from countries order by LOWER(country)
     """
     rows = db_utils.execute_query(stmt, df=False)
     countries = [row[0] for row in rows]

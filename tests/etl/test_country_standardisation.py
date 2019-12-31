@@ -79,9 +79,9 @@ def test(
     assert standardised_countries[1].standardised_country == 'United Kingdom'
 
     assert standardised_countries[2].id == 3
-    assert standardised_countries[2].country == 'UK'
-    assert standardised_countries[2].standardised_country == 'United Kingdom'
+    assert standardised_countries[2].country == 'uae'
+    assert standardised_countries[2].standardised_country == 'United Arab Emirates'
 
     assert standardised_countries[3].id == 4
-    assert standardised_countries[3].country == 'uae'
-    assert standardised_countries[3].standardised_country == 'United Arab Emirates'
+    assert standardised_countries[3].country == 'UK'
+    assert standardised_countries[3].standardised_country == 'United Kingdom'
