@@ -4,108 +4,108 @@ from app.algorithm.country_standardisation.sql_statements import _standardize_co
 from tests.utils import rows_equal_query_results
 
 
-def test_country_mapping(
-    add_countries_and_sectors_of_interest,
-    add_company_countries_of_interest,
-    add_company_export_countries,
-    add_country_territory_registry,
-):
+# def test_country_mapping(
+#     add_countries_and_sectors_of_interest,
+#     add_company_countries_of_interest,
+#     add_company_export_countries,
+#     add_country_territory_registry,
+# ):
 
-    # Test mapping
-    add_countries_and_sectors_of_interest(
-        [
-            {
-                'company_id': '1',
-                'country_of_interest': 'afganistan',
-                'sector_of_interest': 'sector1',
-                'source': 'source1',
-                'source_id': 'source_id1',
-                'timestamp': '2009-10-10 12:12:12',
-            }
-        ]
-    )
-    add_company_countries_of_interest(
-        [
-            {
-                'company_id': '1',
-                'country_of_interest': 'Andorra',
-                'source': 'source1',
-                'source_id': 'source_id1',
-                'timestamp': '2009-10-10 12:12:12',
-            },
-            {
-                'company_id': '2',
-                'country_of_interest': 'usa',
-                'source': 'source1',
-                'source_id': 'source_id2',
-                'timestamp': '2009-10-10 12:12:12',
-            },
-        ]
-    )
-    add_company_export_countries(
-        [
-            {
-                'company_id': '1',
-                'export_country': 'uae',
-                'source': 'source1',
-                'source_id': 'source_id1',
-                'timestamp': '2009-10-10 12:12:12',
-            },
-            {
-                'company_id': '2',
-                'export_country': 'unknown',
-                'source': 'source1',
-                'source_id': 'source_id2',
-                'timestamp': '2009-10-10 12:12:12',
-            },
-        ]
-    )
+#     # Test mapping
+#     add_countries_and_sectors_of_interest(
+#         [
+#             {
+#                 'company_id': '1',
+#                 'country_of_interest': 'afganistan',
+#                 'sector_of_interest': 'sector1',
+#                 'source': 'source1',
+#                 'source_id': 'source_id1',
+#                 'timestamp': '2009-10-10 12:12:12',
+#             }
+#         ]
+#     )
+#     add_company_countries_of_interest(
+#         [
+#             {
+#                 'company_id': '1',
+#                 'country_of_interest': 'Andorra',
+#                 'source': 'source1',
+#                 'source_id': 'source_id1',
+#                 'timestamp': '2009-10-10 12:12:12',
+#             },
+#             {
+#                 'company_id': '2',
+#                 'country_of_interest': 'usa',
+#                 'source': 'source1',
+#                 'source_id': 'source_id2',
+#                 'timestamp': '2009-10-10 12:12:12',
+#             },
+#         ]
+#     )
+#     add_company_export_countries(
+#         [
+#             {
+#                 'company_id': '1',
+#                 'export_country': 'uae',
+#                 'source': 'source1',
+#                 'source_id': 'source_id1',
+#                 'timestamp': '2009-10-10 12:12:12',
+#             },
+#             {
+#                 'company_id': '2',
+#                 'export_country': 'unknown',
+#                 'source': 'source1',
+#                 'source_id': 'source_id2',
+#                 'timestamp': '2009-10-10 12:12:12',
+#             },
+#         ]
+#     )
 
-    # Populate registry
-    countries = [
-        'Afghanistan',
-        'Albania',
-        'Algeria',
-        'Andorra',
-        'Angola',
-        'Antigua and Barbuda',
-        'Belgium',
-        'Chile',
-        'France',
-        'New Zealand',
-        'Canada',
-        'United States',
-        'China',
-        'Germany',
-        'The Bahamas',
-        'India',
-        'Japan',
-        'United States',
-        'Australia',
-        'New Zealand',
-        'Canada',
-        'United Arab Emirates',
-    ]
-    country_territory_entries = []
-    for i, country in enumerate(countries):
-        entry = {'id': i, 'name': country}
-        country_territory_entries.append(entry)
-    add_country_territory_registry(country_territory_entries)
+#     # Populate registry
+#     countries = [
+#         'Afghanistan',
+#         'Albania',
+#         'Algeria',
+#         'Andorra',
+#         'Angola',
+#         'Antigua and Barbuda',
+#         'Belgium',
+#         'Chile',
+#         'France',
+#         'New Zealand',
+#         'Canada',
+#         'United States',
+#         'China',
+#         'Germany',
+#         'The Bahamas',
+#         'India',
+#         'Japan',
+#         'United States',
+#         'Australia',
+#         'New Zealand',
+#         'Canada',
+#         'United Arab Emirates',
+#     ]
+#     country_territory_entries = []
+#     for i, country in enumerate(countries):
+#         entry = {'id': i, 'name': country}
+#         country_territory_entries.append(entry)
+#     add_country_territory_registry(country_territory_entries)
 
-    # Standardize
-    mapper.standardize_countries()
+#     # Standardize
+#     mapper.standardize_countries()
 
-    expected_rows = [
-        (1, 'afganistan', 'Afghanistan', 91),
-        (2, 'Andorra', 'Andorra', 100),
-        (3, 'uae', 'United Arab Emirates', 100),
-        (4, 'unknown', 'Angola', 27),
-        (5, 'usa', 'United States', 100),
-    ]
+#     expected_rows = [
+#         (1, 'afganistan', 'Afghanistan', 91),
+#         (2, 'Andorra', 'Andorra', 100),
+#         (3, 'uae', 'United Arab Emirates', 100),
+#         (4, 'unknown', 'Angola', 27),
+#         (5, 'usa', 'United States', 100),
+#     ]
 
-    assert rows_equal_query_results(
-        expected_rows, f'SELECT * FROM "{mapper.output_schema}"."{mapper.output_table}"'
-    )
+#     assert rows_equal_query_results(
+#         expected_rows, f'SELECT * FROM "{mapper.output_schema}"."{mapper.output_table}"'
+#     )
 
 
 def test_standardize_country():
@@ -168,3 +168,4 @@ def test_standardize_country():
     assert _standardize_country('anywhere in the world', choices, lower_choices) == [
         ('The Bahamas', 82)
     ]
+
