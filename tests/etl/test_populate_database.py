@@ -13,6 +13,7 @@ from app.etl.tasks import populate_database
 @patch('app.etl.tasks.extract_datahub_omis')
 # @patch('app.etl.tasks.extract_datahub_sectors')
 # @patch('app.etl.tasks.extract_export_wins')
+@patch('app.etl.tasks.PopulateStandardisedCountriesTask')
 @patch('app.etl.tasks.ExportCountriesTask')
 @patch('app.etl.tasks.PopulateCountriesAndSectorsOfInterestTask')
 @patch('app.etl.tasks.PopulateCountriesOfInterestTask')
@@ -26,6 +27,7 @@ class TestPopulateDatabase:
         PopulateCountriesOfInterestTask,
         PopulateCountriesAndSectorsOfInterestTask,
         ExportCountriesTask,
+            PopulateStandardisedCountriesTask,
         # extract_export_wins,
         # extract_datahub_sectors,
         extract_datahub_omis,
@@ -45,6 +47,8 @@ class TestPopulateDatabase:
         extract_datahub_omis.assert_called_once()
         # extract_datahub_sectors.assert_called_once()
         # extract_export_wins.assert_called_once()
+        PopulateStandardisedCountriesTask.assert_called_once_with(drop_table=True)
+        PopulateStandardisedCountriesTask.return_value.assert_called_once()
         ExportCountriesTask.assert_called_once_with(drop_table=True)
         ExportCountriesTask.return_value.assert_called_once()
         PopulateCountriesAndSectorsOfInterestTask.assert_called_once_with(
@@ -66,6 +70,7 @@ class TestPopulateDatabase:
                 extract_datahub_omis.return_value,
                 # extract_datahub_sectors.return_value,
                 # extract_export_wins.return_value,
+                PopulateStandardisedCountriesTask.return_value.return_value,
                 ExportCountriesTask.return_value.return_value,
                 (PopulateCountriesAndSectorsOfInterestTask.return_value.return_value),
                 PopulateCountriesOfInterestTask.return_value.return_value,
@@ -83,6 +88,7 @@ class TestPopulateDatabase:
         PopulateCountriesOfInterestTask,
         PopulateCountriesAndSectorsOfInterestTask,
         ExportCountriesTask,
+            PopulateStandardisedCountries,
         # extract_export_wins,
         # extract_datahub_sectors,
         extract_datahub_omis,
@@ -91,7 +97,7 @@ class TestPopulateDatabase:
         extract_datahub_export_countries,
         extract_datahub_company_dataset,
         extract_countries_and_territories_reference,
-        app_with_db,
+            app_with_db,
     ):
         mock_datetime.datetime.now.return_value = datetime.datetime(2019, 1, 1, 2)
         sql = (
