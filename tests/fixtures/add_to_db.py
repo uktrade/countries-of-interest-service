@@ -3,9 +3,13 @@ import pytest
 from app.db.models import (
     CountriesAndSectorsOfInterest,
     CountriesOfInterest,
-    DITCountryTerritoryRegister,
     DatahubCompanyIDToCompaniesHouseCompanyNumber,
+    DatahubExportToCountries,
+    DatahubFutureInterestCountries,
+    DatahubOmis,
+    DITCountryTerritoryRegister,
     ExportCountries,
+    ExportWins,
     SectorsOfInterest,
 )
 
@@ -101,6 +105,56 @@ def add_sectors_of_interest(app_with_db_module):
 
 
 @pytest.fixture(scope='module')
+def add_datahub_export_to_countries(app_with_db_module):
+    def _method(records):
+        for record in records:
+            defaults = {
+                'company_id': record.get('company_id', None),
+                'country_iso_alpha2_code': record.get('country_iso_alpha2_code', None),
+                'id': record.get('id', None)
+            }
+            DatahubExportToCountries.get_or_create(
+                id=record.get('id', None), defaults=defaults
+            )
+            
+    return _method
+
+
+@pytest.fixture(scope='module')
+def add_datahub_future_interest_countries(app_with_db_module):
+    def _method(records):
+        for record in records:
+            defaults = {
+                'company_id': record.get('company_id', None),
+                'country_iso_alpha2_code': record.get('country_iso_alpha2_code', None),
+                'id': record.get('id', None)
+            }
+            DatahubFutureInterestCountries.get_or_create(
+                id=record.get('id', None), defaults=defaults
+            )
+            
+    return _method
+
+
+@pytest.fixture(scope='module')
+def add_datahub_omis(app_with_db_module):
+    def _method(records):
+        for record in records:
+            defaults = {
+                'company_id': record.get('company_id', None),
+                'created_date': record.get('created_date', None),
+                'id': record.get('id', None),
+                'market': record.get('market', None),
+                'sector': record.get('sector', None),
+            }
+            DatahubOmis.get_or_create(
+                id=record.get('id', None), defaults=defaults
+            )
+            
+    return _method
+
+
+@pytest.fixture(scope='module')
 def add_country_territory_registry(app_with_db_module):
     def _method(records):
         for record in records:
@@ -116,4 +170,21 @@ def add_country_territory_registry(app_with_db_module):
                 id=record.get('id', None), defaults=defaults,
             )
 
+    return _method
+
+
+@pytest.fixture(scope='module')
+def add_export_wins(app_with_db_module):
+    def _method(records):
+        for record in records:
+            defaults = {
+                'company_id': record.get('company_id', None),
+                'country': record.get('country', None),
+                'id': record.get('id', None),
+                'timestamp': record.get('timestamp', None),
+            }
+            ExportWins.get_or_create(
+                id=record.get('id', None), defaults=defaults
+            )
+            
     return _method

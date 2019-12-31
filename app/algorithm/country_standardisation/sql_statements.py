@@ -12,22 +12,23 @@ from app.utils import log
 @log('Step 1/2 - extract all market interested/exported country sources')
 def extract_interested_exported_countries():
     stmt = f"""
-    SELECT distinct country FROM (
-        SELECT trim(country_of_interest) as country
-            from coi_countries_and_sectors_of_interest
-                UNION
-        SELECT trim(country_of_interest) as country from coi_countries_of_interest
-                UNION
-        SELECT trim(export_country) as country from coi_export_countries
-    ) u WHERE country IS NOT NULL ORDER BY country
+    select distinct country from (
+    select trim(country_iso_alpha2_code) as country from datahub_export_countries
+    union
+    select trim(country_iso_alpha2_code) as country from datahub_future_interest_countries
+    union
+    select trim(market) as country from datahub_omis
+    union
+    select trim(country) as country from export_wins
+    ) u where country is not null order by country
     """
     rows = db_utils.execute_query(stmt, df=False)
     countries = [row[0] for row in rows]
     return countries
 
 
-@log('Step 2/2 - create standardized country table')
-def create_standardized_interested_exported_country_table(
+@log('Step 2/2 - create standardised country table')
+def create_standardised_interested_exported_country_table(
     countries, output_schema, output_table
 ):
     stmt = f"""
@@ -36,16 +37,16 @@ def create_standardized_interested_exported_country_table(
     result = db_utils.execute_query(stmt, df=False)
     choices = [r[0] for r in result]
     lower_choices = [choice.lower() for choice in choices]
-    columns = ['id', 'country', 'standardized_country', 'similarity']
+    columns = ['id', 'country', 'standardised_country', 'similarity']
     tsv_lines = []
     output_row_count = 1
     for country in countries:
         mappings = _standardize_country(country, choices, lower_choices)
-        for standardized_country, similarity in mappings:
+        for standardised_country, similarity in mappings:
             line = [
                 str(output_row_count),
                 country,
-                standardized_country or '',
+                standardised_country or '',
                 str(similarity),
             ]
             tsv_lines.append('\t'.join(line) + '\n')
@@ -129,7 +130,7 @@ def _create_output_table(output_schema, output_table, drop=False):
     CREATE TABLE IF NOT EXISTS "{output_schema}"."{output_table}" (
         id INT PRIMARY KEY,
         country TEXT,
-        standardized_country TEXT,
+        standardised_country TEXT,
         similarity INT
     );
     """

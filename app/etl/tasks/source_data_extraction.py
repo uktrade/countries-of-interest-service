@@ -81,6 +81,7 @@ class ExtractDatahubCompanyDataset(SourceDataExtractor):
 
 
 class ExtractDatahubExportCountries(SourceDataExtractor):
+    # todo: rename to export to countries
     dataset_id_config_key = 'datahub_export_countries_dataset_id'
     source_table_id_config_key = 'datahub_export_countries_source_table_id'
     schema = {

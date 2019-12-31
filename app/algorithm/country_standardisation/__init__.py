@@ -1,9 +1,10 @@
 from app.algorithm.country_standardisation import sql_statements as sql
 from app.db import db_utils
+from app.db.models import StandardisedCountries
 from app.utils import log
 
 output_schema = 'algorithm'
-output_table = 'standardised_countries'
+output_table = StandardisedCountries.__tablename__
 
 
 def standardize_countries():
