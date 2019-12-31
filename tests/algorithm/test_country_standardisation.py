@@ -1,6 +1,5 @@
 import app.algorithm.country_standardisation as mapper
 from app.algorithm.country_standardisation.sql_statements import _standardise_country
-from app.db.db_utils import execute_query
 
 from tests.utils import rows_equal_query_results
 
@@ -13,25 +12,22 @@ def test_country_mapping(
     add_country_territory_registry,
 ):
 
-
     add_datahub_export_to_countries(
         [
             {
                 'company_id': '25262ffe-e062-49af-a620-a84d4f3feb8b',
                 'country_iso_alpha2_code': 'afganistan',
-                'id': 0
+                'id': 0,
             }
         ]
     )
 
-    sql = 'select * from datahub_export_countries'
-    df = execute_query(sql)
     add_datahub_future_interest_countries(
         [
             {
                 'company_id': 'd584c5e2-ef16-4aba-91d4-71949078831f',
                 'country_iso_alpha2_code': 'Andorra',
-                'id': 0
+                'id': 0,
             }
         ]
     )
@@ -42,7 +38,7 @@ def test_country_mapping(
                 'created_date': '2009-10-10',
                 'id': 'a0e38b4f-f4c9-4ebc-b196-208972268efb',
                 'market': 'usa',
-                'sector': 'Aerospace'
+                'sector': 'Aerospace',
             }
         ]
     )
