@@ -10,27 +10,27 @@ class TestCountriesAndSectorsOfInterest:
             'create table datahub_omis '
             '''(
                  company_id uuid,
-                 market varchar(2),
-                 sector varchar(100),
                  created_date timestamp,
                  id uuid
+                 market varchar(2),
+                 sector varchar(100),
             )'''
         )
         execute_statement(sql)
         values = [
             (
                 'a4881825-6c7c-46f3-b638-6a1346274a6b',
-                'CN',
-                'Food',
                 '2019-01-01 01:00',
                 '1ee5a16b-1a4b-4c84-838f-0d043579c9ba',
+                'CN',
+                'Food',
             ),
             (
                 'f89d85d2-78c7-484d-bf63-228f32bf8d26',
-                'UK',
-                'Engineering',
                 '2019-02-02 02:00',
                 'c0794724-c070-4c7e-a52c-89c0006bf7e6',
+                'UK',
+                'Engineering',
             ),
         ]
         sql = 'insert into datahub_omis values (%s, %s, %s, %s, %s)'
