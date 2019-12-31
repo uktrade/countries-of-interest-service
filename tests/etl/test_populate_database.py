@@ -27,7 +27,7 @@ class TestPopulateDatabase:
         PopulateCountriesOfInterestTask,
         PopulateCountriesAndSectorsOfInterestTask,
         ExportCountriesTask,
-            PopulateStandardisedCountriesTask,
+        PopulateStandardisedCountriesTask,
         # extract_export_wins,
         # extract_datahub_sectors,
         extract_datahub_omis,
@@ -88,7 +88,7 @@ class TestPopulateDatabase:
         PopulateCountriesOfInterestTask,
         PopulateCountriesAndSectorsOfInterestTask,
         ExportCountriesTask,
-            PopulateStandardisedCountries,
+        PopulateStandardisedCountries,
         # extract_export_wins,
         # extract_datahub_sectors,
         extract_datahub_omis,
@@ -97,7 +97,7 @@ class TestPopulateDatabase:
         extract_datahub_export_countries,
         extract_datahub_company_dataset,
         extract_countries_and_territories_reference,
-            app_with_db,
+        app_with_db,
     ):
         mock_datetime.datetime.now.return_value = datetime.datetime(2019, 1, 1, 2)
         sql = (

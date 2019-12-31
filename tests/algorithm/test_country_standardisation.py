@@ -168,4 +168,3 @@ def test_standardize_country():
     assert _standardize_country('anywhere in the world', choices, lower_choices) == [
         ('The Bahamas', 82)
     ]
-

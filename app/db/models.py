@@ -126,7 +126,7 @@ class DatahubOmis(BaseModel):
     id = _col(UUID(as_uuid=True), primary_key=True)
     market = _col(_text)
     sector = _col(_text)
-    
+
 
 class CountriesAndSectorsOfInterest(BaseModel):
 
@@ -217,4 +217,3 @@ class StandardisedCountries(BaseModel):
     country = _col(_text)
     standardised_country = _col(_text)
     similarity = _col(_num)
-    

@@ -3,7 +3,6 @@ import app.algorithm.country_standardisation.sql_statements as country_standardi
 
 
 class PopulateStandardisedCountriesTask:
-
     def __call__(drop_table=True):
         if drop_table is True:
             # todo
@@ -12,12 +11,11 @@ class PopulateStandardisedCountriesTask:
         country_standardisation.create_standardised_interested_exported_country_table(
             countries,
             db.StandardisedCountries.__table_args__['schema'],
-            db.StandardisedCountries.__tablename__
+            db.StandardisedCountries.__tablename__,
         )
         n_rows = len(db.StandardisedCountries.query.all())
         return {
             'status': 'success',
             'rows': n_rows,
-            'table': db.StandardisedCountries.__tablename__
+            'table': db.StandardisedCountries.__tablename__,
         }
-    
