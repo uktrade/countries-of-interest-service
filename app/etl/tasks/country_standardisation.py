@@ -4,6 +4,9 @@ from app.db.db_utils import drop_table
 
 
 class PopulateStandardisedCountriesTask:
+
+    name = 'PopulateStandardisedCountriesTask'
+    
     def __call__(self):
         drop_table(db.StandardisedCountries.__tablename__)
         countries = country_standardisation.extract_interested_exported_countries()

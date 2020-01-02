@@ -20,8 +20,9 @@ def extract_interested_exported_countries():
         from datahub_future_interest_countries
     union
     select trim(market) as country from datahub_omis
-    union
-    select trim(country) as country from export_wins
+    --TODO: add export wins data post MVP
+    --union
+    --select trim(country) as country from export_wins
     ) u where country is not null
     )
 

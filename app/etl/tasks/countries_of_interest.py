@@ -47,9 +47,9 @@ with omis_countries_of_interest as (
 
   from combined_countries_of_interest o
     left join {countries_and_territories_register} c
-      on market::text = c.id
+      on market = c.id
     left join {standardised_countries} s
-      on market::text = s.country
+      on market = s.country
 
   order by source, source_id
 

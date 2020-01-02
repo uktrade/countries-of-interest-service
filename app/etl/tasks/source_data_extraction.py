@@ -4,6 +4,7 @@ import mohawk
 
 import requests
 
+import app.db.models as models
 from app.db.models import sql_alchemy
 
 
@@ -54,9 +55,13 @@ class ExtractCountriesAndTerritoriesReferenceDataset(ReferenceDatasetExtractor):
             ['AE-AZ', 'Abu Dhabi', 'Territory', None, None],
             ['AF', 'Afghanistan', 'Country', None, None],
             ['AO', 'Angola', 'Country', '1975-11-11', None],
+            ['CN', 'China', 'Country', None, None],
+            ['DE', 'Germany', 'Country', None, None],
+            ['MY', 'Myanmar', 'Country', None, None],
+            ['US', 'United States', 'Country', None, None],
         ],
     }
-    table_name = 'reference_countries_and_territories'
+    table_name = models.DITCountryTerritoryRegister.__tablename__
 
 
 class ExtractDatahubCompanyDataset(SourceDataExtractor):
