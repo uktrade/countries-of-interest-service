@@ -1,3 +1,4 @@
+import app.db.models as models
 from app.config import data_sources
 from app.etl import ETLTask
 
@@ -8,21 +9,33 @@ sql = '''
 select
   company_id::text,
   country_iso_alpha2_code,
+  case
+    when c.name is not null then c.name
+    when s.standardised_country is not null then s.standardised_country
+    else NULL
+  end as standardised_country,
   '{export_countries}' as source,
-  id::varchar(100) as source_id,
+  d.id::varchar(100) as source_id,
   null::timestamp as timestamp
 
-from datahub_export_countries
+from datahub_export_countries d
+  left join {countries_and_territories_register} c
+    on country_iso_alpha2_code = c.id
+  left join {standardised_countries} s
+    on country_iso_alpha2_code = s.country
 
-order by 1
+order by source, source_id
 
 '''.format(
-    export_countries=data_sources.datahub_export_countries
+    export_countries=data_sources.datahub_export_countries,
+    countries_and_territories_register=models.DITCountryTerritoryRegister.__tablename__,
+    standardised_countries=models.StandardisedCountries.__tablename__,
 )
 
 table_fields = '''(
   company_id varchar(100),
   export_country varchar(12),
+  standardised_country varchar(100),
   source varchar(50),
   source_id varchar(100),
   timestamp Timestamp,

@@ -300,6 +300,7 @@ def get_company_export_countries(orientation):
         select
           company_id,
           export_country,
+          standardised_country,
           source,
           source_id,
           timestamp

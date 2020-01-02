@@ -78,6 +78,7 @@ def add_company_export_countries(app_with_db_module):
             defaults = {
                 'company_id': record.get('company_id', None),
                 'export_country': record.get('export_country', None),
+                'standardised_country': record.get('standardised_country', None),
                 'timestamp': record.get('timestamp', None),
             }
             ExportCountries.get_or_create(

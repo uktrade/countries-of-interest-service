@@ -67,6 +67,7 @@ select * from results
 table_fields = '''(
     company_id varchar(100),
     country_of_interest varchar(2),
+    standardised_country varchar(100),
     source varchar(50),
     source_id varchar(100),
     timestamp timestamp,
