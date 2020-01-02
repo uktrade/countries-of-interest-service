@@ -7,7 +7,7 @@ index = ('company_id',)
 sql = '''
 select
   company_id::text,
-  country_iso_alpha2_code,
+  country_iso_alpha2_code as export_country,
   '{export_countries}' as source,
   id::varchar(100) as source_id,
   null::timestamp as timestamp

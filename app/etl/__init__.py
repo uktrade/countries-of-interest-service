@@ -22,7 +22,7 @@ class ETLTask:
 
         create_table(self.table_fields, self.table_name)
 
-        df = execute_query(self.sql)
+        df = execute_query(self.sql, raise_if_fail=True)
 
         insert_data(df, self.table_name)
 
