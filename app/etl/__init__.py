@@ -20,10 +20,15 @@ class ETLTask:
         if self.drop_table is True:
             drop_table(self.table_name)
 
+        print('create_table')
         create_table(self.table_fields, self.table_name)
 
+        print('sql:', self.sql)
         df = execute_query(self.sql)
 
+        print('df:', df)
+
+        print('insert_data')
         insert_data(df, self.table_name)
 
         if self.index is not None:

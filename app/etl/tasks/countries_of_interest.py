@@ -1,3 +1,4 @@
+import app.db.models as models
 from app.config import data_sources
 from app.etl import ETLTask
 
@@ -31,22 +32,36 @@ with omis_countries_of_interest as (
 
   select * from datahub_countries_of_interest
 
+), results as (
+  select
+    company_id::text,
+    market as country_of_interest,
+    case
+      when c.name is not null then c.name
+      when s.standardised_country is not null then s.standardised_country
+      else NULL
+    end as standardised_country,
+    source,
+    source_id,
+    timestamp
+
+  from combined_countries_of_interest o
+    left join {countries_and_territories_register} c
+      on market::text = c.id
+    left join {standardised_countries} s
+      on market::text = s.country
+
+  order by source, source_id
+
 )
 
-select
-  company_id::text,
-  market as country_of_interest,
-  source,
-  source_id,
-  timestamp
-
-from combined_countries_of_interest
-
-order by 1
+select * from results
 
 '''.format(
     omis=data_sources.omis,
     future_interest=data_sources.datahub_future_interest_countries,
+    countries_and_territories_register=models.DITCountryTerritoryRegister.__tablename__,
+    standardised_countries=models.StandardisedCountries.__tablename__,
 )
 
 table_fields = '''(
