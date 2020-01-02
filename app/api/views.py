@@ -222,6 +222,7 @@ def get_company_countries_of_interest(orientation):
         select
           company_id,
           country_of_interest,
+          standardised_country,
           source,
           source_id,
           timestamp

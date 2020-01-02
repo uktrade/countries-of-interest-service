@@ -59,6 +59,7 @@ def add_company_countries_of_interest(app_with_db_module):
             defaults = {
                 'company_id': record.get('company_id', None),
                 'country_of_interest': record.get('country_of_interest', None),
+                'standardised_country': record.get('standardised_country', None),
                 'timestamp': record.get('timestamp', None),
             }
             CountriesOfInterest.get_or_create(
