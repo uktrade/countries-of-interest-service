@@ -4,6 +4,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
+import app.db.models as models
 import app.etl.tasks.source_data_extraction
 import app.etl.tasks.source_data_extraction as source_data_extraction
 from app.db.db_utils import execute_statement
@@ -95,7 +96,7 @@ class TestExtractCountriesAndTerritoriesReferenceDataset(
         ],
     }
 
-    table_name = 'reference_countries_and_territories'
+    table_name = models.DITCountryTerritoryRegister.__tablename__
     extractor = (
         source_data_extraction.extract_countries_and_territories_reference_dataset
     )

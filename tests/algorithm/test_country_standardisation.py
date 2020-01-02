@@ -93,12 +93,13 @@ def test_country_mapping(
     # Standardise
     mapper.standardise_countries()
 
+    # TODO: uncomment once export wins is included
     expected_rows = [
         (1, 'afganistan', 'Afghanistan', 91),
         (2, 'Andorra', 'Andorra', 100),
-        (3, 'uae', 'United Arab Emirates', 100),
-        (4, 'unknown', 'Angola', 27),
-        (5, 'usa', 'United States', 100),
+        # (3, 'uae', 'United Arab Emirates', 100),
+        # (3, 'unknown', 'Angola', 27),
+        (3, 'usa', 'United States', 100),
     ]
 
     assert rows_equal_query_results(
