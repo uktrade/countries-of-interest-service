@@ -36,7 +36,7 @@ class TestCountriesAndSectorsOfInterest:
                 {
                     'company_id': '08c5f419-f85f-4051-b640-d3cfef8ef85d',
                     'country_iso_alpha2_code': 'UK',
-                    'id': 0
+                    'id': 0,
                 }
             ]
         )
@@ -59,7 +59,7 @@ class TestCountriesAndSectorsOfInterest:
 
         sql = '''select * from coi_countries_of_interest'''
         df = execute_query(sql)
-        
+
         assert len(df) == 3
 
         assert df['company_id'].values[0] == '08c5f419-f85f-4051-b640-d3cfef8ef85d'
@@ -75,7 +75,7 @@ class TestCountriesAndSectorsOfInterest:
         assert df['source'].values[1] == 'omis'
         assert df['source_id'].values[1] == '1ee5a16b-1a4b-4c84-838f-0d043579c9ba'
         assert df['timestamp'].values[1] == np.datetime64('2019-01-01 01:00')
-        
+
         assert df['company_id'].values[2] == 'f89d85d2-78c7-484d-bf63-228f32bf8d26'
         assert df['country_of_interest'].values[2] == 'UK'
         assert df['standardised_country'].values[2] == 'United Kingdom'

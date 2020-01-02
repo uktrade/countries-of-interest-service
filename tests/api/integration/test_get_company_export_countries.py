@@ -45,7 +45,7 @@ def test_get_company_export_countries(app):
                             'standardised_country1',
                             'source1',
                             'source_id',
-                            '2009-10-10T12:12:12'
+                            '2009-10-10T12:12:12',
                         ]
                     ],
                 },
