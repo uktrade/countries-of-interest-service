@@ -21,10 +21,13 @@ interest_2 = {
 }
 
 
-@pytest.fixture(scope='module', autouse=True)
+@pytest.fixture(scope='function', autouse=True)
 def setup_function(app, add_countries_and_sectors_of_interest):
     app.config['access_control']['hawk_enabled'] = False
+    old_pagination_size = app.config['app']['pagination_size']
     add_countries_and_sectors_of_interest([interest_1, interest_2])
+    yield
+    app.config['app']['pagination_size'] = old_pagination_size
 
 
 def test_multiple_company_id_filter(app):

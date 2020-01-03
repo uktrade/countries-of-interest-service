@@ -12,17 +12,20 @@ interest_1 = {
 
 interest_2 = {
     'company_id': '2',
-    'country_of_interest': 'country2',
+    'export_country': 'country2',
     'source': 'source2',
     'source_id': 'source_id2',
     'timestamp': '2009-10-10 12:12:12',
 }
 
 
-@pytest.fixture(scope='module', autouse=True)
+@pytest.fixture(scope='function', autouse=True)
 def setup_function(app, add_company_export_countries):
     app.config['access_control']['hawk_enabled'] = False
+    old_pagination_size = app.config['app']['pagination_size']
     add_company_export_countries([interest_1, interest_2])
+    yield
+    app.config['app']['pagination_size'] = old_pagination_size
 
 
 def test_get_company_export_countries(app):
@@ -36,7 +39,7 @@ def test_get_company_export_countries(app):
                 {
                     'headers': [
                         'companyId',
-                        'countryOfInterest',
+                        'exportCountry',
                         'source',
                         'sourceId',
                         'timestamp',
@@ -61,7 +64,7 @@ def test_multiple_company_filter(app):
                 {
                     'headers': [
                         'companyId',
-                        'countryOfInterest',
+                        'exportCountry',
                         'source',
                         'sourceId',
                         'timestamp',
@@ -99,7 +102,7 @@ def test_country_filter(app):
                 {
                     'headers': [
                         'companyId',
-                        'countryOfInterest',
+                        'exportCountry',
                         'source',
                         'sourceId',
                         'timestamp',
@@ -124,7 +127,7 @@ def test_multiple_country_filter(app):
                 {
                     'headers': [
                         'companyId',
-                        'countryOfInterest',
+                        'exportCountry',
                         'source',
                         'sourceId',
                         'timestamp',
@@ -163,7 +166,7 @@ def test_single_source_filter(app):
                 {
                     'headers': [
                         'companyId',
-                        'countryOfInterest',
+                        'exportCountry',
                         'source',
                         'sourceId',
                         'timestamp',
@@ -195,7 +198,7 @@ def test_multiple_source_filter(app):
                 {
                     'headers': [
                         'companyId',
-                        'countryOfInterest',
+                        'exportCountry',
                         'source',
                         'sourceId',
                         'timestamp',
@@ -234,7 +237,7 @@ def test_pagination(app):
                 {
                     'headers': [
                         'companyId',
-                        'countryOfInterest',
+                        'exportCountry',
                         'source',
                         'sourceId',
                         'timestamp',
@@ -267,7 +270,7 @@ def test_pagination_next(app):
                 {
                     'headers': [
                         'companyId',
-                        'countryOfInterest',
+                        'exportCountry',
                         'source',
                         'sourceId',
                         'timestamp',
