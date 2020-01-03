@@ -10,6 +10,7 @@ from app.db.models import (
     DatahubOmis,
     ExportCountries,
     ExportWins,
+    Interactions,
     SectorsOfInterest,
     StandardisedCountries,
 )
@@ -203,6 +204,27 @@ def add_standardised_countries(app_with_db_module):
             }
             StandardisedCountries.get_or_create(
                 id=record.get('id', None), defaults=defaults
+
+    return _method
+
+@pytest.fixture(scope='module')
+def add_datahub_interaction(app_with_db_module):
+    def _method(records):
+        for record in records:
+            defaults = {
+                'datahub_id': record.get('datahub_id', None),
+                'companies_house_number': record.get('companies_house_number', None),
+                'subject': record.get('subject', None),
+                'policy_feedback_notes': record.get('policy_feedback_notes', None),
+                'notes': record.get('notes', None),
+                'source': record.get('source', None),
+                'source_id': record.get('source_id', None),
+                'created_on': record.get('created_on', None),
+                'country_name': record.get('country_name', None),
+                'country_alpha2': record.get('country_alpha2', None),
+            }
+            Interactions.get_or_create(
+                id=record.get('id', None), defaults=defaults,
             )
 
     return _method

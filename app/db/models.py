@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 
-from sqlalchemy import PrimaryKeyConstraint
+from sqlalchemy import PrimaryKeyConstraint, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import ClauseElement
 
@@ -212,6 +212,7 @@ class DITCountryTerritoryRegister(BaseModel):
     type = _col(_text)
 
 
+
 class StandardisedCountries(BaseModel):
     __tablename__ = 'standardised_countries'
     __table_args__ = {'schema': 'public'}
@@ -220,3 +221,40 @@ class StandardisedCountries(BaseModel):
     country = _col(_text)
     standardised_country = _col(_text)
     similarity = _col(_num)
+
+
+class Interactions(BaseModel):
+
+    __tablename__ = 'interactions'
+
+    id = _col(_int, primary_key=True, autoincrement=True)
+    datahub_id = _col(_text)
+    companies_house_number = _col(_text)
+    subject = _col(_text)
+    policy_feedback_notes = _col(_text)
+    notes = _col(_text)
+    source = _col(_text)
+    source_id = _col(_text)
+    created_on = _col(_dt)
+    country_name = _col(_text)
+    country_alpha2 = _col(_text)
+
+    __table_args__ = (
+        UniqueConstraint(source, source_id),
+        {'schema': 'public'},
+    )
+
+
+class InteractionsAnalysed(BaseModel):
+
+    __tablename__ = 'interactions_analysed'
+    __table_args__ = {'schema': 'algorithm'}
+
+    id = _col(_int, primary_key=True)
+    place = _col(_text, nullable=False)
+    standardized_place = _col(_text)
+    action = _col(_text)
+    type = _col(_text)
+    context = _col(_sa.ARRAY(_text))
+    negation = _col(_bool)
+
