@@ -8,7 +8,7 @@ sql = '''
 with omis_countries_of_interest as (
   select
     company_id::text,
-    market as country,
+    market as country_of_interest,
     case
       when c.name is not null then c.name
       when s.standardised_country is not null then s.standardised_country
@@ -32,7 +32,7 @@ with omis_countries_of_interest as (
       when country_iso_alpha2_code is not null
         and country_iso_alpha2_code  != '' then country_iso_alpha2_code
       else d.country
-    end as country,
+    end as country_of_interest,
     case
       when c.name is not null then c.name
       when s.standardised_country is not null then s.standardised_country

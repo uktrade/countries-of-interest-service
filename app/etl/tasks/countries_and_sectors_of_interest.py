@@ -8,13 +8,13 @@ sql = '''
     with results as (
         select
             company_id::text,
-            market as country,
+            market as country_of_interest,
             case
                 when c.name is not null then c.name
                 when s.standardised_country is not null then s.standardised_country
                 else NULL
             end as standardised_country,
-            sector,
+            sector as sector_of_interest,
             '{source}' as source,
             o.id::text as source_id,
             created_date as timestamp

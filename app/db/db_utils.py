@@ -80,6 +80,9 @@ def insert_data(df, table_name):
             columns=','.join(df.columns),
             values=','.join(['%s' for i in range(len(df.columns))]),
         )
+        for col in df.columns:
+            if df[col].dtype == '<M8[ns]':
+                df[col] = df[col].map(lambda x: None if pd.isnull(x) else x.isoformat())
         execute_statement(sql, df.values.tolist(), raise_if_fail=True)
 
 
