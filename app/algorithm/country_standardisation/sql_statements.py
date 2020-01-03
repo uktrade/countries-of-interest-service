@@ -14,9 +14,9 @@ def extract_interested_exported_countries():
     stmt = f"""
     with countries as (
     select distinct country from (
-    select trim(country_iso_alpha2_code) as country from datahub_export_countries
+    select trim(country) as country from datahub_export_countries
     union
-    select trim(country_iso_alpha2_code) as country
+    select trim(country) as country
         from datahub_future_interest_countries
     union
     select trim(market) as country from datahub_omis

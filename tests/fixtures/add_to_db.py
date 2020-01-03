@@ -114,6 +114,7 @@ def add_datahub_export_to_countries(app_with_db_module):
         for record in records:
             defaults = {
                 'company_id': record.get('company_id', None),
+                'country': record.get('country', None),
                 'country_iso_alpha2_code': record.get('country_iso_alpha2_code', None),
                 'id': record.get('id', None),
             }
@@ -130,6 +131,7 @@ def add_datahub_future_interest_countries(app_with_db_module):
         for record in records:
             defaults = {
                 'company_id': record.get('company_id', None),
+                'country': record.get('country', None),
                 'country_iso_alpha2_code': record.get('country_iso_alpha2_code', None),
                 'id': record.get('id', None),
             }

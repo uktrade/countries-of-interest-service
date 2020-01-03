@@ -127,15 +127,15 @@ class TestExtractDatahubExportCountries(SourceDataExtractBaseTestCase):
     __test__ = True
     dataset_id_config_key = 'datahub_export_countries_dataset_id'
     expected_data = [
-        ['c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'SK', 0],
-        ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'SD', 1],
+        ['c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'SK', 'slovakia', 0],
+        ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'SD', 'sudan', 1],
     ]
     source_data = {
-        'headers': ['id', 'company_id', 'country_iso_alpha2_code', 'extraField'],
+        'headers': ['id', 'company_id', 'country_iso_alpha2_code', 'country', 'extraField'],
         'next': None,
         'values': [
-            [0, 'c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'SK', 'extra'],
-            [1, 'd0af8e52-ff34-4088-98e3-d2d22cd250ae', 'SD', 'extra'],
+            [0, 'c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'SK', 'slovakia', 'extra'],
+            [1, 'd0af8e52-ff34-4088-98e3-d2d22cd250ae', 'SD', 'sudan', 'extra'],
         ],
     }
     source_table_id_config_key = 'datahub_export_countries_source_table_id'
@@ -147,15 +147,15 @@ class TestExtractDatahubFutureInterestCountries(SourceDataExtractBaseTestCase):
     __test__ = True
     dataset_id_config_key = 'datahub_future_interest_countries_dataset_id'
     expected_data = [
-        ['c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'SK', 0],
-        ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'SD', 1],
+        ['c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'SK', 'slovakia', 0],
+        ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'SD', 'sudan', 1],
     ]
     source_data = {
-        'headers': ['id', 'company_id', 'country_iso_alpha2_code', 'extra_field'],
+        'headers': ['id', 'company_id', 'country_iso_alpha2_code', 'country', 'extra_field'],
         'next': None,
         'values': [
-            [0, 'c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'SK', 'extra'],
-            [1, 'd0af8e52-ff34-4088-98e3-d2d22cd250ae', 'SD', 'extra'],
+            [0, 'c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'SK', 'slovakia', 'extra'],
+            [1, 'd0af8e52-ff34-4088-98e3-d2d22cd250ae', 'SD', 'sudan', 'extra'],
         ],
     }
     source_table_id_config_key = 'datahub_future_interest_countries_source_table_id'

@@ -145,6 +145,7 @@ class DatahubExportToCountries(BaseModel):
     __table_args__ = {'schema': 'public'}
 
     company_id = _col(UUID(as_uuid=True))
+    country = _col(_text)
     country_iso_alpha2_code = _col(_text)
     id = _col(_num, primary_key=True)
 
@@ -155,6 +156,7 @@ class DatahubFutureInterestCountries(BaseModel):
     __table_args__ = {'schema': 'public'}
 
     company_id = _col(UUID(as_uuid=True))
+    country = _col(_text)
     country_iso_alpha2_code = _col(_text)
     id = _col(_num, primary_key=True)
 

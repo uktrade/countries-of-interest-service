@@ -8,7 +8,11 @@ index = ('company_id',)
 sql = '''
 select
   company_id::text,
-  country_iso_alpha2_code,
+  case
+    when country_iso_alpha2_code is not null 
+      and country_iso_alpha2_code != '' then country_iso_alpha2_code
+    else d.country
+  end as export_country,
   case
     when c.name is not null then c.name
     when s.standardised_country is not null then s.standardised_country
@@ -22,7 +26,8 @@ from datahub_export_countries d
   left join {countries_and_territories_register} c
     on country_iso_alpha2_code = c.id
   left join {standardised_countries} s
-    on country_iso_alpha2_code = s.country
+    on d.country = s.country
+      and s.similarity > 90
 
 order by source, source_id
 

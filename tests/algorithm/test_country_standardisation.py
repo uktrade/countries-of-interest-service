@@ -16,7 +16,8 @@ def test_country_mapping(
         [
             {
                 'company_id': '25262ffe-e062-49af-a620-a84d4f3feb8b',
-                'country_iso_alpha2_code': 'afganistan',
+                'country_iso_alpha2_code': 'AF',
+                'country': 'afganistan',
                 'id': 0,
             }
         ]
@@ -26,7 +27,8 @@ def test_country_mapping(
         [
             {
                 'company_id': 'd584c5e2-ef16-4aba-91d4-71949078831f',
-                'country_iso_alpha2_code': 'Andorra',
+                'country_iso_alpha2_code': 'AD',
+                'country': 'Andorra',
                 'id': 0,
             }
         ]

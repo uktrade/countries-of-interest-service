@@ -14,6 +14,7 @@ def test(
             {
                 'company_id': 'f17645ba-c38e-4215-b09e-47451edb9125',
                 'country_iso_alpha2_code': 'UK',
+                'country': 'United Kingdom',
                 'id': 1,
             }
         ]
@@ -24,6 +25,7 @@ def test(
             {
                 'company_id': '2f6a340e-07b1-4bc0-9852-9138fc93249e',
                 'country_iso_alpha2_code': 'DE',
+                'country': 'germany',
                 'id': 1,
             }
         ]
@@ -56,6 +58,7 @@ def test(
     countries = [
         ('UE', 'United Arab Emirates'),
         ('UK', 'United Kingdom'),
+        ('DE', 'Germany'),
     ]
     country_territory_entries = []
     for iso_alpha2_code, country in countries:
@@ -75,8 +78,8 @@ def test(
     assert standardised_countries[0].standardised_country == 'United Kingdom'
 
     assert standardised_countries[1].id == 2
-    assert standardised_countries[1].country == 'DE'
-    assert standardised_countries[1].standardised_country == 'United Kingdom'
+    assert standardised_countries[1].country == 'germany'
+    assert standardised_countries[1].standardised_country == 'Germany'
 
     # TODO: uncomment once export_wins data is included
     # assert standardised_countries[2].id == 3
@@ -84,5 +87,5 @@ def test(
     # assert standardised_countries[2].standardised_country == 'United Arab Emirates'
 
     assert standardised_countries[2].id == 3
-    assert standardised_countries[2].country == 'UK'
+    assert standardised_countries[2].country == 'United Kingdom'
     assert standardised_countries[2].standardised_country == 'United Kingdom'
