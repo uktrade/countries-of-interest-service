@@ -71,7 +71,7 @@ class TestCountriesAndSectorsOfInterest:
 
         assert df['company_id'].values[1] == 'a4881825-6c7c-46f3-b638-6a1346274a6b'
         assert df['country_of_interest'].values[1] == 'CN'
-        assert df['standardised_country'].values[1] == 'China'
+        assert df['standardised_country'].values[1] is None
         assert df['source'].values[1] == 'omis'
         assert df['source_id'].values[1] == '1ee5a16b-1a4b-4c84-838f-0d043579c9ba'
         assert df['timestamp'].values[1] == np.datetime64('2019-01-01 01:00')

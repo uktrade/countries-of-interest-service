@@ -52,7 +52,7 @@ class TestCountriesAndSectorsOfInterest:
         assert len(df) == 2
         assert df['company_id'].values[0] == 'a4881825-6c7c-46f3-b638-6a1346274a6b'
         assert df['country_of_interest'].values[0] == 'CN'
-        assert df['standardised_country'].values[0] == 'China'
+        assert df['standardised_country'].values[0] is None
         assert df['sector_of_interest'].values[0] == 'Food'
         assert df['source'].values[0] == 'omis'
         assert df['source_id'].values[0] == '1ee5a16b-1a4b-4c84-838f-0d043579c9ba'
