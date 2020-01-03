@@ -204,8 +204,10 @@ def add_standardised_countries(app_with_db_module):
             }
             StandardisedCountries.get_or_create(
                 id=record.get('id', None), defaults=defaults
+            )
 
     return _method
+
 
 @pytest.fixture(scope='module')
 def add_datahub_interaction(app_with_db_module):

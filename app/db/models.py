@@ -212,7 +212,6 @@ class DITCountryTerritoryRegister(BaseModel):
     type = _col(_text)
 
 
-
 class StandardisedCountries(BaseModel):
     __tablename__ = 'standardised_countries'
     __table_args__ = {'schema': 'public'}
@@ -257,4 +256,3 @@ class InteractionsAnalysed(BaseModel):
     type = _col(_text)
     context = _col(_sa.ARRAY(_text))
     negation = _col(_bool)
-

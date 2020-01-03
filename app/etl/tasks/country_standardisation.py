@@ -1,4 +1,4 @@
-import app.algorithm.country_standardisation.sql_statements as country_standardisation
+import app.algorithm.country_standardisation.steps as country_standardisation
 import app.db.models as db
 from app.db.db_utils import drop_table
 

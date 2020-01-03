@@ -1,5 +1,5 @@
 import app.algorithm.country_standardisation as mapper
-from app.algorithm.country_standardisation.steps import _standardize_country
+from app.algorithm.country_standardisation.steps import _standardise_country
 
 from tests.utils import rows_equal_query_results
 
