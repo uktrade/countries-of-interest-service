@@ -6,6 +6,7 @@ from app.etl.tasks.countries_and_sectors_of_interest import (
     Task as PopulateCountriesAndSectorsOfInterestTask,
 )
 from app.etl.tasks.countries_of_interest import Task as PopulateCountriesOfInterestTask
+from app.etl.tasks.country_standardisation import PopulateStandardisedCountriesTask
 from app.etl.tasks.export_countries import Task as ExportCountriesTask
 from app.etl.tasks.sectors_of_interest import Task as SectorsOfInterestTask
 from app.etl.tasks.source_data_extraction import (
@@ -40,6 +41,7 @@ def populate_database(drop_table):
         output = output + [extractor()]
 
     for task in [
+        PopulateStandardisedCountriesTask(),
         ExportCountriesTask(drop_table=drop_table),
         PopulateCountriesAndSectorsOfInterestTask(drop_table=drop_table),
         PopulateCountriesOfInterestTask(drop_table=drop_table),

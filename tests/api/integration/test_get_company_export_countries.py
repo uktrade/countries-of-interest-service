@@ -11,6 +11,7 @@ def setup_function(app, add_company_export_countries):
             {
                 'company_id': '1',
                 'export_country': 'country1',
+                'standardised_country': 'standardised_country1',
                 'source': 'source1',
                 'source_id': 'source_id',
                 'timestamp': '2009-10-10 12:12:12',
@@ -31,13 +32,21 @@ def test_get_company_export_countries(app):
                     'headers': [
                         'companyId',
                         'exportCountry',
+                        'standardisedCountry',
                         'source',
                         'sourceId',
                         'timestamp',
                     ],
                     'next': None,
                     'values': [
-                        ['1', 'country1', 'source1', 'source_id', '2009-10-10T12:12:12']
+                        [
+                            '1',
+                            'country1',
+                            'standardised_country1',
+                            'source1',
+                            'source_id',
+                            '2009-10-10T12:12:12',
+                        ]
                     ],
                 },
             ),

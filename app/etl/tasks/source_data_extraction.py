@@ -4,6 +4,7 @@ import mohawk
 
 import requests
 
+import app.db.models as models
 from app.db.models import sql_alchemy
 
 
@@ -54,9 +55,13 @@ class ExtractCountriesAndTerritoriesReferenceDataset(ReferenceDatasetExtractor):
             ['AE-AZ', 'Abu Dhabi', 'Territory', None, None],
             ['AF', 'Afghanistan', 'Country', None, None],
             ['AO', 'Angola', 'Country', '1975-11-11', None],
+            ['CN', 'China', 'Country', None, None],
+            ['DE', 'Germany', 'Country', None, None],
+            ['MY', 'Myanmar', 'Country', None, None],
+            ['US', 'United States', 'Country', None, None],
         ],
     }
-    table_name = 'reference_countries_and_territories'
+    table_name = models.DITCountryTerritoryRegister.__tablename__
 
 
 class ExtractDatahubCompanyDataset(SourceDataExtractor):
@@ -81,21 +86,23 @@ class ExtractDatahubCompanyDataset(SourceDataExtractor):
 
 
 class ExtractDatahubExportCountries(SourceDataExtractor):
+    # todo: rename to export to countries
     dataset_id_config_key = 'datahub_export_countries_dataset_id'
     source_table_id_config_key = 'datahub_export_countries_source_table_id'
     schema = {
         'columns': [
             {'name': 'company_id', 'type': 'uuid'},
             {'name': 'country_iso_alpha2_code', 'type': 'varchar(2)'},
+            {'name': 'country', 'type': 'varchar(100)'},
             {'name': 'id', 'type': 'int'},
         ],
         'primary_key': 'id',
     }
     stub_data = {
-        'headers': ['company_id', 'country_iso_alpha2_code', 'id'],
+        'headers': ['company_id', 'country_iso_alpha2_code', 'country', 'id'],
         'values': [
-            ['c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'US', 1],
-            ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'MY', 2],
+            ['c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'US', 'united states', 1],
+            ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'MY', 'myanmar', 2],
         ],
     }
     table_name = 'datahub_export_countries'
@@ -108,15 +115,16 @@ class ExtractDatahubFutureInterestCountries(SourceDataExtractor):
         'columns': [
             {'name': 'company_id', 'type': 'uuid'},
             {'name': 'country_iso_alpha2_code', 'type': 'varchar(2)'},
+            {'name': 'country', 'type': 'varchar(100)'},
             {'name': 'id', 'type': 'int'},
         ],
         'primary_key': 'id',
     }
     stub_data = {
-        'headers': ['company_id', 'country_iso_alpha2_code', 'id'],
+        'headers': ['company_id', 'country_iso_alpha2_code', 'country', 'id'],
         'values': [
-            ['c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'CN', 1],
-            ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'DE', 2],
+            ['c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'CN', 'china', 1],
+            ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'DE', 'germany', 2],
         ],
     }
     table_name = 'datahub_future_interest_countries'

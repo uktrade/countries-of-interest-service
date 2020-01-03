@@ -87,15 +87,6 @@ class HawkUsers(BaseModel):
         )
 
 
-class DatahubCompanyIDToCompaniesHouseCompanyNumber(BaseModel):
-
-    __tablename__ = 'coi_datahub_company_id_to_companies_house_company_number'
-    __table_args__ = {'schema': 'public'}
-
-    datahub_company_id = _col(UUID(as_uuid=True), primary_key=True)
-    companies_house_company_number = _col(_text)
-
-
 class CountriesAndSectorsOfInterest(BaseModel):
 
     __tablename__ = 'coi_countries_and_sectors_of_interest'
@@ -103,6 +94,7 @@ class CountriesAndSectorsOfInterest(BaseModel):
 
     company_id = _col(_text)
     country_of_interest = _col(_text)
+    standardised_country = _col(_text)
     sector_of_interest = _col(_text)
     source = _col(_text)
     source_id = _col(_text)
@@ -118,11 +110,55 @@ class CountriesOfInterest(BaseModel):
 
     company_id = _col(_text)
     country_of_interest = _col(_text)
+    standardised_country = _col(_text)
     source = _col(_text)
     source_id = _col(_text)
     timestamp = _col(_dt)
 
     __table_args__ = (PrimaryKeyConstraint(source, source_id),)
+
+
+class DatahubOmis(BaseModel):
+
+    __tablename__ = 'datahub_omis'
+    __table_args__ = {'schema': 'public'}
+
+    company_id = _col(UUID(as_uuid=True))
+    created_date = _col(_dt)
+    id = _col(UUID(as_uuid=True), primary_key=True)
+    market = _col(_text)
+    sector = _col(_text)
+
+
+class DatahubCompanyIDToCompaniesHouseCompanyNumber(BaseModel):
+
+    __tablename__ = 'coi_datahub_company_id_to_companies_house_company_number'
+    __table_args__ = {'schema': 'public'}
+
+    datahub_company_id = _col(UUID(as_uuid=True), primary_key=True)
+    companies_house_company_number = _col(_text)
+
+
+class DatahubExportToCountries(BaseModel):
+
+    __tablename__ = 'datahub_export_countries'
+    __table_args__ = {'schema': 'public'}
+
+    company_id = _col(UUID(as_uuid=True))
+    country = _col(_text)
+    country_iso_alpha2_code = _col(_text)
+    id = _col(_num, primary_key=True)
+
+
+class DatahubFutureInterestCountries(BaseModel):
+
+    __tablename__ = 'datahub_future_interest_countries'
+    __table_args__ = {'schema': 'public'}
+
+    company_id = _col(UUID(as_uuid=True))
+    country = _col(_text)
+    country_iso_alpha2_code = _col(_text)
+    id = _col(_num, primary_key=True)
 
 
 class ExportCountries(BaseModel):
@@ -132,11 +168,23 @@ class ExportCountries(BaseModel):
 
     company_id = _col(_text)
     export_country = _col(_text)
+    standardised_country = _col(_text)
     source = _col(_text)
     source_id = _col(_text)
     timestamp = _col(_dt)
 
     __table_args__ = (PrimaryKeyConstraint(source, source_id),)
+
+
+class ExportWins(BaseModel):
+
+    __tablename__ = 'export_wins'
+    __table_args__ = {'schema': 'public'}
+
+    company_id = _col(_text)
+    country = _col(_text)
+    id = _col(UUID(as_uuid=True), primary_key=True)
+    timestamp = _col(_dt)
 
 
 class SectorsOfInterest(BaseModel):
@@ -157,13 +205,21 @@ class DITCountryTerritoryRegister(BaseModel):
     __tablename__ = 'dit_country_territory_register'
     __table_args__ = {'schema': 'public'}
 
-    id = _col(_int, primary_key=True)
-    key = _col(_text)
-    start_date = _col(_date)
     end_date = _col(_date)
+    id = _col(_text, primary_key=True)
     name = _col(_text)
-    official_name = _col(_text)
+    start_date = _col(_date)
     type = _col(_text)
+
+
+class StandardisedCountries(BaseModel):
+    __tablename__ = 'standardised_countries'
+    __table_args__ = {'schema': 'public'}
+
+    id = _col(_int, primary_key=True)
+    country = _col(_text)
+    standardised_country = _col(_text)
+    similarity = _col(_num)
 
 
 class Interactions(BaseModel):
