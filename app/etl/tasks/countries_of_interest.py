@@ -23,7 +23,7 @@ with omis_countries_of_interest as (
       on market = c.id
     left join {standardised_countries} s
       on market = s.country
-
+        and similarity > 90
 
 ), datahub_countries_of_interest as (
   select
@@ -47,6 +47,7 @@ with omis_countries_of_interest as (
       on d.country_iso_alpha2_code = c.id
     left join {standardised_countries} s
       on d.country = s.country
+        and similarity > 90
 
 ), combined_countries_of_interest as (
   select * from omis_countries_of_interest

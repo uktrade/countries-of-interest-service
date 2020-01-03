@@ -24,6 +24,7 @@ sql = '''
                 on o.market::text = c.id
             left join {standardised_countries} s
                 on o.market::text = s.country
+                  and similarity > 90
 
         order by source_id
 
