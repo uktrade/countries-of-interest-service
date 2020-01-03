@@ -120,10 +120,7 @@ def test_multiple_country_filter(app):
                         'timestamp',
                     ],
                     'next': None,
-                    'values': [
-                        list(interest_1.values()),
-                        list(interest_2.values()),
-                    ],
+                    'values': [list(interest_1.values()), list(interest_2.values())],
                 },
             ),
         )

@@ -8,7 +8,7 @@ def assert_api_response(
 
     print('data:', data)
     print('expected_response:', expected_response)
-    
+
     assert status_code == expected_response[0]
     assert _ordered(data) == _ordered(expected_response[1])
     if order_matters:

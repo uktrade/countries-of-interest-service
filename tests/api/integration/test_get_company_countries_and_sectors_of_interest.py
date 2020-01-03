@@ -57,6 +57,7 @@ def test_single_company_id_filter(app):
             ),
         )
 
+
 def test_multiple_company_id_filter(app):
     url = 'http://localhost:80/api/v1/get-company-countries-and-sectors-of-interest'
     with app.test_client() as app_context:
@@ -288,9 +289,7 @@ def test_pagination_next(app):
                     'next': 'http://localhost/api/v1/'
                     'get-company-countries-and-sectors-of-interest?'
                     'next-source=source2&next-source-id=source_id',
-                    'values': [
-                        list(interest_1.values()),
-                    ],
+                    'values': [list(interest_1.values())],
                 },
             ),
         )

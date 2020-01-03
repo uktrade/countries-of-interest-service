@@ -21,6 +21,7 @@ interest_2 = {
     'timestamp': '2009-10-10T12:12:12',
 }
 
+
 @pytest.fixture(scope='function', autouse=True)
 def setup_function(app, add_company_countries_of_interest):
     app.config['access_control']['hawk_enabled'] = False
@@ -72,10 +73,7 @@ def test_multiple_company_filter(app):
                         'timestamp',
                     ],
                     'next': None,
-                    'values': [
-                        list(interest_1.values()),
-                        list(interest_2.values())
-                    ],
+                    'values': [list(interest_1.values()), list(interest_2.values())],
                 },
             ),
         )
