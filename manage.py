@@ -4,6 +4,7 @@ import logging
 from flask_script import Manager
 
 from app import application
+from app.commands.algorithm import AlgorithmCommand
 from app.commands.dev import DevCommand
 
 logging.basicConfig(
@@ -18,4 +19,5 @@ app = application.get_or_create()
 if __name__ == '__main__':
     manager = Manager(app)
     manager.add_command('dev', DevCommand)
+    manager.add_command('algorithm', AlgorithmCommand)
     manager.run()

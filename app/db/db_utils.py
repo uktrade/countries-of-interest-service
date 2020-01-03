@@ -5,7 +5,7 @@ from sqlalchemy.schema import CreateSchema
 
 from app.db.models import sql_alchemy
 
-SCHEMAS = ['public', 'admin']
+SCHEMAS = ['public', 'admin', 'algorithm']
 
 
 def execute_query(query, data=None, df=True, raise_if_fail=False):
@@ -72,19 +72,64 @@ def create_index(index, table_name, index_name=None):
 
 def insert_data(df, table_name):
     if len(df):
-        sql = f'insert into {table_name} values'
-        for i, values in enumerate(df.values):
-            # quote string values
-            values = [
-                "'{}'".format(val) if type(val) in [str, pd.Timestamp] else val
-                for val in values
-            ]
-            values = ['Null' if pd.isnull(val) else val for val in values]
-            values = ['{}'.format(val) for val in values]
-            sql += f"\n\t({', '.join(values)})"
-            sql += ', ' if i != len(df) - 1 else ''
-        sql += '\n\ton conflict do nothing'
-        execute_statement(sql)
+        sql = '''
+            insert into {table_name} ({columns})
+            values ({values}) on conflict do nothing
+        '''.format(
+            table_name=table_name,
+            columns=','.join(df.columns),
+            values=','.join(['%s' for i in range(len(df.columns))]),
+        )
+        for col in df.columns:
+            if df[col].dtype == '<M8[ns]':
+                df[col] = df[col].map(lambda x: None if pd.isnull(x) else x.isoformat())
+        execute_statement(sql, df.values.tolist(), raise_if_fail=True)
+
+
+def dsv_buffer_to_table(
+    csv_buffer,
+    table,
+    schema='public',
+    has_header=False,
+    null='',
+    sep='\t',
+    columns=None,
+    quote=None,
+    encoding=None,
+):
+    connection = sql_alchemy.engine.raw_connection()
+    cursor = connection.cursor()
+    fq_table_name = f'"{schema}"."{table}"'
+    sql = _get_sql_copy_statement(
+        fq_table_name, columns, has_header, sep, null, quote, encoding
+    )
+    try:
+        cursor.copy_expert(sql, csv_buffer)
+        connection.commit()
+    except Exception as err:
+        print('DB ERROR', err.orig)
+    cursor.close()
+    connection.close()
+
+
+def _get_sql_copy_statement(
+    table, columns, has_header, delimiter, null_value, quote, encoding
+):
+    sql = 'COPY {}'.format(table)
+    if columns:
+        sql += ' ({})'.format(','.join(columns))
+    sql += ' FROM STDIN WITH CSV'
+    if has_header:
+        sql += ' HEADER'
+    if delimiter:
+        sql += " DELIMITER E'{}'".format(delimiter)
+    if null_value:
+        sql += " null as '{}'".format(null_value)
+    if quote:
+        sql += " QUOTE \'{}\'".format(quote)
+    if encoding:
+        sql += f" ENCODING '{encoding}'"
+    return sql
 
 
 def create_schemas(engine):

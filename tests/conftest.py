@@ -9,7 +9,7 @@ from app.db.db_utils import create_schemas
 
 
 pytest_plugins = [
-    "tests.api.fixtures.add_to_db",
+    "tests.fixtures.add_to_db",
 ]
 
 TESTING_DB_NAME_TEMPLATE = 'coi_test_{}'

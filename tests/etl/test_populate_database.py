@@ -2,23 +2,24 @@ import datetime
 from unittest.mock import patch
 
 from app.db.db_utils import execute_query, execute_statement
-from app.etl.tasks.core import populate_database
+from app.etl.tasks import populate_database
 
 
-@patch('app.etl.tasks.core.extract_countries_and_territories_reference_dataset')
-@patch('app.etl.tasks.core.extract_datahub_company_dataset')
-@patch('app.etl.tasks.core.extract_datahub_export_countries')
-@patch('app.etl.tasks.core.extract_datahub_future_interest_countries')
-@patch('app.etl.tasks.core.extract_datahub_interactions')
-@patch('app.etl.tasks.core.extract_datahub_omis')
-# @patch('app.etl.tasks.core.extract_datahub_sectors')
-# @patch('app.etl.tasks.core.extract_export_wins')
-@patch('app.etl.tasks.core.ExportCountriesTask')
-@patch('app.etl.tasks.core.PopulateCountriesAndSectorsOfInterestTask')
-@patch('app.etl.tasks.core.PopulateCountriesOfInterestTask')
-@patch('app.etl.tasks.core.SectorsOfInterestTask')
+@patch('app.etl.tasks.extract_countries_and_territories_reference_dataset')
+@patch('app.etl.tasks.extract_datahub_company_dataset')
+@patch('app.etl.tasks.extract_datahub_export_countries')
+@patch('app.etl.tasks.extract_datahub_future_interest_countries')
+@patch('app.etl.tasks.extract_datahub_interactions')
+@patch('app.etl.tasks.extract_datahub_omis')
+# @patch('app.etl.tasks.extract_datahub_sectors')
+# @patch('app.etl.tasks.extract_export_wins')
+@patch('app.etl.tasks.PopulateStandardisedCountriesTask')
+@patch('app.etl.tasks.ExportCountriesTask')
+@patch('app.etl.tasks.PopulateCountriesAndSectorsOfInterestTask')
+@patch('app.etl.tasks.PopulateCountriesOfInterestTask')
+@patch('app.etl.tasks.SectorsOfInterestTask')
 class TestPopulateDatabase:
-    @patch('app.etl.tasks.core.execute_statement')
+    @patch('app.etl.tasks.execute_statement')
     def test_tasks_are_run(
         self,
         execute_statement,
@@ -26,6 +27,7 @@ class TestPopulateDatabase:
         PopulateCountriesOfInterestTask,
         PopulateCountriesAndSectorsOfInterestTask,
         ExportCountriesTask,
+        PopulateStandardisedCountriesTask,
         # extract_export_wins,
         # extract_datahub_sectors,
         extract_datahub_omis,
@@ -45,6 +47,8 @@ class TestPopulateDatabase:
         extract_datahub_omis.assert_called_once()
         # extract_datahub_sectors.assert_called_once()
         # extract_export_wins.assert_called_once()
+        PopulateStandardisedCountriesTask.assert_called_once_with()
+        PopulateStandardisedCountriesTask.return_value.assert_called_once()
         ExportCountriesTask.assert_called_once_with(drop_table=True)
         ExportCountriesTask.return_value.assert_called_once()
         PopulateCountriesAndSectorsOfInterestTask.assert_called_once_with(
@@ -66,6 +70,7 @@ class TestPopulateDatabase:
                 extract_datahub_omis.return_value,
                 # extract_datahub_sectors.return_value,
                 # extract_export_wins.return_value,
+                PopulateStandardisedCountriesTask.return_value.return_value,
                 ExportCountriesTask.return_value.return_value,
                 (PopulateCountriesAndSectorsOfInterestTask.return_value.return_value),
                 PopulateCountriesOfInterestTask.return_value.return_value,
@@ -75,7 +80,7 @@ class TestPopulateDatabase:
 
         assert output == expected_output
 
-    @patch('app.etl.tasks.core.datetime')
+    @patch('app.etl.tasks.datetime')
     def test_updates_task_status_to_success(
         self,
         mock_datetime,
@@ -83,6 +88,7 @@ class TestPopulateDatabase:
         PopulateCountriesOfInterestTask,
         PopulateCountriesAndSectorsOfInterestTask,
         ExportCountriesTask,
+        PopulateStandardisedCountries,
         # extract_export_wins,
         # extract_datahub_sectors,
         extract_datahub_omis,

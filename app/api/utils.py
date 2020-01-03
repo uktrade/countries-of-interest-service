@@ -2,6 +2,18 @@ from flask import request
 
 
 def to_camel_case(word):
+    word = word.lstrip('_').rstrip('_')
+    index = 1
+    previous_letter = word[0]
+    new_word = previous_letter
+    while index < len(word):
+        if word[index] == '_' and previous_letter == '_':
+            pass
+        else:
+            new_word = new_word + word[index]
+        previous_letter = word[index]
+        index += 1
+    word = new_word
     return word.split('_')[0] + ''.join(
         x.capitalize() or '_' for x in word.split('_')[1:]
     )

@@ -190,14 +190,10 @@ class TestAuthentication:
 
     def test_endpoints_secured(self):
         urls = [
-            '/api/v1/get-companies-house-company-numbers',
             '/api/v1/get-company-countries-and-sectors-of-interest',
             '/api/v1/get-company-countries-of-interest',
             '/api/v1/get-company-export-countries',
             '/api/v1/get-company-sectors-of-interest',
-            '/api/v1/get-datahub-company-ids',
-            '/api/v1/' 'get-datahub-company-ids-to-companies-house-company-numbers',
-            '/api/v1/get-sectors',
         ]
         with self.app.test_client() as c:
             for url in urls:

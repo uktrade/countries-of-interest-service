@@ -4,8 +4,9 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-import app.etl.tasks.core.source_data_extraction
-import app.etl.tasks.core.source_data_extraction as source_data_extraction
+import app.db.models as models
+import app.etl.tasks.source_data_extraction
+import app.etl.tasks.source_data_extraction as source_data_extraction
 from app.db.db_utils import execute_statement
 
 
@@ -22,7 +23,7 @@ class SourceDataExtractBaseTestCase:
             'hawk_client_key': 'hawk_client_key',
         }
 
-    @patch('app.etl.tasks.core.source_data_extraction.current_app')
+    @patch('app.etl.tasks.source_data_extraction.current_app')
     def test_stub_data(self, current_app, app_with_db):
         current_app.config = {'app': {'stub_source_data': True}}
         self.extractor.__call__()
@@ -30,8 +31,8 @@ class SourceDataExtractBaseTestCase:
         status = execute_statement(sql, raise_if_fail=True)
         assert int(status.rowcount) > 0
 
-    @patch('app.etl.tasks.core.source_data_extraction.requests')
-    @patch('app.etl.tasks.core.source_data_extraction.current_app')
+    @patch('app.etl.tasks.source_data_extraction.requests')
+    @patch('app.etl.tasks.source_data_extraction.current_app')
     def test_data(self, current_app, requests, app_with_db):
         current_app.config = {
             'app': {'stub_source_data': False},
@@ -95,7 +96,7 @@ class TestExtractCountriesAndTerritoriesReferenceDataset(
         ],
     }
 
-    table_name = 'reference_countries_and_territories'
+    table_name = models.DITCountryTerritoryRegister.__tablename__
     extractor = (
         source_data_extraction.extract_countries_and_territories_reference_dataset
     )
@@ -126,15 +127,21 @@ class TestExtractDatahubExportCountries(SourceDataExtractBaseTestCase):
     __test__ = True
     dataset_id_config_key = 'datahub_export_countries_dataset_id'
     expected_data = [
-        ['c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'SK', 0],
-        ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'SD', 1],
+        ['c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'SK', 'slovakia', 0],
+        ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'SD', 'sudan', 1],
     ]
     source_data = {
-        'headers': ['id', 'company_id', 'country_iso_alpha2_code', 'extraField'],
+        'headers': [
+            'id',
+            'company_id',
+            'country_iso_alpha2_code',
+            'country',
+            'extraField',
+        ],
         'next': None,
         'values': [
-            [0, 'c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'SK', 'extra'],
-            [1, 'd0af8e52-ff34-4088-98e3-d2d22cd250ae', 'SD', 'extra'],
+            [0, 'c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'SK', 'slovakia', 'extra'],
+            [1, 'd0af8e52-ff34-4088-98e3-d2d22cd250ae', 'SD', 'sudan', 'extra'],
         ],
     }
     source_table_id_config_key = 'datahub_export_countries_source_table_id'
@@ -146,15 +153,21 @@ class TestExtractDatahubFutureInterestCountries(SourceDataExtractBaseTestCase):
     __test__ = True
     dataset_id_config_key = 'datahub_future_interest_countries_dataset_id'
     expected_data = [
-        ['c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'SK', 0],
-        ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'SD', 1],
+        ['c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'SK', 'slovakia', 0],
+        ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'SD', 'sudan', 1],
     ]
     source_data = {
-        'headers': ['id', 'company_id', 'country_iso_alpha2_code', 'extra_field'],
+        'headers': [
+            'id',
+            'company_id',
+            'country_iso_alpha2_code',
+            'country',
+            'extra_field',
+        ],
         'next': None,
         'values': [
-            [0, 'c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'SK', 'extra'],
-            [1, 'd0af8e52-ff34-4088-98e3-d2d22cd250ae', 'SD', 'extra'],
+            [0, 'c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'SK', 'slovakia', 'extra'],
+            [1, 'd0af8e52-ff34-4088-98e3-d2d22cd250ae', 'SD', 'sudan', 'extra'],
         ],
     }
     source_table_id_config_key = 'datahub_future_interest_countries_source_table_id'
@@ -256,7 +269,7 @@ class TestExtractDatahubOmis(SourceDataExtractBaseTestCase):
     }
     source_table_id_config_key = 'datahub_omis_source_table_id'
     table_name = 'datahub_omis'
-    extractor = app.etl.tasks.core.source_data_extraction.extract_datahub_omis
+    extractor = app.etl.tasks.source_data_extraction.extract_datahub_omis
 
 
 class TestExtractDatahubSectors(SourceDataExtractBaseTestCase):
@@ -276,7 +289,7 @@ class TestExtractDatahubSectors(SourceDataExtractBaseTestCase):
     }
     source_table_id_config_key = 'datahub_sectors_source_table_id'
     table_name = 'datahub_sectors'
-    extractor = app.etl.tasks.core.source_data_extraction.extract_datahub_sectors
+    extractor = app.etl.tasks.source_data_extraction.extract_datahub_sectors
 
 
 class TestExtractExportWins(SourceDataExtractBaseTestCase):
@@ -296,11 +309,11 @@ class TestExtractExportWins(SourceDataExtractBaseTestCase):
     }
     source_table_id_config_key = 'export_wins_source_table_id'
     table_name = 'export_wins'
-    extractor = app.etl.tasks.core.source_data_extraction.extract_export_wins
+    extractor = app.etl.tasks.source_data_extraction.extract_export_wins
 
 
 class TestGetHawkHeaders:
-    @patch('app.etl.tasks.core.source_data_extraction.mohawk')
+    @patch('app.etl.tasks.source_data_extraction.mohawk')
     def test_if_https_is_false_change_url_to_http(self, mohawk):
         url = 'https://something'
         client_id = 'client_id'
@@ -330,7 +343,7 @@ class TestPopulateTable:
         self.url = 'some_url'
         self.stub_data = {'headers': ['a', 'b'], 'values': [(0, 0), (1, 1)]}
 
-    @patch('app.etl.tasks.core.source_data_extraction.sql_alchemy')
+    @patch('app.etl.tasks.source_data_extraction.sql_alchemy')
     def test_rollback_when_there_is_an_error(self, mock_alchemy, app_with_db):
         connection = Mock()
         transaction = Mock()

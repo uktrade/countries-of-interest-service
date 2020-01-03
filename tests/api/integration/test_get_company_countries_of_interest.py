@@ -3,33 +3,34 @@ import pytest
 import tests.api.utils as utils
 
 
+interest_1 = {
+    'company_id': '1',
+    'country_of_interest': 'country1',
+    'standardised_country': 'standardised_country1',
+    'source': 'source1',
+    'source_id': 'source_id',
+    'timestamp': '2009-10-10T12:12:12',
+}
+
+interest_2 = {
+    'company_id': '2',
+    'country_of_interest': 'country2',
+    'standardised_country': 'standardised_country2',
+    'source': 'source2',
+    'source_id': 'source_id2',
+    'timestamp': '2009-10-10T12:12:12',
+}
+
 @pytest.fixture(scope='function', autouse=True)
 def setup_function(app, add_company_countries_of_interest):
     app.config['access_control']['hawk_enabled'] = False
     old_pagination_size = app.config['app']['pagination_size']
-    add_company_countries_of_interest(
-        [
-            {
-                'company_id': '1',
-                'country_of_interest': 'country1',
-                'source': 'source1',
-                'source_id': 'source_id',
-                'timestamp': '2009-10-10 12:12:12',
-            },
-            {
-                'company_id': '2',
-                'country_of_interest': 'country2',
-                'source': 'source2',
-                'source_id': 'source_id2',
-                'timestamp': '2009-10-10 12:12:12',
-            },
-        ]
-    )
+    add_company_countries_of_interest([interest_1, interest_2])
     yield
     app.config['app']['pagination_size'] = old_pagination_size
 
 
-def test_get_company_countries_of_interest(app):
+def test_single_company_filter(app):
     with app.test_client() as app_context:
         utils.assert_api_response(
             app_context=app_context,
@@ -41,14 +42,13 @@ def test_get_company_countries_of_interest(app):
                     'headers': [
                         'companyId',
                         'countryOfInterest',
+                        'standardisedCountry',
                         'source',
                         'sourceId',
                         'timestamp',
                     ],
                     'next': None,
-                    'values': [
-                        ['1', 'country1', 'source1', 'source_id', '2009-10-10T12:12:12']
-                    ],
+                    'values': [list(interest_1.values())],
                 },
             ),
         )
@@ -66,33 +66,22 @@ def test_multiple_company_filter(app):
                     'headers': [
                         'companyId',
                         'countryOfInterest',
+                        'standardisedCountry',
                         'source',
                         'sourceId',
                         'timestamp',
                     ],
                     'next': None,
                     'values': [
-                        [
-                            '1',
-                            'country1',
-                            'source1',
-                            'source_id',
-                            '2009-10-10T12:12:12',
-                        ],
-                        [
-                            '2',
-                            'country2',
-                            'source2',
-                            'source_id2',
-                            '2009-10-10T12:12:12',
-                        ],
+                        list(interest_1.values()),
+                        list(interest_2.values())
                     ],
                 },
             ),
         )
 
 
-def test_country_filter(app):
+def test_single_country_filter(app):
     with app.test_client() as app_context:
         utils.assert_api_response(
             app_context=app_context,
@@ -104,14 +93,13 @@ def test_country_filter(app):
                     'headers': [
                         'companyId',
                         'countryOfInterest',
+                        'standardisedCountry',
                         'source',
                         'sourceId',
                         'timestamp',
                     ],
                     'next': None,
-                    'values': [
-                        ['1', 'country1', 'source1', 'source_id', '2009-10-10T12:12:12']
-                    ],
+                    'values': [list(interest_1.values())],
                 },
             ),
         )
@@ -129,27 +117,13 @@ def test_multiple_country_filter(app):
                     'headers': [
                         'companyId',
                         'countryOfInterest',
+                        'standardisedCountry',
                         'source',
                         'sourceId',
                         'timestamp',
                     ],
                     'next': None,
-                    'values': [
-                        [
-                            '1',
-                            'country1',
-                            'source1',
-                            'source_id',
-                            '2009-10-10T12:12:12',
-                        ],
-                        [
-                            '2',
-                            'country2',
-                            'source2',
-                            'source_id2',
-                            '2009-10-10T12:12:12',
-                        ],
-                    ],
+                    'values': [list(interest_1.values()), list(interest_2.values())],
                 },
             ),
         )
@@ -168,20 +142,13 @@ def test_single_source_filter(app):
                     'headers': [
                         'companyId',
                         'countryOfInterest',
+                        'standardisedCountry',
                         'source',
                         'sourceId',
                         'timestamp',
                     ],
                     'next': None,
-                    'values': [
-                        [
-                            '2',
-                            'country2',
-                            'source2',
-                            'source_id2',
-                            '2009-10-10T12:12:12',
-                        ]
-                    ],
+                    'values': [list(interest_2.values())],
                 },
             ),
         )
@@ -200,27 +167,13 @@ def test_multiple_source_filter(app):
                     'headers': [
                         'companyId',
                         'countryOfInterest',
+                        'standardisedCountry',
                         'source',
                         'sourceId',
                         'timestamp',
                     ],
                     'next': None,
-                    'values': [
-                        [
-                            '1',
-                            'country1',
-                            'source1',
-                            'source_id',
-                            '2009-10-10T12:12:12',
-                        ],
-                        [
-                            '2',
-                            'country2',
-                            'source2',
-                            'source_id2',
-                            '2009-10-10T12:12:12',
-                        ],
-                    ],
+                    'values': [list(interest_1.values()), list(interest_2.values())],
                 },
             ),
         )
@@ -239,20 +192,13 @@ def test_pagination(app):
                     'headers': [
                         'companyId',
                         'countryOfInterest',
+                        'standardisedCountry',
                         'source',
                         'sourceId',
                         'timestamp',
                     ],
                     'next': None,
-                    'values': [
-                        [
-                            '2',
-                            'country2',
-                            'source2',
-                            'source_id2',
-                            '2009-10-10T12:12:12',
-                        ]
-                    ],
+                    'values': [list(interest_2.values())],
                 },
             ),
         )
@@ -272,6 +218,7 @@ def test_pagination_next(app):
                     'headers': [
                         'companyId',
                         'countryOfInterest',
+                        'standardisedCountry',
                         'source',
                         'sourceId',
                         'timestamp',
@@ -279,9 +226,7 @@ def test_pagination_next(app):
                     'next': 'http://localhost/api/v1/'
                     'get-company-countries-of-interest?'
                     'next-source=source2&next-source-id=source_id2',
-                    'values': [
-                        ['1', 'country1', 'source1', 'source_id', '2009-10-10T12:12:12']
-                    ],
+                    'values': [list(interest_1.values())],
                 },
             ),
         )

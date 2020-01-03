@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 
-from sqlalchemy import PrimaryKeyConstraint
+from sqlalchemy import PrimaryKeyConstraint, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import ClauseElement
 
@@ -14,9 +14,11 @@ _col = db.Column
 _text = db.Text
 _int = db.Integer
 _dt = db.DateTime
+_bigint = _sa.BigInteger
 _bool = db.Boolean
 _num = db.Numeric
 _array = _sa.ARRAY
+_date = _sa.Date
 
 
 class BaseModel(db.Model):
@@ -85,15 +87,6 @@ class HawkUsers(BaseModel):
         )
 
 
-class DatahubCompanyIDToCompaniesHouseCompanyNumber(BaseModel):
-
-    __tablename__ = 'coi_datahub_company_id_to_companies_house_company_number'
-    __table_args__ = {'schema': 'public'}
-
-    datahub_company_id = _col(UUID(as_uuid=True), primary_key=True)
-    companies_house_company_number = _col(_text)
-
-
 class CountriesAndSectorsOfInterest(BaseModel):
 
     __tablename__ = 'coi_countries_and_sectors_of_interest'
@@ -101,6 +94,7 @@ class CountriesAndSectorsOfInterest(BaseModel):
 
     company_id = _col(_text)
     country_of_interest = _col(_text)
+    standardised_country = _col(_text)
     sector_of_interest = _col(_text)
     source = _col(_text)
     source_id = _col(_text)
@@ -116,11 +110,55 @@ class CountriesOfInterest(BaseModel):
 
     company_id = _col(_text)
     country_of_interest = _col(_text)
+    standardised_country = _col(_text)
     source = _col(_text)
     source_id = _col(_text)
     timestamp = _col(_dt)
 
     __table_args__ = (PrimaryKeyConstraint(source, source_id),)
+
+
+class DatahubOmis(BaseModel):
+
+    __tablename__ = 'datahub_omis'
+    __table_args__ = {'schema': 'public'}
+
+    company_id = _col(UUID(as_uuid=True))
+    created_date = _col(_dt)
+    id = _col(UUID(as_uuid=True), primary_key=True)
+    market = _col(_text)
+    sector = _col(_text)
+
+
+class DatahubCompanyIDToCompaniesHouseCompanyNumber(BaseModel):
+
+    __tablename__ = 'coi_datahub_company_id_to_companies_house_company_number'
+    __table_args__ = {'schema': 'public'}
+
+    datahub_company_id = _col(UUID(as_uuid=True), primary_key=True)
+    companies_house_company_number = _col(_text)
+
+
+class DatahubExportToCountries(BaseModel):
+
+    __tablename__ = 'datahub_export_countries'
+    __table_args__ = {'schema': 'public'}
+
+    company_id = _col(UUID(as_uuid=True))
+    country = _col(_text)
+    country_iso_alpha2_code = _col(_text)
+    id = _col(_num, primary_key=True)
+
+
+class DatahubFutureInterestCountries(BaseModel):
+
+    __tablename__ = 'datahub_future_interest_countries'
+    __table_args__ = {'schema': 'public'}
+
+    company_id = _col(UUID(as_uuid=True))
+    country = _col(_text)
+    country_iso_alpha2_code = _col(_text)
+    id = _col(_num, primary_key=True)
 
 
 class ExportCountries(BaseModel):
@@ -130,11 +168,23 @@ class ExportCountries(BaseModel):
 
     company_id = _col(_text)
     export_country = _col(_text)
+    standardised_country = _col(_text)
     source = _col(_text)
     source_id = _col(_text)
     timestamp = _col(_dt)
 
     __table_args__ = (PrimaryKeyConstraint(source, source_id),)
+
+
+class ExportWins(BaseModel):
+
+    __tablename__ = 'export_wins'
+    __table_args__ = {'schema': 'public'}
+
+    company_id = _col(_text)
+    country = _col(_text)
+    id = _col(UUID(as_uuid=True), primary_key=True)
+    timestamp = _col(_dt)
 
 
 class SectorsOfInterest(BaseModel):
@@ -149,3 +199,60 @@ class SectorsOfInterest(BaseModel):
     timestamp = _col(_dt)
 
     __table_args__ = (PrimaryKeyConstraint(source, source_id),)
+
+
+class DITCountryTerritoryRegister(BaseModel):
+    __tablename__ = 'dit_country_territory_register'
+    __table_args__ = {'schema': 'public'}
+
+    end_date = _col(_date)
+    id = _col(_text, primary_key=True)
+    name = _col(_text)
+    start_date = _col(_date)
+    type = _col(_text)
+
+
+class StandardisedCountries(BaseModel):
+    __tablename__ = 'standardised_countries'
+    __table_args__ = {'schema': 'public'}
+
+    id = _col(_int, primary_key=True)
+    country = _col(_text)
+    standardised_country = _col(_text)
+    similarity = _col(_num)
+
+
+class Interactions(BaseModel):
+
+    __tablename__ = 'interactions'
+
+    id = _col(_int, primary_key=True, autoincrement=True)
+    datahub_id = _col(_text)
+    companies_house_number = _col(_text)
+    subject = _col(_text)
+    policy_feedback_notes = _col(_text)
+    notes = _col(_text)
+    source = _col(_text)
+    source_id = _col(_text)
+    created_on = _col(_dt)
+    country_name = _col(_text)
+    country_alpha2 = _col(_text)
+
+    __table_args__ = (
+        UniqueConstraint(source, source_id),
+        {'schema': 'public'},
+    )
+
+
+class InteractionsAnalysed(BaseModel):
+
+    __tablename__ = 'interactions_analysed'
+    __table_args__ = {'schema': 'algorithm'}
+
+    id = _col(_int, primary_key=True)
+    place = _col(_text, nullable=False)
+    standardized_place = _col(_text)
+    action = _col(_text)
+    type = _col(_text)
+    context = _col(_sa.ARRAY(_text))
+    negation = _col(_bool)
