@@ -29,7 +29,7 @@ with omis_countries_of_interest as (
   select
     company_id::text,
     case
-      when country_iso_alpha2_code is not null 
+      when country_iso_alpha2_code is not null
         and country_iso_alpha2_code  != '' then country_iso_alpha2_code
       else d.country
     end as country,

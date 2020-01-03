@@ -131,7 +131,13 @@ class TestExtractDatahubExportCountries(SourceDataExtractBaseTestCase):
         ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'SD', 'sudan', 1],
     ]
     source_data = {
-        'headers': ['id', 'company_id', 'country_iso_alpha2_code', 'country', 'extraField'],
+        'headers': [
+            'id',
+            'company_id',
+            'country_iso_alpha2_code',
+            'country',
+            'extraField',
+        ],
         'next': None,
         'values': [
             [0, 'c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'SK', 'slovakia', 'extra'],
@@ -151,7 +157,13 @@ class TestExtractDatahubFutureInterestCountries(SourceDataExtractBaseTestCase):
         ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'SD', 'sudan', 1],
     ]
     source_data = {
-        'headers': ['id', 'company_id', 'country_iso_alpha2_code', 'country', 'extra_field'],
+        'headers': [
+            'id',
+            'company_id',
+            'country_iso_alpha2_code',
+            'country',
+            'extra_field',
+        ],
         'next': None,
         'values': [
             [0, 'c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'SK', 'slovakia', 'extra'],

@@ -9,7 +9,7 @@ sql = '''
 select
   company_id::text,
   case
-    when country_iso_alpha2_code is not null 
+    when country_iso_alpha2_code is not null
       and country_iso_alpha2_code != '' then country_iso_alpha2_code
     else d.country
   end as export_country,

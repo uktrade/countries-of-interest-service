@@ -57,7 +57,7 @@ class TestExportCountries:
 
         assert df['company_id'].values[1] == '08c5f419-f85f-4051-b640-d3cfef8ef85d'
         assert df['export_country'].values[1] == 'CN'
-        assert df['standardised_country'].values[1] == None
+        assert df['standardised_country'].values[1] is None
         assert df['source'].values[1] == 'datahub_export_countries'
         assert df['source_id'].values[1] == '1'
         assert not df['timestamp'].values[1]
