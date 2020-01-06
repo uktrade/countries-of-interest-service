@@ -7,11 +7,12 @@ dependencies:
 - pyyaml=5.2
 - werkzeug=0.16.0
 - yaml
+- ca-certificates
 - curl
 - openssl=1.1.1
 - pytest=5.3.2
 - pytest-cov=2.8.1
-- python=3.6.8
+- python=3.6.9
 - pip==19.3.1
 - spacy==2.0.16
 - pip:
