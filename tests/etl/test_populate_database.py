@@ -7,14 +7,14 @@ from app.etl.tasks import populate_database
 
 @patch('app.etl.tasks.extract_countries_and_territories_reference_dataset')
 @patch('app.etl.tasks.extract_datahub_company_dataset')
-@patch('app.etl.tasks.extract_datahub_export_countries')
+@patch('app.etl.tasks.extract_datahub_export_to_countries')
 @patch('app.etl.tasks.extract_datahub_future_interest_countries')
 @patch('app.etl.tasks.extract_datahub_interactions')
 @patch('app.etl.tasks.extract_datahub_omis')
 # @patch('app.etl.tasks.extract_datahub_sectors')
 # @patch('app.etl.tasks.extract_export_wins')
 @patch('app.etl.tasks.PopulateStandardisedCountriesTask')
-@patch('app.etl.tasks.ExportCountriesTask')
+@patch('app.etl.tasks.ExportToCountriesTask')
 @patch('app.etl.tasks.PopulateCountriesAndSectorsOfInterestTask')
 @patch('app.etl.tasks.PopulateCountriesOfInterestTask')
 @patch('app.etl.tasks.SectorsOfInterestTask')
@@ -33,7 +33,7 @@ class TestPopulateDatabase:
         extract_datahub_omis,
         extract_datahub_interactions,
         extract_datahub_future_interest_countries,
-        extract_datahub_export_countries,
+        extract_datahub_export_to_countries,
         extract_datahub_company_dataset,
         extract_countries_and_territories_reference_dataset,
     ):
@@ -41,7 +41,7 @@ class TestPopulateDatabase:
 
         extract_countries_and_territories_reference_dataset.assert_called_once()
         extract_datahub_company_dataset.assert_called_once()
-        extract_datahub_export_countries.assert_called_once()
+        extract_datahub_export_to_countries.assert_called_once()
         extract_datahub_future_interest_countries.assert_called_once()
         extract_datahub_interactions.assert_called_once()
         extract_datahub_omis.assert_called_once()
@@ -64,7 +64,7 @@ class TestPopulateDatabase:
             'output': [
                 extract_countries_and_territories_reference_dataset.return_value,
                 extract_datahub_company_dataset.return_value,
-                extract_datahub_export_countries.return_value,
+                extract_datahub_export_to_countries.return_value,
                 extract_datahub_interactions.return_value,
                 extract_datahub_future_interest_countries.return_value,
                 extract_datahub_omis.return_value,
@@ -94,7 +94,7 @@ class TestPopulateDatabase:
         extract_datahub_omis,
         extract_datahub_interactions,
         extract_datahub_future_interest_countries,
-        extract_datahub_export_countries,
+        extract_datahub_export_to_countries,
         extract_datahub_company_dataset,
         extract_countries_and_territories_reference,
         app_with_db,

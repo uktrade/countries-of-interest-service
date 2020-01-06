@@ -4,33 +4,16 @@ from app.db.models import (
     CountriesAndSectorsOfInterest,
     CountriesOfInterest,
     DITCountryTerritoryRegister,
-    DatahubCompanyIDToCompaniesHouseCompanyNumber,
     DatahubExportToCountries,
     DatahubFutureInterestCountries,
     DatahubOmis,
+    DatahubSectors,
     ExportCountries,
     ExportWins,
     Interactions,
     SectorsOfInterest,
     StandardisedCountries,
 )
-
-
-@pytest.fixture(scope='module')
-def add_companies_house_company_numbers(app_with_db_module):
-    def _method(records):
-        for record in records:
-            defaults = {
-                'companies_house_company_number': record.get(
-                    'companies_house_company_number', None
-                ),
-            }
-            DatahubCompanyIDToCompaniesHouseCompanyNumber.get_or_create(
-                datahub_company_id=record.get('datahub_company_id', None),
-                defaults=defaults,
-            )
-
-    return _method
 
 
 @pytest.fixture(scope='module')
@@ -160,6 +143,19 @@ def add_datahub_omis(app_with_db_module):
 
 
 @pytest.fixture(scope='module')
+def add_datahub_sectors(app_with_db_module):
+    def _method(records):
+        for record in records:
+            defaults = {
+                'id': record.get('id', None),
+                'sector': record.get('sector', None),
+            }
+            DatahubSectors.get_or_create(id=record.get('id', None), defaults=defaults)
+
+    return _method
+
+
+@pytest.fixture(scope='module')
 def add_country_territory_registry(app_with_db_module):
     def _method(records):
         for record in records:
@@ -214,16 +210,11 @@ def add_datahub_interaction(app_with_db_module):
     def _method(records):
         for record in records:
             defaults = {
-                'datahub_id': record.get('datahub_id', None),
-                'companies_house_number': record.get('companies_house_number', None),
+                'datahub_interaction_id': record.get('datahub_interaction_id', None),
+                'datahub_company_id': record.get('datahub_company_id', None),
                 'subject': record.get('subject', None),
-                'policy_feedback_notes': record.get('policy_feedback_notes', None),
                 'notes': record.get('notes', None),
-                'source': record.get('source', None),
-                'source_id': record.get('source_id', None),
                 'created_on': record.get('created_on', None),
-                'country_name': record.get('country_name', None),
-                'country_alpha2': record.get('country_alpha2', None),
             }
             Interactions.get_or_create(
                 id=record.get('id', None), defaults=defaults,
