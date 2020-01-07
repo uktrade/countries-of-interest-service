@@ -5,6 +5,13 @@ from flask import Blueprint, redirect, request, session, url_for
 from flask_oauthlib.client import OAuth
 
 
+import urllib.request
+
+original_open = urllib.request.urlopen
+def myopen(path):
+    return original_open(path, cafile=certifi.where())
+urllib.request.urlopen = myopen
+
 import werkzeug
 from werkzeug.exceptions import abort
 
