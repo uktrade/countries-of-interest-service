@@ -6,6 +6,7 @@ ENV PATH="/root/miniconda3/bin:${PATH}"
 ARG PATH="/root/miniconda3/bin:${PATH}"
 
 ADD scripts scripts
+RUN scripts/install_dockerize.sh
 RUN scripts/install_miniconda.sh
 RUN scripts/install_node.sh
 
