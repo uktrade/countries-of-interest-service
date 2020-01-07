@@ -18,7 +18,10 @@ class TestPopulateDatabase:
         with self.app.test_request_context():
             output = populate_database()
         populate_database_task.delay.assert_called_once_with(False)
-        assert output == {'status': 200, 'message': 'started populate_database task'}
+        assert output.get_json() == {
+            'status': 200,
+            'message': 'started populate_database task',
+        }
 
     def test_called_with_drop_table_in_request(self, populate_database_task):
 
@@ -26,7 +29,10 @@ class TestPopulateDatabase:
             request.request.args = {'drop-table': ''}
             output = populate_database()
         populate_database_task.delay.assert_called_once_with(True)
-        assert output == {'status': 200, 'message': 'started populate_database task'}
+        assert output.get_json() == {
+            'status': 200,
+            'message': 'started populate_database task',
+        }
 
     @patch('app.api.views.datetime')
     def test_creates_etl_status_table_if_it_does_not_exist(
