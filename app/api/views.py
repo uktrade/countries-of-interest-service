@@ -441,7 +441,7 @@ def populate_database():
         execute_statement(sql)
         sql = '''insert into etl_status values (%s, %s)'''
         execute_statement(sql, data=['RUNNING', datetime.datetime.now()])
-        return {'status': 200, 'message': 'started populate_database task'}
+        return flask_app.make_response({'status': 200, 'message': 'started populate_database task'})
     else:
         timestamp = df['timestamp'].values[0]
         response = {
