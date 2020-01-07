@@ -39,7 +39,7 @@ order by source, source_id
 
 table_fields = '''(
   company_id varchar(100),
-  export_country varchar(12),
+  export_country varchar(100),
   standardised_country varchar(100),
   source varchar(50),
   source_id varchar(100),
