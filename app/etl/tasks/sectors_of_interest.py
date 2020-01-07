@@ -7,7 +7,7 @@ sql = '''
 with omis_sectors_of_interest as (
     select
       company_id::text,
-      sector,
+      sector as sector_of_interest,
       '{omis}' as source,
       id::varchar(100) as source_id,
       created_date as timestamp
