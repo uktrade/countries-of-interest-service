@@ -28,14 +28,24 @@ DevCommand = Manager(app=app, usage='Development commands')
     '--create_tables', dest='tables', action='store_true', help='Create database tables'
 )
 @DevCommand.option(
-    '--drop_tables', dest='drop_tables', action='store_true', help='Drop database tables'
+    '--drop_tables',
+    dest='drop_tables',
+    action='store_true',
+    help='Drop database tables',
 )
 @DevCommand.option(
-    '--recreate_tables', dest='recreate_tables', action='store_true', help='Drop and recreate database tables'
+    '--recreate_tables',
+    dest='recreate_tables',
+    action='store_true',
+    help='Drop and recreate database tables',
 )
-def db(create=False, drop=False, tables=False, drop_tables=False, recreate_tables=False):
+def db(
+    create=False, drop=False, tables=False, drop_tables=False, recreate_tables=False
+):
     if not any([create, drop, drop_tables, tables, recreate_tables]):
-        print('please choose an option (--drop, --create or --create_tables or --drop_tables  or --recreate_tables)')
+        print(
+            'please choose an option (--drop, --create or --create_tables or --drop_tables  or --recreate_tables)'
+        )
     else:
         db_url = app.config['SQLALCHEMY_DATABASE_URI']
         db_name = db_url.database
