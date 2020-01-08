@@ -9,7 +9,7 @@ with omis_sectors_of_interest as (
       company_id::text,
       sector as sector_of_interest,
       '{omis}' as source,
-      id::varchar(100) as source_id,
+      id::text as source_id,
       created_date as timestamp
 
     from datahub_omis
@@ -23,10 +23,10 @@ select * from omis_sectors_of_interest
 )
 
 table_fields = '''(
-    company_id varchar(100),
-    sector_of_interest varchar(200),
-    source varchar(50),
-    source_id varchar(100),
+    company_id text,
+    sector_of_interest text,
+    source text,
+    source_id text,
     timestamp timestamp,
     primary key (source, source_id)
 )'''

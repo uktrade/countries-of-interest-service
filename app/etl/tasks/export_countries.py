@@ -19,7 +19,7 @@ select
     else NULL
   end as standardised_country,
   '{export_countries}' as source,
-  d.id::varchar(100) as source_id,
+  d.id::text as source_id,
   null::timestamp as timestamp
 
 from datahub_export_countries d
@@ -38,11 +38,11 @@ order by source, source_id
 )
 
 table_fields = '''(
-  company_id varchar(100),
-  export_country varchar(100),
-  standardised_country varchar(100),
-  source varchar(50),
-  source_id varchar(100),
+  company_id text,
+  export_country text,
+  standardised_country text,
+  source text,
+  source_id text,
   timestamp Timestamp,
   primary key (source, source_id)
 )'''

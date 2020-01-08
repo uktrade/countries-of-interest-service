@@ -15,7 +15,7 @@ with omis_countries_of_interest as (
       else NULL
     end as standardised_country,
     '{omis}' as source,
-    d.id::varchar(100) as source_id,
+    d.id::text as source_id,
     created_date as timestamp
 
   from datahub_omis d
@@ -39,7 +39,7 @@ with omis_countries_of_interest as (
       else NULL
     end as standardised_country,
     '{future_interest}' as source,
-    d.id::varchar(100) as source_id,
+    d.id::text as source_id,
     null::timestamp as timestamp
 
   from datahub_future_interest_countries d
@@ -72,11 +72,11 @@ select * from results
 )
 
 table_fields = '''(
-    company_id varchar(100),
-    country_of_interest varchar(100),
-    standardised_country varchar(100),
-    source varchar(50),
-    source_id varchar(100),
+    company_id text,
+    country_of_interest text,
+    standardised_country text,
+    source text,
+    source_id text,
     timestamp timestamp,
     primary key (source, source_id)
 )'''
