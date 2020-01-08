@@ -69,8 +69,8 @@ to run tests in a specific directory do,
 once services and app have been created
 
 #### bind services
-`cf bind-service countries-of-interest-service-staging countries-of-interest-service-db`  
-`cf bind-service countries-of-interest-service-staging countries-of-interest-service-redis`
+`cf bind-service countries-of-interest-service countries-of-interest-service-db`  
+`cf bind-service countries-of-interest-service countries-of-interest-service-redis`
 
 #### deploy with vault environment variables
 deploy via jenkins > Build with Parameters
