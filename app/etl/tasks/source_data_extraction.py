@@ -44,8 +44,8 @@ class ExtractCountriesAndTerritoriesReferenceDataset(ReferenceDatasetExtractor):
             {'name': 'id', 'type': 'text', 'source_name': 'ID'},
             {'name': 'name', 'type': 'text', 'source_name': 'Name'},
             {'name': 'type', 'type': 'text', 'source_name': 'Type'},
-            {'name': 'start_date', 'type': 'date', 'source_name': 'Start Date'},
-            {'name': 'end_date', 'type': 'date', 'source_name': 'End Date'},
+            {'name': 'start_date', 'type': 'date', 'source_name': 'Start date'},
+            {'name': 'end_date', 'type': 'date', 'source_name': 'End date'},
         ],
         'primary_key': 'id',
     }
@@ -245,9 +245,11 @@ class ExtractExportWins(SourceDataExtractor):
 def get_hawk_headers(
     url, client_id, client_key, content='', content_type='', https=False, method='GET',
 ):
-
     if https is False:
+        # todo: ask data workspace to fix the https/http x-forwarded-for
         url = url.replace('https', 'http')
+    # strip query string
+    url = url.split('?')[0]
     credentials = {'id': client_id, 'key': client_key, 'algorithm': 'sha256'}
 
     sender = mohawk.Sender(
@@ -264,11 +266,11 @@ def get_hawk_headers(
 def populate_table_paginated(schema, table_name, url):
     client_id = current_app.config['dataworkspace']['hawk_client_id']
     client_key = current_app.config['dataworkspace']['hawk_client_key']
-    headers = get_hawk_headers(url, client_id, client_key)
 
     next_page = url
     n_rows = 0
     while next_page is not None:
+        headers = get_hawk_headers(next_page, client_id, client_key)
         response = requests.get(next_page, headers=headers)
         data = response.json()
         output = populate_table(data, schema, table_name, overwrite=next_page == url)
