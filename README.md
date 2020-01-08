@@ -56,15 +56,14 @@ to run tests in a specific directory do,
 
 ### deployment
 
-#### deploy app
+#### deploy app and build route
 `cf push countries-of-interest-service`
-or via jenkins > Build with Parameters
 
 #### configure app disk space
 `cf v3-scale countries-of-interest-service -k 3G`
 
 #### create services
-`cf create-service postgres small-10 countries-of-interest-service-db`
+`cf create-service postgres small-10 countries-of-interest-service-db`  
 `cf create-service redis tiny-3.2 countries-of-interest-service-redis`
 
 once services and app have been created
@@ -90,3 +89,6 @@ once services and app have been created
 
 #### add celery worker
 `cf v3-scale countries-of-interest-service --process worker -i 1 -k 3G`
+
+#### deploy with vault environment variables
+deploy via jenkins > Build with Parameters
