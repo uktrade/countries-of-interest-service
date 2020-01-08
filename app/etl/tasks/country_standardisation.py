@@ -6,6 +6,7 @@ from app.db.db_utils import drop_table
 class PopulateStandardisedCountriesTask:
 
     name = 'PopulateStandardisedCountriesTask'
+    table_name = db.StandardisedCountries.__tablename__
 
     def __call__(self):
         drop_table(db.StandardisedCountries.__tablename__)
