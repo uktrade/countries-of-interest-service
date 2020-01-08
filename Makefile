@@ -10,7 +10,6 @@ run_server:
 
 .PHONY: run_dev_server
 run_dev_server:
-	make run_dev_celery &
 	FLASK_DEBUG=1 FLASK_APP='app.application:get_or_create()' flask run --host 0.0.0.0 --port ${PORT}
 
 .PHONY: run_celery
