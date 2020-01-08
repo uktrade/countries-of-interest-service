@@ -90,23 +90,24 @@ class TestExtractCountriesAndTerritoriesReferenceDataset(
     __test__ = True
     group_slug_config_key = 'countries_and_territories_group_slug'
     reference_slug_config_key = 'countries_and_territories_reference_slug'
+    item_pk = 'country_iso_alpha2_code'
     expected_data = [
         {
-            'id': 'AE-AZ',
+            'country_iso_alpha2_code': 'AE-AZ',
             'name': 'Abu Dhabi',
             'type': 'Territory',
             'start_date': None,
             'end_date': None,
         },
         {
-            'id': 'AF',
+            'country_iso_alpha2_code': 'AF',
             'name': 'Afghanistan',
             'type': 'Country',
             'start_date': None,
             'end_date': None,
         },
         {
-            'id': 'AO',
+            'country_iso_alpha2_code': 'AO',
             'name': 'Angola',
             'type': 'Country',
             'start_date': '1975-11-11',

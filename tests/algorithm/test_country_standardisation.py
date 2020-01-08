@@ -88,7 +88,7 @@ def test_country_mapping(
     ]
     country_territory_entries = []
     for iso_alpha2_code, country in countries:
-        entry = {'id': iso_alpha2_code, 'name': country}
+        entry = {'country_iso_alpha2_code': iso_alpha2_code, 'name': country}
         country_territory_entries.append(entry)
     add_country_territory_registry(country_territory_entries)
 

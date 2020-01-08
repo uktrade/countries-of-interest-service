@@ -22,7 +22,7 @@ sql = '''
 
         from datahub_omis o
             left join {countries_and_territories_register} c
-                on o.market::text = c.id
+                on o.market::text = c.country_iso_alpha2_code
             left join {standardised_countries} s
                 on o.market::text = s.country
                   and similarity > 90

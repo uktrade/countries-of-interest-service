@@ -1,3 +1,5 @@
+import logging
+
 from flask import current_app
 
 import mohawk
@@ -9,6 +11,10 @@ from sqlalchemy.dialects import postgresql
 
 import app.db.models.external as models
 from app.db.models import sql_alchemy
+
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 class SourceDataExtractor:
@@ -48,12 +54,12 @@ class ReferenceDatasetExtractor(SourceDataExtractor):
 
 
 class ExtractCountriesAndTerritoriesReferenceDataset(ReferenceDatasetExtractor):
-
+    unique_key = 'country_iso_alpha2_code'
     group_slug = 'countries_and_territories_group_slug'
     reference_slug = 'countries_and_territories_reference_slug'
     model = models.DITCountryTerritoryRegister
     mapping = {
-        'ID': 'id',
+        'ID': 'country_iso_alpha2_code',
         'Name': 'name',
         'Type': 'type',
         'Start Date': 'start_date',
@@ -304,7 +310,9 @@ def populate_table(data, model, mapping, unique_key, overwrite=True):
         status = connection.execute(update_statement)
         n_rows = int(status.rowcount)
         transaction.commit()
-    except (exc.ProgrammingError, exc.DataError):
+    except (exc.ProgrammingError, exc.DataError) as err:
+        logger.error(f'Error populating {model.__tablename__} table')
+        logger.error(err)
         transaction.rollback()
     connection.close()
 
