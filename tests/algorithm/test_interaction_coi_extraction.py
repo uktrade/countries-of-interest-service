@@ -20,11 +20,17 @@ def setup_function(mocker):
     mocker.patch.object(mapper.steps, '_analyse_interaction', side_effect=_side_effect)
 
 
-def test_interaction_coi_extraction(add_datahub_interaction,):
+def test_interaction_coi_extraction(add_datahub_interaction):
 
     # Test mapping
     add_datahub_interaction(
-        [{'id': '1', 'datahub_id': 'dsd-234', 'notes': 'Google exports to Brussels'}]
+        [
+            {
+                'datahub_interaction_id': '52552367-436f-4a5d-84a2-dbf4ffeddb76',
+                'datahub_company_id': 'df14625d-c89b-4efd-bc5a-9b46f68b71bb',
+                'notes': 'Google exports to Brussels',
+            }
+        ]
     )
 
     mapper.analyse_interactions()
