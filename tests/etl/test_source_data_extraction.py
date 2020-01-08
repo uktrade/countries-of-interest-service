@@ -87,7 +87,7 @@ class TestExtractCountriesAndTerritoriesReferenceDataset(
         ['AO', 'Angola', 'Country', '1975-11-11', None],
     ]
     source_data = {
-        'headers': ['ID', 'Name', 'Type', 'Start Date', 'End Date'],
+        'headers': ['ID', 'Name', 'Type', 'Start date', 'End date'],
         'next': None,
         'values': [
             ['AE-AZ', 'Abu Dhabi', 'Territory', None, None],

@@ -50,7 +50,7 @@ class ExtractCountriesAndTerritoriesReferenceDataset(ReferenceDatasetExtractor):
         'primary_key': 'id',
     }
     stub_data = {
-        'headers': ['ID', 'Name', 'Type', 'Start Date', 'End Date'],
+        'headers': ['ID', 'Name', 'Type', 'Start date', 'End date'],
         'values': [
             ['AE-AZ', 'Abu Dhabi', 'Territory', None, None],
             ['AF', 'Afghanistan', 'Country', None, None],
