@@ -44,7 +44,8 @@ def db(
 ):
     if not any([create, drop, drop_tables, tables, recreate_tables]):
         print(
-            'please choose an option (--drop, --create or --create_tables or --drop_tables  or --recreate_tables)'
+            'please choose an option '
+            '(--drop, --create, --create_tables, --drop_tables or --recreate_tables)'
         )
     else:
         db_url = app.config['SQLALCHEMY_DATABASE_URI']
