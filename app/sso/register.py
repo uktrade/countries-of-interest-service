@@ -39,6 +39,8 @@ def register_sso_component(flask_app, role_based=True):
         client_secret=flask_app.config['sso']['client_secret'],
         user_datastore=user_datastore,
     )
-
-    flask_app.register_blueprint(sso)
+    try:
+        flask_app.register_blueprint(sso)
+    except AssertionError:
+        pass
     return flask_app
