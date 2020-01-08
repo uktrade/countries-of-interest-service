@@ -72,11 +72,14 @@ once services and app have been created
 `cf bind-service countries-of-interest-service-staging countries-of-interest-service-db`  
 `cf bind-service countries-of-interest-service-staging countries-of-interest-service-redis`
 
+#### deploy with vault environment variables
+deploy via jenkins > Build with Parameters
+
 #### ssh into cloud foundry
 `cf ssh countries-of-interest-service`
 
 #### activate conda envionment
-`source /deps/0/conda/bin/activate`
+`source /home/vcap/deps/0/conda/bin/activate`
 
 #### activate conda environment for app
 `source activate dep_env`
@@ -89,6 +92,3 @@ once services and app have been created
 
 #### add celery worker
 `cf v3-scale countries-of-interest-service --process worker -i 1 -k 3G`
-
-#### deploy with vault environment variables
-deploy via jenkins > Build with Parameters
