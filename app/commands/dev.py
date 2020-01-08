@@ -7,7 +7,7 @@ from sqlalchemy import create_engine
 import sqlalchemy_utils
 
 from app.db.db_utils import create_schemas
-from app.db.models.external import HawkUsers
+from app.db.models.internal import HawkUsers
 
 DevCommand = Manager(app=app, usage='Development commands')
 
