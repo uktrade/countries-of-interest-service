@@ -38,7 +38,10 @@ def populate_database(drop_table):
         # extract_export_wins,
     ]:
         logger.info(f'extractor: {extractor.__class__.__name__}')
-        output = output + [extractor()]
+        try:
+            output = output + [extractor()]
+        except Exception as e:
+            output = output + [{'table': extractor.table_name, 'status': 'error', 'error': str(e)}]
 
     for task in [
         PopulateStandardisedCountriesTask(),
@@ -48,7 +51,10 @@ def populate_database(drop_table):
         SectorsOfInterestTask(drop_table=drop_table),
     ]:
         logger.info(f'task: {task.name}')
-        output = output + [task()]
+        try:
+            output = output + [task()]
+        except Exception as e:
+            output = output + [{'table': task.table_name, 'status': 'error', 'error': str(e)}]
     sql = 'create table if not exists etl_runs (timestamp timestamp)'
     execute_statement(sql)
     sql = 'insert into etl_runs values (%s)'
