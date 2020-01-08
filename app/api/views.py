@@ -16,7 +16,7 @@ from app.api.access_control import AccessControl
 from app.api.tasks import populate_database_task
 from app.api.utils import response_orientation_decorator, to_web_dict
 from app.db.db_utils import execute_query, execute_statement, table_exists
-from app.db.models import HawkUsers
+from app.db.models.external import HawkUsers
 from app.sso.token import login_required
 
 api = Blueprint(name="api", import_name=__name__)

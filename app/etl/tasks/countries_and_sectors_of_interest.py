@@ -1,4 +1,4 @@
-import app.db.models as models
+import app.db.models.external as models
 from app.config import data_sources
 from app.etl import ETLTask
 

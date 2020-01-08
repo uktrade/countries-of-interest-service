@@ -1,5 +1,5 @@
 from app.algorithm.interaction_coi_extraction.steps import process_interactions
-from app.db.models import Interactions, InteractionsAnalysed
+from app.db.models.external import Interactions, InteractionsAnalysed
 from app.utils import log
 
 input_schema = 'public'

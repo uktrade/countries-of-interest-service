@@ -1,6 +1,6 @@
 import pytest
 
-from app.db.models import (
+from app.db.models.external import (
     CountriesAndSectorsOfInterest,
     CountriesOfInterest,
     DITCountryTerritoryRegister,
