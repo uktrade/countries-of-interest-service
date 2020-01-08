@@ -73,7 +73,7 @@ once services and app have been created
 `cf bind-service countries-of-interest-service-staging countries-of-interest-service-redis`
 
 #### ssh into cloud foundry
-`cf ssh`
+`cf ssh countries-of-interest-service`
 
 #### activate conda envionment
 `source /deps/0/conda/bin/activate`
