@@ -41,9 +41,9 @@ class ExtractCountriesAndTerritoriesReferenceDataset(ReferenceDatasetExtractor):
     reference_slug = 'countries_and_territories_reference_slug'
     schema = {
         'columns': [
-            {'name': 'id', 'type': 'varchar(50)', 'source_name': 'ID'},
-            {'name': 'name', 'type': 'varchar(200)', 'source_name': 'Name'},
-            {'name': 'type', 'type': 'varchar(100)', 'source_name': 'Type'},
+            {'name': 'id', 'type': 'text', 'source_name': 'ID'},
+            {'name': 'name', 'type': 'text', 'source_name': 'Name'},
+            {'name': 'type', 'type': 'text', 'source_name': 'Type'},
             {'name': 'start_date', 'type': 'date', 'source_name': 'Start Date'},
             {'name': 'end_date', 'type': 'date', 'source_name': 'End Date'},
         ],
@@ -70,8 +70,8 @@ class ExtractDatahubCompanyDataset(SourceDataExtractor):
     schema = {
         'columns': [
             {'name': 'id', 'type': 'uuid'},
-            {'name': 'company_number', 'type': 'varchar(50)'},
-            {'name': 'sector', 'type': 'varchar(50)'},
+            {'name': 'company_number', 'type': 'text'},
+            {'name': 'sector', 'type': 'text'},
         ],
         'primary_key': 'id',
     }
@@ -92,8 +92,8 @@ class ExtractDatahubExportCountries(SourceDataExtractor):
     schema = {
         'columns': [
             {'name': 'company_id', 'type': 'uuid'},
-            {'name': 'country_iso_alpha2_code', 'type': 'varchar(2)'},
-            {'name': 'country', 'type': 'varchar(100)'},
+            {'name': 'country_iso_alpha2_code', 'type': 'text'},
+            {'name': 'country', 'type': 'text'},
             {'name': 'id', 'type': 'int'},
         ],
         'primary_key': 'id',
@@ -114,8 +114,8 @@ class ExtractDatahubFutureInterestCountries(SourceDataExtractor):
     schema = {
         'columns': [
             {'name': 'company_id', 'type': 'uuid'},
-            {'name': 'country_iso_alpha2_code', 'type': 'varchar(2)'},
-            {'name': 'country', 'type': 'varchar(100)'},
+            {'name': 'country_iso_alpha2_code', 'type': 'text'},
+            {'name': 'country', 'type': 'text'},
             {'name': 'id', 'type': 'int'},
         ],
         'primary_key': 'id',
@@ -171,10 +171,10 @@ class ExtractDatahubOmis(SourceDataExtractor):
     schema = {
         'columns': [
             {'name': 'company_id', 'type': 'uuid'},
-            {'name': 'market', 'type': 'varchar(2)'},
+            {'name': 'market', 'type': 'text'},
             {'name': 'created_date', 'type': 'timestamp'},
             {'name': 'id', 'type': 'uuid'},
-            {'name': 'sector', 'type': 'varchar(200)'},
+            {'name': 'sector', 'type': 'text'},
         ],
         'primary_key': 'id',
     }
@@ -206,7 +206,7 @@ class ExtractDatahubSectors(SourceDataExtractor):
     schema = {
         'columns': [
             {'name': 'id', 'type': 'uuid'},
-            {'name': 'sector', 'type': 'varchar(200)'},
+            {'name': 'sector', 'type': 'text'},
         ],
         'primary_key': 'id',
     }
@@ -226,8 +226,8 @@ class ExtractExportWins(SourceDataExtractor):
     schema = {
         'columns': [
             {'name': 'id', 'type': 'uuid'},
-            {'name': 'company_id', 'type': 'varchar(12)'},
-            {'name': 'country', 'type': 'varchar(2)'},
+            {'name': 'company_id', 'type': 'text'},
+            {'name': 'country', 'type': 'text'},
             {'name': 'timestamp', 'type': ' timestamp'},
         ],
         'primary_key': 'id',
