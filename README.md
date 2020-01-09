@@ -52,3 +52,43 @@ to run tests in a specific directory do,
 
 ### running tests in Docker
 `docker-compose build; docker-compose run -e FLASK_ENV=test web python -m unittest`
+
+
+### deployment
+
+#### deploy app and build route
+`cf push countries-of-interest-service`
+
+#### configure app disk space
+`cf v3-scale countries-of-interest-service -k 3G`
+
+#### create services
+`cf create-service postgres small-10 countries-of-interest-service-db`  
+`cf create-service redis tiny-3.2 countries-of-interest-service-redis`
+
+once services and app have been created
+
+#### bind services
+`cf bind-service countries-of-interest-service countries-of-interest-service-db`  
+`cf bind-service countries-of-interest-service countries-of-interest-service-redis`
+
+#### deploy with vault environment variables
+deploy via jenkins > Build with Parameters
+
+#### ssh into cloud foundry
+`cf ssh countries-of-interest-service`
+
+#### activate conda envionment
+`source /home/vcap/deps/0/conda/bin/activate`
+
+#### activate conda environment for app
+`source activate dep_env`
+
+#### create tables
+`python manage.py dev db --create_tables # create tables`
+
+#### add hawk users
+`python manage.py dev add_hawk_user --client_id=<client_id> --client_key=<client_key> --client_scope=* --description=data-flow`
+
+#### add celery worker
+`cf v3-scale countries-of-interest-service --process worker -i 1 -k 3G`

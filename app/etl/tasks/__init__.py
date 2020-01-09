@@ -7,12 +7,12 @@ from app.etl.tasks.countries_and_sectors_of_interest import (
 )
 from app.etl.tasks.countries_of_interest import Task as PopulateCountriesOfInterestTask
 from app.etl.tasks.country_standardisation import PopulateStandardisedCountriesTask
-from app.etl.tasks.export_countries import Task as ExportCountriesTask
+from app.etl.tasks.export_countries import Task as ExportToCountriesTask
 from app.etl.tasks.sectors_of_interest import Task as SectorsOfInterestTask
 from app.etl.tasks.source_data_extraction import (
     extract_countries_and_territories_reference_dataset,
     extract_datahub_company_dataset,
-    extract_datahub_export_countries,
+    extract_datahub_export_to_countries,
     extract_datahub_future_interest_countries,
     extract_datahub_interactions,
     extract_datahub_omis,
@@ -30,7 +30,7 @@ def populate_database(drop_table):
     for extractor in [
         extract_countries_and_territories_reference_dataset,
         extract_datahub_company_dataset,
-        extract_datahub_export_countries,
+        extract_datahub_export_to_countries,
         extract_datahub_interactions,
         extract_datahub_future_interest_countries,
         extract_datahub_omis,
@@ -47,7 +47,7 @@ def populate_database(drop_table):
 
     for task in [
         PopulateStandardisedCountriesTask(),
-        ExportCountriesTask(drop_table=drop_table),
+        ExportToCountriesTask(drop_table=drop_table),
         PopulateCountriesAndSectorsOfInterestTask(drop_table=drop_table),
         PopulateCountriesOfInterestTask(drop_table=drop_table),
         SectorsOfInterestTask(drop_table=drop_table),
