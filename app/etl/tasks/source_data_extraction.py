@@ -52,8 +52,8 @@ class ExtractCountriesAndTerritoriesReferenceDataset(ReferenceDatasetExtractor):
         'ID': 'id',
         'Name': 'name',
         'Type': 'type',
-        'Start Date': 'start_date',
-        'End Date': 'end_date',
+        'Start date': 'start_date',
+        'End date': 'end_date',
     }
     model = models.DITCountryTerritoryRegister
     reference_slug = 'countries_and_territories_reference_slug'
