@@ -82,9 +82,9 @@ class ExtractCountriesAndTerritoriesReferenceDataset(ReferenceDatasetExtractor):
 class ExtractDatahubCompanyDataset(SourceDataExtractor):
     dataset_id_config_key = 'datahub_companies_dataset_id'
     source_table_id_config_key = 'datahub_companies_source_table_id'
-
+    unique_key = 'datahub_company_id'
     mapping = {
-        'id': 'id',
+        'id': 'datahub_company_id',
         'company_number': 'company_number',
         'sector': 'sector',
     }

@@ -38,7 +38,8 @@ class DatahubCompany(BaseModel):
     __tablename__ = 'datahub_company'
     __table_args__ = {'schema': 'public'}
 
-    id = _col(UUID(as_uuid=True), primary_key=True)
+    id = _col(_int, primary_key=True, autoincrement=True)
+    datahub_company_id = _col(UUID(as_uuid=True), unique=True)
     company_number = _col(_text)
     sector = _col(_text)
 

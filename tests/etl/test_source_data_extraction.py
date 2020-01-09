@@ -132,14 +132,15 @@ class TestExtractDatahubCompany(SourceDataExtractBaseTestCase):
 
     __test__ = True
     dataset_id_config_key = 'datahub_companies_dataset_id'
+    item_pk = 'datahub_company_id'
     expected_data = [
         {
-            'id': 'c31e4492-1f16-48a2-8c5e-8c0334d959a3',
+            'datahub_company_id': 'c31e4492-1f16-48a2-8c5e-8c0334d959a3',
             'company_number': 'asdf',
             'sector': 'Food',
         },
         {
-            'id': 'd0af8e52-ff34-4088-98e3-d2d22cd250ae',
+            'datahub_company_id': 'd0af8e52-ff34-4088-98e3-d2d22cd250ae',
             'company_number': 'asdf2',
             'sector': 'Aerospace',
         },
