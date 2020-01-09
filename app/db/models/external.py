@@ -17,7 +17,8 @@ class DatahubOmis(BaseModel):
     __tablename__ = 'datahub_omis'
     __table_args__ = {'schema': 'public'}
 
-    id = _col(UUID(as_uuid=True), primary_key=True)
+    id = _col(_int, primary_key=True, autoincrement=True)
+    datahub_omis_order_id = _col(UUID(as_uuid=True), unique=True)
     company_id = _col(UUID(as_uuid=True))
     created_date = _col(_dt)
     market = _col(_text)

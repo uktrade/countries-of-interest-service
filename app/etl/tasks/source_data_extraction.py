@@ -184,11 +184,12 @@ class ExtractDatahubInteractions(SourceDataExtractor):
 class ExtractDatahubOmis(SourceDataExtractor):
     dataset_id_config_key = 'datahub_omis_dataset_id'
     source_table_id_config_key = 'datahub_omis_source_table_id'
+    unique_key = 'datahub_omis_order_id'
     mapping = {
         'company_id': 'company_id',
         'market': 'market',
         'created_date': 'created_date',
-        'id': 'id',
+        'id': 'datahub_omis_order_id',
         'sector': 'sector',
     }
     model = models.DatahubOmis

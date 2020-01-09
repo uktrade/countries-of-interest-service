@@ -36,7 +36,7 @@ def test(
             {
                 'company_id': 'f1fe0161-a3ed-4566-b920-1935c108ae2d',
                 'created_date': '2019-01-01 01:00:00',
-                'id': '56c47b42-0306-4e74-a915-e279f81be0b5',
+                'datahub_omis_order_id': '56c47b42-0306-4e74-a915-e279f81be0b5',
                 'market': 'AG',
                 'sector': 'Aerospace',
             }

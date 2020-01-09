@@ -38,7 +38,7 @@ def test_country_mapping(
             {
                 'company_id': '7ff93060-1f05-4bbc-a58a-65ae7d7e8ba8',
                 'created_date': '2009-10-10',
-                'id': 'a0e38b4f-f4c9-4ebc-b196-208972268efb',
+                'datahub_omis_order_id': 'a0e38b4f-f4c9-4ebc-b196-208972268efb',
                 'market': 'usa',
                 'sector': 'Aerospace',
             }
