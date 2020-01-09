@@ -3,7 +3,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-import app.db.models as models
+import app.db.models.external as models
 import app.etl.tasks.source_data_extraction
 import app.etl.tasks.source_data_extraction as source_data_extraction
 from app.db.db_utils import execute_statement

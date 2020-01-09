@@ -1,4 +1,4 @@
-from app.db.models import StandardisedCountries
+from app.db.models.internal import StandardisedCountries
 from app.etl.tasks.country_standardisation import PopulateStandardisedCountriesTask
 
 

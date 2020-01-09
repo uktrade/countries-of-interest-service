@@ -1,16 +1,18 @@
 import pytest
 
-from app.db.models import (
-    CountriesAndSectorsOfInterest,
-    CountriesOfInterest,
+from app.db.models.external import (
     DITCountryTerritoryRegister,
     DatahubExportToCountries,
     DatahubFutureInterestCountries,
     DatahubOmis,
     DatahubSectors,
-    ExportCountries,
     ExportWins,
     Interactions,
+)
+from app.db.models.internal import (
+    CountriesAndSectorsOfInterest,
+    CountriesOfInterest,
+    ExportCountries,
     SectorsOfInterest,
     StandardisedCountries,
 )

@@ -6,7 +6,7 @@ from mohawk.util import utc_now
 import pytest
 
 from app.api.views import ac, api, json_error
-from app.db.models import HawkUsers
+from app.db.models.internal import HawkUsers
 
 
 @api.route('/test/', methods=["GET"])

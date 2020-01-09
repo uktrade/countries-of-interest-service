@@ -1,5 +1,6 @@
-import app.db.models as models
 from app.config import data_sources
+from app.db.models.external import DITCountryTerritoryRegister
+from app.db.models.internal import StandardisedCountries
 from app.etl import ETLTask
 
 index = ('company_id',)
@@ -67,8 +68,8 @@ select * from results
 '''.format(
     omis=data_sources.omis,
     future_interest=data_sources.datahub_future_interest_countries,
-    countries_and_territories_register=models.DITCountryTerritoryRegister.__tablename__,
-    standardised_countries=models.StandardisedCountries.__tablename__,
+    countries_and_territories_register=DITCountryTerritoryRegister.__tablename__,
+    standardised_countries=StandardisedCountries.__tablename__,
 )
 
 table_fields = '''(

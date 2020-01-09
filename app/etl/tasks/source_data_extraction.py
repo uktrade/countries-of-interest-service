@@ -7,7 +7,8 @@ import requests
 from sqlalchemy import exc
 from sqlalchemy.dialects import postgresql
 
-import app.db.models as models
+import app.db.models.external as models
+from app.db.models import sql_alchemy
 
 
 class SourceDataExtractor:
@@ -281,7 +282,7 @@ def populate_table_paginated(model, mapping, unique_key, url):
 
 
 def populate_table(data, model, mapping, unique_key, overwrite=True):
-    connection = models.sql_alchemy.engine.connect()
+    connection = sql_alchemy.engine.connect()
     transaction = connection.begin()
     n_rows = 0
     try:

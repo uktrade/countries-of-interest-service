@@ -5,7 +5,7 @@ from fuzzywuzzy import fuzz, process
 
 from app.db import db_utils
 from app.db.db_utils import dsv_buffer_to_table
-from app.db.models import DITCountryTerritoryRegister
+from app.db.models.external import DITCountryTerritoryRegister
 from app.utils import log
 
 
