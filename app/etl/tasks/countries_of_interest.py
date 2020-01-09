@@ -16,7 +16,6 @@ with omis_countries_of_interest as (
       else NULL
     end as standardised_country,
     '{omis}' as source,
-    d.id::text as source_id,
     d.datahub_omis_order_id::text as source_id,
     created_date as timestamp
 

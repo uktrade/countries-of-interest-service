@@ -42,7 +42,11 @@ def populate_database(drop_table):
             output = output + [extractor()]
         except Exception as e:
             output = output + [
-                {'table': extractor.model.__tablename__, 'status': 'error', 'error': str(e)}
+                {
+                    'table': extractor.model.__tablename__,
+                    'status': 'error',
+                    'error': str(e),
+                }
             ]
 
     for task in [
