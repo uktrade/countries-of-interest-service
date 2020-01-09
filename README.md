@@ -54,41 +54,47 @@ to run tests in a specific directory do,
 `docker-compose build; docker-compose run -e FLASK_ENV=test web python -m unittest`
 
 
-### deployment
+## deployment
 
-#### deploy app and build route
+### deploy app and build route
 `cf push countries-of-interest-service`
 
-#### configure app disk space
+### configure app disk space
 `cf v3-scale countries-of-interest-service -k 3G`
 
-#### create services
+### create services
 `cf create-service postgres small-10 countries-of-interest-service-db`  
 `cf create-service redis tiny-3.2 countries-of-interest-service-redis`
 
 once services and app have been created
 
-#### bind services
+### bind services
 `cf bind-service countries-of-interest-service countries-of-interest-service-db`  
 `cf bind-service countries-of-interest-service countries-of-interest-service-redis`
 
-#### deploy with vault environment variables
+### deploy with vault environment variables
 deploy via jenkins > Build with Parameters
 
-#### ssh into cloud foundry
+### ssh into cloud foundry
 `cf ssh countries-of-interest-service`
 
-#### activate conda envionment
+### activate conda envionment
 `source /home/vcap/deps/0/conda/bin/activate`
 
-#### activate conda environment for app
+### activate conda environment for app
 `source activate dep_env`
 
-#### create tables
+### create tables
 `python app/manage.py dev db --create_tables # create tables`
 
-#### add hawk users
+### add hawk users
 `python app/manage.py dev add_hawk_user --client_id=<client_id> --client_key=<client_key> --client_scope=* --description=data-flow`
 
-#### add celery worker
+### add celery worker
 `cf v3-scale countries-of-interest-service --process worker -i 1 -k 3G`
+
+## Running the interactions algorithm
+`cf run-task --name interaction_coi_extraction -m 2G countries-of-interest-service "./manage.py algorithm --interaction_coi_extraction"`
+
+## Recreating tables
+`cf run-task --name recreate_tables countries-of-interest-service "./manage.py db --recreate_tables"`
