@@ -44,7 +44,7 @@ def populate_database(drop_table):
             output = output + [
                 {
                     'table': extractor.model.__tablename__,
-                    'status': 'error',
+                    'status': 500,
                     'error': str(e),
                 }
             ]
@@ -61,7 +61,7 @@ def populate_database(drop_table):
             output = output + [task()]
         except Exception as e:
             output = output + [
-                {'table': task.table_name, 'status': 'error', 'error': str(e)}
+                {'table': task.table_name, 'status': 500, 'error': str(e)}
             ]
     sql = 'create table if not exists etl_runs (timestamp timestamp)'
     execute_statement(sql)

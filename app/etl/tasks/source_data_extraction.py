@@ -310,7 +310,9 @@ def populate_table(data, model, mapping, unique_key, overwrite=True):
         logger.error(f'Error populating {model.__tablename__} table')
         logger.error(err)
         transaction.rollback()
-    connection.close()
+        raise err
+    finally:
+        connection.close()
 
     return {'table': model.__tablename__, 'rows': n_rows, 'status': 200}
 
