@@ -17,7 +17,7 @@ sql = '''
             end as standardised_country,
             sector as sector_of_interest,
             '{source}' as source,
-            o.id::text as source_id,
+            o.datahub_omis_order_id::text as source_id,
             created_date as timestamp
 
         from datahub_omis o

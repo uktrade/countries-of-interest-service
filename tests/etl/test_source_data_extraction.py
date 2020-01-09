@@ -279,19 +279,20 @@ class TestExtractDatahubInteractions(SourceDataExtractBaseTestCase):
 class TestExtractDatahubOmis(SourceDataExtractBaseTestCase):
     __test__ = True
     dataset_id_config_key = 'datahub_omis_dataset_id'
+    item_pk = 'datahub_omis_order_id'
     expected_data = [
         {
             'company_id': 'c31e4492-1f16-48a2-8c5e-8c0334d959a3',
             'market': 'CN',
             'created_date': '2018-01-01 00:00:00',
-            'id': 'e84de2c0-fe7a-41fc-ba1d-5885925ff3ca',
+            'datahub_omis_order_id': 'e84de2c0-fe7a-41fc-ba1d-5885925ff3ca',
             'sector': 'Aerospace',
         },
         {
             'company_id': 'd0af8e52-ff34-4088-98e3-d2d22cd250ae',
             'market': 'DE',
             'created_date': '2018-01-02 00:00:00',
-            'id': 'a3cc5ef5-0ec0-491a-aa48-48656d66e662',
+            'datahub_omis_order_id': 'a3cc5ef5-0ec0-491a-aa48-48656d66e662',
             'sector': 'Food',
         },
     ]

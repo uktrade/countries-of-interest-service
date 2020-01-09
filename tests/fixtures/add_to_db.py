@@ -135,11 +135,14 @@ def add_datahub_omis(app_with_db_module):
             defaults = {
                 'company_id': record.get('company_id', None),
                 'created_date': record.get('created_date', None),
-                'id': record.get('id', None),
                 'market': record.get('market', None),
                 'sector': record.get('sector', None),
+                'datahub_omis_order_id': record.get('datahub_omis_order_id', None),
             }
-            DatahubOmis.get_or_create(id=record.get('id', None), defaults=defaults)
+            DatahubOmis.get_or_create(
+                datahub_omis_order_id=record.get('datahub_omis_order_id', None),
+                defaults=defaults,
+            )
 
     return _method
 
