@@ -82,7 +82,7 @@ class ExtractCountriesAndTerritoriesReferenceDataset(ReferenceDatasetExtractor):
 class ExtractDatahubCompanyDataset(SourceDataExtractor):
     dataset_id_config_key = 'datahub_companies_dataset_id'
     mapping = {
-        'id': 'id',
+        'id': 'datahub_company_id',
         'company_number': 'company_number',
         'sector': 'sector',
     }
@@ -95,6 +95,7 @@ class ExtractDatahubCompanyDataset(SourceDataExtractor):
             ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'asdf2', 'Aerospace'],
         ],
     }
+    unique_key = 'datahub_company_id'
 
 
 class ExtractDatahubExportToCountries(SourceDataExtractor):
@@ -180,7 +181,7 @@ class ExtractDatahubOmis(SourceDataExtractor):
         'company_id': 'company_id',
         'market': 'market',
         'created_date': 'created_date',
-        'id': 'id',
+        'id': 'datahub_omis_order_id',
         'sector': 'sector',
     }
     model = models.DatahubOmis
@@ -204,6 +205,7 @@ class ExtractDatahubOmis(SourceDataExtractor):
             ],
         ],
     }
+    unique_key = 'datahub_omis_order_id'
 
 
 class ExtractDatahubSectors(SourceDataExtractor):

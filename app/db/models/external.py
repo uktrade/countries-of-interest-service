@@ -7,7 +7,6 @@ from app.db.models import (
     _date,
     _dt,
     _int,
-    _num,
     _text,
 )
 
@@ -17,7 +16,8 @@ class DatahubOmis(BaseModel):
     __tablename__ = 'datahub_omis'
     __table_args__ = {'schema': 'public'}
 
-    id = _col(UUID(as_uuid=True), primary_key=True)
+    id = _col(_int, primary_key=True, autoincrement=True)
+    datahub_omis_order_id = _col(UUID(as_uuid=True), unique=True)
     company_id = _col(UUID(as_uuid=True))
     created_date = _col(_dt)
     market = _col(_text)
@@ -38,7 +38,8 @@ class DatahubCompany(BaseModel):
     __tablename__ = 'datahub_company'
     __table_args__ = {'schema': 'public'}
 
-    id = _col(UUID(as_uuid=True), primary_key=True)
+    id = _col(_int, primary_key=True, autoincrement=True)
+    datahub_company_id = _col(UUID(as_uuid=True), unique=True)
     company_number = _col(_text)
     sector = _col(_text)
 
@@ -48,7 +49,7 @@ class DatahubExportToCountries(BaseModel):
     __tablename__ = 'datahub_export_countries'
     __table_args__ = {'schema': 'public'}
 
-    id = _col(_num, primary_key=True)
+    id = _col(_int, primary_key=True)
     company_id = _col(UUID(as_uuid=True))
     country = _col(_text)
     country_iso_alpha2_code = _col(_text)
@@ -59,7 +60,7 @@ class DatahubFutureInterestCountries(BaseModel):
     __tablename__ = 'datahub_future_interest_countries'
     __table_args__ = {'schema': 'public'}
 
-    id = _col(_num, primary_key=True)
+    id = _col(_int, primary_key=True)
     company_id = _col(UUID(as_uuid=True))
     country = _col(_text)
     country_iso_alpha2_code = _col(_text)

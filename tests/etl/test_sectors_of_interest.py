@@ -11,14 +11,14 @@ class TestSectorsOfInterest:
                 {
                     'company_id': 'a4881825-6c7c-46f3-b638-6a1346274a6b',
                     'created_date': '2019-01-01 01:00',
-                    'id': '1ee5a16b-1a4b-4c84-838f-0d043579c9ba',
+                    'datahub_omis_order_id': '1ee5a16b-1a4b-4c84-838f-0d043579c9ba',
                     'market': 'CN',
                     'sector': 'Food',
                 },
                 {
                     'company_id': 'f89d85d2-78c7-484d-bf63-228f32bf8d26',
                     'created_date': '2019-02-02 02:00',
-                    'id': 'c0794724-c070-4c7e-a52c-89c0006bf7e6',
+                    'datahub_omis_order_id': 'c0794724-c070-4c7e-a52c-89c0006bf7e6',
                     'market': 'UK',
                     'sector': 'Engineering',
                 },

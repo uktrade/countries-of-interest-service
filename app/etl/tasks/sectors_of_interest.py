@@ -9,7 +9,7 @@ with omis_sectors_of_interest as (
       company_id::text,
       sector as sector_of_interest,
       '{omis}' as source,
-      id::text as source_id,
+      datahub_omis_order_id as source_id,
       created_date as timestamp
 
     from datahub_omis

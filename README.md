@@ -85,10 +85,10 @@ deploy via jenkins > Build with Parameters
 `source activate dep_env`
 
 #### create tables
-`python manage.py dev db --create_tables # create tables`
+`python app/manage.py dev db --create_tables # create tables`
 
 #### add hawk users
-`python manage.py dev add_hawk_user --client_id=<client_id> --client_key=<client_key> --client_scope=* --description=data-flow`
+`python app/manage.py dev add_hawk_user --client_id=<client_id> --client_key=<client_key> --client_scope=* --description=data-flow`
 
 #### add celery worker
 `cf v3-scale countries-of-interest-service --process worker -i 1 -k 3G`
