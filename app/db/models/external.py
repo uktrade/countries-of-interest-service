@@ -80,7 +80,8 @@ class DITCountryTerritoryRegister(BaseModel):
     __tablename__ = 'dit_country_territory_register'
     __table_args__ = {'schema': 'public'}
 
-    id = _col(_text, primary_key=True)
+    id = _col(_int, primary_key=True, autoincrement=True)
+    country_iso_alpha2_code = _col(_text, unique=True)
     end_date = _col(_date)
     name = _col(_text)
     start_date = _col(_date)

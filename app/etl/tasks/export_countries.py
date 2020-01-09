@@ -10,8 +10,8 @@ sql = '''
 select
   company_id::text,
   case
-    when country_iso_alpha2_code is not null
-      and country_iso_alpha2_code != '' then country_iso_alpha2_code
+    when d.country_iso_alpha2_code is not null
+      and d.country_iso_alpha2_code != '' then d.country_iso_alpha2_code
     else d.country
   end as export_country,
   case
@@ -25,7 +25,7 @@ select
 
 from datahub_export_countries d
   left join {countries_and_territories_register} c
-    on country_iso_alpha2_code = c.id
+    on d.country_iso_alpha2_code = c.country_iso_alpha2_code
   left join {standardised_countries} s
     on d.country = s.country
       and s.similarity > 90

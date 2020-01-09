@@ -163,13 +163,14 @@ def add_country_territory_registry(app_with_db_module):
         for record in records:
             defaults = {
                 'end_date': record.get('end_date', None),
-                'id': record.get('id', None),
                 'name': record.get('name', None),
                 'start_date': record.get('start_date', None),
                 'type': record.get('type', None),
+                'country_iso_alpha2_code': record.get('country_iso_alpha2_code', None),
             }
             DITCountryTerritoryRegister.get_or_create(
-                id=record.get('id', None), defaults=defaults,
+                country_iso_alpha2_code=record.get('country_iso_alpha2_code', None),
+                defaults=defaults,
             )
 
     return _method
