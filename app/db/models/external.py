@@ -7,7 +7,6 @@ from app.db.models import (
     _date,
     _dt,
     _int,
-    _num,
     _text,
 )
 
@@ -49,7 +48,7 @@ class DatahubExportToCountries(BaseModel):
     __tablename__ = 'datahub_export_countries'
     __table_args__ = {'schema': 'public'}
 
-    id = _col(_num, primary_key=True)
+    id = _col(_int, primary_key=True)
     company_id = _col(UUID(as_uuid=True))
     country = _col(_text)
     country_iso_alpha2_code = _col(_text)
@@ -60,7 +59,7 @@ class DatahubFutureInterestCountries(BaseModel):
     __tablename__ = 'datahub_future_interest_countries'
     __table_args__ = {'schema': 'public'}
 
-    id = _col(_num, primary_key=True)
+    id = _col(_int, primary_key=True)
     company_id = _col(UUID(as_uuid=True))
     country = _col(_text)
     country_iso_alpha2_code = _col(_text)
