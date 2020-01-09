@@ -94,7 +94,7 @@ deploy via jenkins > Build with Parameters
 `cf v3-scale countries-of-interest-service --process worker -i 1 -k 3G`
 
 ## Running the interactions algorithm
-`cf run-task --name interaction_coi_extraction -m 2G -k 3G countries-of-interest-service "./manage.py algorithm --interaction_coi_extraction"`
+`cf run-task --name interaction_coi_extraction -m 2G -k 3G countries-of-interest-service "./manage.py algorithm interaction_coi_extraction"`
 
 ## Recreating tables
 `cf run-task --name recreate_tables countries-of-interest-service "./manage.py db --recreate_tables"`
