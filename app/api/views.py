@@ -160,7 +160,8 @@ def get_company_countries_and_sectors_of_interest(orientation):
         next_ += '&'.join(['country={}'.format(country) for country in countries])
         next_ += '&'.join(['source={}'.format(source) for source in sources])
         next_ += '&' if next_[-1] != '?' else ''
-        next_ += 'next-source={}&next-source-id={}'.format(
+        next_ += 'orientation={}'.format(orientation)
+        next_ += '&next-source={}&next-source-id={}'.format(
             df['source'].values[-1], df['source_id'].values[-1],
         )
         df = df[:-1]
@@ -238,7 +239,8 @@ def get_company_countries_of_interest(orientation):
         next_ += '&'.join(['country={}'.format(country) for country in countries])
         next_ += '&'.join(['source={}'.format(source) for source in sources])
         next_ += '&' if next_[-1] != '?' else ''
-        next_ += 'next-source={}&next-source-id={}'.format(
+        next_ += 'orientation={}'.format(orientation)
+        next_ += '&next-source={}&next-source-id={}'.format(
             df['source'].values[-1], df['source_id'].values[-1],
         )
         df = df[:-1]
@@ -316,7 +318,8 @@ def get_company_export_countries(orientation):
         next_ += '&'.join(['country={}'.format(country) for country in countries])
         next_ += '&'.join(['source={}'.format(source) for source in sources])
         next_ += '&' if next_[-1] != '?' else ''
-        next_ += 'next-source={}&next-source-id={}'.format(
+        next_ += 'orientation={}'.format(orientation)
+        next_ += '&next-source={}&next-source-id={}'.format(
             df['source'].values[-1], df['source_id'].values[-1],
         )
         df = df[:-1]
@@ -394,7 +397,8 @@ def get_company_sectors_of_interest(orientation):
         next_ += '&'.join(['sector={}'.format(sector) for sector in sectors])
         next_ += '&'.join(['source={}'.format(source) for source in sources])
         next_ += '&' if next_[-1] != '?' else ''
-        next_ += 'next-source={}&next-source-id={}'.format(
+        next_ += 'orientation={}'.format(orientation)
+        next_ += '&next-source={}&next-source-id={}'.format(
             df['source'].values[-1], df['source_id'].values[-1],
         )
         df = df[:-1]
