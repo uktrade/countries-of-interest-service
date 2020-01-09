@@ -41,7 +41,9 @@ class TestCountriesAndSectorsOfInterest:
             ]
         )
 
-        add_country_territory_registry([{'id': 'UK', 'name': 'United Kingdom'}])
+        add_country_territory_registry(
+            [{'country_iso_alpha2_code': 'UK', 'name': 'United Kingdom'}]
+        )
 
         add_standardised_countries(
             [

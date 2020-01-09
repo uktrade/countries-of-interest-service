@@ -1,6 +1,6 @@
 from app.algorithm.country_standardisation import steps as sql
 from app.db import db_utils
-from app.db.models import StandardisedCountries
+from app.db.models.internal import StandardisedCountries
 from app.utils import log
 
 output_schema = 'algorithm'

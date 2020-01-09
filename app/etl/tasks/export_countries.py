@@ -1,5 +1,6 @@
-import app.db.models as models
 from app.config import data_sources
+from app.db.models.external import DITCountryTerritoryRegister
+from app.db.models.internal import StandardisedCountries
 from app.etl import ETLTask
 
 
@@ -9,8 +10,8 @@ sql = '''
 select
   company_id::text,
   case
-    when country_iso_alpha2_code is not null
-      and country_iso_alpha2_code != '' then country_iso_alpha2_code
+    when d.country_iso_alpha2_code is not null
+      and d.country_iso_alpha2_code != '' then d.country_iso_alpha2_code
     else d.country
   end as export_country,
   case
@@ -24,7 +25,7 @@ select
 
 from datahub_export_countries d
   left join {countries_and_territories_register} c
-    on country_iso_alpha2_code = c.id
+    on d.country_iso_alpha2_code = c.country_iso_alpha2_code
   left join {standardised_countries} s
     on d.country = s.country
       and s.similarity > 90
@@ -33,8 +34,8 @@ order by source, source_id
 
 '''.format(
     export_countries=data_sources.datahub_export_countries,
-    countries_and_territories_register=models.DITCountryTerritoryRegister.__tablename__,
-    standardised_countries=models.StandardisedCountries.__tablename__,
+    countries_and_territories_register=DITCountryTerritoryRegister.__tablename__,
+    standardised_countries=StandardisedCountries.__tablename__,
 )
 
 table_fields = '''(

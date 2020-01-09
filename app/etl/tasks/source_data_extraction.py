@@ -1,3 +1,5 @@
+import logging
+
 from flask import current_app
 
 import mohawk
@@ -7,7 +9,12 @@ import requests
 from sqlalchemy import exc
 from sqlalchemy.dialects import postgresql
 
-import app.db.models as models
+import app.db.models.external as models
+from app.db.models import sql_alchemy
+
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 class SourceDataExtractor:
@@ -49,7 +56,7 @@ class ReferenceDatasetExtractor(SourceDataExtractor):
 class ExtractCountriesAndTerritoriesReferenceDataset(ReferenceDatasetExtractor):
     group_slug = 'countries_and_territories_group_slug'
     mapping = {
-        'ID': 'id',
+        'ID': 'country_iso_alpha2_code',
         'Name': 'name',
         'Type': 'type',
         'Start date': 'start_date',
@@ -69,6 +76,7 @@ class ExtractCountriesAndTerritoriesReferenceDataset(ReferenceDatasetExtractor):
             ['US', 'United States', 'Country', None, None],
         ],
     }
+    unique_key = 'country_iso_alpha2_code'
 
 
 class ExtractDatahubCompanyDataset(SourceDataExtractor):
@@ -274,7 +282,7 @@ def populate_table_paginated(model, mapping, unique_key, url):
 
 
 def populate_table(data, model, mapping, unique_key, overwrite=True):
-    connection = models.sql_alchemy.engine.connect()
+    connection = sql_alchemy.engine.connect()
     transaction = connection.begin()
     n_rows = 0
     try:
@@ -296,7 +304,9 @@ def populate_table(data, model, mapping, unique_key, overwrite=True):
         status = connection.execute(update_statement)
         n_rows = int(status.rowcount)
         transaction.commit()
-    except (exc.ProgrammingError, exc.DataError):
+    except (exc.ProgrammingError, exc.DataError) as err:
+        logger.error(f'Error populating {model.__tablename__} table')
+        logger.error(err)
         transaction.rollback()
     connection.close()
 
