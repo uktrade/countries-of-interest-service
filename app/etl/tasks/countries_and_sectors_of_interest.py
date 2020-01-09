@@ -40,12 +40,12 @@ sql = '''
 )
 
 table_fields = '''(
-    company_id varchar(100),
-    country_of_interest varchar(100),
-    standardised_country varchar(100),
-    sector_of_interest varchar(50),
-    source varchar(50),
-    source_id varchar(100),
+    company_id text,
+    country_of_interest text,
+    standardised_country text,
+    sector_of_interest text,
+    source text,
+    source_id text,
     timestamp timestamp,
     primary key (source, source_id)
 )'''

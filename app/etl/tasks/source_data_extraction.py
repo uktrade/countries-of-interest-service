@@ -54,19 +54,18 @@ class ReferenceDatasetExtractor(SourceDataExtractor):
 
 
 class ExtractCountriesAndTerritoriesReferenceDataset(ReferenceDatasetExtractor):
-    unique_key = 'country_iso_alpha2_code'
     group_slug = 'countries_and_territories_group_slug'
-    reference_slug = 'countries_and_territories_reference_slug'
-    model = models.DITCountryTerritoryRegister
     mapping = {
         'ID': 'country_iso_alpha2_code',
         'Name': 'name',
         'Type': 'type',
-        'Start Date': 'start_date',
-        'End Date': 'end_date',
+        'Start date': 'start_date',
+        'End date': 'end_date',
     }
+    model = models.DITCountryTerritoryRegister
+    reference_slug = 'countries_and_territories_reference_slug'
     stub_data = {
-        'headers': ['ID', 'Name', 'Type', 'Start Date', 'End Date'],
+        'headers': ['ID', 'Name', 'Type', 'Start date', 'End date'],
         'values': [
             ['AE-AZ', 'Abu Dhabi', 'Territory', None, None],
             ['AF', 'Afghanistan', 'Country', None, None],
@@ -77,19 +76,18 @@ class ExtractCountriesAndTerritoriesReferenceDataset(ReferenceDatasetExtractor):
             ['US', 'United States', 'Country', None, None],
         ],
     }
+    unique_key = 'country_iso_alpha2_code'
 
 
 class ExtractDatahubCompanyDataset(SourceDataExtractor):
     dataset_id_config_key = 'datahub_companies_dataset_id'
-    source_table_id_config_key = 'datahub_companies_source_table_id'
-    unique_key = 'datahub_company_id'
     mapping = {
         'id': 'datahub_company_id',
         'company_number': 'company_number',
         'sector': 'sector',
     }
     model = models.DatahubCompany
-
+    source_table_id_config_key = 'datahub_companies_source_table_id'
     stub_data = {
         'headers': ['id', 'company_number', 'sector'],
         'values': [
@@ -97,12 +95,11 @@ class ExtractDatahubCompanyDataset(SourceDataExtractor):
             ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'asdf2', 'Aerospace'],
         ],
     }
+    unique_key = 'datahub_company_id'
 
 
 class ExtractDatahubExportToCountries(SourceDataExtractor):
     dataset_id_config_key = 'datahub_export_countries_dataset_id'
-    source_table_id_config_key = 'datahub_export_countries_source_table_id'
-
     mapping = {
         'company_id': 'company_id',
         'country_iso_alpha2_code': 'country_iso_alpha2_code',
@@ -110,7 +107,7 @@ class ExtractDatahubExportToCountries(SourceDataExtractor):
         'id': 'id',
     }
     model = models.DatahubExportToCountries
-
+    source_table_id_config_key = 'datahub_export_countries_source_table_id'
     stub_data = {
         'headers': ['company_id', 'country_iso_alpha2_code', 'country', 'id'],
         'values': [
@@ -122,7 +119,6 @@ class ExtractDatahubExportToCountries(SourceDataExtractor):
 
 class ExtractDatahubFutureInterestCountries(SourceDataExtractor):
     dataset_id_config_key = 'datahub_future_interest_countries_dataset_id'
-    source_table_id_config_key = 'datahub_future_interest_countries_source_table_id'
     mapping = {
         'company_id': 'company_id',
         'country_iso_alpha2_code': 'country_iso_alpha2_code',
@@ -130,7 +126,7 @@ class ExtractDatahubFutureInterestCountries(SourceDataExtractor):
         'id': 'id',
     }
     model = models.DatahubFutureInterestCountries
-
+    source_table_id_config_key = 'datahub_future_interest_countries_source_table_id'
     stub_data = {
         'headers': ['company_id', 'country_iso_alpha2_code', 'country', 'id'],
         'values': [
@@ -142,10 +138,6 @@ class ExtractDatahubFutureInterestCountries(SourceDataExtractor):
 
 class ExtractDatahubInteractions(SourceDataExtractor):
     dataset_id_config_key = 'datahub_interactions_dataset_id'
-    source_table_id_config_key = 'datahub_interactions_source_table_id'
-    model = models.Interactions
-    unique_key = 'datahub_interaction_id'
-
     mapping = {
         'datahub_id': 'datahub_interaction_id',
         'company_id': 'datahub_company_id',
@@ -153,7 +145,8 @@ class ExtractDatahubInteractions(SourceDataExtractor):
         'interaction_subject': 'subject',
         'created_on': 'created_on',
     }
-
+    model = models.Interactions
+    source_table_id_config_key = 'datahub_interactions_source_table_id'
     stub_data = {
         'headers': [
             'datahub_id',
@@ -179,12 +172,11 @@ class ExtractDatahubInteractions(SourceDataExtractor):
             ],
         ],
     }
+    unique_key = 'datahub_interaction_id'
 
 
 class ExtractDatahubOmis(SourceDataExtractor):
     dataset_id_config_key = 'datahub_omis_dataset_id'
-    source_table_id_config_key = 'datahub_omis_source_table_id'
-    unique_key = 'datahub_omis_order_id'
     mapping = {
         'company_id': 'company_id',
         'market': 'market',
@@ -193,6 +185,7 @@ class ExtractDatahubOmis(SourceDataExtractor):
         'sector': 'sector',
     }
     model = models.DatahubOmis
+    source_table_id_config_key = 'datahub_omis_source_table_id'
     stub_data = {
         'headers': ['company_id', 'market', 'created_date', 'id', 'sector'],
         'values': [
@@ -212,16 +205,17 @@ class ExtractDatahubOmis(SourceDataExtractor):
             ],
         ],
     }
+    unique_key = 'datahub_omis_order_id'
 
 
 class ExtractDatahubSectors(SourceDataExtractor):
     dataset_id_config_key = 'datahub_sectors_dataset_id'
-    source_table_id_config_key = 'datahub_sectors_source_table_id'
     mapping = {
         'id': 'id',
         'sector': 'sector',
     }
     model = models.DatahubSectors
+    source_table_id_config_key = 'datahub_sectors_source_table_id'
     stub_data = {
         'headers': ['id', 'sector'],
         'values': [
@@ -233,8 +227,6 @@ class ExtractDatahubSectors(SourceDataExtractor):
 
 class ExtractExportWins(SourceDataExtractor):
     dataset_id_config_key = 'export_wins_dataset_id'
-    source_table_id_config_key = 'export_wins_source_table_id'
-
     mapping = {
         'company_id': 'company_id',
         'timestamp': 'timestamp',
@@ -242,6 +234,7 @@ class ExtractExportWins(SourceDataExtractor):
         'id': 'id',
     }
     model = models.ExportWins
+    source_table_id_config_key = 'export_wins_source_table_id'
     stub_data = {
         'headers': ['id', 'company_id', 'country', 'timestamp'],
         'values': [
@@ -254,9 +247,11 @@ class ExtractExportWins(SourceDataExtractor):
 def get_hawk_headers(
     url, client_id, client_key, content='', content_type='', https=False, method='GET',
 ):
-
     if https is False:
+        # todo: ask data workspace to fix the https/http x-forwarded-for
         url = url.replace('https', 'http')
+    # strip query string
+    url = url.split('?')[0]
     credentials = {'id': client_id, 'key': client_key, 'algorithm': 'sha256'}
 
     sender = mohawk.Sender(
@@ -273,11 +268,11 @@ def get_hawk_headers(
 def populate_table_paginated(model, mapping, unique_key, url):
     client_id = current_app.config['dataworkspace']['hawk_client_id']
     client_key = current_app.config['dataworkspace']['hawk_client_key']
-    headers = get_hawk_headers(url, client_id, client_key)
 
     next_page = url
     n_rows = 0
     while next_page is not None:
+        headers = get_hawk_headers(next_page, client_id, client_key)
         response = requests.get(next_page, headers=headers)
         data = response.json()
         output = populate_table(
@@ -315,7 +310,9 @@ def populate_table(data, model, mapping, unique_key, overwrite=True):
         logger.error(f'Error populating {model.__tablename__} table')
         logger.error(err)
         transaction.rollback()
-    connection.close()
+        raise err
+    finally:
+        connection.close()
 
     return {'table': model.__tablename__, 'rows': n_rows, 'status': 200}
 

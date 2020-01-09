@@ -3,6 +3,8 @@ from unittest.mock import Mock, patch
 
 import pytest
 
+import sqlalchemy.exc
+
 import app.db.models.external as models
 import app.etl.tasks.source_data_extraction
 import app.etl.tasks.source_data_extraction as source_data_extraction
@@ -115,7 +117,7 @@ class TestExtractCountriesAndTerritoriesReferenceDataset(
         },
     ]
     source_data = {
-        'headers': ['ID', 'Name', 'Type', 'Start Date', 'End Date'],
+        'headers': ['ID', 'Name', 'Type', 'Start date', 'End date'],
         'next': None,
         'values': [
             ['AE-AZ', 'Abu Dhabi', 'Territory', None, None],
@@ -413,14 +415,14 @@ class TestPopulateTable:
             ],
         }
 
-        response = source_data_extraction.populate_table(
-            data,
-            self.sector_model,
-            {'id': 'id', 'sector': 'sector'},
-            'id',
-            overwrite=True,
-        )
-        assert response == {'rows': 0, 'status': 200, 'table': 'datahub_sectors'}
+        with pytest.raises(sqlalchemy.exc.DataError):
+            source_data_extraction.populate_table(
+                data,
+                self.sector_model,
+                {'id': 'id', 'sector': 'sector'},
+                'id',
+                overwrite=True,
+            )
 
         rows = self.get_rows()
         assert len(rows) == 2
