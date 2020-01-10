@@ -17,7 +17,7 @@ class TestPopulateDatabase:
     def test_called_without_drop_table_in_request(self, populate_database_task):
         with self.app.test_request_context():
             output = populate_database()
-        populate_database_task.delay.assert_called_once_with(False)
+        populate_database_task.delay.assert_called_once_with(False, [], [])
         assert output.get_json() == {
             'status': 200,
             'message': 'started populate_database task',
@@ -28,7 +28,8 @@ class TestPopulateDatabase:
         with self.app.test_request_context() as request:
             request.request.args = {'drop-table': ''}
             output = populate_database()
-        populate_database_task.delay.assert_called_once_with(True)
+        populate_database_task.delay.assert_called_once_with(True, [], [])
+
         assert output.get_json() == {
             'status': 200,
             'message': 'started populate_database task',

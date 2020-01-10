@@ -8,6 +8,9 @@ class PopulateStandardisedCountriesTask:
     name = 'PopulateStandardisedCountriesTask'
     table_name = StandardisedCountries.__tablename__
 
+    def __init__(self, **kwargs):
+        super().__init__()
+
     def __call__(self):
         drop_table(StandardisedCountries.__tablename__)
         countries = country_standardisation.extract_interested_exported_countries()
