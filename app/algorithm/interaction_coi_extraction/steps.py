@@ -260,8 +260,9 @@ def process_interactions(
     cursor.execute(
         f'''
             SELECT id, notes FROM "{input_schema}"."{input_table}"
-            WHERE id > (SELECT coalesce(max(id), 0)
+            WHERE id > (SELECT coalesce(max(interaction_id), 0)
             FROM "{output_schema}"."{output_table}")
+            AND notes is not NULL
             ORDER BY id, created_on
         '''
     )
@@ -314,7 +315,7 @@ def process_interactions(
             null='',
             has_header=False,
             columns=[
-                'id',
+                'interaction_id',
                 'place',
                 'standardized_place',
                 'action',

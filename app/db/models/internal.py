@@ -1,4 +1,4 @@
-from sqlalchemy import PrimaryKeyConstraint
+from sqlalchemy import ForeignKey, PrimaryKeyConstraint
 
 from app.db.models import (
     BaseModel,
@@ -11,6 +11,7 @@ from app.db.models import (
     _sa,
     _text,
 )
+from app.db.models.external import Interactions
 
 
 class HawkUsers(BaseModel):
@@ -120,7 +121,8 @@ class InteractionsAnalysed(BaseModel):
     __tablename__ = 'interactions_analysed'
     __table_args__ = {'schema': 'algorithm'}
 
-    id = _col(_int, primary_key=True)
+    id = _col(_int, primary_key=True, autoincrement=True)
+    interaction_id = _col(_int, ForeignKey(Interactions.id))
     place = _col(_text, nullable=False)
     standardized_place = _col(_text)
     action = _col(_text)
