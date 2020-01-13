@@ -1,0 +1,53 @@
+flask:
+  env: $ENV{FLASK_ENV, dev}
+app:
+  secret_key: $ENV{APP_SECRET_KEY, random_string}
+  database_url: $ENV{DATABASE_URL, postgresql://postgres@postgres/postgres}
+  pagination_size: $ENV{PAGINATION_SIZE, 50}
+  run_scheduler: $ENV{RUN_SCHEDULER, False}
+  stub_source_data: $ENV{STUB_SOURCE_DATA, True}
+sso:
+  base_url: $ENV{SSO_URL, https://sso.trade.gov.uk}
+  profile_path: $ENV{ACCESS_TOKEN_PATH, /api/v1/user/me/}
+  authorize_path: $ENV{AUTHORIZE_PATH, /o/authorize/}
+  access_token_path: $ENV{SSO_PATH_USER, /o/token/}
+  logout_path: $ENV{SSO_PATH_LOGOUT, /logout/}
+  client_id: $ENV{ABC_CLIENT_ID, sso_client_id}
+  client_secret: $ENV{ABC_CLIENT_SECRET, sso_client_secret}
+dataworkspace:
+  base_url: $ENV{DATAWORKSPACE_BASE_URL, localapps.com:8000}
+  hawk_client_id: $ENV{DATAWORKSPACE_HAWK_CLIENT_ID, dataworkspace_client_id}
+  hawk_client_key: $ENV{DATAWORKSPACE_HAWK_CLIENT_KEY, dataworkspace_client_key}
+  countries_and_territories_group_slug: $ENV{COUNTRIES_AND_TERRITORIES_GROUP_SLUG, test}
+  countries_and_territories_reference_slug: $ENV{COUNTRIES_AND_TERRITORIES_REFERENCE_SLUG, countries-and-territories}
+  datahub_companies_dataset_id: $ENV{DATAHUB_COMPANIES_DATASET_ID, }
+  datahub_companies_source_table_id: $ENV{DATAHUB_COMPANIES_SOURCE_TABLE_ID, }
+  datahub_export_countries_dataset_id: $ENV{DATAHUB_EXPORT_COUNTRIES_DATASET_ID, }
+  datahub_export_countries_source_table_id: $ENV{DATAHUB_EXPORT_COUNTRIES_SOURCE_TABLE_ID, }
+  datahub_future_interest_countries_dataset_id: $ENV{DATAHUB_FUTURE_INTEREST_COUNTRIES_DATASET_ID, }
+  datahub_future_interest_countries_source_table_id: $ENV{DATAHUB_FUTURE_INTEREST_COUNTRIES_SOURCE_TABLE_ID, }
+  datahub_interactions_dataset_id: $ENV{DATAHUB_INTERACTIONS_DATASET_ID, }
+  datahub_interactions_source_table_id: $ENV{DATAHUB_INTERACTIONS_SOURCE_TABLE_ID, }
+  datahub_omis_dataset_id: $ENV{DATAHUB_OMIS_DATASET_ID, }
+  datahub_omis_source_table_id: $ENV{DATAHUB_OMIS_SOURCE_TABLE_ID, }
+dataflow:
+  host: $ENV{DATAFLOW_HOST, }
+  hawk_client_id: $ENV{DATAFLOW_HAWK_CLIENT_ID, dataflow_client_id}
+  hawk_client_key: $ENV{DATAFLOW_HAWK_CLIENT_KEY, dataflow_client_id}
+cache:
+  host: $ENV{CACHE_HOST, redis://redis}
+  port: $ENV{CACHE_PORT, 6379}
+  password: $ENV{CACHE_PWD, }
+  ssl: $ENV{CACHE_SSL, True}
+access_control:
+  hawk_enabled: $ENV{AC_HAWK_ENABLED, True}
+  hawk_nonce_enabled: $ENV{AC_HAWK_NONCE_ENABLED, True}
+  hawk_response_header: $ENV{AC_HAWK_RESPONSE_HEADER, True}
+  hawk_algorithm: $ENV{AC_HAWK_ALGORITHM, sha256}
+  hawk_accept_untrusted_content: $ENV{AC_HAWK_ACCEPT_UNTRUSTED_CONTENT, False}
+  hawk_localtime_offset_in_seconds: $ENV{AC_HAWK_LOCALTIME_OFFSET_IN_SECONDS, 0}
+  hawk_timestamp_skew_in_seconds: $ENV{AC_HAWK_TIMESTAMP_SKEW_IN_SECONDS, 60}
+session:
+  secret_key: $ENV{SESSION_SECRET_KEY, _authbroker_token}
+
+

@@ -2,20 +2,31 @@ version: '3'
 services:
   web:
     build: .
-    environment:
-      - DATABASE_URL=postgresql://postgres@postgres/postgres
-      - CELERY_BACKEND=redis://redis
-      - CELERY_BROKER=redis://redis
     env_file:
       - ${ENV_FILE:-.env}
     ports:
       - ${PORT:-5000}:5000
     depends_on:
       - postgres
+      - redis
     volumes:
       - .:/app
+  celery:
+    build:
+      context: .
+    volumes:
+      - .:/app
+    entrypoint: dockerize -wait tcp://postgres:5432 -wait tcp://redis:6379 -wait tcp://web:5000 -timeout 180s
+    env_file:
+      - ${ENV_FILE:-.env}
+    command: /app/scripts/celery_entrypoint.sh
+
   postgres:
     image: "postgres"
+    ports:
+      - "5433:5432"
   redis:
-    image: "redis"
-  
+    image: redis:3.2
+    restart: always
+    ports:
+      - "6378:6379"
