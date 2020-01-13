@@ -17,7 +17,7 @@ class TestPopulateDatabase:
     def test_called_without_drop_table_in_request(self, populate_database_task):
         with self.app.test_request_context():
             output = populate_database()
-        populate_database_task.delay.assert_called_once_with(False)
+        populate_database_task.delay.assert_called_once_with(False, [], [])
         assert output.get_json() == {
             'status': 200,
             'message': 'started populate_database task',
@@ -28,7 +28,7 @@ class TestPopulateDatabase:
         with self.app.test_request_context() as request:
             request.request.args = {'drop-table': ''}
             output = populate_database()
-        populate_database_task.delay.assert_called_once_with(True)
+        populate_database_task.delay.assert_called_once_with(True, [], [])
         assert output.get_json() == {
             'status': 200,
             'message': 'started populate_database task',
@@ -80,7 +80,7 @@ class TestPopulateDatabase:
             populate_database()
         populate_database_task.delay.assert_not_called()
 
-    def test_reruns_task_if_last_was_succesful(self, populate_database_task):
+    def test_reruns_task_if_last_was_successful(self, populate_database_task):
         sql = (
             'create table if not exists etl_status ('
             'status varchar(100), timestamp timestamp)'
@@ -91,3 +91,18 @@ class TestPopulateDatabase:
         with self.app.test_request_context():
             populate_database()
         populate_database_task.delay.assert_called_once()
+
+    def test_called_with_specified_extractors_or_tasks(self, populate_database_task):
+        with self.app.test_request_context() as request:
+            request.request.args = {
+                'extractors': 'datahub_company',
+                'tasks': 'countries_of_interest',
+            }
+            output = populate_database()
+        populate_database_task.delay.assert_called_once_with(
+            False, ['datahub_company'], ['countries_of_interest']
+        )
+        assert output.get_json() == {
+            'status': 200,
+            'message': 'started populate_database task',
+        }

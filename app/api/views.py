@@ -431,6 +431,13 @@ def get_index():
 def populate_database():
     drop_table = 'drop-table' in request.args
     force_update = 'force-update' in request.args
+    extractors = []
+    if 'extractors' in request.args:
+        extractors = request.args['extractors'].split(',')
+
+    tasks = []
+    if 'tasks' in request.args:
+        tasks = request.args['tasks'].split(',')
     sql = (
         'create table if not exists etl_status '
         '(status varchar(100), timestamp timestamp)'
@@ -440,7 +447,7 @@ def populate_database():
 
     df = execute_query(sql)
     if force_update is True or len(df) == 0 or df['status'].values[0] == 'SUCCESS':
-        populate_database_task.delay(drop_table)
+        populate_database_task.delay(drop_table, extractors, tasks)
         sql = 'delete from etl_status'
         execute_statement(sql)
         sql = '''insert into etl_status values (%s, %s)'''
