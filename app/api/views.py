@@ -89,6 +89,7 @@ def json_error(f):
 def get_company_countries_and_sectors_of_interest(orientation):
     pagination_size = flask_app.config['app']['pagination_size']
     next_source = request.args.get('next-source')
+
     next_source_id = request.args.get('next-source-id')
     company_ids = request.args.getlist('company-id')
     countries = request.args.getlist('country')
@@ -154,6 +155,7 @@ def get_company_countries_and_sectors_of_interest(orientation):
         order by (source, source_id)
         limit {pagination_size} + 1
     '''
+
     df = execute_query(sql_query, data=values)
     if len(df) == pagination_size + 1:
         next_ = '{}{}?'.format(request.host_url[:-1], request.path)
