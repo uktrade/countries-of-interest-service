@@ -222,6 +222,7 @@ def test_pagination_next(app):
                     ],
                     'next': 'http://localhost/api/v1/'
                     'get-company-export-countries?'
+                    'orientation=tabular&'
                     'next-source=source2&next-source-id=source_id2',
                     'values': [list(interest_1.values())],
                 },

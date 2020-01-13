@@ -288,6 +288,7 @@ def test_pagination_next(app):
                     ],
                     'next': 'http://localhost/api/v1/'
                     'get-company-countries-and-sectors-of-interest?'
+                    'orientation=tabular&'
                     'next-source=source2&next-source-id=source_id',
                     'values': [list(interest_1.values())],
                 },
