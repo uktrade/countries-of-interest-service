@@ -3,3 +3,5 @@ flask:
 app:
   hawk_enabled: True
   database_url: postgresql://postgres:postgres@postgres/postgres
+sso:
+  base_url: http://localhost
