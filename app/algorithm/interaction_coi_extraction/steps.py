@@ -1,7 +1,6 @@
 import io
 
 import pycountry
-import spacy
 
 from app.db import sql_alchemy
 from app.db.db_utils import dsv_buffer_to_table
@@ -153,6 +152,7 @@ REFERENCE_COUNTRY_MAPPING = {
 
 
 def _load_model():
+    import spacy
     """
     Checks if the model is allocated within the project and downloads them if not.
     :return:
