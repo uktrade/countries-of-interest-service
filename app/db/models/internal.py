@@ -47,6 +47,22 @@ class HawkUsers(BaseModel):
         )
 
 
+class MentionedInInteractions(BaseModel):
+
+    __tablename__ = "coi_mentioned_in_interactions"
+
+    company_id = _col(_text)
+    country_of_interest = _col(_text)
+    source = _col(_text)
+    source_id = _col(_text)
+    timestamp = _col(_dt)
+
+    __table_args__ = (
+        PrimaryKeyConstraint(source, source_id),
+        {'schema': 'public'},
+    )
+
+
 class CountriesAndSectorsOfInterest(BaseModel):
 
     __tablename__ = 'coi_countries_and_sectors_of_interest'
