@@ -38,30 +38,25 @@ job_defaults: &job_defaults
   steps:
     - checkout
     - restore_cache:
-          keys:
-          - coi-{{ .Branch }}-{{ checksum "environment.yml" }}-{{ .Environment.CACHE_VERSION }}
+         name: Restore pip cache
+         keys:
+           - coi-<< parameters.python_image >>-{{ checksum "requirements.txt" }}
+         paths:
+           - ~/cache/pip
+
     - run:
-        name: install dependencies
-        command: |
-          python3 -m venv venv
-          . venv/bin/activate
-          wget https://repo.continuum.io/miniconda/Miniconda3-4.5.12-Linux-x86_64.sh -O ~/miniconda.sh
-          bash ~/miniconda.sh -b -u -p ~/miniconda
-          source ~/miniconda/bin/activate
-          conda env create -q --force -f environment.yml
+        name: Install dependencies
+        command: python -m pip install --cache-dir ~/cache/pip --progress-bar off -r requirements.txt
+
     - save_cache:
+        name: Save pip cache
+        key: coi-<< parameters.python_image >>-{{ checksum "requirements.txt" }}
         paths:
-          - venv
-          - ../miniconda
-          - ../.conda
-        key: coi-{{ .Branch }}-{{ checksum "environment.yml" }}-{{ .Environment.CACHE_VERSION }}
+          - ~/cache/pip
 
     - run:
         name: Run format checks
         command: |
-          . venv/bin/activate
-          source ~/miniconda/bin/activate
-          source activate countries-of-interest-service
           make check
 
     - run:
@@ -83,9 +78,6 @@ job_defaults: &job_defaults
     - run:
         name: Run tests
         command: |
-          . venv/bin/activate
-          source ~/miniconda/bin/activate
-          source activate countries-of-interest-service
           make run_tests COV='--cov=. --cov-report=html'
 
     - when:
@@ -94,9 +86,6 @@ job_defaults: &job_defaults
           - run:
               name: Publish coverage
               command: |
-                . venv/bin/activate
-                source ~/miniconda/bin/activate
-                source activate countries-of-interest-service
                 wget -O codecov.sh https://codecov.io/bash
                 bash ./codecov.sh -t ${COV_TOKEN}
 

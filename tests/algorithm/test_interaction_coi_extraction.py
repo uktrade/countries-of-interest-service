@@ -35,7 +35,9 @@ def test_interaction_coi_extraction(add_datahub_interaction):
 
     mapper.analyse_interactions()
 
-    expected_rows = [(1, 'Brussels', 'Belgium', 'exported', 'GPE', ['export'], False)]
+    expected_rows = [
+        (1, 1, 'Brussels', 'Belgium', 'exported', 'GPE', ['export'], False)
+    ]
     assert rows_equal_query_results(
         expected_rows, f'SELECT * FROM "{mapper.output_schema}"."{mapper.output_table}"'
     )
