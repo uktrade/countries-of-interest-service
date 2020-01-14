@@ -1,7 +1,6 @@
 from sqlalchemy import ForeignKey, PrimaryKeyConstraint
 
 from app.db.models import (
-    BaseModel,
     _array,
     _bool,
     _col,
@@ -10,6 +9,7 @@ from app.db.models import (
     _num,
     _sa,
     _text,
+    BaseModel,
 )
 from app.db.models.external import Interactions
 

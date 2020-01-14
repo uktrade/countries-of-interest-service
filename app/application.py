@@ -1,13 +1,9 @@
 import os
 
-from celery import Celery
-
 import certifi
-
-from flask import Flask, json
-
 import redis
-
+from celery import Celery
+from flask import Flask, json
 from sqlalchemy.engine.url import make_url
 
 from app import config

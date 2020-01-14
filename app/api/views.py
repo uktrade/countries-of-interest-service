@@ -2,14 +2,11 @@ import datetime
 import logging
 from functools import wraps
 
+import pandas as pd
+import redis
 from flask import current_app as flask_app, make_response
 from flask import jsonify, render_template, request
 from flask.blueprints import Blueprint
-
-import pandas as pd
-
-import redis
-
 from werkzeug.exceptions import BadRequest, NotFound, Unauthorized
 
 from app.api.access_control import AccessControl

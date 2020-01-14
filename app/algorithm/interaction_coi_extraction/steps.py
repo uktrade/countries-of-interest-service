@@ -1,7 +1,6 @@
 import io
 
 import pycountry
-
 import spacy
 
 from app.db import sql_alchemy
