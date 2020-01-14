@@ -5,3 +5,5 @@ applications:
   buildpack:
     - python_buildpack
     - nodejs_buildpack
+  disk_quota: 3G
+  memory: 2G
