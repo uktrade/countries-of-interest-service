@@ -37,7 +37,7 @@ job_defaults: &job_defaults
 
   steps:
     - checkout
-    ]- restore_cache:
+    - restore_cache:
          name: Restore pip cache
          keys:
            - coi-<< parameters.python_image >>-{{ checksum "requirements.txt" }}
