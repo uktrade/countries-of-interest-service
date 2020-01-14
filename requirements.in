@@ -1,3 +1,5 @@
+--only-binary=spacy,thinc
+
 flask==1.1.1
 psycopg2==2.8.4
 pyyaml==5.2
@@ -23,7 +25,7 @@ pandas==0.*
 pycountry==19.8.18
 pytest-mock==1.6.0
 pip-tools==4.3.0
-requests-oauthlib==1.1.0
+requests-oauthlib==0.6.2
 redis==3.3.11
 sqlalchemy==1.3.12
 sqlalchemy-utils==0.36.1
