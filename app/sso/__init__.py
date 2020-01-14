@@ -8,7 +8,6 @@ import werkzeug
 from werkzeug.exceptions import abort
 
 
-
 sso = Blueprint('sso', __name__)
 
 
