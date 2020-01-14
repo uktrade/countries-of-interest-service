@@ -1,11 +1,8 @@
 import logging
 
-from flask import current_app
-
 import mohawk
-
 import requests
-
+from flask import current_app
 from sqlalchemy import exc
 from sqlalchemy.dialects import postgresql
 

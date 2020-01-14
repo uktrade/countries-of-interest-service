@@ -6,9 +6,7 @@ This module provides API access control based on Hawk scheme
 from functools import wraps
 
 from flask import current_app, request
-
 from mohawk.util import parse_authorization_header
-
 from werkzeug.exceptions import BadRequest, Unauthorized
 
 try:

@@ -2,7 +2,6 @@ import uuid
 from unittest.mock import Mock, patch
 
 import pytest
-
 import sqlalchemy.exc
 
 import app.db.models.external as models

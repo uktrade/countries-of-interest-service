@@ -1,9 +1,7 @@
 import pytest
-
 from spacy.language import Language
 
 import app.algorithm.interaction_coi_extraction as mapper
-
 from tests.utils import rows_equal_query_results
 
 

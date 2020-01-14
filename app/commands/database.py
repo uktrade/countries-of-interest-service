@@ -1,5 +1,4 @@
 from flask import current_app as app
-
 from flask_script import Manager
 
 from app.api.tasks import populate_database_task

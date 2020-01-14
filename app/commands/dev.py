@@ -1,10 +1,7 @@
-from flask import current_app as app
-
-from flask_script import Manager
-
-from sqlalchemy import create_engine
-
 import sqlalchemy_utils
+from flask import current_app as app
+from flask_script import Manager
+from sqlalchemy import create_engine
 
 from app.db.db_utils import create_schemas
 from app.db.models.internal import HawkUsers

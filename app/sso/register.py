@@ -1,6 +1,6 @@
 from urllib.parse import urljoin
 
-from flask_security import SQLAlchemyUserDatastore, Security
+from flask_security import Security, SQLAlchemyUserDatastore
 
 from . import sso
 from .models import Role, User
