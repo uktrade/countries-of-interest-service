@@ -37,12 +37,12 @@
 	<p>Returns a list of company - country and sector of interest relationships for companies stored in Datahub. These companies have expressed interest in the country-sector combination. You can use the <code>country</code>, <code>sector</code>, <code>company-id</code> and <code>source</code> arguments to filter on country, sector and data source.</p>
 	<p>e.g.</p>
 	<ul>
-	  <li><a href="/api/v1/get-company-countries-and-sectors-of-interest">/api/v1/get-company-countries-sectors-of-interest</a></li>
-	  <li><a href="/api/v1/get-company-countries-and-sectors-of-interest?country=CN">/api/v1/get-company-countries-sectors-of-interest?country=CN</a></li>
-	  <li><a href="/api/v1/get-company-countries-and-sectors-of-interest?sector=Aerospace">/api/v1/get-company-countries-sectors-of-interest?sector=Aerospace</a></li>
-	  <li><a href="/api/v1/get-company-countries-and-sectors-of-interest?source=omis">/api/v1/get-company-countries-sectors-of-interest?source=omis</a></li>
-	  <li><a href="/api/v1/get-company-countries-and-sectors-of-interest?country=CN&sector=Aerospace">/api/v1/get-company-countries-sectors-of-interest?country=CN&ampsector=Aerospace</a></li>
-	  <li><a href="/api/v1/get-company-countries-and-sectors-of-interest?company-id=d0af8e52-ff34-4088-98e3-d2d22cd250ae">/api/v1/get-company-countries-sectors-of-interest?company-id=d0af8e52-ff34-4088-98e3-d2d22cd250ae</a></li>
+	  <li><a href="/api/v1/get-company-countries-and-sectors-of-interest">/api/v1/get-company-countries-and-sectors-of-interest</a></li>
+	  <li><a href="/api/v1/get-company-countries-and-sectors-of-interest?country=CN">/api/v1/get-company-countries-and-sectors-of-interest?country=CN</a></li>
+	  <li><a href="/api/v1/get-company-countries-and-sectors-of-interest?sector=Aerospace">/api/v1/get-company-countries-and-sectors-of-interest?sector=Aerospace</a></li>
+	  <li><a href="/api/v1/get-company-countries-and-sectors-of-interest?source=omis">/api/v1/get-company-countries-and-sectors-of-interest?source=omis</a></li>
+	  <li><a href="/api/v1/get-company-countries-and-sectors-of-interest?country=CN&sector=Aerospace">/api/v1/get-company-countries-and-sectors-of-interest?country=CN&ampsector=Aerospace</a></li>
+	  <li><a href="/api/v1/get-company-countries-and-sectors-of-interest?company-id=d0af8e52-ff34-4088-98e3-d2d22cd250ae">/api/v1/get-company-and-countries-sectors-of-interest?company-id=d0af8e52-ff34-4088-98e3-d2d22cd250ae</a></li>
 	</ul>
       </div>
 
@@ -94,6 +94,20 @@
 	  <li><a href="/api/v1/get-company-sectors-of-interest?source=omis">/api/v1/get-company-sectors-of-interest?source=omis</a></li>
 	  <li><a href="/api/v1/get-company-sectors-of-interest?sector=Aerospace&source=omis">/api/v1/get-company-sectors-of-interest?sector=Aerospace&ampsource=omis</a></li>
 	  <li><a href="/api/v1/get-company-sectors-of-interest?company-id=d0af8e52-ff34-4088-98e3-d2d22cd250ae">/api/v1/get-company-sectors-of-interest?company-id=d0af8e52-ff34-4088-98e3-d2d22cd250ae</a></li>
+	</ul>
+      </div>
+
+      <div class="api-description">
+	<h3>
+	  <code>
+	    /api/v1/get-company-countries-mentioned-in-interactions
+	  </code>
+	</h3>
+	<p>Returns a list of instances where a company has mentioned a country in a datahub interaction. You can use the <code>country</code> and <code>company-id</code> arguments to filter the results.</p>
+	<p>e.g.</p>
+	<ul>
+	  <li><a href="/api/v1/get-company-countries-mentioned-in-interactions">/api/v1/get-company-countries-mentioned-in-interactions</a></li>
+	  <li><a href="/api/v1/get-company-countries-mentioned-in-interactions?company-id=d0af8e52-ff34-4088-98e3-d2d22cd250ae">/api/v1/get-company-countries-mentioned-in-interactions?company-id=d0af8e52-ff34-4088-98e3-d2d22cd250ae</a></li>
 	</ul>
       </div>
 

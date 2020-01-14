@@ -53,12 +53,11 @@ class MentionedInInteractions(BaseModel):
 
     company_id = _col(_text)
     country_of_interest = _col(_text)
-    source = _col(_text)
-    source_id = _col(_text)
+    interaction_id = _col(_text)
     timestamp = _col(_dt)
 
     __table_args__ = (
-        PrimaryKeyConstraint(source, source_id),
+        PrimaryKeyConstraint(interaction_id),
         {'schema': 'public'},
     )
 
