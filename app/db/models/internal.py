@@ -150,6 +150,7 @@ class InteractionsAnalysedInteractionIdLog(BaseModel):
     __table_args__ = {'schema': 'algorithm'}
 
     datahub_interaction_id = _col(UUID(as_uuid=True), primary_key=True)
+    analysed_at = _col(_dt)
 
 
 class StandardisedCountries(BaseModel):

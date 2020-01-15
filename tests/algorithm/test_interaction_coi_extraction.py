@@ -1,3 +1,5 @@
+import datetime
+
 from flask import current_app as flask_app
 
 import pytest
@@ -23,6 +25,11 @@ def add_objects(app_with_db):
 
 
 @pytest.fixture
+def mock_datetime(mocker):
+    return mocker.patch.object(mapper.steps, 'datetime')
+
+
+@pytest.fixture
 def add_side_effect(mocker):
     def _method(outputs):
         outputs = outputs[::-1]  # reverse the list
@@ -42,7 +49,7 @@ def add_side_effect(mocker):
     return _method
 
 
-def test_interaction_coi_extraction(add_objects, add_side_effect):
+def test_interaction_coi_extraction(add_objects, add_side_effect, mock_datetime):
     # Test mapping
     add_objects(
         Interactions,
@@ -57,6 +64,8 @@ def test_interaction_coi_extraction(add_objects, add_side_effect):
 
     output = [[('Brussels', 'Belgium', 'exported', 'GPE', ['export'], False)]]
     add_side_effect(output)
+
+    mock_datetime.datetime.now.return_value = datetime.datetime(2020, 1, 1)
 
     mapper.analyse_interactions()
 
@@ -83,6 +92,7 @@ def test_interaction_coi_extraction(add_objects, add_side_effect):
         str(interaction_ids[0].datahub_interaction_id)
         == '52552367-436f-4a5d-84a2-dbf4ffeddb76'
     )
+    assert interaction_ids[0].analysed_at == datetime.datetime(2020, 1, 1)
 
 
 def test_interaction_already_seen(add_objects, add_side_effect):

@@ -1,3 +1,4 @@
+import datetime
 import io
 
 from flask import current_app as flask_app
@@ -323,6 +324,7 @@ def process_interactions(
             yield chunk, datahub_interaction_ids
             batch_count += 1
 
+    analysed_at = datetime.datetime.now()
     for chunk, datahub_interaction_ids in _analysed_interaction_chunks():
         connection = flask_app.db.engine.connect()
         transaction = connection.begin()
@@ -346,13 +348,14 @@ def process_interactions(
                     'negation',
                 ],
                 quote='$',
+                reraise=True,
             )
 
             sql = f'''
             insert into "{output_schema}"."{log_table}"
-            values (%s) on conflict do nothing
+            values (%s, %s) on conflict do nothing
             '''
-            connection.execute(sql, [[d] for d in datahub_interaction_ids])
+            connection.execute(sql, [[d, analysed_at] for d in datahub_interaction_ids])
             transaction.commit()
 
         except Exception as err:
