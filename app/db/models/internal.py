@@ -55,8 +55,7 @@ class MentionedInInteractions(BaseModel):
     id = _col(_int, primary_key=True, autoincrement=True)
     company_id = _col(_text)
     country_of_interest = _col(_text)
-    source = _col(_text)
-    source_id = _col(_text)
+    interaction_id = _col(_text)
     timestamp = _col(_dt)
 
     __table_args__ = ({'schema': 'public'},)

@@ -7,7 +7,6 @@ import sqlalchemy
 
 import app.db.models.external as external_models
 import app.db.models.internal as internal_models
-from app.config import data_sources
 
 
 logger = logging.getLogger(__name__)
@@ -21,8 +20,7 @@ with results as (
   select
     datahub_company_id::text as company_id,
     standardized_place::text as country_of_interest,
-    '{source}'::text as source,
-    datahub_interaction_id::text as source_id,
+    datahub_interaction_id::text as interaction_id,
     created_on::timestamp as timestamp
 
   from {interactions} join {interactions_analysed} using (id)
@@ -32,13 +30,11 @@ with results as (
 insert into {mentioned_in_interactions} (
     company_id,
     country_of_interest,
-    source,
-    source_id,
+    interaction_id,
     timestamp
 ) select * from results
 
 '''.format(
-    source=data_sources.datahub_interactions,
     interactions=external_models.Interactions.__tablename__,
     interactions_analysed='{}.{}'.format(
         internal_models.InteractionsAnalysed.__table_args__['schema'],
