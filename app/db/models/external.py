@@ -2,12 +2,12 @@ from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 
 from app.db.models import (
-    BaseModel,
     _col,
     _date,
     _dt,
     _int,
     _text,
+    BaseModel,
 )
 
 

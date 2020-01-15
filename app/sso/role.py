@@ -1,7 +1,6 @@
 from functools import wraps
 
 from flask import redirect, request, url_for
-
 from flask_security import current_user, login_user, logout_user
 
 from . import BaseSSOClient

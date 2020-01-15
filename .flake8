@@ -6,3 +6,4 @@ application-package-names=authbroker_client
 exclude =
     venv,
     .venv
+import_order_style = smarkets

@@ -1,5 +1,4 @@
 import click
-
 from flask.cli import AppGroup
 
 from app.api.tasks import populate_database_task

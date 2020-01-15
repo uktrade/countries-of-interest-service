@@ -1,9 +1,7 @@
 import logging
 
-from flask import current_app
-
 import sqlalchemy
-
+from flask import current_app
 
 import app.db.models.external as external_models
 import app.db.models.internal as internal_models

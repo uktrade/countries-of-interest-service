@@ -2,9 +2,7 @@ from functools import wraps
 from urllib.error import URLError
 
 from flask import redirect, request, url_for
-
 from flask_oauthlib.client import OAuthException
-
 from werkzeug.exceptions import HTTPException
 
 from . import BaseSSOClient
