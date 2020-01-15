@@ -100,7 +100,7 @@ def test_interaction_already_seen(add_objects, add_side_effect):
                 'id': 2,
                 'datahub_interaction_id': '52552367-436f-4a5d-84a2-dbf4ffeddb77',
                 'datahub_company_id': 'df14625d-c89b-4efd-bc5a-9b46f68b71bb',
-                'notes': '',
+                'notes': 'nothing mentioning a location',
             },
             {
                 'id': 3,

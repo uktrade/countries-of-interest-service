@@ -293,7 +293,7 @@ def process_interactions(
                 id = row[0]
                 datahub_interaction_id = str(row[1])
                 interaction = row[2]
-                if interaction == None or interaction == '':
+                if interaction is None or interaction == '':
                     continue
                 interaction_doc = nlp(interaction)
                 places = _analyse_interaction(interaction_doc)
