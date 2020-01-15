@@ -1,9 +1,7 @@
 import click
-
-from flask.cli import AppGroup, with_appcontext
-
 import sqlalchemy_utils
 from flask import current_app as app
+from flask.cli import AppGroup, with_appcontext
 from sqlalchemy import create_engine
 
 from app.db.db_utils import create_schemas
