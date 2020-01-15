@@ -4,8 +4,8 @@
 #
 #    pip-compile --output-file=requirements.txt requirements.in
 #
---only-binary spacy
 --only-binary thinc
+--only-binary spacy
 
 amqp==2.5.2               # via kombu
 appdirs==1.4.3            # via black
@@ -22,6 +22,9 @@ chardet==3.0.4            # via requests
 click==7.0                # via black, flask, pip-tools
 codecov==2.0.15
 coverage==5.0.3           # via codecov, pytest-cov
+cymem==2.0.3              # via preshed, spacy, thinc
+cytoolz==0.9.0.1          # via thinc
+dill==0.2.9               # via spacy, thinc
 entrypoints==0.3          # via flake8
 flake8-import-order==0.18.1
 flake8==3.7.9
@@ -46,6 +49,9 @@ markupsafe==1.1.1         # via jinja2
 mccabe==0.6.1             # via flake8
 mohawk==1.1.0
 more-itertools==8.1.0     # via pytest, zipp
+msgpack-numpy==0.4.3.2    # via spacy, thinc
+msgpack==0.5.6            # via msgpack-numpy, thinc
+murmurhash==1.0.2         # via spacy, thinc
 numpy==1.18.1
 oauthlib==2.1.0           # via flask-oauthlib, requests-oauthlib
 packaging==20.0           # via pytest
@@ -54,7 +60,9 @@ passlib==1.7.2            # via flask-security
 pathspec==0.7.0           # via black
 pathtools==0.1.2          # via watchdog
 pip-tools==4.3.0
+plac==0.9.6               # via spacy, thinc
 pluggy==0.13.1            # via pytest
+preshed==2.0.1            # via spacy, thinc
 psycopg2==2.8.4
 py==1.8.1                 # via pytest
 pycodestyle==2.5.0        # via flake8, flake8-import-order
@@ -68,22 +76,27 @@ python-dateutil==2.8.1    # via pandas
 pytz==2019.3              # via apscheduler, babel, celery, pandas, tzlocal
 pyyaml==5.2
 redis==3.3.11
-regex==2018.01.10         # via black
+regex==2018.01.10         # via black, spacy
 requests-oauthlib==0.6.2
-requests==2.22.0          # via codecov, requests-oauthlib
-six==1.13.0               # via apscheduler, mohawk, packaging, pip-tools, python-dateutil, sqlalchemy-utils
+requests==2.22.0          # via codecov, requests-oauthlib, spacy
+six==1.13.0               # via apscheduler, mohawk, packaging, pip-tools, python-dateutil, sqlalchemy-utils, thinc
+spacy==2.0.16
 speaklater==1.3           # via flask-babelex
 sqlalchemy-utils==0.36.1
 sqlalchemy==1.3.12
+thinc==6.12.1             # via spacy
 toml==0.10.0              # via black
 toolz==0.10.0
+tqdm==4.41.1              # via thinc
 typed-ast==1.4.1          # via black
 tzlocal==2.0.0            # via apscheduler
+ujson==1.35               # via spacy
 urllib3==1.25.7           # via requests
 vine==1.3.0               # via amqp, celery
 watchdog==0.9.0
 wcwidth==0.1.8            # via pytest
 werkzeug==0.16.0
+wrapt==1.10.11            # via thinc
 wtforms==2.2.1            # via flask-wtf
 zipp==1.0.0               # via importlib-metadata
 
