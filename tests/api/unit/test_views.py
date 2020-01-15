@@ -1,9 +1,7 @@
 import datetime
-import unittest
 import unittest.mock
 
 import redis
-
 from werkzeug.exceptions import BadRequest, NotFound
 
 import app.api.views as views

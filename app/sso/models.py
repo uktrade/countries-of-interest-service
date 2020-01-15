@@ -1,12 +1,12 @@
 from flask_security import RoleMixin, UserMixin
 
 from app.db.models import (
-    BaseModel,
     _bool,
     _col,
     _dt,
     _int,
     _text,
+    BaseModel,
     db,
 )
 

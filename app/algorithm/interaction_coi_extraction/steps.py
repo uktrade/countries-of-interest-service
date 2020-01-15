@@ -1,11 +1,9 @@
 import datetime
 import io
 
-from flask import current_app as flask_app
-
 import pycountry
-
 import spacy
+from flask import current_app as flask_app
 
 from app.db import sql_alchemy
 from app.db.db_utils import dsv_buffer_to_table

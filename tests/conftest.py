@@ -1,7 +1,6 @@
 import datetime
 
 import pytest
-
 import sqlalchemy_utils
 
 from app import application

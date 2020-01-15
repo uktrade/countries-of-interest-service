@@ -1,15 +1,12 @@
 import datetime
 
-from flask import current_app as flask_app
-
 import pytest
-
+from flask import current_app as flask_app
 from spacy.language import Language
 
 import app.algorithm.interaction_coi_extraction as mapper
 from app.db.models.external import Interactions
 from app.db.models.internal import InteractionsAnalysedInteractionIdLog
-
 from tests.utils import rows_equal_query_results
 
 

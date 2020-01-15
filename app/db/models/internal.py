@@ -2,7 +2,6 @@ from sqlalchemy import PrimaryKeyConstraint
 from sqlalchemy.dialects.postgresql import UUID
 
 from app.db.models import (
-    BaseModel,
     _array,
     _bool,
     _col,
@@ -11,6 +10,7 @@ from app.db.models import (
     _num,
     _sa,
     _text,
+    BaseModel,
 )
 
 

@@ -1,11 +1,11 @@
 import pytest
 
 from app.db.models.external import (
-    DITCountryTerritoryRegister,
     DatahubExportToCountries,
     DatahubFutureInterestCountries,
     DatahubOmis,
     DatahubSectors,
+    DITCountryTerritoryRegister,
     ExportWins,
     Interactions,
 )
