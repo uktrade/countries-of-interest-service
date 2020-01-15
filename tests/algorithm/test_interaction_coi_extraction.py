@@ -62,8 +62,8 @@ def test_interaction_coi_extraction(add_objects, add_side_effect):
 
     expected_rows = [
         (
-            '52552367-436f-4a5d-84a2-dbf4ffeddb76',
             1,
+            '52552367-436f-4a5d-84a2-dbf4ffeddb76',
             'Brussels',
             'Belgium',
             'exported',
@@ -126,8 +126,8 @@ def test_interaction_already_seen(add_objects, add_side_effect):
 
     expected_rows = [
         (
-            '52552367-436f-4a5d-84a2-dbf4ffeddb78',
             3,
+            '52552367-436f-4a5d-84a2-dbf4ffeddb78',
             'China',
             'China',
             'exported',

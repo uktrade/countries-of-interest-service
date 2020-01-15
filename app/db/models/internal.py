@@ -136,8 +136,8 @@ class InteractionsAnalysed(BaseModel):
     __tablename__ = 'interactions_analysed'
     __table_args__ = {'schema': 'algorithm'}
 
+    id = _col(_int, primary_key=True, autoincrement=True)
     datahub_interaction_id = _col(UUID(as_uuid=True))
-    id = _col(_int, primary_key=True)
     place = _col(_text, nullable=False)
     standardized_place = _col(_text)
     action = _col(_text)

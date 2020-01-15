@@ -263,7 +263,7 @@ def process_interactions(
         f'''
             SELECT
                 id,
-                interactions.datahub_interaction_id,
+                datahub_interaction_id,
                 notes
 
             FROM "{input_schema}"."{input_table}" interactions
@@ -271,6 +271,7 @@ def process_interactions(
                     USING (datahub_interaction_id)
 
             WHERE log.datahub_interaction_id IS NULL
+                AND notes is not NULL
 
             ORDER BY id, created_on
         '''
