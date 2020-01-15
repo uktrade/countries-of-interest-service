@@ -6,6 +6,7 @@ from app.etl.tasks.countries_and_sectors_of_interest import (
 from app.etl.tasks.countries_of_interest import Task as PopulateCountriesOfInterestTask
 from app.etl.tasks.country_standardisation import PopulateStandardisedCountriesTask
 from app.etl.tasks.export_countries import Task as ExportToCountriesTask
+from app.etl.tasks.interactions_analysed import Task as PopulateAnalysedInteractionsTask
 from app.etl.tasks.sectors_of_interest import Task as SectorsOfInterestTask
 from app.etl.tasks.source_data_extraction import (
     extract_countries_and_territories_reference_dataset,
@@ -26,6 +27,7 @@ DATAHUB_OMIS = 'datahub_omis'
 
 
 STANDARDISE_COUNTRIES = 'standardise_countries'
+INTERACTIONS_ANALYSED = 'interactions_analysed'
 EXPORT_TO_COUNTRIES = 'export_to_countries'
 COUNTRIES_AND_SECTORS_OF_INTEREST = 'countries_and_sectors_of_interest'
 COUNTRIES_OF_INTEREST = 'countries_of_interest'
@@ -49,6 +51,7 @@ EXTRACTORS = EXTRACTORS_DICT.keys()
 TASKS_DICT = OrderedDict(
     {
         STANDARDISE_COUNTRIES: PopulateStandardisedCountriesTask,
+        INTERACTIONS_ANALYSED: PopulateAnalysedInteractionsTask,
         EXPORT_TO_COUNTRIES: ExportToCountriesTask,
         COUNTRIES_AND_SECTORS_OF_INTEREST: PopulateCountriesAndSectorsOfInterestTask,
         COUNTRIES_OF_INTEREST: PopulateCountriesOfInterestTask,
