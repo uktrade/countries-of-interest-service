@@ -153,6 +153,7 @@ REFERENCE_COUNTRY_MAPPING = {
 
 def _load_model():
     import spacy
+
     """
     Checks if the model is allocated within the project and downloads them if not.
     :return:
