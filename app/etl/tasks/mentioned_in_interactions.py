@@ -1,3 +1,5 @@
+import logging
+
 from flask import current_app
 
 import sqlalchemy
@@ -6,6 +8,11 @@ import sqlalchemy
 import app.db.models.external as external_models
 import app.db.models.internal as internal_models
 from app.config import data_sources
+
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
 
 index = ('company_id',)
 
@@ -38,6 +45,7 @@ insert into {mentioned_in_interactions} select * from results
 class Task:
 
     name = "mentioned_in_interactions"
+    table_name = internal_models.MentionedInInteractions.__tablename__
 
     def __init__(self, drop_table=True, *args, **kwargs):
         self.drop_table = drop_table
@@ -57,15 +65,7 @@ class Task:
             }
         except sqlalchemy.exc.ProgrammingError as err:
             transaction.rollback()
+            logger.error(f'Error running task, "{self.name}". Error: {err}')
             raise err
-            return {
-                'status': 500,
-                'error': str(err),
-                'table': internal_models.MentionedInInteractions.__tablename__,
-            }
         finally:
             connection.close()
-        return {
-            'status': 500,
-            'table': internal_models.MentionedInInteractions.__tablename__,
-        }
