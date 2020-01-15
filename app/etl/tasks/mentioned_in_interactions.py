@@ -30,8 +30,7 @@ with results as (
 insert into {mentioned_in_interactions} (
     company_id,
     country_of_interest,
-    source,
-    source_id,
+    interaction_id,
     timestamp
 ) select * from results
 
