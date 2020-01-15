@@ -29,7 +29,13 @@ with results as (
 
 )
 
-insert into {mentioned_in_interactions} select * from results
+insert into {mentioned_in_interactions} (
+    company_id,
+    country_of_interest,
+    source,
+    source_id,
+    timestamp
+) select * from results
 
 '''.format(
     source=data_sources.datahub_interactions,
