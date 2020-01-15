@@ -1,4 +1,5 @@
 from sqlalchemy import PrimaryKeyConstraint
+from sqlalchemy.dialects.postgresql import UUID
 
 from app.db.models import (
     BaseModel,
@@ -135,6 +136,7 @@ class InteractionsAnalysed(BaseModel):
     __tablename__ = 'interactions_analysed'
     __table_args__ = {'schema': 'algorithm'}
 
+    datahub_interaction_id = _col(UUID(as_uuid=True))
     id = _col(_int, primary_key=True)
     place = _col(_text, nullable=False)
     standardized_place = _col(_text)
@@ -142,6 +144,14 @@ class InteractionsAnalysed(BaseModel):
     type = _col(_text)
     context = _col(_sa.ARRAY(_text))
     negation = _col(_bool)
+
+
+class InteractionsAnalysedInteractionIdLog(BaseModel):
+
+    __tablename__ = 'interactions_analysed_interaction_id_log'
+    __table_args__ = {'schema': 'algorithm'}
+
+    datahub_interaction_id = _col(UUID(as_uuid=True), primary_key=True)
 
 
 class StandardisedCountries(BaseModel):

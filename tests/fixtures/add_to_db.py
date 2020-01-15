@@ -14,6 +14,7 @@ from app.db.models.internal import (
     CountriesOfInterest,
     ExportCountries,
     InteractionsAnalysed,
+    InteractionsAnalysedInteractionIdLog,
     MentionedInInteractions,
     SectorsOfInterest,
     StandardisedCountries,
@@ -252,6 +253,7 @@ def add_interactions_analysed(app_with_db_module):
     def _method(records):
         for record in records:
             defaults = {
+                'datahub_interaction_id': record.get('datahub_interaction_id', None),
                 'place': record.get('place', None),
                 'standardized_place': record.get('standardized_place', None),
                 'action': record.get('action', None),
@@ -262,5 +264,17 @@ def add_interactions_analysed(app_with_db_module):
             InteractionsAnalysed.get_or_create(
                 id=record.get('id', None), defaults=defaults,
             )
+
+    return _method
+
+
+@pytest.fixture(scope='module')
+def add_interactions_analysed_interaction_id_log(app_with_db_module):
+    def _method(records):
+        for record in records:
+            defaults = {
+                'datahub_interaction_id': record.get('datahub_interaction_id', None),
+            }
+            InteractionsAnalysedInteractionIdLog.get_or_create(defaults=defaults)
 
     return _method

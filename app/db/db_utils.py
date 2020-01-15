@@ -96,6 +96,7 @@ def dsv_buffer_to_table(
     columns=None,
     quote=None,
     encoding=None,
+    reraise=False,
 ):
     connection = sql_alchemy.engine.raw_connection()
     cursor = connection.cursor()
@@ -108,6 +109,8 @@ def dsv_buffer_to_table(
         connection.commit()
     except Exception as err:
         print('DB ERROR', err.orig)
+        if reraise is True:
+            raise err
     cursor.close()
     connection.close()
 
