@@ -27,11 +27,13 @@ from app.etl.tasks import populate_database
 @patch('app.etl.tasks.countries_and_sectors_of_interest.Task.__call__')
 @patch('app.etl.tasks.countries_of_interest.Task.__call__')
 @patch('app.etl.tasks.sectors_of_interest.Task.__call__')
+@patch('app.etl.tasks.mentioned_in_interactions.Task.__call__')
 class TestPopulateDatabase:
     @patch('app.etl.tasks.execute_statement')
     def test_tasks_are_run(
         self,
         execute_statement,
+        populate_mentioned_in_interactions_task,
         populate_sectors_of_interest_task,
         populate_countries_of_interest_task,
         populate_countries_and_sectors_of_interest_task,
@@ -71,6 +73,9 @@ class TestPopulateDatabase:
             'populate_countries_of_interest'
         )
         populate_sectors_of_interest_task.return_value = 'populate_sectors_of_interest'
+        populate_mentioned_in_interactions_task.return_value = (
+            'populate_mentioned_in_interactions'
+        )
 
         output = populate_database(True, [], [])
 
@@ -87,6 +92,7 @@ class TestPopulateDatabase:
         assert populate_countries_and_sectors_of_interest_task.called is True
         assert populate_countries_of_interest_task.called is True
         assert populate_sectors_of_interest_task.called is True
+        assert populate_mentioned_in_interactions_task.called is True
 
         assert output == {
             'output': [
@@ -102,6 +108,7 @@ class TestPopulateDatabase:
                 'populate_countries_and_sectors_of_interest',
                 'populate_countries_of_interest',
                 'populate_sectors_of_interest',
+                'populate_mentioned_in_interactions',
             ]
         }
 
@@ -109,6 +116,7 @@ class TestPopulateDatabase:
     def test_only_specified_tasks_are_run(
         self,
         execute_statement,
+        populate_mentioned_in_interactions_task,
         populate_sectors_of_interest_task,
         populate_countries_of_interest_task,
         populate_countries_and_sectors_of_interest_task,
@@ -148,6 +156,9 @@ class TestPopulateDatabase:
             'populate_countries_of_interest'
         )
         populate_sectors_of_interest_task.return_value = 'populate_sectors_of_interest'
+        populate_mentioned_in_interactions_task.return_value = (
+            'populate_mentioned_in_interactions'
+        )
 
         output = populate_database(True, ['datahub_company'], ['countries_of_interest'])
 
@@ -164,6 +175,7 @@ class TestPopulateDatabase:
         assert populate_countries_and_sectors_of_interest_task.called is False
         assert populate_countries_of_interest_task.called is True
         assert populate_sectors_of_interest_task.called is False
+        assert populate_mentioned_in_interactions_task.called is False
 
         assert output == {
             'output': ['datahub_company_dataset', 'populate_countries_of_interest']
@@ -173,6 +185,7 @@ class TestPopulateDatabase:
     def test_updates_task_status_to_success(
         self,
         mock_datetime,
+        populate_mentioned_in_interactions_task,
         populate_sectors_of_interest_task,
         populate_countries_of_interest_task,
         populate_countries_and_sectors_of_interest_task,
@@ -214,3 +227,4 @@ class TestPopulateDatabase:
         populate_countries_and_sectors_of_interest_task.assert_called_once_with()
         populate_countries_of_interest_task.assert_called_once_with()
         populate_sectors_of_interest_task.assert_called_once_with()
+        populate_mentioned_in_interactions_task.assert_called_once_with()

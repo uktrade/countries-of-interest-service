@@ -13,6 +13,8 @@ from app.db.models.internal import (
     CountriesAndSectorsOfInterest,
     CountriesOfInterest,
     ExportCountries,
+    InteractionsAnalysed,
+    MentionedInInteractions,
     SectorsOfInterest,
     StandardisedCountries,
 )
@@ -195,6 +197,24 @@ def add_export_wins(app_with_db_module):
 
 
 @pytest.fixture(scope='module')
+def add_mentioned_in_interactions(app_with_db_module):
+    def _method(records):
+        for record in records:
+            defaults = {
+                'company_id': record.get('company_id', None),
+                'country_of_interest': record.get('country_of_interest', None),
+                'source': record.get('source', None),
+                'source_id': record[('source_id', None)],
+                'timestamp': record.get('timestamp', None),
+            }
+            MentionedInInteractions.get_or_create(
+                id=record.get('id', None), defaults=defaults
+            )
+
+    return _method
+
+
+@pytest.fixture(scope='module')
 def add_standardised_countries(app_with_db_module):
     def _method(records):
         for record in records:
@@ -223,6 +243,25 @@ def add_datahub_interaction(app_with_db_module):
                 'created_on': record.get('created_on', None),
             }
             Interactions.get_or_create(
+                id=record.get('id', None), defaults=defaults,
+            )
+
+    return _method
+
+
+@pytest.fixture(scope='module')
+def add_interactions_analysed(app_with_db_module):
+    def _method(records):
+        for record in records:
+            defaults = {
+                'place': record.get('place', None),
+                'standardized_place': record.get('standardized_place', None),
+                'action': record.get('action', None),
+                'type': record.get('type', None),
+                'context': record.get('context', None),
+                'negation': record.get('negation', None),
+            }
+            InteractionsAnalysed.get_or_create(
                 id=record.get('id', None), defaults=defaults,
             )
 

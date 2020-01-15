@@ -7,6 +7,9 @@ from app.etl.tasks.countries_of_interest import Task as PopulateCountriesOfInter
 from app.etl.tasks.country_standardisation import PopulateStandardisedCountriesTask
 from app.etl.tasks.export_countries import Task as ExportToCountriesTask
 from app.etl.tasks.interactions_analysed import Task as PopulateAnalysedInteractionsTask
+from app.etl.tasks.mentioned_in_interactions import (
+    Task as PopulateMentionedInInteractionsTask,
+)
 from app.etl.tasks.sectors_of_interest import Task as SectorsOfInterestTask
 from app.etl.tasks.source_data_extraction import (
     extract_countries_and_territories_reference_dataset,
@@ -32,7 +35,7 @@ EXPORT_TO_COUNTRIES = 'export_to_countries'
 COUNTRIES_AND_SECTORS_OF_INTEREST = 'countries_and_sectors_of_interest'
 COUNTRIES_OF_INTEREST = 'countries_of_interest'
 SECTORS_OF_INTEREST = 'sectors_of_interest'
-
+MENTIONED_IN_INTERACTIONS = 'mentioned_in_interactions'
 
 EXTRACTORS_DICT = OrderedDict(
     {
@@ -56,6 +59,7 @@ TASKS_DICT = OrderedDict(
         COUNTRIES_AND_SECTORS_OF_INTEREST: PopulateCountriesAndSectorsOfInterestTask,
         COUNTRIES_OF_INTEREST: PopulateCountriesOfInterestTask,
         SECTORS_OF_INTEREST: SectorsOfInterestTask,
+        MENTIONED_IN_INTERACTIONS: PopulateMentionedInInteractionsTask,
     }
 )
 
