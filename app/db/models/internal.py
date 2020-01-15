@@ -61,7 +61,6 @@ class MentionedInInteractions(BaseModel):
     __table_args__ = ({'schema': 'public'},)
 
 
-
 class CountriesAndSectorsOfInterest(BaseModel):
 
     __tablename__ = 'coi_countries_and_sectors_of_interest'
