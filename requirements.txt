@@ -30,7 +30,6 @@ flask-login==0.4.1        # via flask-security
 flask-mail==0.9.1         # via flask-security
 flask-oauthlib==0.9.5
 flask-principal==0.4.0    # via flask-security
-flask-script==2.0.5
 flask-security==3.0.0
 flask-sqlalchemy==2.4.1
 flask-wtf==0.14.2         # via flask-security
