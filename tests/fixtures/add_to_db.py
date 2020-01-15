@@ -205,10 +205,12 @@ def add_mentioned_in_interactions(app_with_db_module):
                 'company_id': record.get('company_id', None),
                 'country_of_interest': record.get('country_of_interest', None),
                 'source': record.get('source', None),
-                'source_id': record.get('source_id', None),
+                'source_id': record[('source_id', None)],
                 'timestamp': record.get('timestamp', None),
             }
-            MentionedInInteractions.get_or_create(defaults=defaults)
+            MentionedInInteractions.get_or_create(
+                id=record.get('id', None), defaults=defaults
+            )
 
     return _method
 
