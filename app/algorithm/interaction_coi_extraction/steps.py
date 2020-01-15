@@ -271,7 +271,6 @@ def process_interactions(
                     USING (datahub_interaction_id)
 
             WHERE log.datahub_interaction_id IS NULL
-                AND notes is not NULL
 
             ORDER BY id, created_on
         '''
@@ -294,6 +293,8 @@ def process_interactions(
                 id = row[0]
                 datahub_interaction_id = str(row[1])
                 interaction = row[2]
+                if interaction == None or interaction == '':
+                    continue
                 interaction_doc = nlp(interaction)
                 places = _analyse_interaction(interaction_doc)
                 for place in places:
