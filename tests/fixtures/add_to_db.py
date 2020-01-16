@@ -89,7 +89,9 @@ def add_mentioned_in_interactions(app_with_db_module):
                 'interaction_id': record.get('interaction_id', None),
                 'timestamp': record.get('timestamp', None),
             }
-            MentionedInInteractions.get_or_create(id=record.get('id', None), defaults=defaults)
+            MentionedInInteractions.get_or_create(
+                id=record.get('id', None), defaults=defaults
+            )
 
     return _method
 
