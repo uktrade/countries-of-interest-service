@@ -289,7 +289,7 @@ def process_interactions(
 
             datahub_interaction_ids = []
             for row in rows:
-                id = row[0]
+                row_id = row[0]
                 datahub_interaction_id = str(row[1])
                 interaction = row[2]
                 if interaction is None or interaction == '':
@@ -302,7 +302,7 @@ def process_interactions(
                         ','.join(
                             [
                                 f'${datahub_interaction_id}$',
-                                f'${id}$',
+                                f'${row_id}$',
                                 f"${place.replace('$','')}$",
                                 ''
                                 if not mapped_place
