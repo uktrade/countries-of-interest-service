@@ -44,6 +44,7 @@ class TestTask:
             [
                 {
                     'id': 0,
+                    'datahub_interaction_id': '48599843-2d10-490b-854d-7d97f16f0d13',
                     'place': 'Milan',
                     'standardized_place': 'Italy',
                     'action': 'action_0',
@@ -53,6 +54,7 @@ class TestTask:
                 },
                 {
                     'id': 2,
+                    'datahub_interaction_id': '7c7636c5-d50e-4bb5-9b1c-195754b048a1',
                     'place': 'Moldova',
                     'standardized_place': 'Moldova',
                     'action': 'action_2',

@@ -21,7 +21,7 @@ with results as (
     datahub_interaction_id::text as interaction_id,
     created_on::timestamp as timestamp
 
-  from {interactions} join {interactions_analysed} using (id)
+  from {interactions} join {interactions_analysed} using (datahub_interaction_id)
 
 )
 

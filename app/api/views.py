@@ -265,7 +265,7 @@ def get_company_countries_of_interest(orientation):
 @ac.authorization_required
 def get_company_countries_mentioned_in_interactions(orientation):
     pagination_size = flask_app.config['app']['pagination_size']
-    next_interaction_id = request.args.get('next-interaction-id')
+    next_id = request.args.get('next-id')
     company_ids = request.args.getlist('company-id')
     countries = request.args.getlist('country')
 
@@ -290,15 +290,16 @@ def get_company_countries_mentioned_in_interactions(orientation):
             + ','.join(['%s' for i in range(len(company_ids))])
             + ')'
         )
-    if next_interaction_id is not None:
+    if next_id is not None:
         where = where + ' and' if where != '' else 'where'
-        where = where + ' interaction_id >= %s'
-        values = values + [next_interaction_id]
+        where = where + ' id >= %s'
+        values = values + [next_id]
 
     mentioned_in_interactions = internal_models.MentionedInInteractions.__tablename__
 
     sql_query = f'''
         select
+          id,
           company_id,
           country_of_interest,
           interaction_id,
@@ -307,7 +308,7 @@ def get_company_countries_mentioned_in_interactions(orientation):
         from {mentioned_in_interactions}
 
         {where}
-        order by interaction_id
+        order by id
         limit {pagination_size} + 1
     '''
     df = execute_query(sql_query, data=values)
@@ -320,10 +321,11 @@ def get_company_countries_mentioned_in_interactions(orientation):
         next_ += '&'.join(['country={}'.format(country) for country in countries])
         next_ += '&' if next_[-1] != '?' else ''
         next_ += 'orientation={}'.format(orientation)
-        next_ += '&next-interaction-id={}'.format(df['interaction_id'].values[-1],)
+        next_ += '&next-id={}'.format(df['id'].values[-1],)
         df = df[:-1]
     else:
         next_ = None
+    df = df.drop('id', axis=1)
     web_dict = to_web_dict(df, orientation)
     web_dict['next'] = next_
     return flask_app.make_response(web_dict)

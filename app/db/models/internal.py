@@ -1,4 +1,5 @@
-from sqlalchemy import ForeignKey, PrimaryKeyConstraint
+from sqlalchemy import PrimaryKeyConstraint
+from sqlalchemy.dialects.postgresql import UUID
 
 from app.db.models import (
     _array,
@@ -11,7 +12,6 @@ from app.db.models import (
     _text,
     BaseModel,
 )
-from app.db.models.external import Interactions
 
 
 class HawkUsers(BaseModel):
@@ -135,13 +135,22 @@ class InteractionsAnalysed(BaseModel):
     __table_args__ = {'schema': 'algorithm'}
 
     id = _col(_int, primary_key=True, autoincrement=True)
-    interaction_id = _col(_int, ForeignKey(Interactions.id))
+    datahub_interaction_id = _col(UUID(as_uuid=True))
     place = _col(_text, nullable=False)
     standardized_place = _col(_text)
     action = _col(_text)
     type = _col(_text)
     context = _col(_sa.ARRAY(_text))
     negation = _col(_bool)
+
+
+class InteractionsAnalysedInteractionIdLog(BaseModel):
+
+    __tablename__ = 'interactions_analysed_interaction_id_log'
+    __table_args__ = {'schema': 'algorithm'}
+
+    datahub_interaction_id = _col(UUID(as_uuid=True), primary_key=True)
+    analysed_at = _col(_dt)
 
 
 class StandardisedCountries(BaseModel):
