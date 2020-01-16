@@ -37,7 +37,8 @@ def test_single_company_filter(app):
     with app.test_client() as app_context:
         utils.assert_api_response(
             app_context=app_context,
-            api='http://localhost:80/api/v1/get-company-countries-mentioned-in-interactions',
+            api='http://localhost:80/api/v1/'
+            'get-company-countries-mentioned-in-interactions',
             params='company-id=company_1',
             expected_response=(
                 200,
@@ -59,7 +60,8 @@ def test_multiple_company_filter(app):
     with app.test_client() as app_context:
         utils.assert_api_response(
             app_context=app_context,
-            api='http://localhost:80/api/v1/get-company-countries-mentioned-in-interactions',
+            api='http://localhost:80/api/v1/'
+            'get-company-countries-mentioned-in-interactions',
             params='company-id=company_1&company-id=company_2',
             expected_response=(
                 200,
@@ -84,7 +86,8 @@ def test_single_country_filter(app):
     with app.test_client() as app_context:
         utils.assert_api_response(
             app_context=app_context,
-            api='http://localhost:80/api/v1/get-company-countries-mentioned-in-interactions',
+            api='http://localhost:80/api/v1/'
+            'get-company-countries-mentioned-in-interactions',
             params='country=country_1',
             expected_response=(
                 200,
@@ -106,7 +109,8 @@ def test_multiple_country_filter(app):
     with app.test_client() as app_context:
         utils.assert_api_response(
             app_context=app_context,
-            api='http://localhost:80/api/v1/get-company-countries-mentioned-in-interactions',
+            api='http://localhost:80/api/v1/'
+            'get-company-countries-mentioned-in-interactions',
             params='country=country_1&country=country_2',
             expected_response=(
                 200,
