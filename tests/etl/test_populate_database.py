@@ -22,19 +22,23 @@ from app.etl.tasks import populate_database
 @patch(
     'app.etl.tasks.country_standardisation.PopulateStandardisedCountriesTask.__call__'
 )
+@patch('app.etl.tasks.interactions_analysed.Task.__call__')
 @patch('app.etl.tasks.export_countries.Task.__call__')
 @patch('app.etl.tasks.countries_and_sectors_of_interest.Task.__call__')
 @patch('app.etl.tasks.countries_of_interest.Task.__call__')
 @patch('app.etl.tasks.sectors_of_interest.Task.__call__')
+@patch('app.etl.tasks.mentioned_in_interactions.Task.__call__')
 class TestPopulateDatabase:
     @patch('app.etl.tasks.execute_statement')
     def test_tasks_are_run(
         self,
         execute_statement,
+        populate_mentioned_in_interactions_task,
         populate_sectors_of_interest_task,
         populate_countries_of_interest_task,
         populate_countries_and_sectors_of_interest_task,
         populate_export_to_countries_task,
+        populate_interactions_analysed_task,
         populate_standardised_countries_task,
         extract_datahub_omis,
         extract_datahub_interactions,
@@ -58,6 +62,9 @@ class TestPopulateDatabase:
         populate_standardised_countries_task.return_value = (
             'populate_standardised_countries'
         )
+        populate_interactions_analysed_task.return_value = (
+            'populate_interactions_analysed'
+        )
         populate_export_to_countries_task.return_value = 'populate_export_to_countries'
         populate_countries_and_sectors_of_interest_task.return_value = (
             'populate_countries_and_sectors_of_interest'
@@ -66,6 +73,9 @@ class TestPopulateDatabase:
             'populate_countries_of_interest'
         )
         populate_sectors_of_interest_task.return_value = 'populate_sectors_of_interest'
+        populate_mentioned_in_interactions_task.return_value = (
+            'populate_mentioned_in_interactions'
+        )
 
         output = populate_database(True, [], [])
 
@@ -77,10 +87,12 @@ class TestPopulateDatabase:
         assert extract_datahub_omis.called is True
 
         assert populate_standardised_countries_task.called is True
+        assert populate_interactions_analysed_task.called is True
         assert populate_export_to_countries_task.called is True
         assert populate_countries_and_sectors_of_interest_task.called is True
         assert populate_countries_of_interest_task.called is True
         assert populate_sectors_of_interest_task.called is True
+        assert populate_mentioned_in_interactions_task.called is True
 
         assert output == {
             'output': [
@@ -91,10 +103,12 @@ class TestPopulateDatabase:
                 'datahub_future_interest_countries',
                 'datahub_omis',
                 'populate_standardised_countries',
+                'populate_interactions_analysed',
                 'populate_export_to_countries',
                 'populate_countries_and_sectors_of_interest',
                 'populate_countries_of_interest',
                 'populate_sectors_of_interest',
+                'populate_mentioned_in_interactions',
             ]
         }
 
@@ -102,10 +116,12 @@ class TestPopulateDatabase:
     def test_only_specified_tasks_are_run(
         self,
         execute_statement,
+        populate_mentioned_in_interactions_task,
         populate_sectors_of_interest_task,
         populate_countries_of_interest_task,
         populate_countries_and_sectors_of_interest_task,
         populate_export_to_countries_task,
+        populate_interactions_analysed_task,
         populate_standardised_countries_task,
         extract_datahub_omis,
         extract_datahub_interactions,
@@ -129,6 +145,9 @@ class TestPopulateDatabase:
         populate_standardised_countries_task.return_value = (
             'populate_standardised_countries'
         )
+        populate_interactions_analysed_task.return_value = (
+            'populate_interactions_analysed'
+        )
         populate_export_to_countries_task.return_value = 'populate_export_to_countries'
         populate_countries_and_sectors_of_interest_task.return_value = (
             'populate_countries_and_sectors_of_interest'
@@ -137,6 +156,9 @@ class TestPopulateDatabase:
             'populate_countries_of_interest'
         )
         populate_sectors_of_interest_task.return_value = 'populate_sectors_of_interest'
+        populate_mentioned_in_interactions_task.return_value = (
+            'populate_mentioned_in_interactions'
+        )
 
         output = populate_database(True, ['datahub_company'], ['countries_of_interest'])
 
@@ -148,10 +170,12 @@ class TestPopulateDatabase:
         assert extract_datahub_omis.called is False
 
         assert populate_standardised_countries_task.called is False
+        assert populate_interactions_analysed_task.called is False
         assert populate_export_to_countries_task.called is False
         assert populate_countries_and_sectors_of_interest_task.called is False
         assert populate_countries_of_interest_task.called is True
         assert populate_sectors_of_interest_task.called is False
+        assert populate_mentioned_in_interactions_task.called is False
 
         assert output == {
             'output': ['datahub_company_dataset', 'populate_countries_of_interest']
@@ -161,10 +185,12 @@ class TestPopulateDatabase:
     def test_updates_task_status_to_success(
         self,
         mock_datetime,
+        populate_mentioned_in_interactions_task,
         populate_sectors_of_interest_task,
         populate_countries_of_interest_task,
         populate_countries_and_sectors_of_interest_task,
         populate_export_to_countries_task,
+        populate_interactions_analysed_task,
         populate_standardised_countries_task,
         extract_datahub_omis,
         extract_datahub_interactions,
@@ -196,7 +222,9 @@ class TestPopulateDatabase:
         extract_datahub_omis.assert_called_once()
 
         populate_standardised_countries_task.assert_called_once_with()
+        populate_interactions_analysed_task.assert_called_once_with()
         populate_export_to_countries_task.assert_called_once_with()
         populate_countries_and_sectors_of_interest_task.assert_called_once_with()
         populate_countries_of_interest_task.assert_called_once_with()
         populate_sectors_of_interest_task.assert_called_once_with()
+        populate_mentioned_in_interactions_task.assert_called_once_with()

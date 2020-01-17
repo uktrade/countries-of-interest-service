@@ -1,16 +1,15 @@
 import os
 
-from celery import Celery
-
 import certifi
-
-from flask import Flask, json
-
 import redis
-
+from celery import Celery
+from flask import Flask, json
 from sqlalchemy.engine.url import make_url
 
 from app import config
+from app.commands.algorithm import cmd_group as algorithm_cmd
+from app.commands.database import cmd_group as database_cmd
+from app.commands.dev import cmd_group as dev_cmd
 from app.sso.register import register_sso_component
 
 
@@ -59,6 +58,9 @@ def make_current_app_test_app(test_db_name):
 def _create_base_app():
     flask_app = Flask(__name__)
     flask_app.config.update(config.get_config())
+    flask_app.cli.add_command(dev_cmd)
+    flask_app.cli.add_command(algorithm_cmd)
+    flask_app.cli.add_command(database_cmd)
 
     postgres_db_config = (
         os.environ.get('DATABASE_URL')

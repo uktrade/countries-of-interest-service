@@ -2,20 +2,18 @@ import datetime
 import logging
 from functools import wraps
 
+import pandas as pd
+import redis
 from flask import current_app as flask_app, make_response
 from flask import jsonify, render_template, request
 from flask.blueprints import Blueprint
-
-import pandas as pd
-
-import redis
-
 from werkzeug.exceptions import BadRequest, NotFound, Unauthorized
 
 from app.api.access_control import AccessControl
 from app.api.tasks import populate_database_task
 from app.api.utils import response_orientation_decorator, to_web_dict
 from app.db.db_utils import execute_query, execute_statement, table_exists
+from app.db.models import internal as internal_models
 from app.db.models.internal import HawkUsers
 from app.sso.token import login_required
 
@@ -89,6 +87,7 @@ def json_error(f):
 def get_company_countries_and_sectors_of_interest(orientation):
     pagination_size = flask_app.config['app']['pagination_size']
     next_source = request.args.get('next-source')
+
     next_source_id = request.args.get('next-source-id')
     company_ids = request.args.getlist('company-id')
     countries = request.args.getlist('country')
@@ -154,10 +153,15 @@ def get_company_countries_and_sectors_of_interest(orientation):
         order by (source, source_id)
         limit {pagination_size} + 1
     '''
+
     df = execute_query(sql_query, data=values)
     if len(df) == pagination_size + 1:
         next_ = '{}{}?'.format(request.host_url[:-1], request.path)
+        next_ += '&'.join(
+            ['company-id={}'.format(company_id) for company_id in company_ids]
+        )
         next_ += '&'.join(['country={}'.format(country) for country in countries])
+        next_ += '&'.join(['sector={}'.format(sector) for sector in sectors])
         next_ += '&'.join(['source={}'.format(source) for source in sources])
         next_ += '&' if next_[-1] != '?' else ''
         next_ += 'orientation={}'.format(orientation)
@@ -236,6 +240,9 @@ def get_company_countries_of_interest(orientation):
     if len(df) == pagination_size + 1:
         next_ = '{}{}'.format(request.host_url[:-1], request.path)
         next_ += '?'
+        next_ += '&'.join(
+            ['company-id={}'.format(company_id) for company_id in company_ids]
+        )
         next_ += '&'.join(['country={}'.format(country) for country in countries])
         next_ += '&'.join(['source={}'.format(source) for source in sources])
         next_ += '&' if next_[-1] != '?' else ''
@@ -246,6 +253,79 @@ def get_company_countries_of_interest(orientation):
         df = df[:-1]
     else:
         next_ = None
+    web_dict = to_web_dict(df, orientation)
+    web_dict['next'] = next_
+    return flask_app.make_response(web_dict)
+
+
+@api.route('/api/v1/get-company-countries-mentioned-in-interactions')
+@json_error
+@response_orientation_decorator
+@ac.authentication_required
+@ac.authorization_required
+def get_company_countries_mentioned_in_interactions(orientation):
+    pagination_size = flask_app.config['app']['pagination_size']
+    next_id = request.args.get('next-id')
+    company_ids = request.args.getlist('company-id')
+    countries = request.args.getlist('country')
+
+    values = countries + company_ids
+    where = ''
+    if len(countries) == 1:
+        where = 'where country_of_interest=%s'
+    elif len(countries) > 1:
+        where = (
+            'where country_of_interest in ('
+            + ','.join('%s' for i in range(len(countries)))
+            + ')'
+        )
+    if len(company_ids) == 1:
+        where = where + ' and' if where != '' else 'where'
+        where = where + ' company_id=%s'
+    elif len(company_ids) > 1:
+        where = where + ' and' if where != '' else 'where'
+        where = (
+            where
+            + ' company_id in ('
+            + ','.join(['%s' for i in range(len(company_ids))])
+            + ')'
+        )
+    if next_id is not None:
+        where = where + ' and' if where != '' else 'where'
+        where = where + ' id >= %s'
+        values = values + [next_id]
+
+    mentioned_in_interactions = internal_models.MentionedInInteractions.__tablename__
+
+    sql_query = f'''
+        select
+          id,
+          company_id,
+          country_of_interest,
+          interaction_id,
+          timestamp
+
+        from {mentioned_in_interactions}
+
+        {where}
+        order by id
+        limit {pagination_size} + 1
+    '''
+    df = execute_query(sql_query, data=values)
+    if len(df) == pagination_size + 1:
+        next_ = '{}{}'.format(request.host_url[:-1], request.path)
+        next_ += '?'
+        next_ += '&'.join(
+            ['company-id={}'.format(company_id) for company_id in company_ids]
+        )
+        next_ += '&'.join(['country={}'.format(country) for country in countries])
+        next_ += '&' if next_[-1] != '?' else ''
+        next_ += 'orientation={}'.format(orientation)
+        next_ += '&next-id={}'.format(df['id'].values[-1],)
+        df = df[:-1]
+    else:
+        next_ = None
+    df = df.drop('id', axis=1)
     web_dict = to_web_dict(df, orientation)
     web_dict['next'] = next_
     return flask_app.make_response(web_dict)
@@ -315,6 +395,9 @@ def get_company_export_countries(orientation):
     if len(df) == pagination_size + 1:
         next_ = '{}{}'.format(request.host_url[:-1], request.path)
         next_ += '?'
+        next_ += '&'.join(
+            ['company-id={}'.format(company_id) for company_id in company_ids]
+        )
         next_ += '&'.join(['country={}'.format(country) for country in countries])
         next_ += '&'.join(['source={}'.format(source) for source in sources])
         next_ += '&' if next_[-1] != '?' else ''

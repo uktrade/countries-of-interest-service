@@ -1,8 +1,9 @@
+import datetime
 import io
 
 import pycountry
-
 import spacy
+from flask import current_app as flask_app
 
 from app.db import sql_alchemy
 from app.db.db_utils import dsv_buffer_to_table
@@ -252,16 +253,24 @@ def _analyse_interaction(interaction_doc):
 
 @log('Step 1/1 - process interactions')
 def process_interactions(
-    input_table, input_schema, output_schema, output_table, batch_size=1000
+    input_table, input_schema, log_table, output_schema, output_table, batch_size=1000
 ):
     nlp = _load_model()
     raw_connection = sql_alchemy.engine.raw_connection()
     cursor = raw_connection.cursor(name='fetch_interactions')
     cursor.execute(
         f'''
-            SELECT id, notes FROM "{input_schema}"."{input_table}"
-            WHERE id > (SELECT coalesce(max(id), 0)
-            FROM "{output_schema}"."{output_table}")
+            SELECT
+                id,
+                datahub_interaction_id,
+                notes
+
+            FROM "{input_schema}"."{input_table}" interactions
+                LEFT JOIN "{output_schema}"."{log_table}" log
+                    USING (datahub_interaction_id)
+
+            WHERE log.datahub_interaction_id IS NULL
+
             ORDER BY id, created_on
         '''
     )
@@ -277,9 +286,14 @@ def process_interactions(
                 "uploading events"
                 f"{f'{batch_count*batch_size}-{batch_count*batch_size+len(rows)}'}"
             )
+
+            datahub_interaction_ids = []
             for row in rows:
-                id = row[0]
-                interaction = row[1]
+                row_id = row[0]
+                datahub_interaction_id = str(row[1])
+                interaction = row[2]
+                if interaction is None or interaction == '':
+                    continue
                 interaction_doc = nlp(interaction)
                 places = _analyse_interaction(interaction_doc)
                 for place in places:
@@ -287,7 +301,8 @@ def process_interactions(
                     line = (
                         ','.join(
                             [
-                                f'${id}$',
+                                f'${datahub_interaction_id}$',
+                                f'${row_id}$',
                                 f"${place.replace('$','')}$",
                                 ''
                                 if not mapped_place
@@ -301,28 +316,50 @@ def process_interactions(
                         + '\n'
                     )
                     chunk.write(line)
+                datahub_interaction_ids.append(datahub_interaction_id)
+
             chunk.seek(0)
-            yield chunk
+            yield chunk, datahub_interaction_ids
             batch_count += 1
 
-    for chunk in _analysed_interaction_chunks():
-        dsv_buffer_to_table(
-            chunk,
-            table=output_table,
-            schema=output_schema,
-            sep=',',
-            null='',
-            has_header=False,
-            columns=[
-                'id',
-                'place',
-                'standardized_place',
-                'action',
-                'type',
-                'context',
-                'negation',
-            ],
-            quote='$',
-        )
+    analysed_at = datetime.datetime.now()
+    for chunk, datahub_interaction_ids in _analysed_interaction_chunks():
+        connection = flask_app.db.engine.connect()
+        transaction = connection.begin()
+
+        try:
+            dsv_buffer_to_table(
+                chunk,
+                table=output_table,
+                schema=output_schema,
+                sep=',',
+                null='',
+                has_header=False,
+                columns=[
+                    'datahub_interaction_id',
+                    'id',
+                    'place',
+                    'standardized_place',
+                    'action',
+                    'type',
+                    'context',
+                    'negation',
+                ],
+                quote='$',
+                reraise=True,
+            )
+
+            sql = f'''
+            insert into "{output_schema}"."{log_table}"
+            values (%s, %s) on conflict do nothing
+            '''
+            connection.execute(sql, [[d, analysed_at] for d in datahub_interaction_ids])
+            transaction.commit()
+
+        except Exception as err:
+            print('error:', err)
+            transaction.rollback()
+        finally:
+            connection.close()
 
     cursor.close()

@@ -1,10 +1,8 @@
 import datetime
 
-from flask.json import JSONEncoder
-
 import numpy as np
-
 import pandas as pd
+from flask.json import JSONEncoder
 
 
 class CustomJSONEncoder(JSONEncoder):

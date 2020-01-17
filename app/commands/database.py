@@ -1,35 +1,27 @@
-from flask import current_app as app
-
-from flask_script import Manager
+import click
+from flask.cli import AppGroup
 
 from app.api.tasks import populate_database_task
 from app.etl.tasks.pipeline import EXTRACTORS, TASKS
-from app.utils import log
+
+cmd_group = AppGroup('database', help='Commands to extract data from external sources')
 
 
-PopulateDatabaseCommand = Manager(app=app, usage='Development commands')
-
-
-@log('Populate database')
-@PopulateDatabaseCommand.option(
+@cmd_group.command('populate')
+@click.option(
     '--extractors',
-    dest='extractors',
     type=str,
     help=f"comma separated list of the following tasks: {', '.join(EXTRACTORS)}",
     default='',
 )
-@PopulateDatabaseCommand.option(
+@click.option(
     '--tasks',
-    dest='tasks',
     type=str,
     help=f"comma separated list of the following tasks: {', '.join(TASKS)}",
     default='',
 )
-@PopulateDatabaseCommand.option(
-    '--keep_tables',
-    dest='keep_tables',
-    action='store_true',
-    help="Don't drop tables before inserting data",
+@click.option(
+    '--keep_tables', is_flag=True, help="Don't drop tables before inserting data",
 )
 def populate(keep_tables, extractors, tasks):
     extractors = list(filter(None, extractors.split(',')))
@@ -56,5 +48,5 @@ def _check_parameters(user_entered, master_list):
             f'\nInvalid option: {", ".join(not_found)}\n\n'
             f'Must be one of the following: {", ".join(master_list)}\n'
         )
-        print(msg)
+        click.echo(msg)
     return not_found

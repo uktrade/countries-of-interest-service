@@ -1,23 +1,8 @@
-import urllib.request
-
 import certifi
-
-from flask import Blueprint, redirect, request, session, url_for
-
-from flask_oauthlib.client import OAuth
-
 import werkzeug
+from flask import Blueprint, redirect, request, session, url_for
+from flask_oauthlib.client import OAuth
 from werkzeug.exceptions import abort
-
-
-original_open = urllib.request.urlopen
-
-
-def myopen(path):
-    return original_open(path, cafile=certifi.where())
-
-
-urllib.request.urlopen = myopen
 
 
 sso = Blueprint('sso', __name__)
