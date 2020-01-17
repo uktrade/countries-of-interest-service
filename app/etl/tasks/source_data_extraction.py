@@ -136,7 +136,7 @@ class ExtractDatahubFutureInterestCountries(SourceDataExtractor):
 class ExtractDatahubInteractions(SourceDataExtractor):
     dataset_id_config_key = 'datahub_interactions_dataset_id'
     mapping = {
-        'datahub_id': 'datahub_interaction_id',
+        'id': 'datahub_interaction_id',
         'company_id': 'datahub_company_id',
         'interaction_notes': 'notes',
         'interaction_subject': 'subject',
@@ -146,7 +146,7 @@ class ExtractDatahubInteractions(SourceDataExtractor):
     source_table_id_config_key = 'datahub_interactions_source_table_id'
     stub_data = {
         'headers': [
-            'datahub_id',
+            'id',
             'company_id',
             'interaction_notes',
             'interaction_subject',
