@@ -1,5 +1,6 @@
 import pandas as pd
 import sqlalchemy
+import sqlalchemy.exc
 from sqlalchemy.schema import CreateSchema
 
 from app.db.models import sql_alchemy
@@ -25,7 +26,7 @@ def execute_statement(stmt, data=None, raise_if_fail=False):
         return status
     except sqlalchemy.exc.ProgrammingError as err:
         transaction.rollback()
-        print('DB ERROR', err.orig)
+        print('DB ERROR', err)
         if raise_if_fail:
             raise err
         connection.close()
@@ -107,7 +108,7 @@ def dsv_buffer_to_table(
         cursor.copy_expert(sql, csv_buffer)
         connection.commit()
     except Exception as err:
-        print('DB ERROR', err.orig)
+        print('DB ERROR', err)
         if reraise is True:
             raise err
     cursor.close()

@@ -298,18 +298,18 @@ def process_interactions(
                 places = _analyse_interaction(interaction_doc)
                 for place in places:
                     place, mapped_place, action, label, verb_list, neg = place
+                    filtered_verbs = make_safe(','.join(verb_list))
                     line = (
                         ','.join(
                             [
                                 f'${datahub_interaction_id}$',
-                                f'${row_id}$',
                                 f"${place.replace('$','')}$",
                                 ''
                                 if not mapped_place
                                 else f"${mapped_place.replace('$','')}$",
                                 '' if not action else f'${action}$',
                                 f'${label}$',
-                                f'''${{{','.join(verb_list)}}}$''',
+                                f'''${{{filtered_verbs}}}$''',
                                 f'${neg}$',
                             ]
                         )
@@ -337,7 +337,6 @@ def process_interactions(
                 has_header=False,
                 columns=[
                     'datahub_interaction_id',
-                    'id',
                     'place',
                     'standardized_place',
                     'action',
@@ -363,3 +362,10 @@ def process_interactions(
             connection.close()
 
     cursor.close()
+
+
+def make_safe(text):
+    chars = ['$', '{', '}']
+    for char in chars:
+        text = text.replace(char, '')
+    return text
