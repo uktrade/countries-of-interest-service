@@ -289,7 +289,6 @@ def process_interactions(
 
             datahub_interaction_ids = []
             for row in rows:
-                row_id = row[0]
                 datahub_interaction_id = str(row[1])
                 interaction = row[2]
                 if interaction is None or interaction == '':
