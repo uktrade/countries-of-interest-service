@@ -250,7 +250,7 @@ class TestExtractDatahubInteractions(SourceDataExtractBaseTestCase):
     ]
     source_data = {
         'headers': [
-            'datahub_id',
+            'id',
             'company_id',
             'interaction_notes',
             'interaction_subject',
