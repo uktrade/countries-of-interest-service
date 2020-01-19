@@ -5,6 +5,7 @@ module.exports = {
     entry: {
 	'vendors': './app/static/vendors.js',
 	'data_report': './app/static/data_report.js',
+	'data_visualisation': './app/static/data_visualisation.js',
     },
     mode: 'development',
     output: {
