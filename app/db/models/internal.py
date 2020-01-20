@@ -155,7 +155,7 @@ class InteractionsAnalysedInteractionIdLog(BaseModel):
 
 class StandardisedCountries(BaseModel):
     __tablename__ = 'standardised_countries'
-    __table_args__ = {'schema': 'public'}
+    __table_args__ = {'schema': 'algorithm'}
 
     id = _col(_int, primary_key=True)
     country = _col(_text)

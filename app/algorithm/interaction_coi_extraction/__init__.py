@@ -6,10 +6,10 @@ from app.db.models.internal import (
 )
 from app.utils import log
 
-input_schema = 'public'
+input_schema = Interactions.get_schema()
 input_table = Interactions.__tablename__
 log_table = InteractionsAnalysedInteractionIdLog.__tablename__
-output_schema = 'algorithm'
+output_schema = InteractionsAnalysed.get_schema()
 output_table = InteractionsAnalysed.__tablename__
 
 
