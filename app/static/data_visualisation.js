@@ -17,17 +17,23 @@ class App extends React.Component {
 
     constructor(props){
         super(props);
-        this.state = {variable: "country"};
+        this.state = {
+            intervals: [],
+            playing: false,
+            variable: "country"
+        };
 
         this.play = this.play.bind(this);
         this.setData = this.setData.bind(this);
         this.setDate = this.setDate.bind(this);
         this.setNextDate = this.setNextDate.bind(this);
+        this.setPlaying = this.setPlaying.bind(this);
+        this.togglePlaying = this.togglePlaying.bind(this);
     }
 
-    play(e) {
+    play() {
         console.log("App.play");
-        this.interval = window.setInterval(this.setNextDate, 1000);
+        return window.setInterval(this.setNextDate, 1000);
     }
 
     setData(data) {
@@ -94,10 +100,7 @@ class App extends React.Component {
 
     setDate(date) {
         console.log("this.interval");
-        console.log(this.interval);
-        console.log(date);
         if(this.interval !== undefined && date === this.state.dates[this.state.dates.length - 1]) {
-            console.log("clearInterval");
             window.clearInterval(this.interval);
         }
         this.setState({date: date});
@@ -105,9 +108,7 @@ class App extends React.Component {
 
     setNextDate() {
         console.log("App.setNextDate");
-        console.log(this.state.dates);
         let date = this.state.date;
-        console.log(date);
         if(
             date !== undefined &&
                 this.state.dates.length > 0 &&
@@ -116,6 +117,25 @@ class App extends React.Component {
             let nextDate = this.state.dates[index+1];
             this.setDate(nextDate);
         }
+    }
+
+    setPlaying(playing)  {
+        for(let i=0; i<this.state.intervals.length; i++){
+            let interval = this.state.intervals.pop();
+            window.clearInterval(interval);
+        }
+        
+        let intervals = [];
+        if(playing === true){
+            let interval = this.play();
+            intervals = [interval];
+        } 
+        this.setState({playing: playing, intervals: intervals});
+    }
+
+    togglePlaying() {
+        let playing = !(this.state.playing);
+        this.setPlaying(playing);
     }
     
     render() {
@@ -197,9 +217,9 @@ class App extends React.Component {
               <div>{this.state.date ? this.state.date.toLocaleDateString() : ""}</div>
               <button
                 className="btn btn-primary"
-                onClick={this.play}
+                onClick={this.togglePlaying}
                 style={{marginTop: 10}}>
-                Play
+                {this.state.playing === true ? "Stop" : "Play"}
               </button>
             </div>
         );
@@ -301,6 +321,7 @@ class BarRace extends React.Component {
             },
             0
         );
+
         let dataNormalised = [...dataDate];
         dataNormalised = dataNormalised.sort((a, b)=>b.nInterests - a.nInterests);
         for(let i=0; i<dataNormalised.length; i++) {
@@ -310,6 +331,7 @@ class BarRace extends React.Component {
                 rank: i+1
             };
         }
+        dataNormalised = dataNormalised.filter(d=>d.rank <= nTopRanks);
 
         let maxShareOfInterest = d3.max(dataNormalised, d=>d.shareOfInterest);
 
@@ -323,35 +345,79 @@ class BarRace extends React.Component {
             );
         this.yAxis.element.transition().call(d3.axisLeft(this.yAxis.scale));
         
-        this.plotArea.element.selectAll(".bar")
-            .data(dataNormalised, d=>d[this.variable])
-            .join("rect")
+        let selection = this.plotArea.element.selectAll(".bar")
+            .data(dataNormalised, d=>d[this.variable]);
+
+        selection.enter()
+            .append("rect")
             .attr("class", "bar")
-            .transition()
-            .attr("y", d=>d.rank > nTopRanks ? this.container.height : this.yAxis.scale(d.rank))
             .attr("width", d=>this.xAxis.scale(d.shareOfInterest))
             .attr("height", this.yAxis.scale.bandwidth() - 1)
             .attr("x", 0)
+            .attr("y", this.canvas.height)
             .style("fill", d=>this.props.colourScale(d[this.variable]))
-            .attr("rx", 3);
+            .attr("rx", 3)
+            .transition(1000)
+            .attr("y", d=>d.rank > nTopRanks ? this.container.height : this.yAxis.scale(d.rank));
+
+        selection
+            .transition()
+            .duration(1000)
+            .attr("width", d=>this.xAxis.scale(d.shareOfInterest))
+            .attr("y", d=>d.rank > nTopRanks ? this.container.height : this.yAxis.scale(d.rank));
+
         
-        this.plotArea.element.selectAll(`.${this.variable}-tag`)
-            .data(dataNormalised, d=>d[this.variable])
-            .join("text")
+        selection.exit()
+            .transition()
+            .duration(1000)
+            .attr("y", this.container.height);
+
+
+        selection = this.plotArea.element.selectAll(`.${this.variable}-tag`)
+            .data(dataNormalised, d=>d[this.variable]);
+
+        selection.enter()
+            .append("text")
             .attr("class", `${this.variable}-tag`)
             .attr("x", this.plotArea.width)
+            .attr("y", d=>this.yAxis.scale(this.canvas.height))
             .attr("text-anchor", "end")
             .attr("dominant-baseline", "middle")
-            .html(d=>d[this.variable])
+            .html(d=>d.rank > 10 ? "" : d[this.variable])
             .transition()
+            .duration(1000)
             .attr(
                 "y",
-                d=>{
-                    return d.rank > 10 ?
-                        this.container.height :
-                        this.yAxis.scale(d.rank) + this.yAxis.scale.bandwidth() / 2;
+                d=> {
+                    if(d.rank > 10) {
+                        return this.canvas.height;
+                    } else {
+                        return this.yAxis.scale(d.rank) + this.yAxis.scale.bandwidth() / 2;
+                    }
                 }
             );
+
+        selection
+            .html(d=>d.rank > 10 ? "" : d[this.variable])
+            .transition()
+            .duration(1000)
+            .attr(
+                "y",
+                d=> {
+                    if(d.rank > 10) {
+                        return this.canvas.height;
+                    } else {
+                        return this.yAxis.scale(d.rank) + this.yAxis.scale.bandwidth() / 2;
+                    }
+                }
+            );
+        
+        selection.exit()
+            .transition()
+            .duration(1000)
+            .attr("y", this.canvas.height)
+            .remove();
+        
     }
     
     render() {
@@ -480,6 +546,8 @@ class LineChart extends React.Component {
             let x = this.xAxis.scale(this.props.date);
             this.coverUp.element
                 .transition()
+                .ease(d3.easeLinear)
+                .duration(1000)
                 .attr("x", x)
                 .attr("width", this.plotArea.width - x);
         }
