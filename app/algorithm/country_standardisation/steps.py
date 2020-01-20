@@ -41,7 +41,7 @@ def create_standardised_interested_exported_country_table(
     SELECT distinct name FROM {DITCountryTerritoryRegister.__tablename__}
 """
     result = db_utils.execute_query(stmt, df=False)
-    choices = [r[0] for r in result]
+    choices = [r[0] for r in result] + list(split_mappings.keys())
     lower_choices = [choice.lower() for choice in choices]
     columns = ['id', 'country', 'standardised_country', 'similarity']
     tsv_lines = []
@@ -83,51 +83,72 @@ replacements = {
     'czech republic': 'czechia',
     'holland': 'the netherlands',
 }
+split_mappings = {
+    'Netherlands Antilles': [
+        'Bonaire',
+        'Saint Eustatius',
+        'Saba',
+        'Curaçao',
+        'Sint Maarten (Dutch part)',
+    ],
+}
 
 
 def _standardise_country(country, choices, lower_choices):
     lower_value = country.lower()
     # ignore regions
-    for region in regions:
-        lower_value.replace('south africa', '+')
-        lower_value = lower_value.replace(region, '0' * len(region))
-        lower_value.replace('+', 'south africa')
+    if lower_value in regions:
+        lower_value = '0' * len(lower_value)
     # reformat countries
     for key, value in replacements.items():
         lower_value = lower_value.replace(key, value)
     # check for direct match
     index = lower_choices.index(lower_value) if lower_value in lower_choices else None
     if index:
-        return [(choices[index], 100)]
+        top_matches = [(choices[index], 100)]
+
     # check for fuzzy match, include first result and other
     # matches with 90 or higher similarity
-    mapped_country = process.extract(
-        lower_value.replace('island', '?').replace('central', '?'),
-        choices,
-        limit=5,
-        scorer=fuzz.WRatio,
-    )
-    top_matches = [mapped_country[0]] + [
-        match for match in mapped_country[1:] if match[1] >= 90
-    ]
-
-    # adjust score for difference in relative length
-    adj_top_matches = [
-        (
-            match[0],
-            max(
-                match[1]
-                - math.ceil(abs(len(country) - len(match[0])) / (max(len(country), 1)))
-                * 4,
-                0,
-            )
-            if match[0].lower().replace('the ', '') not in country.lower()
-            else match[1],
+    else:
+        mapped_country = process.extract(
+            lower_value.replace('island', '?').replace('central', '?'),
+            choices,
+            limit=5,
+            scorer=fuzz.WRatio,
         )
-        for match in top_matches
-    ]
+        top_matches = [mapped_country[0]] + [
+            match for match in mapped_country[1:] if match[1] >= 90
+        ]
 
-    return adj_top_matches
+        # adjust score for difference in relative length
+        top_matches = [
+            (
+                match[0],
+                max(
+                    match[1]
+                    - math.ceil(
+                        abs(len(country) - len(match[0])) / (max(len(country), 1))
+                    )
+                    * 4,
+                    0,
+                )
+                if match[0].lower().replace('the ', '') not in country.lower()
+                else match[1],
+            )
+            for match in top_matches
+        ]
+
+    # split if group of countries
+    split_top_matches = []
+    for country, score in top_matches:
+        if country in split_mappings.keys():
+            split_top_matches = split_top_matches + [
+                (split_country, score) for split_country in split_mappings[country]
+            ]
+        else:
+            split_top_matches.append((country, score))
+
+    return split_top_matches
 
 
 def _create_output_table(output_schema, output_table, drop=False):
