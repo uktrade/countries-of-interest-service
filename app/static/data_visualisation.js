@@ -404,7 +404,8 @@ class BarRace extends React.Component {
             .attr("y", this.canvas.height)
             .style("fill", d=>this.props.colourScale(d[this.variable]))
             .attr("rx", 3)
-            .transition(1000)
+            .transition()
+            .duration(1000)
             .attr("y", d=>d.rank > nTopRanks ? this.container.height : this.yAxis.scale(d.rank));
 
         selection

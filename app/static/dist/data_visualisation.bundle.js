@@ -543,7 +543,7 @@ function (_React$Component2) {
         return _this6.xAxis.scale(d.shareOfInterest);
       }).attr("height", this.yAxis.scale.bandwidth() - 1).attr("x", 0).attr("y", this.canvas.height).style("fill", function (d) {
         return _this6.props.colourScale(d[_this6.variable]);
-      }).attr("rx", 3).transition(1000).attr("y", function (d) {
+      }).attr("rx", 3).transition().duration(1000).attr("y", function (d) {
         return d.rank > nTopRanks ? _this6.container.height : _this6.yAxis.scale(d.rank);
       });
       selection.transition().duration(1000).attr("width", function (d) {
