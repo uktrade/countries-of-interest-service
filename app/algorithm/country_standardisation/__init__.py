@@ -3,7 +3,7 @@ from app.db import db_utils
 from app.db.models.internal import StandardisedCountries
 from app.utils import log
 
-output_schema = 'algorithm'
+output_schema = StandardisedCountries.get_schema()
 output_table = StandardisedCountries.__tablename__
 
 

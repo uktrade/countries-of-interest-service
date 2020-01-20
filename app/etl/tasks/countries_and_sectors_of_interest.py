@@ -5,7 +5,7 @@ from app.etl import ETLTask
 
 index = ('company_id',)
 
-sql = '''
+sql = f'''
     with results as (
         select
             company_id::text,
@@ -16,14 +16,14 @@ sql = '''
                 else NULL
             end as standardised_country,
             sector as sector_of_interest,
-            '{source}' as source,
+            '{data_sources.omis}' as source,
             o.datahub_omis_order_id::text as source_id,
             created_date as timestamp
 
         from datahub_omis o
-            left join {countries_and_territories_register} c
+            left join {DITCountryTerritoryRegister.get_fq_table_name()} c
                 on o.market::text = c.country_iso_alpha2_code
-            left join {standardised_countries} s
+            left join {StandardisedCountries.get_fq_table_name()} s
                 on o.market::text = s.country
                   and similarity > 90
 
@@ -33,11 +33,7 @@ sql = '''
 
     select * from results
 
-'''.format(
-    source=data_sources.omis,
-    countries_and_territories_register=DITCountryTerritoryRegister.__tablename__,
-    standardised_countries=StandardisedCountries.__tablename__,
-)
+'''
 
 table_fields = '''(
     company_id text,
@@ -66,5 +62,5 @@ class Task(ETLTask):
             table_fields=table_fields,
             table_name=table_name,
             *args,
-            **kwargs
+            **kwargs,
         )

@@ -26,6 +26,17 @@ class BaseModel(db.Model):
         _sa.session.commit()
 
     @classmethod
+    def get_schema(cls):
+        if 'schema' in cls.__table_args__:
+            return cls.__table_args__['schema']
+        else:
+            return 'public'
+
+    @classmethod
+    def get_fq_table_name(cls):
+        return f'"{cls.get_schema()}"."{cls.__tablename__}"'
+
+    @classmethod
     def get_or_create(cls, defaults=None, **kwargs):
         """
         Creates a new object or returns existing.
