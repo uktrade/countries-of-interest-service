@@ -157,8 +157,6 @@ function (_React$Component) {
         url = url + "?cumulative";
       }
 
-      console.log("url");
-      console.log(url);
       axios__WEBPACK_IMPORTED_MODULE_1___default.a.get(url).then(function (response) {
         return _this2.setData(response.data);
       })["catch"](function (response) {
@@ -202,8 +200,6 @@ function (_React$Component) {
           url = url + "?cumulative";
         }
 
-        console.log("url");
-        console.log(url);
         axios__WEBPACK_IMPORTED_MODULE_1___default.a.get(url).then(function (response) {
           return _this3.setData(response.data);
         })["catch"](function (response) {
@@ -257,6 +253,7 @@ function (_React$Component) {
         return acc;
       }, {});
       countries = Object.values(countries);
+      countries.sort();
       var countryColourScale = d3__WEBPACK_IMPORTED_MODULE_2__["scaleOrdinal"]().domain(countries).range(d3__WEBPACK_IMPORTED_MODULE_2__["schemeTableau10"]);
       var sectorsData = processedData["top_sectors"];
       var sectors = datesData.reduce(function (acc, d) {
@@ -278,8 +275,6 @@ function (_React$Component) {
   }, {
     key: "setDate",
     value: function setDate(date) {
-      console.log("this.interval");
-
       if (this.interval !== undefined && date === this.state.dates[this.state.dates.length - 1]) {
         window.clearInterval(this.interval);
       }
@@ -556,7 +551,7 @@ function (_React$Component2) {
       }).attr("y", function (d) {
         return d.rank > nTopRanks ? _this6.container.height : _this6.yAxis.scale(d.rank);
       });
-      selection.exit().transition().duration(1000).attr("y", this.container.height);
+      selection.exit().transition().duration(1000).attr("y", this.container.height).remove();
       selection = this.plotArea.element.selectAll(".".concat(this.variable, "-tag")).data(dataNormalised, function (d) {
         return d[_this6.variable];
       });
@@ -752,8 +747,6 @@ function (_React$Component3) {
         return acc;
       }, {});
       groupedData = Object.values(groupedData);
-      console.log("legend");
-      console.log(groupedData);
       this.layer0.element.selectAll(".line").data(groupedData, function (d) {
         return d.variable;
       }).join("path").attr("class", "line").attr("d", function (d) {

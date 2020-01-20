@@ -15,8 +15,6 @@ class App extends React.Component {
 	if(this.state.cumulative == true) {
 	    url = url + "?cumulative";
 	}
-        console.log("url");
-        console.log(url);
         axios.get(url)
             .then(response => this.setData(response.data))
             .catch(response => alert(`failed to get data. ${response}`));
@@ -47,8 +45,6 @@ class App extends React.Component {
 	    if(this.state.cumulative == true) {
 	        url = url + "?cumulative";
 	    }
-            console.log("url");
-            console.log(url);
             axios.get(url)
                 .then(response => this.setData(response.data))
                 .catch(response => alert(`failed to get data. ${response}`));
@@ -97,6 +93,7 @@ class App extends React.Component {
             {}
         );
         countries = Object.values(countries);
+        countries.sort(); 
         let countryColourScale = d3.scaleOrdinal()
             .domain(countries)
             .range(d3.schemeTableau10);
@@ -127,7 +124,6 @@ class App extends React.Component {
     }
 
     setDate(date) {
-        console.log("this.interval");
         if(this.interval !== undefined && date === this.state.dates[this.state.dates.length - 1]) {
             window.clearInterval(this.interval);
         }
@@ -421,7 +417,8 @@ class BarRace extends React.Component {
         selection.exit()
             .transition()
             .duration(1000)
-            .attr("y", this.container.height);
+            .attr("y", this.container.height)
+            .remove();
 
 
         selection = this.plotArea.element.selectAll(`.${this.variable}-tag`)
@@ -642,9 +639,6 @@ class LineChart extends React.Component {
             {}
         );
         groupedData = Object.values(groupedData);
-
-        console.log("legend");
-        console.log(groupedData);
 
         this.layer0.element.selectAll(".line")
             .data(groupedData, d=>d.variable)
