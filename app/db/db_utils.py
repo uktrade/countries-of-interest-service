@@ -117,7 +117,6 @@ def dsv_buffer_to_table(
         connection.commit()
     except Exception as err:
 
-
         exc_type, exc_value, exc_traceback = sys.exc_info()
         print("error:")
         traceback.print_tb(exc_traceback, file=sys.stdout)

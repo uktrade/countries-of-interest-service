@@ -361,7 +361,9 @@ def process_interactions(
             print("error:")
             traceback.print_tb(exc_traceback, file=sys.stdout)
             # exc_type below is ignored on 3.5 and later
-            traceback.print_exception(exc_type, exc_value, exc_traceback, file=sys.stdout)
+            traceback.print_exception(
+                exc_type, exc_value, exc_traceback, file=sys.stdout
+            )
             print(err)
             transaction.rollback()
         finally:
