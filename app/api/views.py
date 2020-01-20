@@ -542,6 +542,7 @@ def populate_database():
         }
         return flask_app.make_response(response)
 
+
 @api.route('/data-visualisation-data')
 @login_required
 def data_visualisation_data():
@@ -554,24 +555,27 @@ def data_visualisation_data():
     df = df[df['timestamp'].notnull()]
     df['country'] = df['standardised_country']
     df['timestamp'] = pd.to_datetime(df['timestamp'])
-    
-    df_top_sectors = df.groupby('sector').size().sort_values(ascending=False).reset_index()
+
+    df_top_sectors = (
+        df.groupby('sector').size().sort_values(ascending=False).reset_index()
+    )
     df_top_sectors = df_top_sectors.rename(columns={0: 'n_interests'})
 
     df_sector_ts = df.copy()
-    # df_sector_ts = df_sector_ts[df_sector_ts['sector'].isin(df_top_sectors[:10]['sector'])]
+
     df_sector_ts['quarter'] = df_sector_ts['timestamp'].map(
         lambda dt: datetime.datetime(dt.year, 3 * ((dt.month - 1) // 3) + 1, 1)
     )
     df_sector_ts = df_sector_ts.groupby(['sector', 'quarter']).size().reset_index()
     df_sector_ts = df_sector_ts.rename(columns={0: 'n_interests'})
 
-    
-    df_top_countries = df.groupby('country').size().sort_values(ascending=False).reset_index()
+    df_top_countries = (
+        df.groupby('country').size().sort_values(ascending=False).reset_index()
+    )
     df_top_countries = df_top_countries.rename(columns={0: 'n_interests'})
-    
+
     df_country_ts = df.copy()
-    # df_country_ts = df_country_ts[df_country_ts['country'].isin(df_top_countries[:10]['country'])]
+
     df_country_ts['quarter'] = df_country_ts['timestamp'].map(
         lambda dt: datetime.datetime(dt.year, 3 * ((dt.month - 1) // 3) + 1, 1)
     )
@@ -586,10 +590,12 @@ def data_visualisation_data():
     }
     return output
 
+
 @api.route('/data-visualisation')
 @login_required
 def data_visualisation():
     return render_template('data-visualisation.html')
+
 
 @api.route('/healthcheck/', methods=["GET"])
 def healthcheck():
