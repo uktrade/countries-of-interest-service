@@ -1,7 +1,6 @@
 import click
 from flask.cli import AppGroup
 
-from app.api.tasks import populate_database_task
 from app.etl.tasks.pipeline import EXTRACTORS, TASKS
 
 cmd_group = AppGroup('database', help='Commands to extract data from external sources')
@@ -24,6 +23,8 @@ cmd_group = AppGroup('database', help='Commands to extract data from external so
     '--keep_tables', is_flag=True, help="Don't drop tables before inserting data",
 )
 def populate(keep_tables, extractors, tasks):
+    from app.api.tasks import populate_database_task
+
     extractors = list(filter(None, extractors.split(',')))
     not_found = _check_parameters(extractors, EXTRACTORS)
     if not_found:

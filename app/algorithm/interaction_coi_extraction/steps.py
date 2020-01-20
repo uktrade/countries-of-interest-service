@@ -1,5 +1,7 @@
 import datetime
 import io
+import sys
+import traceback
 
 import pycountry
 import spacy
@@ -289,7 +291,6 @@ def process_interactions(
 
             datahub_interaction_ids = []
             for row in rows:
-                row_id = row[0]
                 datahub_interaction_id = str(row[1])
                 interaction = row[2]
                 if interaction is None or interaction == '':
@@ -298,18 +299,18 @@ def process_interactions(
                 places = _analyse_interaction(interaction_doc)
                 for place in places:
                     place, mapped_place, action, label, verb_list, neg = place
+                    filtered_verbs = make_safe(','.join(verb_list))
                     line = (
                         ','.join(
                             [
                                 f'${datahub_interaction_id}$',
-                                f'${row_id}$',
                                 f"${place.replace('$','')}$",
                                 ''
                                 if not mapped_place
                                 else f"${mapped_place.replace('$','')}$",
                                 '' if not action else f'${action}$',
                                 f'${label}$',
-                                f'''${{{','.join(verb_list)}}}$''',
+                                f'''${{{filtered_verbs}}}$''',
                                 f'${neg}$',
                             ]
                         )
@@ -337,7 +338,6 @@ def process_interactions(
                 has_header=False,
                 columns=[
                     'datahub_interaction_id',
-                    'id',
                     'place',
                     'standardized_place',
                     'action',
@@ -357,9 +357,23 @@ def process_interactions(
             transaction.commit()
 
         except Exception as err:
-            print('error:', err)
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            print("error:")
+            traceback.print_tb(exc_traceback, file=sys.stdout)
+            # exc_type below is ignored on 3.5 and later
+            traceback.print_exception(
+                exc_type, exc_value, exc_traceback, file=sys.stdout
+            )
+            print(err)
             transaction.rollback()
         finally:
             connection.close()
 
     cursor.close()
+
+
+def make_safe(text):
+    chars = ['$', '{', '}']
+    for char in chars:
+        text = text.replace(char, '')
+    return text

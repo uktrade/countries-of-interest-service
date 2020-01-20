@@ -39,7 +39,7 @@ def create_standardised_interested_exported_country_table(
 ):
     stmt = f"""
     SELECT distinct name FROM {DITCountryTerritoryRegister.__tablename__}
-    """
+"""
     result = db_utils.execute_query(stmt, df=False)
     choices = [r[0] for r in result]
     lower_choices = [choice.lower() for choice in choices]

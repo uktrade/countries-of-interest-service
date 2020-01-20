@@ -521,11 +521,7 @@ def populate_database():
     tasks = []
     if 'tasks' in request.args:
         tasks = request.args['tasks'].split(',')
-    sql = (
-        'create table if not exists etl_status '
-        '(status varchar(100), timestamp timestamp)'
-    )
-    execute_statement(sql)
+
     sql = 'select * from etl_status'
 
     df = execute_query(sql)
@@ -533,7 +529,7 @@ def populate_database():
         populate_database_task.delay(drop_table, extractors, tasks)
         sql = 'delete from etl_status'
         execute_statement(sql)
-        sql = '''insert into etl_status values (%s, %s)'''
+        sql = '''insert into etl_status (status, timestamp) values (%s, %s)'''
         execute_statement(sql, data=['RUNNING', datetime.datetime.now()])
         return flask_app.make_response(
             {'status': 200, 'message': 'started populate_database task'}
