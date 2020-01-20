@@ -639,6 +639,7 @@ class LineChart extends React.Component {
             {}
         );
         groupedData = Object.values(groupedData);
+        groupedData.sort((a, b)=>a.variable > b.variable ? 1 : -1);
 
         this.layer0.element.selectAll(".line")
             .data(groupedData, d=>d.variable)
@@ -655,21 +656,19 @@ class LineChart extends React.Component {
 
         let legendBlockWidth = 20;
         legendItems
-            .selectAll(".legend-block")
             .data(groupedData)
-            .join("rect")
+            .append("rect")
             .attr("class", "legend-block")
             .attr("x", 10)
             .attr("y", (d,i)=>i * legendBlockWidth + 1)
-            .attr("width", legendBlockWidth)
-            .attr("height", legendBlockWidth)
+            .attr("rx", 3)        
+            .attr("width", legendBlockWidth - 2)
+            .attr("height", legendBlockWidth - 2)
             .style("fill", d=>this.props.colourScale(d.variable));
 
         legendItems
-            .selectAll(".legend-text")
             .data(groupedData)
-            .join("text")
-        //.append("text")
+            .append("text")
             .attr("class", "legend-block")
             .attr("x", 10 + legendBlockWidth + 10)
             .attr("y", (d, i)=>i * legendBlockWidth + 1 + (legendBlockWidth / 2))

@@ -747,6 +747,9 @@ function (_React$Component3) {
         return acc;
       }, {});
       groupedData = Object.values(groupedData);
+      groupedData.sort(function (a, b) {
+        return a.variable > b.variable ? 1 : -1;
+      });
       this.layer0.element.selectAll(".line").data(groupedData, function (d) {
         return d.variable;
       }).join("path").attr("class", "line").attr("d", function (d) {
@@ -758,13 +761,12 @@ function (_React$Component3) {
         return d[_this8.variable];
       }).join("g").attr("class", "legend-item");
       var legendBlockWidth = 20;
-      legendItems.selectAll(".legend-block").data(groupedData).join("rect").attr("class", "legend-block").attr("x", 10).attr("y", function (d, i) {
+      legendItems.data(groupedData).append("rect").attr("class", "legend-block").attr("x", 10).attr("y", function (d, i) {
         return i * legendBlockWidth + 1;
-      }).attr("width", legendBlockWidth).attr("height", legendBlockWidth).style("fill", function (d) {
+      }).attr("rx", 3).attr("width", legendBlockWidth - 2).attr("height", legendBlockWidth - 2).style("fill", function (d) {
         return _this8.props.colourScale(d.variable);
       });
-      legendItems.selectAll(".legend-text").data(groupedData).join("text") //.append("text")
-      .attr("class", "legend-block").attr("x", 10 + legendBlockWidth + 10).attr("y", function (d, i) {
+      legendItems.data(groupedData).append("text").attr("class", "legend-block").attr("x", 10 + legendBlockWidth + 10).attr("y", function (d, i) {
         return i * legendBlockWidth + 1 + legendBlockWidth / 2;
       }).html(function (d) {
         return d.variable;
