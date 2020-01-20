@@ -1,3 +1,6 @@
+import sys
+import traceback
+
 import pandas as pd
 import sqlalchemy
 import sqlalchemy.exc
@@ -26,7 +29,12 @@ def execute_statement(stmt, data=None, raise_if_fail=False):
         return status
     except sqlalchemy.exc.ProgrammingError as err:
         transaction.rollback()
-        print('DB ERROR', err)
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        print("error:")
+        traceback.print_tb(exc_traceback, file=sys.stdout)
+        # exc_type below is ignored on 3.5 and later
+        traceback.print_exception(exc_type, exc_value, exc_traceback, file=sys.stdout)
+        print(err)
         if raise_if_fail:
             raise err
         connection.close()
@@ -108,7 +116,14 @@ def dsv_buffer_to_table(
         cursor.copy_expert(sql, csv_buffer)
         connection.commit()
     except Exception as err:
-        print('DB ERROR', err)
+
+
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        print("error:")
+        traceback.print_tb(exc_traceback, file=sys.stdout)
+        # exc_type below is ignored on 3.5 and later
+        traceback.print_exception(exc_type, exc_value, exc_traceback, file=sys.stdout)
+        print(err)
         if reraise is True:
             raise err
     cursor.close()

@@ -1,5 +1,7 @@
 import datetime
 import io
+import sys
+import traceback
 
 import pycountry
 import spacy
@@ -355,7 +357,12 @@ def process_interactions(
             transaction.commit()
 
         except Exception as err:
-            print('error:', err)
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            print("error:")
+            traceback.print_tb(exc_traceback, file=sys.stdout)
+            # exc_type below is ignored on 3.5 and later
+            traceback.print_exception(exc_type, exc_value, exc_traceback, file=sys.stdout)
+            print(err)
             transaction.rollback()
         finally:
             connection.close()
