@@ -81,15 +81,15 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./app/static/data_report.js");
+/******/ 	return __webpack_require__(__webpack_require__.s = "./app/static/data_visualisation.js");
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ "./app/static/data_report.js":
-/*!***********************************!*\
-  !*** ./app/static/data_report.js ***!
-  \***********************************/
+/***/ "./app/static/data_visualisation.js":
+/*!******************************************!*\
+  !*** ./app/static/data_visualisation.js ***!
+  \******************************************/
 /*! no exports provided */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -102,13 +102,23 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var d3__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! d3 */ "./node_modules/d3/index.js");
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_3__);
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -116,10 +126,15 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
+console.log("data_visualisation");
 
 
 
@@ -131,300 +146,618 @@ var App =
 function (_React$Component) {
   _inherits(App, _React$Component);
 
+  _createClass(App, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      var _this2 = this;
+
+      axios__WEBPACK_IMPORTED_MODULE_1___default.a.get("/data-visualisation-data").then(function (response) {
+        return _this2.setData(response.data);
+      })["catch"](function (response) {
+        return alert("failed to get data. ".concat(response));
+      });
+    }
+  }]);
+
   function App(props) {
     var _this;
 
     _classCallCheck(this, App);
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(App).call(this, props));
-    _this.orderFrequencyChartId = 'order-frequency-chart';
     _this.state = {
-      data: null,
-      nRowsTopSector: 5
+      variable: "country"
     };
-    _this.drawOrderFrequencyChart = _this.drawOrderFrequencyChart.bind(_assertThisInitialized(_this));
-    _this.onNRowsTopSectorChange = _this.onNRowsTopSectorChange.bind(_assertThisInitialized(_this));
+    _this.play = _this.play.bind(_assertThisInitialized(_this));
+    _this.setData = _this.setData.bind(_assertThisInitialized(_this));
+    _this.setDate = _this.setDate.bind(_assertThisInitialized(_this));
+    _this.setNextDate = _this.setNextDate.bind(_assertThisInitialized(_this));
     return _this;
   }
 
   _createClass(App, [{
-    key: "componentDidMount",
-    value: function componentDidMount() {
-      var _this2 = this;
+    key: "play",
+    value: function play(e) {
+      console.log("App.play");
+      this.interval = window.setInterval(this.setNextDate, 1000);
+    }
+  }, {
+    key: "setData",
+    value: function setData(data) {
+      var processedData = _objectSpread({}, data);
 
-      axios__WEBPACK_IMPORTED_MODULE_1___default.a.get('/api/v1/get-data-report-data').then(function (response) {
-        return response.data;
-      }).then(function (data) {
-        return _this2.setState({
-          data: data
+      processedData = Object.keys(processedData).reduce(function (acc, key) {
+        var data = processedData[key];
+        data = data.map(function (d) {
+          return _objectSpread({}, d, {
+            quarter: new Date(d.quarter)
+          });
         });
-      }).then(function (x) {
-        return _this2.drawOrderFrequencyChart();
+        data = data.sort(function (a, b) {
+          return a.quarter - b.quarter;
+        });
+        acc[key] = data;
+        return acc;
+      }, {});
+      var datesData = processedData["interest_by_countries_and_quarter"];
+      var dates = datesData.reduce(function (acc, d) {
+        acc[[d.quarter]] = d.quarter;
+        return acc;
+      }, {});
+      dates = Object.values(dates);
+      dates = dates.sort(function (a, b) {
+        return a - b;
+      });
+      var countriesData = processedData["top_countries"];
+      var countries = datesData.reduce(function (acc, d) {
+        acc[[d.country]] = d.country;
+        return acc;
+      }, {});
+      countries = Object.values(countries);
+      var countryColourScale = d3__WEBPACK_IMPORTED_MODULE_2__["scaleOrdinal"]().domain(countries).range(d3__WEBPACK_IMPORTED_MODULE_2__["schemeTableau10"]);
+      var sectorsData = processedData["top_sectors"];
+      var sectors = datesData.reduce(function (acc, d) {
+        acc[[d.country]] = d.country;
+        return acc;
+      }, {});
+      var schema = d3__WEBPACK_IMPORTED_MODULE_2__["schemeTableau10"]; // d3.schemeSet3
+
+      sectors = Object.values(sectors);
+      var sectorColourScale = d3__WEBPACK_IMPORTED_MODULE_2__["scaleOrdinal"]().domain(sectors).range(schema);
+      this.setState({
+        countries: countries,
+        countryColourScale: countryColourScale,
+        data: processedData,
+        dates: dates,
+        sectorColourScale: sectorColourScale
       });
     }
   }, {
-    key: "drawOrderFrequencyChart",
-    value: function drawOrderFrequencyChart() {
-      if (this.state.data == null) {
-        return;
+    key: "setDate",
+    value: function setDate(date) {
+      console.log("this.interval");
+      console.log(this.interval);
+      console.log(date);
+
+      if (this.interval !== undefined && date === this.state.dates[this.state.dates.length - 1]) {
+        console.log("clearInterval");
+        window.clearInterval(this.interval);
       }
 
-      var data = this.state.data.omisOrderFrequency.values;
-      var dates = data.map(function (row) {
-        return new Date(row[0]);
+      this.setState({
+        date: date
       });
-      var n_orders = data.map(function (row) {
-        return row[1];
-      });
-      var parsedData = d3__WEBPACK_IMPORTED_MODULE_2__["zip"](dates, n_orders);
-      var container = d3__WEBPACK_IMPORTED_MODULE_2__["select"]("#".concat(this.orderFrequencyChartId));
-      var canvas = container.select(".canvas");
-      var canvasWidth = parseInt(container.style('width'), 10);
-      var canvasHeight = 300;
-      canvas.attr("width", canvasWidth).attr("height", canvasHeight);
-      var chart = canvas.select(".chart");
-      var chartMargins = {
-        left: 50,
-        right: 30,
-        bottom: 50,
-        top: 15
-      };
-      var chartWidth = canvasWidth - chartMargins.left - chartMargins.right;
-      var chartHeight = canvasHeight - chartMargins.top - chartMargins.bottom;
-      chart.attr('transform', "translate(".concat(chartMargins.left, ", ").concat(chartMargins.top, ")"));
-      var xScale = d3__WEBPACK_IMPORTED_MODULE_2__["scaleTime"]().range([0, chartWidth]).domain([d3__WEBPACK_IMPORTED_MODULE_2__["min"](dates), d3__WEBPACK_IMPORTED_MODULE_2__["max"](dates)]);
-      var yScale = d3__WEBPACK_IMPORTED_MODULE_2__["scaleLinear"]().range([chartHeight, 0]).domain([d3__WEBPACK_IMPORTED_MODULE_2__["min"](n_orders), d3__WEBPACK_IMPORTED_MODULE_2__["max"](n_orders)]);
-      chart.selectAll("*").remove();
-      var valueline = d3__WEBPACK_IMPORTED_MODULE_2__["line"]().x(function (d) {
-        return xScale(d[0]);
-      }).y(function (d) {
-        return yScale(d[1]);
-      }).curve(d3__WEBPACK_IMPORTED_MODULE_2__["curveMonotoneX"]);
-      chart.append("path").data([parsedData]).attr("class", "line").attr("d", valueline);
-      var xAxis = d3__WEBPACK_IMPORTED_MODULE_2__["axisBottom"](xScale);
-      chart.append('g').attr('transform', "translate(0, ".concat(chartHeight, ")")).call(xAxis);
-      var yAxis = d3__WEBPACK_IMPORTED_MODULE_2__["axisLeft"](yScale);
-      chart.append('g').call(yAxis);
-      chart.selectAll(".dot").data(parsedData).enter().append("circle").attr("class", "dot").attr("cx", function (d) {
-        return xScale(d[0]);
-      }).attr("cy", function (d) {
-        return yScale(d[1]);
-      }).attr("r", 2);
     }
   }, {
-    key: "onNRowsTopSectorChange",
-    value: function onNRowsTopSectorChange(nRows) {
-      this.setState({
-        nRowsTopSector: nRows
-      });
+    key: "setNextDate",
+    value: function setNextDate() {
+      console.log("App.setNextDate");
+      console.log(this.state.dates);
+      var date = this.state.date;
+      console.log(date);
+
+      if (date !== undefined && this.state.dates.length > 0 && date != this.state.dates[this.state.dates.length - 1]) {
+        var index = this.state.dates.indexOf(this.state.date);
+        var nextDate = this.state.dates[index + 1];
+        this.setDate(nextDate);
+      }
     }
   }, {
     key: "render",
     value: function render() {
-      console.log("render");
-      console.log(this.state);
-      var _this$state = this.state,
-          data = _this$state.data,
-          nRowsTopSector = _this$state.nRowsTopSector,
-          orderFrequency = _this$state.orderFrequency;
+      var _this3 = this;
 
-      if (data == null) {
-        return '';
+      console.log("App.render");
+      console.log(this.state);
+      var slider = "";
+      var dates = this.state.dates;
+
+      if (dates !== undefined && dates.length > 0) {
+        slider = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
+          className: "custom-range",
+          min: "0",
+          max: dates.length - 1,
+          onChange: function onChange(e) {
+            return _this3.setDate(dates[e.target.value]);
+          },
+          type: "range",
+          value: this.state.date === undefined || this.state.dates === undefined ? 1 : this.state.dates.indexOf(this.state.date) + 1
+        });
+
+        if (this.state.date === undefined && dates.length > 0) {
+          this.state.date = dates[0];
+        }
       }
 
-      var nCompanies = data.nCompanies,
-          nCompaniesMatchedToCompaniesHouse = data.nCompaniesMatchedToCompaniesHouse,
-          nCompaniesMatchedToSector = data.nCompaniesMatchedToSector,
-          nCompaniesMatchedToDuplicateCompaniesHouse = data.nCompaniesMatchedToDuplicateCompaniesHouse,
-          nSectors = data.nSectors,
-          nCompaniesWithOmisOrders = data.nCompaniesWithOmisOrders,
-          nCompaniesWithExportCountries = data.nCompaniesWithExportCountries,
-          nCompaniesWithFutureInterestCountries = data.nCompaniesWithFutureInterestCountries;
-      var chartId = this.orderFrequencyChartId;
-      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+      var charts = "";
+
+      if (this.state.variable === "country") {
+        var id = "country";
+        var data = this.state.data !== undefined ? this.state.data["interest_by_countries_and_quarter"] : undefined;
+        var date = this.state.date;
+        var colourScale = this.state.countryColourScale;
+        charts = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(CountryLineChart, {
+          id: "country",
+          data: data,
+          date: date,
+          colourScale: colourScale,
+          topCategories: this.state.data !== undefined ? this.state.data["top_countries"] : undefined
+        }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(CountryBarRace, {
+          id: "country",
+          data: data,
+          date: date,
+          colourScale: colourScale
+        }));
+      } else if (this.state.variable == "sector") {
+        charts = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(SectorLineChart, null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(SectorBarRace, {
+          id: "country",
+          data: this.state.data !== undefined ? this.state.data["interest_by_countries_and_quarter"] : undefined,
+          date: this.state.date,
+          colourScale: this.state.countryColourScale
+        }));
+      }
+
+      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, charts, slider, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, this.state.date ? this.state.date.toLocaleDateString() : ""), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        className: "btn btn-primary",
+        onClick: this.play,
         style: {
-          paddingTop: '1em'
+          marginTop: 10
         }
-      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(MatchedCompanies, {
-        nCompanies: nCompanies,
-        nDuplicates: nCompaniesMatchedToDuplicateCompaniesHouse,
-        nMatches: nCompaniesMatchedToCompaniesHouse
-      }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(SectorMatches, {
-        nCompanies: nCompanies,
-        nMatches: nCompaniesMatchedToSector,
-        nSectors: nSectors
-      }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(TopSectors, {
-        data: data.topSectors.values,
-        onChange: this.onNRowsTopSectorChange,
-        nRows: nRowsTopSector
-      }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(CompanyOrderSummary, {
-        nCompanies: nCompanies,
-        nWithOrders: nCompaniesWithOmisOrders
-      }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(CompanyExportCountriesSummary, {
-        nCompanies: nCompanies,
-        nWithExportCountries: nCompaniesWithExportCountries
-      }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(CompanyCountriesOfInterestSummary, {
-        nCompanies: nCompanies,
-        nWithCountriesOfInterest: nCompaniesWithFutureInterestCountries
-      }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(OrderFrequency, {
-        chartId: chartId,
-        data: data.omisOrderFrequency.values
-      }));
+      }, "Play"));
     }
   }]);
 
   return App;
 }(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component);
 
-var MatchedCompanies = function MatchedCompanies(_ref) {
-  var nCompanies = _ref.nCompanies,
-      nDuplicates = _ref.nDuplicates,
-      nMatches = _ref.nMatches;
+var BarRace =
+/*#__PURE__*/
+function (_React$Component2) {
+  _inherits(BarRace, _React$Component2);
 
-  if (nCompanies == null) {
-    return '';
+  function BarRace(props) {
+    var _this4;
+
+    _classCallCheck(this, BarRace);
+
+    _this4 = _possibleConstructorReturn(this, _getPrototypeOf(BarRace).call(this, props));
+    _this4.state = {};
+    return _this4;
   }
 
-  var nUniqueMatches = nMatches - nDuplicates;
-  return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-    className: "data-report"
-  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h3", {
-    style: {
-      paddingBottom: '0.5em'
+  _createClass(BarRace, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      console.log("BarRace.componentDidMount");
+      this.container = {
+        element: d3__WEBPACK_IMPORTED_MODULE_2__["select"]("#".concat(this.variable)),
+        height: 300
+      };
+      this.container.width = parseInt(this.container.element.style("width"), 10);
+      this.canvas = {
+        element: this.container.element.select(".canvas"),
+        padding: {
+          left: 50,
+          right: 30,
+          bottom: 15,
+          top: 50
+        },
+        width: this.container.width,
+        height: this.container.height
+      };
+      this.canvas.element.attr("width", this.canvas.width);
+      this.canvas.element.attr("height", this.canvas.height);
+      this.plotArea = {
+        element: this.canvas.element.select(".plot-area"),
+        height: this.canvas.height - this.canvas.padding.bottom - this.canvas.padding.top,
+        width: this.canvas.width - this.canvas.padding.left - this.canvas.padding.right,
+        x: this.canvas.padding.left,
+        y: this.canvas.padding.top
+      };
+      this.plotArea.element.attr("transform", "translate(".concat(this.plotArea.x, ", ").concat(this.plotArea.y, ")"));
+      this.xAxis = {
+        element: this.plotArea.element.select(".x-axis"),
+        scale: d3__WEBPACK_IMPORTED_MODULE_2__["scaleLinear"](),
+        width: this.plotArea.width,
+        x: 0,
+        y: 0
+      };
+      this.xAxis.element.attr("transform", "translate(".concat(this.xAxis.x, ", ").concat(this.xAxis.y, ")"));
+      this.xAxis.scale.range([0, this.xAxis.width]);
+      this.yAxis = {
+        element: this.plotArea.element.select(".y-axis"),
+        scale: d3__WEBPACK_IMPORTED_MODULE_2__["scaleBand"](),
+        height: this.plotArea.height,
+        x: 0,
+        y: 0
+      };
+      this.yAxis.element.attr("transform", "translate(".concat(this.yAxis.x, ", ").concat(this.yAxis.y, ")"));
+      this.yAxis.scale.range([0, this.yAxis.height]);
     }
-  }, "Datahub - Companies House matching"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", {
-    className: "table table-striped"
-  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("thead", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Count"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Percent"))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Companies"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, nCompanies), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Matches"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, nMatches), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, Math.round(100 * 100 * nMatches / nCompanies) / 100)))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h3", {
-    style: {
-      paddingBottom: '0.5em'
+  }, {
+    key: "componentDidUpdate",
+    value: function componentDidUpdate() {
+      console.log("BarRace.componentDidUpdate");
+      var data = this.props.data;
+
+      if (data !== undefined) {
+        this.draw();
+      }
     }
-  }, "Breakdown of matched companies"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", {
-    className: "table table-striped"
-  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("thead", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Count"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Percent"))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Matches"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, nMatches), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Unique Matches"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, nUniqueMatches), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, Math.round(100 * 100 * nUniqueMatches / nMatches) / 100)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "Duplicates"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, nDuplicates), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, Math.round(100 * 100 * nDuplicates / nMatches) / 100)))));
-};
+  }, {
+    key: "draw",
+    value: function draw() {
+      var _this5 = this;
 
-var SectorMatches = function SectorMatches(_ref2) {
-  var nCompanies = _ref2.nCompanies,
-      nSectors = _ref2.nSectors,
-      nMatches = _ref2.nMatches;
+      console.log("BarRace.draw()");
+      var data = this.props.data;
+      var nTopRanks = 10;
+      var ranks = [];
 
-  if (nCompanies == null) {
-    return '';
+      for (var i = 1; i <= nTopRanks; i++) {
+        ranks.push(i);
+      }
+
+      var dataDate = data.filter(function (d) {
+        return d.quarter.toISOString() == _this5.props.date.toISOString();
+      });
+      var totalInterest = dataDate.reduce(function (acc, d) {
+        acc = acc + d.nInterests;
+        return acc;
+      }, 0);
+
+      var dataNormalised = _toConsumableArray(dataDate);
+
+      dataNormalised = dataNormalised.sort(function (a, b) {
+        return b.nInterests - a.nInterests;
+      });
+
+      for (var _i = 0; _i < dataNormalised.length; _i++) {
+        dataNormalised[_i] = _objectSpread({}, dataNormalised[_i], {
+          shareOfInterest: dataNormalised[_i].nInterests / totalInterest,
+          rank: _i + 1
+        });
+      }
+
+      var maxShareOfInterest = d3__WEBPACK_IMPORTED_MODULE_2__["max"](dataNormalised, function (d) {
+        return d.shareOfInterest;
+      });
+      this.xAxis.scale.domain([0, maxShareOfInterest]);
+      this.yAxis.scale.domain(ranks);
+      this.xAxis.element.transition().call(d3__WEBPACK_IMPORTED_MODULE_2__["axisTop"](this.xAxis.scale).tickFormat(function (d) {
+        return "".concat(parseInt(10000 * d) / 100, " %");
+      }));
+      this.yAxis.element.transition().call(d3__WEBPACK_IMPORTED_MODULE_2__["axisLeft"](this.yAxis.scale));
+      this.plotArea.element.selectAll(".bar").data(dataNormalised, function (d) {
+        return d[_this5.variable];
+      }).join("rect").attr("class", "bar").transition().attr("y", function (d) {
+        return d.rank > nTopRanks ? _this5.container.height : _this5.yAxis.scale(d.rank);
+      }).attr("width", function (d) {
+        return _this5.xAxis.scale(d.shareOfInterest);
+      }).attr("height", this.yAxis.scale.bandwidth() - 1).attr("x", 0).style("fill", function (d) {
+        return _this5.props.colourScale(d[_this5.variable]);
+      }).attr("rx", 3);
+      this.plotArea.element.selectAll(".".concat(this.variable, "-tag")).data(dataNormalised, function (d) {
+        return d[_this5.variable];
+      }).join("text").attr("class", "".concat(this.variable, "-tag")).attr("x", this.plotArea.width).attr("text-anchor", "end").attr("dominant-baseline", "middle").html(function (d) {
+        return d[_this5.variable];
+      }).transition().attr("y", function (d) {
+        return d.rank > 10 ? _this5.container.height : _this5.yAxis.scale(d.rank) + _this5.yAxis.scale.bandwidth() / 2;
+      });
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      console.log("BarRace.render()");
+      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "container bar-race",
+        id: "".concat(this.variable)
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("svg", {
+        className: "canvas"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("g", {
+        className: "plot-area"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("g", {
+        className: "x-axis"
+      }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("g", {
+        className: "y-axis"
+      }))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "tooltip"
+      }));
+    }
+  }]);
+
+  return BarRace;
+}(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component);
+
+var LineChart =
+/*#__PURE__*/
+function (_React$Component3) {
+  _inherits(LineChart, _React$Component3);
+
+  function LineChart(props) {
+    var _this6;
+
+    _classCallCheck(this, LineChart);
+
+    _this6 = _possibleConstructorReturn(this, _getPrototypeOf(LineChart).call(this, props));
+    _this6.state = {};
+    return _this6;
   }
 
-  return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-    className: "sector-summary"
-  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h3", null, "Sector summary"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", {
-    className: "table table-striped"
-  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "#Companies"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, nCompanies)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "#Sectors"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, nSectors)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "#Companies matched to a sector"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, nMatches)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "%Companies matched to a sector"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, Math.round(100 * 100 * nMatches / nCompanies) / 100)))));
-};
+  _createClass(LineChart, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      console.log("LineChart.componentDidMount");
+      this.container = {
+        element: d3__WEBPACK_IMPORTED_MODULE_2__["select"]("#".concat(this.variable, "-line-chart")),
+        height: 300
+      };
+      this.container.width = parseInt(this.container.element.style("width"), 10);
+      this.canvas = {
+        element: this.container.element.select(".canvas"),
+        padding: {
+          left: 50,
+          right: 30,
+          bottom: 50,
+          top: 15
+        },
+        width: this.container.width,
+        height: this.container.height
+      };
+      this.canvas.element.attr("width", this.canvas.width);
+      this.canvas.element.attr("height", this.canvas.height);
+      this.plotArea = {
+        element: this.canvas.element.select(".plot-area"),
+        height: this.canvas.height - this.canvas.padding.bottom - this.canvas.padding.top,
+        width: this.canvas.width - this.canvas.padding.left - this.canvas.padding.right,
+        x: this.canvas.padding.left,
+        y: this.canvas.padding.top
+      };
+      this.plotArea.element.attr("transform", "translate(".concat(this.plotArea.x, ", ").concat(this.plotArea.y, ")"));
+      this.xAxis = {
+        element: this.plotArea.element.select(".x-axis"),
+        scale: d3__WEBPACK_IMPORTED_MODULE_2__["scaleTime"](),
+        width: this.plotArea.width,
+        x: 0,
+        y: this.plotArea.height
+      };
+      this.xAxis.element.attr("transform", "translate(".concat(this.xAxis.x, ", ").concat(this.xAxis.y, ")"));
+      this.xAxis.scale.range([0, this.xAxis.width]);
+      this.yAxis = {
+        element: this.plotArea.element.select(".y-axis"),
+        scale: d3__WEBPACK_IMPORTED_MODULE_2__["scaleLinear"](),
+        height: this.plotArea.height,
+        x: 0,
+        y: 0
+      };
+      this.yAxis.element.attr("transform", "translate(".concat(this.yAxis.x, ", ").concat(this.yAxis.y, ")"));
+      this.yAxis.scale.range([this.yAxis.height, 0]);
+      this.layer0 = {
+        element: this.plotArea.element.select(".layer-0")
+      };
+      this.coverUp = {
+        element: this.plotArea.element.select(".cover-up"),
+        width: this.plotArea.width + 2,
+        // hide stroke of line
+        height: this.plotArea.height
+      };
+      this.coverUp.element.attr("x", 1) // uncover axis
+      .attr("width", this.coverUp.width).attr("height", this.coverUp.height + 2) // line stroke
+      .style("fill", "white");
+      this.legend = {
+        element: this.plotArea.element.select(".legend"),
+        x: 0,
+        y: 0
+      };
+      this.legend.element.attr("transform", "translate(".concat(this.legend.x, ", ").concat(this.legend.y, ")"));
+    }
+  }, {
+    key: "componentDidUpdate",
+    value: function componentDidUpdate() {
+      console.log("LineChart.componentDidUpdate");
+      console.log(this.props.date);
 
-var TopSectors = function TopSectors(_ref3) {
-  var data = _ref3.data,
-      onChange = _ref3.onChange,
-      _ref3$nRows = _ref3.nRows,
-      nRows = _ref3$nRows === void 0 ? 5 : _ref3$nRows;
-  var nRowsInput;
+      if (this.props.data !== undefined) {
+        if (this.plotArea.element.selectAll(".line").size() == 0) {
+          this.draw();
+        }
+      }
 
-  var onChange2 = function onChange2(e) {
-    return onChange(nRowsInput.value);
-  };
+      if (this.props.data !== undefined && this.props.date !== undefined) {
+        var x = this.xAxis.scale(this.props.date);
+        this.coverUp.element.transition().attr("x", x).attr("width", this.plotArea.width - x);
+      }
+    }
+  }, {
+    key: "draw",
+    value: function draw() {
+      var _this7 = this;
 
-  var filteredData = data.slice(0, nRows);
-  return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h3", null, "Top sectors"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-    className: "form-group"
-  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", {
-    className: "form-label"
-  }, "Number of rows"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
-    ref: function ref(input) {
-      return nRowsInput = input;
-    },
-    onChange: onChange2,
-    className: "form-control",
-    type: "number",
-    value: nRows
-  })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", {
-    className: "table table-striped"
-  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("thead", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Sector"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("th", null, "Count"))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, filteredData.map(function (sector, i) {
-    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", {
-      key: i
-    }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, sector[0]), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, sector[1]));
-  }))));
-};
+      console.log("LineChart.draw()");
+      var data = this.props.data;
+      var top10 = this.props.topCategories.map(function (d) {
+        return d[_this7.variable];
+      });
+      top10 = top10.splice(0, 10);
+      data = data.filter(function (d) {
+        return top10.indexOf(d[_this7.variable]) != -1;
+      });
+      var startDate = d3__WEBPACK_IMPORTED_MODULE_2__["min"](data, function (d) {
+        return d.quarter;
+      });
+      var endDate = d3__WEBPACK_IMPORTED_MODULE_2__["max"](data, function (d) {
+        return d.quarter;
+      });
+      this.xAxis.scale.domain([startDate, endDate]);
+      this.xAxis.element.transition().call(d3__WEBPACK_IMPORTED_MODULE_2__["axisBottom"](this.xAxis.scale));
+      var minNInterests = d3__WEBPACK_IMPORTED_MODULE_2__["min"](data, function (d) {
+        return d.nInterests;
+      });
+      var maxNInterests = d3__WEBPACK_IMPORTED_MODULE_2__["max"](data, function (d) {
+        return d.nInterests;
+      });
+      this.yAxis.scale.domain([minNInterests, maxNInterests]);
+      this.yAxis.element.transition().call(d3__WEBPACK_IMPORTED_MODULE_2__["axisLeft"](this.yAxis.scale));
+      var plotLine = d3__WEBPACK_IMPORTED_MODULE_2__["line"]().x(function (d) {
+        return _this7.xAxis.scale(d.quarter);
+      }).y(function (d) {
+        return _this7.yAxis.scale(d.nInterests);
+      }).curve(d3__WEBPACK_IMPORTED_MODULE_2__["curveMonotoneX"]);
+      var groupedData = data.reduce(function (acc, d) {
+        if (acc[[d[_this7.variable]]] === undefined) {
+          acc[[d[_this7.variable]]] = {
+            variable: d[_this7.variable],
+            values: []
+          };
+        }
 
-var CompanyOrderSummary = function CompanyOrderSummary(_ref4) {
-  var nCompanies = _ref4.nCompanies,
-      nWithOrders = _ref4.nWithOrders;
-  return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-    className: "company-order-summary"
-  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h3", null, "Company order summary"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", {
-    className: "table table-striped"
-  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "#Companies"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, nCompanies)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "#Companies with orders"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, nWithOrders)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "%Companies with orders"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, Math.round(100 * 100 * nWithOrders / nCompanies) / 100)))));
-};
+        acc[[d[_this7.variable]]].values.push(d);
+        return acc;
+      }, {});
+      groupedData = Object.values(groupedData);
+      this.layer0.element.selectAll(".line").data(groupedData, function (d) {
+        return d.variable;
+      }).join("path").attr("class", "line").attr("d", function (d) {
+        return plotLine(d.values);
+      }).style("stroke", function (d) {
+        return _this7.props.colourScale(d.variable);
+      });
+      var legendItems = this.legend.element.selectAll(".legend-item").data(groupedData, function (d) {
+        return d[_this7.variable];
+      }).join("g").attr("class", "legend-item");
+      var legendBlockWidth = 20;
+      legendItems.data(groupedData).append("rect").attr("x", 10).attr("y", function (d, i) {
+        return i * legendBlockWidth + 1;
+      }).attr("width", legendBlockWidth).attr("height", legendBlockWidth).style("fill", function (d) {
+        return _this7.props.colourScale(d.variable);
+      });
+      legendItems.data(groupedData).append("text").attr("x", 10 + legendBlockWidth + 10).attr("y", function (d, i) {
+        return i * legendBlockWidth + 1 + legendBlockWidth / 2;
+      }).html(function (d) {
+        return d.variable;
+      }).attr("text-anchor", "start").attr("dominant-baseline", "middle");
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      console.log("Line.render()");
+      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "container line-chart",
+        id: "".concat(this.variable, "-line-chart")
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("svg", {
+        className: "canvas"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("g", {
+        className: "plot-area"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("g", {
+        className: "layer-0"
+      }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("rect", {
+        className: "cover-up"
+      }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("g", {
+        className: "x-axis"
+      }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("g", {
+        className: "y-axis"
+      }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("g", {
+        className: "legend"
+      }))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "tooltip"
+      }));
+    }
+  }]);
 
-var CompanyExportCountriesSummary = function CompanyExportCountriesSummary(_ref5) {
-  var nCompanies = _ref5.nCompanies,
-      nWithExportCountries = _ref5.nWithExportCountries;
+  return LineChart;
+}(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component);
 
-  if (nCompanies == null) {
-    return '';
+var CountryBarRace =
+/*#__PURE__*/
+function (_BarRace) {
+  _inherits(CountryBarRace, _BarRace);
+
+  function CountryBarRace(props) {
+    var _this8;
+
+    _classCallCheck(this, CountryBarRace);
+
+    _this8 = _possibleConstructorReturn(this, _getPrototypeOf(CountryBarRace).call(this, props));
+    _this8.variable = "country";
+    return _this8;
   }
 
-  return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-    className: "company-export-country-summary"
-  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h3", null, "Company export country summary"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", {
-    className: "table table-striped"
-  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "#Companies"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, nCompanies)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "#Companies with export countries"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, nWithExportCountries)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "%Companies with export countries"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, Math.round(100 * 100 * nWithExportCountries / nCompanies) / 100)))));
-};
+  return CountryBarRace;
+}(BarRace);
 
-var CompanyCountriesOfInterestSummary = function CompanyCountriesOfInterestSummary(_ref6) {
-  var nCompanies = _ref6.nCompanies,
-      nWithCountriesOfInterest = _ref6.nWithCountriesOfInterest;
+var SectorBarRace =
+/*#__PURE__*/
+function (_BarRace2) {
+  _inherits(SectorBarRace, _BarRace2);
 
-  if (nCompanies == null) {
-    return '';
+  function SectorBarRace(props) {
+    var _this9;
+
+    _classCallCheck(this, SectorBarRace);
+
+    _this9 = _possibleConstructorReturn(this, _getPrototypeOf(SectorBarRace).call(this, props));
+    _this9.variable = "sector";
+    return _this9;
   }
 
-  return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-    className: "company-countries-of-interest-summary"
-  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h3", null, "Countries of interest summary"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", {
-    className: "table table-striped"
-  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tbody", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "#Companies"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, nCompanies)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "#Companies with countries of interest"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, nWithCountriesOfInterest)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, "%Companies with countries of interest"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("td", null, Math.round(100 * 100 * nWithCountriesOfInterest / nCompanies) / 100)))));
-};
+  return SectorBarRace;
+}(BarRace);
 
-var OrderFrequency = function OrderFrequency(_ref7) {
-  var chartId = _ref7.chartId,
-      data = _ref7.data;
+var CountryLineChart =
+/*#__PURE__*/
+function (_LineChart) {
+  _inherits(CountryLineChart, _LineChart);
 
-  if (data == null) {
-    return '';
+  function CountryLineChart(props) {
+    var _this10;
+
+    _classCallCheck(this, CountryLineChart);
+
+    _this10 = _possibleConstructorReturn(this, _getPrototypeOf(CountryLineChart).call(this, props));
+    _this10.variable = "country";
+    return _this10;
   }
 
-  return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-    className: "order-frequency"
-  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h3", null, "Order frequency"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(OrderFrequencyChart, {
-    data: data,
-    id: chartId
-  }));
-};
+  return CountryLineChart;
+}(LineChart);
 
-var OrderFrequencyChart = function OrderFrequencyChart(_ref8) {
-  var data = _ref8.data,
-      id = _ref8.id;
+var SectorLineChart =
+/*#__PURE__*/
+function (_LineChart2) {
+  _inherits(SectorLineChart, _LineChart2);
 
-  if (data == null) {
-    return '';
+  function SectorLineChart(props) {
+    var _this11;
+
+    _classCallCheck(this, SectorLineChart);
+
+    _this11 = _possibleConstructorReturn(this, _getPrototypeOf(SectorLineChart).call(this, props));
+    _this11.variable = "sector";
+    return _this11;
   }
 
-  return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-    id: id,
-    className: "order-frequency-chart"
-  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("svg", {
-    className: "canvas"
-  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("g", {
-    className: "chart"
-  })));
-};
+  return SectorLineChart;
+}(LineChart);
 
 Object(react_dom__WEBPACK_IMPORTED_MODULE_3__["render"])(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(App, null), document.getElementById('react-container'));
 
@@ -63575,4 +63908,4 @@ if (false) {} else {
 /***/ })
 
 /******/ });
-//# sourceMappingURL=data_report.bundle.js.map
+//# sourceMappingURL=data_visualisation.bundle.js.map
