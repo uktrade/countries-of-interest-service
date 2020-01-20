@@ -151,7 +151,15 @@ function (_React$Component) {
     value: function componentDidMount() {
       var _this2 = this;
 
-      axios__WEBPACK_IMPORTED_MODULE_1___default.a.get("/data-visualisation-data").then(function (response) {
+      var url = "/data-visualisation-data";
+
+      if (this.state.cumulative == true) {
+        url = url + "?cumulative";
+      }
+
+      console.log("url");
+      console.log(url);
+      axios__WEBPACK_IMPORTED_MODULE_1___default.a.get(url).then(function (response) {
         return _this2.setData(response.data);
       })["catch"](function (response) {
         return alert("failed to get data. ".concat(response));
@@ -166,24 +174,55 @@ function (_React$Component) {
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(App).call(this, props));
     _this.state = {
+      cumulative: true,
       intervals: [],
       playing: false,
       variable: "country"
     };
     _this.play = _this.play.bind(_assertThisInitialized(_this));
+    _this.setCumulative = _this.setCumulative.bind(_assertThisInitialized(_this));
     _this.setData = _this.setData.bind(_assertThisInitialized(_this));
     _this.setDate = _this.setDate.bind(_assertThisInitialized(_this));
     _this.setNextDate = _this.setNextDate.bind(_assertThisInitialized(_this));
     _this.setPlaying = _this.setPlaying.bind(_assertThisInitialized(_this));
+    _this.toggleCumulative = _this.toggleCumulative.bind(_assertThisInitialized(_this));
     _this.togglePlaying = _this.togglePlaying.bind(_assertThisInitialized(_this));
     return _this;
   }
 
   _createClass(App, [{
+    key: "getSnapshotBeforeUpdate",
+    value: function getSnapshotBeforeUpdate(prevProps, prevState) {
+      var _this3 = this;
+
+      if (prevState.cumulative !== this.state.cumulative) {
+        var url = "/data-visualisation-data";
+
+        if (this.state.cumulative == true) {
+          url = url + "?cumulative";
+        }
+
+        console.log("url");
+        console.log(url);
+        axios__WEBPACK_IMPORTED_MODULE_1___default.a.get(url).then(function (response) {
+          return _this3.setData(response.data);
+        })["catch"](function (response) {
+          return alert("failed to get data. ".concat(response));
+        });
+      }
+    }
+  }, {
     key: "play",
     value: function play() {
       console.log("App.play");
       return window.setInterval(this.setNextDate, 1000);
+    }
+  }, {
+    key: "setCumulative",
+    value: function setCumulative(cumulative) {
+      this.setState({
+        cumulative: cumulative
+      });
     }
   }, {
     key: "setData",
@@ -259,6 +298,11 @@ function (_React$Component) {
         var index = this.state.dates.indexOf(this.state.date);
         var nextDate = this.state.dates[index + 1];
         this.setDate(nextDate);
+        var lastDate = this.state.dates[this.state.dates.length - 1];
+
+        if (nextDate === this.state.dates[this.state.dates.length - 1]) {
+          this.setPlaying(false);
+        }
       }
     }
   }, {
@@ -283,6 +327,12 @@ function (_React$Component) {
       });
     }
   }, {
+    key: "toggleCumulative",
+    value: function toggleCumulative() {
+      var cumulative = !this.state.cumulative;
+      this.setCumulative(cumulative);
+    }
+  }, {
     key: "togglePlaying",
     value: function togglePlaying() {
       var playing = !this.state.playing;
@@ -291,7 +341,7 @@ function (_React$Component) {
   }, {
     key: "render",
     value: function render() {
-      var _this3 = this;
+      var _this4 = this;
 
       console.log("App.render");
       console.log(this.state);
@@ -304,7 +354,7 @@ function (_React$Component) {
           min: "0",
           max: dates.length - 1,
           onChange: function onChange(e) {
-            return _this3.setDate(dates[e.target.value]);
+            return _this4.setDate(dates[e.target.value]);
           },
           type: "range",
           value: this.state.date === undefined || this.state.dates === undefined ? 1 : this.state.dates.indexOf(this.state.date) + 1
@@ -349,7 +399,21 @@ function (_React$Component) {
         style: {
           marginTop: 10
         }
-      }, this.state.playing === true ? "Stop" : "Play"));
+      }, this.state.playing === true ? "Stop" : "Play"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "checkbox",
+        style: {
+          paddingTop: 5
+        }
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
+        onChange: this.toggleCumulative,
+        type: "checkbox",
+        value: "",
+        checked: this.state.cumulative === true
+      }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        style: {
+          paddingLeft: 10
+        }
+      }, "Cumulative"))));
     }
   }]);
 
@@ -362,13 +426,13 @@ function (_React$Component2) {
   _inherits(BarRace, _React$Component2);
 
   function BarRace(props) {
-    var _this4;
+    var _this5;
 
     _classCallCheck(this, BarRace);
 
-    _this4 = _possibleConstructorReturn(this, _getPrototypeOf(BarRace).call(this, props));
-    _this4.state = {};
-    return _this4;
+    _this5 = _possibleConstructorReturn(this, _getPrototypeOf(BarRace).call(this, props));
+    _this5.state = {};
+    return _this5;
   }
 
   _createClass(BarRace, [{
@@ -433,7 +497,7 @@ function (_React$Component2) {
   }, {
     key: "draw",
     value: function draw() {
-      var _this5 = this;
+      var _this6 = this;
 
       console.log("BarRace.draw()");
       var data = this.props.data;
@@ -445,7 +509,7 @@ function (_React$Component2) {
       }
 
       var dataDate = data.filter(function (d) {
-        return d.quarter.toISOString() == _this5.props.date.toISOString();
+        return d.quarter.toISOString() == _this6.props.date.toISOString();
       });
       var totalInterest = dataDate.reduce(function (acc, d) {
         acc = acc + d.nInterests;
@@ -478,42 +542,42 @@ function (_React$Component2) {
       }));
       this.yAxis.element.transition().call(d3__WEBPACK_IMPORTED_MODULE_2__["axisLeft"](this.yAxis.scale));
       var selection = this.plotArea.element.selectAll(".bar").data(dataNormalised, function (d) {
-        return d[_this5.variable];
+        return d[_this6.variable];
       });
       selection.enter().append("rect").attr("class", "bar").attr("width", function (d) {
-        return _this5.xAxis.scale(d.shareOfInterest);
+        return _this6.xAxis.scale(d.shareOfInterest);
       }).attr("height", this.yAxis.scale.bandwidth() - 1).attr("x", 0).attr("y", this.canvas.height).style("fill", function (d) {
-        return _this5.props.colourScale(d[_this5.variable]);
+        return _this6.props.colourScale(d[_this6.variable]);
       }).attr("rx", 3).transition(1000).attr("y", function (d) {
-        return d.rank > nTopRanks ? _this5.container.height : _this5.yAxis.scale(d.rank);
+        return d.rank > nTopRanks ? _this6.container.height : _this6.yAxis.scale(d.rank);
       });
       selection.transition().duration(1000).attr("width", function (d) {
-        return _this5.xAxis.scale(d.shareOfInterest);
+        return _this6.xAxis.scale(d.shareOfInterest);
       }).attr("y", function (d) {
-        return d.rank > nTopRanks ? _this5.container.height : _this5.yAxis.scale(d.rank);
+        return d.rank > nTopRanks ? _this6.container.height : _this6.yAxis.scale(d.rank);
       });
       selection.exit().transition().duration(1000).attr("y", this.container.height);
       selection = this.plotArea.element.selectAll(".".concat(this.variable, "-tag")).data(dataNormalised, function (d) {
-        return d[_this5.variable];
+        return d[_this6.variable];
       });
       selection.enter().append("text").attr("class", "".concat(this.variable, "-tag")).attr("x", this.plotArea.width).attr("y", function (d) {
-        return _this5.yAxis.scale(_this5.canvas.height);
+        return _this6.canvas.height;
       }).attr("text-anchor", "end").attr("dominant-baseline", "middle").html(function (d) {
-        return d.rank > 10 ? "" : d[_this5.variable];
+        return d.shareOfInterest === 0 ? "" : d[_this6.variable];
       }).transition().duration(1000).attr("y", function (d) {
         if (d.rank > 10) {
-          return _this5.canvas.height;
+          return _this6.canvas.height;
         } else {
-          return _this5.yAxis.scale(d.rank) + _this5.yAxis.scale.bandwidth() / 2;
+          return _this6.yAxis.scale(d.rank) + _this6.yAxis.scale.bandwidth() / 2;
         }
       });
       selection.html(function (d) {
-        return d.rank > 10 ? "" : d[_this5.variable];
+        return d.shareOfInterest === 0 ? "" : d[_this6.variable];
       }).transition().duration(1000).attr("y", function (d) {
         if (d.rank > 10) {
-          return _this5.canvas.height;
+          return _this6.canvas.height;
         } else {
-          return _this5.yAxis.scale(d.rank) + _this5.yAxis.scale.bandwidth() / 2;
+          return _this6.yAxis.scale(d.rank) + _this6.yAxis.scale.bandwidth() / 2;
         }
       });
       selection.exit().transition().duration(1000).attr("y", this.canvas.height).remove();
@@ -548,13 +612,13 @@ function (_React$Component3) {
   _inherits(LineChart, _React$Component3);
 
   function LineChart(props) {
-    var _this6;
+    var _this7;
 
     _classCallCheck(this, LineChart);
 
-    _this6 = _possibleConstructorReturn(this, _getPrototypeOf(LineChart).call(this, props));
-    _this6.state = {};
-    return _this6;
+    _this7 = _possibleConstructorReturn(this, _getPrototypeOf(LineChart).call(this, props));
+    _this7.state = {};
+    return _this7;
   }
 
   _createClass(LineChart, [{
@@ -612,9 +676,10 @@ function (_React$Component3) {
         element: this.plotArea.element.select(".cover-up"),
         width: this.plotArea.width + 2,
         // hide stroke of line
-        height: this.plotArea.height
+        height: this.plotArea.height + 2
       };
       this.coverUp.element.attr("x", 1) // uncover axis
+      .attr("y", -2) // plot stroke
       .attr("width", this.coverUp.width).attr("height", this.coverUp.height + 2) // line stroke
       .style("fill", "white");
       this.legend = {
@@ -628,12 +693,11 @@ function (_React$Component3) {
     key: "componentDidUpdate",
     value: function componentDidUpdate() {
       console.log("LineChart.componentDidUpdate");
-      console.log(this.props.date);
+      console.log(this.props);
 
       if (this.props.data !== undefined) {
-        if (this.plotArea.element.selectAll(".line").size() == 0) {
-          this.draw();
-        }
+        //if(this.plotArea.element.selectAll(".line").size() == 0) {
+        this.draw(); //}
       }
 
       if (this.props.data !== undefined && this.props.date !== undefined) {
@@ -644,16 +708,16 @@ function (_React$Component3) {
   }, {
     key: "draw",
     value: function draw() {
-      var _this7 = this;
+      var _this8 = this;
 
       console.log("LineChart.draw()");
       var data = this.props.data;
       var top10 = this.props.topCategories.map(function (d) {
-        return d[_this7.variable];
+        return d[_this8.variable];
       });
       top10 = top10.splice(0, 10);
       data = data.filter(function (d) {
-        return top10.indexOf(d[_this7.variable]) != -1;
+        return top10.indexOf(d[_this8.variable]) != -1;
       });
       var startDate = d3__WEBPACK_IMPORTED_MODULE_2__["min"](data, function (d) {
         return d.quarter;
@@ -672,39 +736,42 @@ function (_React$Component3) {
       this.yAxis.scale.domain([minNInterests, maxNInterests]);
       this.yAxis.element.transition().call(d3__WEBPACK_IMPORTED_MODULE_2__["axisLeft"](this.yAxis.scale));
       var plotLine = d3__WEBPACK_IMPORTED_MODULE_2__["line"]().x(function (d) {
-        return _this7.xAxis.scale(d.quarter);
+        return _this8.xAxis.scale(d.quarter);
       }).y(function (d) {
-        return _this7.yAxis.scale(d.nInterests);
+        return _this8.yAxis.scale(d.nInterests);
       }).curve(d3__WEBPACK_IMPORTED_MODULE_2__["curveMonotoneX"]);
       var groupedData = data.reduce(function (acc, d) {
-        if (acc[[d[_this7.variable]]] === undefined) {
-          acc[[d[_this7.variable]]] = {
-            variable: d[_this7.variable],
+        if (acc[[d[_this8.variable]]] === undefined) {
+          acc[[d[_this8.variable]]] = {
+            variable: d[_this8.variable],
             values: []
           };
         }
 
-        acc[[d[_this7.variable]]].values.push(d);
+        acc[[d[_this8.variable]]].values.push(d);
         return acc;
       }, {});
       groupedData = Object.values(groupedData);
+      console.log("legend");
+      console.log(groupedData);
       this.layer0.element.selectAll(".line").data(groupedData, function (d) {
         return d.variable;
       }).join("path").attr("class", "line").attr("d", function (d) {
         return plotLine(d.values);
       }).style("stroke", function (d) {
-        return _this7.props.colourScale(d.variable);
+        return _this8.props.colourScale(d.variable);
       });
       var legendItems = this.legend.element.selectAll(".legend-item").data(groupedData, function (d) {
-        return d[_this7.variable];
+        return d[_this8.variable];
       }).join("g").attr("class", "legend-item");
       var legendBlockWidth = 20;
-      legendItems.data(groupedData).append("rect").attr("x", 10).attr("y", function (d, i) {
+      legendItems.selectAll(".legend-block").data(groupedData).join("rect").attr("class", "legend-block").attr("x", 10).attr("y", function (d, i) {
         return i * legendBlockWidth + 1;
       }).attr("width", legendBlockWidth).attr("height", legendBlockWidth).style("fill", function (d) {
-        return _this7.props.colourScale(d.variable);
+        return _this8.props.colourScale(d.variable);
       });
-      legendItems.data(groupedData).append("text").attr("x", 10 + legendBlockWidth + 10).attr("y", function (d, i) {
+      legendItems.selectAll(".legend-text").data(groupedData).join("text") //.append("text")
+      .attr("class", "legend-block").attr("x", 10 + legendBlockWidth + 10).attr("y", function (d, i) {
         return i * legendBlockWidth + 1 + legendBlockWidth / 2;
       }).html(function (d) {
         return d.variable;
@@ -746,13 +813,13 @@ function (_BarRace) {
   _inherits(CountryBarRace, _BarRace);
 
   function CountryBarRace(props) {
-    var _this8;
+    var _this9;
 
     _classCallCheck(this, CountryBarRace);
 
-    _this8 = _possibleConstructorReturn(this, _getPrototypeOf(CountryBarRace).call(this, props));
-    _this8.variable = "country";
-    return _this8;
+    _this9 = _possibleConstructorReturn(this, _getPrototypeOf(CountryBarRace).call(this, props));
+    _this9.variable = "country";
+    return _this9;
   }
 
   return CountryBarRace;
@@ -764,13 +831,13 @@ function (_BarRace2) {
   _inherits(SectorBarRace, _BarRace2);
 
   function SectorBarRace(props) {
-    var _this9;
+    var _this10;
 
     _classCallCheck(this, SectorBarRace);
 
-    _this9 = _possibleConstructorReturn(this, _getPrototypeOf(SectorBarRace).call(this, props));
-    _this9.variable = "sector";
-    return _this9;
+    _this10 = _possibleConstructorReturn(this, _getPrototypeOf(SectorBarRace).call(this, props));
+    _this10.variable = "sector";
+    return _this10;
   }
 
   return SectorBarRace;
@@ -782,13 +849,13 @@ function (_LineChart) {
   _inherits(CountryLineChart, _LineChart);
 
   function CountryLineChart(props) {
-    var _this10;
+    var _this11;
 
     _classCallCheck(this, CountryLineChart);
 
-    _this10 = _possibleConstructorReturn(this, _getPrototypeOf(CountryLineChart).call(this, props));
-    _this10.variable = "country";
-    return _this10;
+    _this11 = _possibleConstructorReturn(this, _getPrototypeOf(CountryLineChart).call(this, props));
+    _this11.variable = "country";
+    return _this11;
   }
 
   return CountryLineChart;
@@ -800,13 +867,13 @@ function (_LineChart2) {
   _inherits(SectorLineChart, _LineChart2);
 
   function SectorLineChart(props) {
-    var _this11;
+    var _this12;
 
     _classCallCheck(this, SectorLineChart);
 
-    _this11 = _possibleConstructorReturn(this, _getPrototypeOf(SectorLineChart).call(this, props));
-    _this11.variable = "sector";
-    return _this11;
+    _this12 = _possibleConstructorReturn(this, _getPrototypeOf(SectorLineChart).call(this, props));
+    _this12.variable = "sector";
+    return _this12;
   }
 
   return SectorLineChart;
