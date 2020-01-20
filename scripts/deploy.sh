@@ -2,11 +2,11 @@
 
 source ./scripts/functions.sh
 
-MANIFEST="manifest-dev.yml"
+PARAMETERS="-m 2G -k 2G"
 
 if [ "$1" = "live" ]; then
-  MANIFEST="manifest-live.yml"
+  PARAMETERS="-m 4G -k 4G"
 fi
 
-run "cf push -f $MANIFEST countries-of-interest-service-$1 --no-start"
+run "cf push -f manual-manifest.yml countries-of-interest-service-$1 $PARAMETERS --no-start"
 run "cf start countries-of-interest-service-$1"
