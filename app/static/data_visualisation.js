@@ -9,8 +9,15 @@ window.React = React;
 
 class App extends React.Component {
 
+
     componentDidMount() {
-        axios.get("/data-visualisation-data")
+	let url = "/data-visualisation-data";
+	if(this.state.cumulative == true) {
+	    url = url + "?cumulative";
+	}
+        console.log("url");
+        console.log(url);
+        axios.get(url)
             .then(response => this.setData(response.data))
             .catch(response => alert(`failed to get data. ${response}`));
     }
@@ -18,24 +25,45 @@ class App extends React.Component {
     constructor(props){
         super(props);
         this.state = {
+	    cumulative: true,
             intervals: [],
             playing: false,
             variable: "country"
         };
 
         this.play = this.play.bind(this);
+	this.setCumulative = this.setCumulative.bind(this);
         this.setData = this.setData.bind(this);
         this.setDate = this.setDate.bind(this);
         this.setNextDate = this.setNextDate.bind(this);
         this.setPlaying = this.setPlaying.bind(this);
+	this.toggleCumulative = this.toggleCumulative.bind(this);
         this.togglePlaying = this.togglePlaying.bind(this);
     }
 
+    getSnapshotBeforeUpdate(prevProps, prevState) {
+	if(prevState.cumulative !== this.state.cumulative) {
+            let url = "/data-visualisation-data";
+	    if(this.state.cumulative == true) {
+	        url = url + "?cumulative";
+	    }
+            console.log("url");
+            console.log(url);
+            axios.get(url)
+                .then(response => this.setData(response.data))
+                .catch(response => alert(`failed to get data. ${response}`));
+	}
+    }
+    
     play() {
         console.log("App.play");
         return window.setInterval(this.setNextDate, 1000);
     }
 
+    setCumulative(cumulative) {
+	this.setState({cumulative: cumulative});
+    }
+    
     setData(data) {
         let processedData = {...data};
         processedData = Object.keys(processedData).reduce(
@@ -116,6 +144,10 @@ class App extends React.Component {
             let index = this.state.dates.indexOf(this.state.date);
             let nextDate = this.state.dates[index+1];
             this.setDate(nextDate);
+            let lastDate = this.state.dates[this.state.dates.length - 1];
+            if(nextDate === this.state.dates[this.state.dates.length - 1]) {
+                this.setPlaying(false);
+            }
         }
     }
 
@@ -133,6 +165,11 @@ class App extends React.Component {
         this.setState({playing: playing, intervals: intervals});
     }
 
+    toggleCumulative() {
+	let cumulative = !(this.state.cumulative);
+	this.setCumulative(cumulative);
+    }
+    
     togglePlaying() {
         let playing = !(this.state.playing);
         this.setPlaying(playing);
@@ -211,16 +248,30 @@ class App extends React.Component {
 
         
         return (
-            <div>
-              {charts}
+	    <div>
+	      {charts}
               {slider}
-              <div>{this.state.date ? this.state.date.toLocaleDateString() : ""}</div>
-              <button
+	      <div>{this.state.date ? this.state.date.toLocaleDateString() : ""}</div>
+	      <button
                 className="btn btn-primary"
                 onClick={this.togglePlaying}
                 style={{marginTop: 10}}>
                 {this.state.playing === true ? "Stop" : "Play"}
               </button>
+
+              <div className="checkbox" style={{paddingTop: 5}}>
+                <label>
+                  <input
+                    onChange={this.toggleCumulative}
+                    type="checkbox"
+                    value=""
+                    checked={this.state.cumulative === true}
+                  />
+                  <span style={{paddingLeft: 10}} >Cumulative</span>
+                </label>
+              </div>
+
+	      
             </div>
         );
     }
@@ -380,10 +431,10 @@ class BarRace extends React.Component {
             .append("text")
             .attr("class", `${this.variable}-tag`)
             .attr("x", this.plotArea.width)
-            .attr("y", d=>this.yAxis.scale(this.canvas.height))
+            .attr("y", d=>this.canvas.height)
             .attr("text-anchor", "end")
             .attr("dominant-baseline", "middle")
-            .html(d=>d.rank > 10 ? "" : d[this.variable])
+            .html(d=>d.shareOfInterest === 0 ? "" : d[this.variable])
             .transition()
             .duration(1000)
             .attr(
@@ -398,7 +449,7 @@ class BarRace extends React.Component {
             );
 
         selection
-            .html(d=>d.rank > 10 ? "" : d[this.variable])
+            .html(d=>d.shareOfInterest === 0 ? "" : d[this.variable])
             .transition()
             .duration(1000)
             .attr(
@@ -513,11 +564,12 @@ class LineChart extends React.Component {
         this.coverUp = {
             element:this.plotArea.element.select(".cover-up"),
             width: this.plotArea.width + 2,  // hide stroke of line
-            height: this.plotArea.height
+            height: this.plotArea.height + 2
         };
         
         this.coverUp.element
             .attr("x", 1) // uncover axis
+            .attr("y", -2) // plot stroke
             .attr("width", this.coverUp.width)
             .attr("height", this.coverUp.height + 2) // line stroke
             .style("fill", "white");
@@ -534,12 +586,12 @@ class LineChart extends React.Component {
     
     componentDidUpdate() {
         console.log("LineChart.componentDidUpdate");
-        console.log(this.props.date);
+        console.log(this.props);
 
         if(this.props.data !== undefined) {
-            if(this.plotArea.element.selectAll(".line").size() == 0) {
-                this.draw();
-            }
+            //if(this.plotArea.element.selectAll(".line").size() == 0) {
+            this.draw();
+            //}
         }
         
         if (this.props.data !== undefined && this.props.date !== undefined) {
@@ -591,6 +643,9 @@ class LineChart extends React.Component {
         );
         groupedData = Object.values(groupedData);
 
+        console.log("legend");
+        console.log(groupedData);
+
         this.layer0.element.selectAll(".line")
             .data(groupedData, d=>d.variable)
             .join("path")
@@ -606,8 +661,10 @@ class LineChart extends React.Component {
 
         let legendBlockWidth = 20;
         legendItems
+            .selectAll(".legend-block")
             .data(groupedData)
-            .append("rect")
+            .join("rect")
+            .attr("class", "legend-block")
             .attr("x", 10)
             .attr("y", (d,i)=>i * legendBlockWidth + 1)
             .attr("width", legendBlockWidth)
@@ -615,8 +672,11 @@ class LineChart extends React.Component {
             .style("fill", d=>this.props.colourScale(d.variable));
 
         legendItems
+            .selectAll(".legend-text")
             .data(groupedData)
-            .append("text")
+            .join("text")
+        //.append("text")
+            .attr("class", "legend-block")
             .attr("x", 10 + legendBlockWidth + 10)
             .attr("y", (d, i)=>i * legendBlockWidth + 1 + (legendBlockWidth / 2))
             .html(d=>d.variable)

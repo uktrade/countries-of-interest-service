@@ -586,6 +586,18 @@ def data_visualisation_data():
     df_country_ts = df_country_ts.groupby(['country', 'quarter']).size().reset_index()
     df_country_ts = df_country_ts.rename(columns={0: 'n_interests'})
 
+    # cumulative
+    if 'cumulative' in request.args:
+        df_quarters = pd.DataFrame(df_country_ts['quarter'].unique(), columns=['quarter'])
+        df_countries = pd.DataFrame(df_country_ts['country'].unique(), columns=['country'])
+        
+        df_quarters['on'] = 1
+        df_countries['on'] = 1
+        df_combo = pd.merge(df_quarters, df_countries, on='on').drop('on', axis=1)
+        df_country_ts = pd.merge(df_combo, df_country_ts, on=['country', 'quarter'], how='left')
+        df_country_ts = df_country_ts.fillna(0)
+        df_country_ts = df_country_ts.groupby(['country', 'quarter']).sum().groupby(level=[0]).cumsum().reset_index()
+
     output = {
         'top_countries': to_web_dict(df_top_countries)['results'],
         'interest_by_countries_and_quarter': to_web_dict(df_country_ts)['results'],
