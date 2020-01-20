@@ -1,0 +1,9 @@
+# manifest.yml
+---
+applications:
+-
+  buildpacks:
+    - python_buildpack
+    - nodejs_buildpack
+  memory: 4G
+  disk_quota: 4G
