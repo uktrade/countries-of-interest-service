@@ -2,7 +2,7 @@
 
 source ./scripts/functions.sh
 
-PARAMETERS="-m 2G -k 2G"
+PARAMETERS="-m 4G -k 3G"
 SYSTEM="-$1"
 
 if [ "$1" = "live" ]; then
