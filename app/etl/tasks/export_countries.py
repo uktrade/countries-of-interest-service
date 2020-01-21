@@ -6,7 +6,7 @@ from app.etl import ETLTask
 
 index = ('company_id',)
 
-sql = '''
+sql = f'''
 select
   company_id::text,
   case
@@ -19,24 +19,20 @@ select
     when s.standardised_country is not null then s.standardised_country
     else NULL
   end as standardised_country,
-  '{export_countries}' as source,
+  '{data_sources.datahub_export_countries}' as source,
   d.id::text as source_id,
   null::timestamp as timestamp
 
 from datahub_export_countries d
-  left join {countries_and_territories_register} c
+  left join {DITCountryTerritoryRegister.get_fq_table_name()} c
     on d.country_iso_alpha2_code = c.country_iso_alpha2_code
-  left join {standardised_countries} s
+  left join {StandardisedCountries.get_fq_table_name()} s
     on d.country = s.country
       and s.similarity > 90
 
 order by source, source_id
 
-'''.format(
-    export_countries=data_sources.datahub_export_countries,
-    countries_and_territories_register=DITCountryTerritoryRegister.__tablename__,
-    standardised_countries=StandardisedCountries.__tablename__,
-)
+'''
 
 table_fields = '''(
   company_id text,
@@ -64,5 +60,5 @@ class Task(ETLTask):
             table_fields=table_fields,
             table_name=table_name,
             *args,
-            **kwargs
+            **kwargs,
         )

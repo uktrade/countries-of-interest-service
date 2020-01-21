@@ -155,9 +155,26 @@ class InteractionsAnalysedInteractionIdLog(BaseModel):
 
 class StandardisedCountries(BaseModel):
     __tablename__ = 'standardised_countries'
-    __table_args__ = {'schema': 'public'}
+    __table_args__ = {'schema': 'algorithm'}
 
     id = _col(_int, primary_key=True)
     country = _col(_text)
     standardised_country = _col(_text)
     similarity = _col(_num)
+
+
+class ETLStatus(BaseModel):
+    __tablename__ = 'etl_status'
+    __table_args__ = {'schema': 'public'}
+
+    id = _col(_int, primary_key=True)
+    status = _col(_text)
+    timestamp = _col(_dt)
+
+
+class ETLRuns(BaseModel):
+    __tablename__ = 'etl_runs'
+    __table_args__ = {'schema': 'public'}
+
+    id = _col(_int, primary_key=True)
+    timestamp = _col(_dt)

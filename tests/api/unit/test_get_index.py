@@ -46,7 +46,8 @@ class TestPopulateDatabase:
         sql = 'select * from etl_status'
         rows = execute_query(sql, df=False)
         populate_database_task.delay.assert_called_once()
-        assert rows == [('RUNNING', datetime.datetime(2019, 1, 1, 1))]
+        assert rows[0][1] == 'RUNNING'
+        assert rows[0][2] == datetime.datetime(2019, 1, 1, 1)
 
     def test_if_force_update_rerun_task(self, populate_database_task):
         with self.app.test_request_context() as request:
@@ -57,12 +58,7 @@ class TestPopulateDatabase:
     def test_if_force_update_rerun_while_another_task_is_running(
         self, populate_database_task
     ):
-        sql = (
-            'create table if not exists etl_status ('
-            'status varchar(100), timestamp timestamp)'
-        )
-        execute_statement(sql)
-        sql = 'insert into etl_status values (%s, %s)'
+        sql = 'insert into etl_status (status, timestamp) values (%s, %s)'
         execute_statement(sql, data=['RUNNING', '2019-01-01 01:00'])
         with self.app.test_request_context() as request:
             request.request.args = {'force-update': ''}
@@ -70,24 +66,14 @@ class TestPopulateDatabase:
         populate_database_task.delay.assert_called_once()
 
     def test_does_not_rerun_while_another_task_is_running(self, populate_database_task):
-        sql = (
-            'create table if not exists etl_status ('
-            'status varchar(100), timestamp timestamp)'
-        )
-        execute_statement(sql)
-        sql = 'insert into etl_status values (%s, %s)'
+        sql = 'insert into etl_status (status, timestamp) values (%s, %s)'
         execute_statement(sql, data=['RUNNING', '2019-01-01 01:00'])
         with self.app.test_request_context():
             populate_database()
         populate_database_task.delay.assert_not_called()
 
     def test_reruns_task_if_last_was_succesful(self, populate_database_task):
-        sql = (
-            'create table if not exists etl_status ('
-            'status varchar(100), timestamp timestamp)'
-        )
-        execute_statement(sql)
-        sql = 'insert into etl_status values (%s, %s)'
+        sql = 'insert into etl_status (status, timestamp) values (%s, %s)'
         execute_statement(sql, data=['SUCCESS', '2019-01-01 01:00'])
         with self.app.test_request_context():
             populate_database()
@@ -103,9 +89,7 @@ class TestGetIndex:
     @patch('app.api.views.render_template')
     def test_last_updated_passed_to_template(self, render_template, is_authenticated):
         is_authenticated.return_value = True
-        sql = 'create table if not exists ' 'etl_runs (timestamp timestamp)'
-        execute_statement(sql)
-        sql = 'insert into etl_runs values (%s)'
+        sql = 'insert into etl_runs (timestamp) values (%s)'
         values = [
             ('2019-01-01 01:00',),
             ('2019-01-01 02:00',),

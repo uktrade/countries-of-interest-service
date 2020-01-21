@@ -133,7 +133,6 @@ def test_interaction_already_seen(add_objects, add_side_effect):
 
     expected_rows = [
         (
-            3,
             '52552367-436f-4a5d-84a2-dbf4ffeddb78',
             'China',
             'China',
@@ -145,7 +144,10 @@ def test_interaction_already_seen(add_objects, add_side_effect):
     ]
 
     assert rows_equal_query_results(
-        expected_rows, f'SELECT * FROM "{mapper.output_schema}"."{mapper.output_table}"'
+        expected_rows,
+        f'SELECT datahub_interaction_id,place,'
+        f'standardized_place,action,type,context,negation'
+        f' FROM "{mapper.output_schema}"."{mapper.output_table}"',
     )
 
     session = flask_app.db.session
