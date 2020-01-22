@@ -8,12 +8,12 @@ cmd_group = AppGroup('algorithm', help='Commands to run algorithm')
 
 
 @cmd_group.command('standardise_countries')
-@log('standardise countries to DIT reference dataset')
+@log.write('standardise countries to DIT reference dataset')
 def standardise_countries():
     standardise()
 
 
 @cmd_group.command('interaction_coi_extraction')
-@log('extract coi from datahub interactions')
+@log.write('extract coi from datahub interactions')
 def interaction_coi_extraction():
     analyse_interactions()

@@ -253,7 +253,7 @@ def _analyse_interaction(interaction_doc):
     return places
 
 
-@log('Step 1/1 - process interactions')
+@log.write('Step 1/1 - process interactions')
 def process_interactions(
     input_table, input_schema, log_table, output_schema, output_table, batch_size=1000
 ):
@@ -356,15 +356,11 @@ def process_interactions(
             connection.execute(sql, [[d, analysed_at] for d in datahub_interaction_ids])
             transaction.commit()
 
-        except Exception as err:
+        except Exception:
             exc_type, exc_value, exc_traceback = sys.exc_info()
-            print("error:")
-            traceback.print_tb(exc_traceback, file=sys.stdout)
-            # exc_type below is ignored on 3.5 and later
             traceback.print_exception(
                 exc_type, exc_value, exc_traceback, file=sys.stdout
             )
-            print(err)
             transaction.rollback()
         finally:
             connection.close()
