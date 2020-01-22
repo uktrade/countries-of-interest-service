@@ -251,13 +251,17 @@ class App extends React.Component {
         }
 
         let barRaceVariableSelector = (
-            <select
-              className="custom-select"
-              onChange={(e)=>this.setBarRaceVariable(e.target.value)}
-            >
-              <option value="nInterests" selected>nInterests</option>
-              <option value="shareOfInterest">shareOfInterest</option>
-            </select>
+            <div className="form-group row">
+              <label className="col-md-3 col-form-label text-right">Bar Race Variable</label>
+              <select
+                className="custom-select col-md-9"
+                onChange={(e)=>this.setBarRaceVariable(e.target.value)}
+              >
+                <option value="nInterests" selected>nInterests</option>
+                <option value="shareOfInterest">shareOfInterest</option>
+              </select>
+              
+            </div>
         );
         
         return (

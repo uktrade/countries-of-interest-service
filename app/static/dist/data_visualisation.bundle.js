@@ -400,8 +400,12 @@ function (_React$Component) {
         }));
       }
 
-      var barRaceVariableSelector = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("select", {
-        className: "custom-select",
+      var barRaceVariableSelector = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "form-group row"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", {
+        className: "col-md-3 col-form-label text-right"
+      }, "Bar Race Variable"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("select", {
+        className: "custom-select col-md-9",
         onChange: function onChange(e) {
           return _this4.setBarRaceVariable(e.target.value);
         }
@@ -410,7 +414,7 @@ function (_React$Component) {
         selected: true
       }, "nInterests"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("option", {
         value: "shareOfInterest"
-      }, "shareOfInterest"));
+      }, "shareOfInterest")));
       return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, charts, slider, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, this.state.date ? this.state.date.toLocaleDateString() : ""), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         className: "btn btn-primary",
         onClick: this.togglePlaying,
