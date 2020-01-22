@@ -521,11 +521,7 @@ def populate_database():
     tasks = []
     if 'tasks' in request.args:
         tasks = request.args['tasks'].split(',')
-    sql = (
-        'create table if not exists etl_status '
-        '(status varchar(100), timestamp timestamp)'
-    )
-    execute_statement(sql)
+
     sql = 'select * from etl_status'
 
     df = execute_query(sql)
@@ -533,7 +529,7 @@ def populate_database():
         populate_database_task.delay(drop_table, extractors, tasks)
         sql = 'delete from etl_status'
         execute_statement(sql)
-        sql = '''insert into etl_status values (%s, %s)'''
+        sql = '''insert into etl_status (status, timestamp) values (%s, %s)'''
         execute_statement(sql, data=['RUNNING', datetime.datetime.now()])
         return flask_app.make_response(
             {'status': 200, 'message': 'started populate_database task'}
@@ -588,15 +584,27 @@ def data_visualisation_data():
 
     # cumulative
     if 'cumulative' in request.args:
-        df_quarters = pd.DataFrame(df_country_ts['quarter'].unique(), columns=['quarter'])
-        df_countries = pd.DataFrame(df_country_ts['country'].unique(), columns=['country'])
-        
+        df_quarters = pd.DataFrame(
+            df_country_ts['quarter'].unique(), columns=['quarter']
+        )
+        df_countries = pd.DataFrame(
+            df_country_ts['country'].unique(), columns=['country']
+        )
+
         df_quarters['on'] = 1
         df_countries['on'] = 1
         df_combo = pd.merge(df_quarters, df_countries, on='on').drop('on', axis=1)
-        df_country_ts = pd.merge(df_combo, df_country_ts, on=['country', 'quarter'], how='left')
+        df_country_ts = pd.merge(
+            df_combo, df_country_ts, on=['country', 'quarter'], how='left'
+        )
         df_country_ts = df_country_ts.fillna(0)
-        df_country_ts = df_country_ts.groupby(['country', 'quarter']).sum().groupby(level=[0]).cumsum().reset_index()
+        df_country_ts = (
+            df_country_ts.groupby(['country', 'quarter'])
+            .sum()
+            .groupby(level=[0])
+            .cumsum()
+            .reset_index()
+        )
 
     output = {
         'top_countries': to_web_dict(df_top_countries)['results'],

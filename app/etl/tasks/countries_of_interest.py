@@ -5,7 +5,7 @@ from app.etl import ETLTask
 
 index = ('company_id',)
 
-sql = '''
+sql = f'''
 with omis_countries_of_interest as (
   select
     company_id::text,
@@ -15,14 +15,14 @@ with omis_countries_of_interest as (
       when s.standardised_country is not null then s.standardised_country
       else NULL
     end as standardised_country,
-    '{omis}' as source,
+    '{data_sources.omis}' as source,
     d.datahub_omis_order_id::text as source_id,
     created_date as timestamp
 
   from datahub_omis d
-    left join {countries_and_territories_register} c
+    left join {DITCountryTerritoryRegister.get_fq_table_name()} c
       on market = c.country_iso_alpha2_code
-    left join {standardised_countries} s
+    left join {StandardisedCountries.get_fq_table_name()} s
       on market = s.country
         and similarity > 90
 
@@ -39,14 +39,14 @@ with omis_countries_of_interest as (
       when s.standardised_country is not null then s.standardised_country
       else NULL
     end as standardised_country,
-    '{future_interest}' as source,
+    '{data_sources.datahub_future_interest_countries}' as source,
     d.id::text as source_id,
     null::timestamp as timestamp
 
   from datahub_future_interest_countries d
-    left join {countries_and_territories_register} c
+    left join {DITCountryTerritoryRegister.get_fq_table_name()} c
       on d.country_iso_alpha2_code = c.country_iso_alpha2_code
-    left join {standardised_countries} s
+    left join {StandardisedCountries.get_fq_table_name()} s
       on d.country = s.country
         and similarity > 90
 
@@ -65,12 +65,7 @@ with omis_countries_of_interest as (
 
 select * from results
 
-'''.format(
-    omis=data_sources.omis,
-    future_interest=data_sources.datahub_future_interest_countries,
-    countries_and_territories_register=DITCountryTerritoryRegister.__tablename__,
-    standardised_countries=StandardisedCountries.__tablename__,
-)
+'''
 
 table_fields = '''(
     company_id text,
@@ -98,5 +93,5 @@ class Task(ETLTask):
             table_fields=table_fields,
             table_name=table_name,
             *args,
-            **kwargs
+            **kwargs,
         )

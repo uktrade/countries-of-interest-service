@@ -202,17 +202,16 @@ class TestPopulateDatabase:
     ):
         mock_datetime.datetime.now.return_value = datetime.datetime(2019, 1, 1, 2)
         sql = (
-            'create table if not exists etl_status ('
-            'status varchar(100), timestamp timestamp)'
+            "insert into etl_status (status, timestamp) values"
+            "('RUNNING', '2019-01-01 01:00')"
         )
-        execute_statement(sql)
-        sql = "insert into etl_status values" "('RUNNING', '2019-01-01 01:00')"
         execute_statement(sql)
         populate_database(True, [], [])
         sql = 'select * from etl_status'
         rows = execute_query(sql, df=False)
         assert len(rows) == 1
-        assert rows == [('SUCCESS', datetime.datetime(2019, 1, 1, 2))]
+        assert rows[0][1] == 'SUCCESS'
+        assert rows[0][2] == datetime.datetime(2019, 1, 1, 2)
 
         extract_countries_and_territories_reference_dataset.assert_called_once()
         extract_datahub_company_dataset.assert_called_once()

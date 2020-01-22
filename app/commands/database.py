@@ -1,7 +1,6 @@
 import click
 from flask.cli import AppGroup
 
-
 from app.etl.tasks.pipeline import EXTRACTORS, TASKS
 
 cmd_group = AppGroup('database', help='Commands to extract data from external sources')

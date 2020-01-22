@@ -23,14 +23,16 @@ class App extends React.Component {
     constructor(props){
         super(props);
         this.state = {
+	    barRaceVariable: "nInterests", //"shareOfInterest",
 	    cumulative: true,
             intervals: [],
             playing: false,
-            variable: "country"
+            category: "country"
         };
 
         this.play = this.play.bind(this);
 	this.setCumulative = this.setCumulative.bind(this);
+	this.setBarRaceVariable = this.setBarRaceVariable.bind(this);
         this.setData = this.setData.bind(this);
         this.setDate = this.setDate.bind(this);
         this.setNextDate = this.setNextDate.bind(this);
@@ -56,6 +58,10 @@ class App extends React.Component {
         return window.setInterval(this.setNextDate, 1000);
     }
 
+    setBarRaceVariable(variable) {
+	this.setState({barRaceVariable: variable});
+    }
+    
     setCumulative(cumulative) {
 	this.setState({cumulative: cumulative});
     }
@@ -195,7 +201,7 @@ class App extends React.Component {
         }
 
         let charts = "";
-        if(this.state.variable === "country") {
+        if(this.state.category === "country") {
             let id="country";
             let data = this.state.data !== undefined ?
                 this.state.data["interest_by_countries_and_quarter"] :
@@ -215,6 +221,7 @@ class App extends React.Component {
                            undefined}
                   />
                   <CountryBarRace
+		    barRaceVariable={this.state.barRaceVariable}
                     id="country"
                     data={data}
                     date={date}
@@ -223,11 +230,12 @@ class App extends React.Component {
                 </div>
             );
 
-        } else if (this.state.variable == "sector") {
+        } else if (this.state.category == "sector") {
             charts = (
                 <div>
                   <SectorLineChart />
                   <SectorBarRace
+                    barRaceVarible={this.state.barRaceVariable}
                     id="country"
                     data={
                         this.state.data !== undefined ?
@@ -242,6 +250,15 @@ class App extends React.Component {
             
         }
 
+        let barRaceVariableSelector = (
+            <select
+              className="custom-select"
+              onChange={(e)=>this.setBarRaceVariable(e.target.value)}
+            >
+              <option value="nInterests" selected>nInterests</option>
+              <option value="shareOfInterest">shareOfInterest</option>
+            </select>
+        );
         
         return (
 	    <div>
@@ -266,6 +283,7 @@ class App extends React.Component {
                   <span style={{paddingLeft: 10}} >Cumulative</span>
                 </label>
               </div>
+              {barRaceVariableSelector}
 
 	      
             </div>
@@ -284,7 +302,7 @@ class BarRace extends React.Component {
     componentDidMount() {
         console.log("BarRace.componentDidMount");
         this.container = {
-            element: d3.select(`#${this.variable}`),
+            element: d3.select(`#${this.category}`),
             height: 300,
         };
 
@@ -352,6 +370,7 @@ class BarRace extends React.Component {
     
     draw() {
         console.log("BarRace.draw()");
+        console.log(this.props.barRaceVariable);
         let data = this.props.data;
         let nTopRanks = 10;
         let ranks = [];
@@ -380,29 +399,32 @@ class BarRace extends React.Component {
         }
         dataNormalised = dataNormalised.filter(d=>d.rank <= nTopRanks);
 
-        let maxShareOfInterest = d3.max(dataNormalised, d=>d.shareOfInterest);
+        let maxShareOfInterest = d3.max(dataNormalised, d=>d[this.props.barRaceVariable]);
 
         this.xAxis.scale.domain([0, maxShareOfInterest]);
         this.yAxis.scale.domain(ranks);
         this.xAxis.element
             .transition()
             .call(
-                d3.axisTop(this.xAxis.scale)
+                this.props.barRaceVariable === "shareOfInterest" ? 
+                    d3.axisTop(this.xAxis.scale)
                     .tickFormat(d=>`${parseInt(10000*d)/100} %`)
+                    :
+                    d3.axisTop(this.xAxis.scale)
             );
         this.yAxis.element.transition().call(d3.axisLeft(this.yAxis.scale));
         
         let selection = this.plotArea.element.selectAll(".bar")
-            .data(dataNormalised, d=>d[this.variable]);
+            .data(dataNormalised, d=>d[this.category]);
 
         selection.enter()
             .append("rect")
             .attr("class", "bar")
-            .attr("width", d=>this.xAxis.scale(d.shareOfInterest))
+            .attr("width", d=>this.xAxis.scale(d[this.props.barRaceVariable]))
             .attr("height", this.yAxis.scale.bandwidth() - 1)
             .attr("x", 0)
             .attr("y", this.canvas.height)
-            .style("fill", d=>this.props.colourScale(d[this.variable]))
+            .style("fill", d=>this.props.colourScale(d[this.category]))
             .attr("rx", 3)
             .transition()
             .duration(1000)
@@ -411,7 +433,7 @@ class BarRace extends React.Component {
         selection
             .transition()
             .duration(1000)
-            .attr("width", d=>this.xAxis.scale(d.shareOfInterest))
+            .attr("width", d=>this.xAxis.scale(d[this.props.barRaceVariable]))
             .attr("y", d=>d.rank > nTopRanks ? this.container.height : this.yAxis.scale(d.rank));
 
         
@@ -422,17 +444,17 @@ class BarRace extends React.Component {
             .remove();
 
 
-        selection = this.plotArea.element.selectAll(`.${this.variable}-tag`)
-            .data(dataNormalised, d=>d[this.variable]);
+        selection = this.plotArea.element.selectAll(`.${this.category}-tag`)
+            .data(dataNormalised, d=>d[this.category]);
 
         selection.enter()
             .append("text")
-            .attr("class", `${this.variable}-tag`)
+            .attr("class", `${this.category}-tag`)
             .attr("x", this.plotArea.width)
             .attr("y", d=>this.canvas.height)
             .attr("text-anchor", "end")
             .attr("dominant-baseline", "middle")
-            .html(d=>d.shareOfInterest === 0 ? "" : d[this.variable])
+            .html(d=>d[this.props.barRaceVariable] === 0 ? "" : d[this.category])
             .transition()
             .duration(1000)
             .attr(
@@ -447,7 +469,7 @@ class BarRace extends React.Component {
             );
 
         selection
-            .html(d=>d.shareOfInterest === 0 ? "" : d[this.variable])
+            .html(d=>d[this.props.barRaceVariable] === 0 ? "" : d[this.category])
             .transition()
             .duration(1000)
             .attr(
@@ -472,8 +494,9 @@ class BarRace extends React.Component {
     render() {
 
         console.log("BarRace.render()");
+	console.log(this.props.barRaceVariable);
         return (
-            <div className="container bar-race" id={`${this.variable}`}>
+            <div className="container bar-race" id={`${this.category}`}>
               <svg className="canvas">
                 <g className="plot-area">
                   <g className="x-axis"></g>
@@ -498,7 +521,7 @@ class LineChart extends React.Component {
     componentDidMount() {
         console.log("LineChart.componentDidMount");
         this.container = {
-            element: d3.select(`#${this.variable}-line-chart`),
+            element: d3.select(`#${this.category}-line-chart`),
             height: 300,
         };
 
@@ -606,9 +629,9 @@ class LineChart extends React.Component {
     draw() {
         console.log("LineChart.draw()");
         let data = this.props.data;
-        let top10 = this.props.topCategories.map(d=>d[this.variable]);
+        let top10 = this.props.topCategories.map(d=>d[this.category]);
         top10 = top10.splice(0, 10);
-        data = data.filter(d=>top10.indexOf(d[this.variable]) != -1);
+        data = data.filter(d=>top10.indexOf(d[this.category]) != -1);
 
         let startDate = d3.min(data, d=>d.quarter);
         let endDate = d3.max(data, d=>d.quarter);
@@ -628,30 +651,30 @@ class LineChart extends React.Component {
 
         let groupedData = data.reduce(
             (acc, d) => {
-                if(acc[[d[this.variable]]] === undefined) {
-                    acc[[d[this.variable]]] = {
-                        variable: d[this.variable],
+                if(acc[[d[this.category]]] === undefined) {
+                    acc[[d[this.category]]] = {
+                        category: d[this.category],
                         values: []
                     };                    
                 }
-                acc[[d[this.variable]]].values.push(d);
+                acc[[d[this.category]]].values.push(d);
                 return acc;
             },
             {}
         );
         groupedData = Object.values(groupedData);
-        groupedData.sort((a, b)=>a.variable > b.variable ? 1 : -1);
+        groupedData.sort((a, b)=>a.category > b.category ? 1 : -1);
 
         this.layer0.element.selectAll(".line")
-            .data(groupedData, d=>d.variable)
+            .data(groupedData, d=>d.category)
             .join("path")
             .attr("class", "line")
             .attr("d", d=>plotLine(d.values))
-            .style("stroke", d=>this.props.colourScale(d.variable));
+            .style("stroke", d=>this.props.colourScale(d.category));
 
 
         let legendItems = this.legend.element.selectAll(".legend-item")
-            .data(groupedData, d=>d[this.variable])
+            .data(groupedData, d=>d[this.category])
             .join("g")
             .attr("class", "legend-item");
 
@@ -665,7 +688,7 @@ class LineChart extends React.Component {
             .attr("rx", 3)        
             .attr("width", legendBlockWidth - 2)
             .attr("height", legendBlockWidth - 2)
-            .style("fill", d=>this.props.colourScale(d.variable));
+            .style("fill", d=>this.props.colourScale(d.category));
 
         legendItems
             .data(groupedData)
@@ -673,7 +696,7 @@ class LineChart extends React.Component {
             .attr("class", "legend-block")
             .attr("x", 10 + legendBlockWidth + 10)
             .attr("y", (d, i)=>i * legendBlockWidth + 1 + (legendBlockWidth / 2))
-            .html(d=>d.variable)
+            .html(d=>d.category)
             .attr("text-anchor", "start")
             .attr("dominant-baseline", "middle");
         
@@ -682,7 +705,7 @@ class LineChart extends React.Component {
     render() {
         console.log("Line.render()");
         return (
-            <div className="container line-chart" id={`${this.variable}-line-chart`}>
+            <div className="container line-chart" id={`${this.category}-line-chart`}>
             <svg className="canvas">
               <g className="plot-area">
                 <g className="layer-0"></g>            
@@ -702,7 +725,7 @@ class CountryBarRace extends BarRace {
 
     constructor(props) {
         super(props);
-        this.variable = "country";
+        this.category = "country";
     }
     
 }
@@ -711,7 +734,7 @@ class SectorBarRace extends BarRace {
 
     constructor(props) {
         super(props);
-        this.variable = "sector";
+        this.category = "sector";
     }
     
 }
@@ -720,7 +743,7 @@ class CountryLineChart extends LineChart {
 
     constructor(props) {
         super(props);
-        this.variable = "country";
+        this.category = "country";
     }
 
     
@@ -730,7 +753,7 @@ class SectorLineChart extends LineChart {
 
     constructor(props) {
         super(props);
-        this.variable = "sector";
+        this.category = "sector";
     }
     
 }

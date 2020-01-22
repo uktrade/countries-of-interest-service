@@ -172,13 +172,16 @@ function (_React$Component) {
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(App).call(this, props));
     _this.state = {
+      barRaceVariable: "nInterests",
+      //"shareOfInterest",
       cumulative: true,
       intervals: [],
       playing: false,
-      variable: "country"
+      category: "country"
     };
     _this.play = _this.play.bind(_assertThisInitialized(_this));
     _this.setCumulative = _this.setCumulative.bind(_assertThisInitialized(_this));
+    _this.setBarRaceVariable = _this.setBarRaceVariable.bind(_assertThisInitialized(_this));
     _this.setData = _this.setData.bind(_assertThisInitialized(_this));
     _this.setDate = _this.setDate.bind(_assertThisInitialized(_this));
     _this.setNextDate = _this.setNextDate.bind(_assertThisInitialized(_this));
@@ -212,6 +215,13 @@ function (_React$Component) {
     value: function play() {
       console.log("App.play");
       return window.setInterval(this.setNextDate, 1000);
+    }
+  }, {
+    key: "setBarRaceVariable",
+    value: function setBarRaceVariable(variable) {
+      this.setState({
+        barRaceVariable: variable
+      });
     }
   }, {
     key: "setCumulative",
@@ -362,7 +372,7 @@ function (_React$Component) {
 
       var charts = "";
 
-      if (this.state.variable === "country") {
+      if (this.state.category === "country") {
         var id = "country";
         var data = this.state.data !== undefined ? this.state.data["interest_by_countries_and_quarter"] : undefined;
         var date = this.state.date;
@@ -374,13 +384,15 @@ function (_React$Component) {
           colourScale: colourScale,
           topCategories: this.state.data !== undefined ? this.state.data["top_countries"] : undefined
         }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(CountryBarRace, {
+          barRaceVariable: this.state.barRaceVariable,
           id: "country",
           data: data,
           date: date,
           colourScale: colourScale
         }));
-      } else if (this.state.variable == "sector") {
+      } else if (this.state.category == "sector") {
         charts = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(SectorLineChart, null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(SectorBarRace, {
+          barRaceVarible: this.state.barRaceVariable,
           id: "country",
           data: this.state.data !== undefined ? this.state.data["interest_by_countries_and_quarter"] : undefined,
           date: this.state.date,
@@ -388,6 +400,17 @@ function (_React$Component) {
         }));
       }
 
+      var barRaceVariableSelector = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("select", {
+        className: "custom-select",
+        onChange: function onChange(e) {
+          return _this4.setBarRaceVariable(e.target.value);
+        }
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("option", {
+        value: "nInterests",
+        selected: true
+      }, "nInterests"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("option", {
+        value: "shareOfInterest"
+      }, "shareOfInterest"));
       return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, charts, slider, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, this.state.date ? this.state.date.toLocaleDateString() : ""), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         className: "btn btn-primary",
         onClick: this.togglePlaying,
@@ -408,7 +431,7 @@ function (_React$Component) {
         style: {
           paddingLeft: 10
         }
-      }, "Cumulative"))));
+      }, "Cumulative"))), barRaceVariableSelector);
     }
   }]);
 
@@ -435,7 +458,7 @@ function (_React$Component2) {
     value: function componentDidMount() {
       console.log("BarRace.componentDidMount");
       this.container = {
-        element: d3__WEBPACK_IMPORTED_MODULE_2__["select"]("#".concat(this.variable)),
+        element: d3__WEBPACK_IMPORTED_MODULE_2__["select"]("#".concat(this.category)),
         height: 300
       };
       this.container.width = parseInt(this.container.element.style("width"), 10);
@@ -495,6 +518,7 @@ function (_React$Component2) {
       var _this6 = this;
 
       console.log("BarRace.draw()");
+      console.log(this.props.barRaceVariable);
       var data = this.props.data;
       var nTopRanks = 10;
       var ranks = [];
@@ -528,37 +552,37 @@ function (_React$Component2) {
         return d.rank <= nTopRanks;
       });
       var maxShareOfInterest = d3__WEBPACK_IMPORTED_MODULE_2__["max"](dataNormalised, function (d) {
-        return d.shareOfInterest;
+        return d[_this6.props.barRaceVariable];
       });
       this.xAxis.scale.domain([0, maxShareOfInterest]);
       this.yAxis.scale.domain(ranks);
-      this.xAxis.element.transition().call(d3__WEBPACK_IMPORTED_MODULE_2__["axisTop"](this.xAxis.scale).tickFormat(function (d) {
+      this.xAxis.element.transition().call(this.props.barRaceVariable === "shareOfInterest" ? d3__WEBPACK_IMPORTED_MODULE_2__["axisTop"](this.xAxis.scale).tickFormat(function (d) {
         return "".concat(parseInt(10000 * d) / 100, " %");
-      }));
+      }) : d3__WEBPACK_IMPORTED_MODULE_2__["axisTop"](this.xAxis.scale));
       this.yAxis.element.transition().call(d3__WEBPACK_IMPORTED_MODULE_2__["axisLeft"](this.yAxis.scale));
       var selection = this.plotArea.element.selectAll(".bar").data(dataNormalised, function (d) {
-        return d[_this6.variable];
+        return d[_this6.category];
       });
       selection.enter().append("rect").attr("class", "bar").attr("width", function (d) {
-        return _this6.xAxis.scale(d.shareOfInterest);
+        return _this6.xAxis.scale(d[_this6.props.barRaceVariable]);
       }).attr("height", this.yAxis.scale.bandwidth() - 1).attr("x", 0).attr("y", this.canvas.height).style("fill", function (d) {
-        return _this6.props.colourScale(d[_this6.variable]);
+        return _this6.props.colourScale(d[_this6.category]);
       }).attr("rx", 3).transition().duration(1000).attr("y", function (d) {
         return d.rank > nTopRanks ? _this6.container.height : _this6.yAxis.scale(d.rank);
       });
       selection.transition().duration(1000).attr("width", function (d) {
-        return _this6.xAxis.scale(d.shareOfInterest);
+        return _this6.xAxis.scale(d[_this6.props.barRaceVariable]);
       }).attr("y", function (d) {
         return d.rank > nTopRanks ? _this6.container.height : _this6.yAxis.scale(d.rank);
       });
       selection.exit().transition().duration(1000).attr("y", this.container.height).remove();
-      selection = this.plotArea.element.selectAll(".".concat(this.variable, "-tag")).data(dataNormalised, function (d) {
-        return d[_this6.variable];
+      selection = this.plotArea.element.selectAll(".".concat(this.category, "-tag")).data(dataNormalised, function (d) {
+        return d[_this6.category];
       });
-      selection.enter().append("text").attr("class", "".concat(this.variable, "-tag")).attr("x", this.plotArea.width).attr("y", function (d) {
+      selection.enter().append("text").attr("class", "".concat(this.category, "-tag")).attr("x", this.plotArea.width).attr("y", function (d) {
         return _this6.canvas.height;
       }).attr("text-anchor", "end").attr("dominant-baseline", "middle").html(function (d) {
-        return d.shareOfInterest === 0 ? "" : d[_this6.variable];
+        return d[_this6.props.barRaceVariable] === 0 ? "" : d[_this6.category];
       }).transition().duration(1000).attr("y", function (d) {
         if (d.rank > 10) {
           return _this6.canvas.height;
@@ -567,7 +591,7 @@ function (_React$Component2) {
         }
       });
       selection.html(function (d) {
-        return d.shareOfInterest === 0 ? "" : d[_this6.variable];
+        return d[_this6.props.barRaceVariable] === 0 ? "" : d[_this6.category];
       }).transition().duration(1000).attr("y", function (d) {
         if (d.rank > 10) {
           return _this6.canvas.height;
@@ -581,9 +605,10 @@ function (_React$Component2) {
     key: "render",
     value: function render() {
       console.log("BarRace.render()");
+      console.log(this.props.barRaceVariable);
       return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "container bar-race",
-        id: "".concat(this.variable)
+        id: "".concat(this.category)
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("svg", {
         className: "canvas"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("g", {
@@ -621,7 +646,7 @@ function (_React$Component3) {
     value: function componentDidMount() {
       console.log("LineChart.componentDidMount");
       this.container = {
-        element: d3__WEBPACK_IMPORTED_MODULE_2__["select"]("#".concat(this.variable, "-line-chart")),
+        element: d3__WEBPACK_IMPORTED_MODULE_2__["select"]("#".concat(this.category, "-line-chart")),
         height: 300
       };
       this.container.width = parseInt(this.container.element.style("width"), 10);
@@ -708,11 +733,11 @@ function (_React$Component3) {
       console.log("LineChart.draw()");
       var data = this.props.data;
       var top10 = this.props.topCategories.map(function (d) {
-        return d[_this8.variable];
+        return d[_this8.category];
       });
       top10 = top10.splice(0, 10);
       data = data.filter(function (d) {
-        return top10.indexOf(d[_this8.variable]) != -1;
+        return top10.indexOf(d[_this8.category]) != -1;
       });
       var startDate = d3__WEBPACK_IMPORTED_MODULE_2__["min"](data, function (d) {
         return d.quarter;
@@ -736,40 +761,40 @@ function (_React$Component3) {
         return _this8.yAxis.scale(d.nInterests);
       }).curve(d3__WEBPACK_IMPORTED_MODULE_2__["curveMonotoneX"]);
       var groupedData = data.reduce(function (acc, d) {
-        if (acc[[d[_this8.variable]]] === undefined) {
-          acc[[d[_this8.variable]]] = {
-            variable: d[_this8.variable],
+        if (acc[[d[_this8.category]]] === undefined) {
+          acc[[d[_this8.category]]] = {
+            category: d[_this8.category],
             values: []
           };
         }
 
-        acc[[d[_this8.variable]]].values.push(d);
+        acc[[d[_this8.category]]].values.push(d);
         return acc;
       }, {});
       groupedData = Object.values(groupedData);
       groupedData.sort(function (a, b) {
-        return a.variable > b.variable ? 1 : -1;
+        return a.category > b.category ? 1 : -1;
       });
       this.layer0.element.selectAll(".line").data(groupedData, function (d) {
-        return d.variable;
+        return d.category;
       }).join("path").attr("class", "line").attr("d", function (d) {
         return plotLine(d.values);
       }).style("stroke", function (d) {
-        return _this8.props.colourScale(d.variable);
+        return _this8.props.colourScale(d.category);
       });
       var legendItems = this.legend.element.selectAll(".legend-item").data(groupedData, function (d) {
-        return d[_this8.variable];
+        return d[_this8.category];
       }).join("g").attr("class", "legend-item");
       var legendBlockWidth = 20;
       legendItems.data(groupedData).append("rect").attr("class", "legend-block").attr("x", 10).attr("y", function (d, i) {
         return i * legendBlockWidth + 1;
       }).attr("rx", 3).attr("width", legendBlockWidth - 2).attr("height", legendBlockWidth - 2).style("fill", function (d) {
-        return _this8.props.colourScale(d.variable);
+        return _this8.props.colourScale(d.category);
       });
       legendItems.data(groupedData).append("text").attr("class", "legend-block").attr("x", 10 + legendBlockWidth + 10).attr("y", function (d, i) {
         return i * legendBlockWidth + 1 + legendBlockWidth / 2;
       }).html(function (d) {
-        return d.variable;
+        return d.category;
       }).attr("text-anchor", "start").attr("dominant-baseline", "middle");
     }
   }, {
@@ -778,7 +803,7 @@ function (_React$Component3) {
       console.log("Line.render()");
       return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "container line-chart",
-        id: "".concat(this.variable, "-line-chart")
+        id: "".concat(this.category, "-line-chart")
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("svg", {
         className: "canvas"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("g", {
@@ -813,7 +838,7 @@ function (_BarRace) {
     _classCallCheck(this, CountryBarRace);
 
     _this9 = _possibleConstructorReturn(this, _getPrototypeOf(CountryBarRace).call(this, props));
-    _this9.variable = "country";
+    _this9.category = "country";
     return _this9;
   }
 
@@ -831,7 +856,7 @@ function (_BarRace2) {
     _classCallCheck(this, SectorBarRace);
 
     _this10 = _possibleConstructorReturn(this, _getPrototypeOf(SectorBarRace).call(this, props));
-    _this10.variable = "sector";
+    _this10.category = "sector";
     return _this10;
   }
 
@@ -849,7 +874,7 @@ function (_LineChart) {
     _classCallCheck(this, CountryLineChart);
 
     _this11 = _possibleConstructorReturn(this, _getPrototypeOf(CountryLineChart).call(this, props));
-    _this11.variable = "country";
+    _this11.category = "country";
     return _this11;
   }
 
@@ -867,7 +892,7 @@ function (_LineChart2) {
     _classCallCheck(this, SectorLineChart);
 
     _this12 = _possibleConstructorReturn(this, _getPrototypeOf(SectorLineChart).call(this, props));
-    _this12.variable = "sector";
+    _this12.category = "sector";
     return _this12;
   }
 

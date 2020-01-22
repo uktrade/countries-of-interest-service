@@ -1,0 +1,7 @@
+# manifest.yml
+---
+applications:
+-
+  buildpacks:
+    - python_buildpack
+    - nodejs_buildpack

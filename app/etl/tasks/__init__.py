@@ -51,14 +51,13 @@ def populate_database(drop_table, extractors, tasks):
                 output = output + [
                     {'table': task.table_name, 'status': 500, 'error': str(e)}
                 ]
-    sql = 'create table if not exists etl_runs (timestamp timestamp)'
-    execute_statement(sql)
-    sql = 'insert into etl_runs values (%s)'
+
+    sql = 'insert into etl_runs (timestamp) values (%s)'
     ts_finish = datetime.datetime.now()
     execute_statement(sql, [ts_finish])
     sql = 'delete from etl_status'
     execute_statement(sql)
-    sql = '''insert into etl_status values (%s, %s)'''
+    sql = '''insert into etl_status (status, timestamp) values (%s, %s)'''
     execute_statement(sql, ['SUCCESS', ts_finish])
 
     output = {'output': output}
