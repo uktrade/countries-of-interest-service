@@ -9,7 +9,7 @@ from app.db.models.external import DITCountryTerritoryRegister
 from app.utils import log
 
 
-@log('Step 1/2 - extract all market interested/exported country sources')
+@log.write('Step 1/2 - extract all market interested/exported country sources')
 def extract_interested_exported_countries():
     stmt = f"""
     with countries as (
@@ -33,7 +33,7 @@ def extract_interested_exported_countries():
     return countries
 
 
-@log('Step 2/2 - create standardised country table')
+@log.write('Step 2/2 - create standardised country table')
 def create_standardised_interested_exported_country_table(
     countries, output_schema, output_table
 ):
