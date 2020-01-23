@@ -552,6 +552,7 @@ def data_visualisation_data():
 
     df = pd.read_csv(f'{os.getcwd()}/data/coi_combined_view.csv')
     df = pd.DataFrame(df[:-1])
+    df = df[df.standardised_country != 'United Kingdom']
     df = df[df['timestamp'].notnull()]
     df['country'] = df['standardised_country']
     df['timestamp'] = pd.to_datetime(df['timestamp'])
