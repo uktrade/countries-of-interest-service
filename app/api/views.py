@@ -4,8 +4,8 @@ from functools import wraps
 
 import pandas as pd
 import redis
-from flask import current_app as flask_app, make_response
-from flask import jsonify, render_template, request
+from flask import current_app as flask_app
+from flask import jsonify, make_response, render_template, request
 from flask.blueprints import Blueprint
 from werkzeug.exceptions import BadRequest, NotFound, Unauthorized
 

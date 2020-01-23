@@ -60,6 +60,10 @@ class MentionedInInteractions(BaseModel):
 
     __table_args__ = ({'schema': 'public'},)
 
+    @property
+    def exporter_status(self):
+        return 'mentioned'
+
 
 class CountriesAndSectorsOfInterest(BaseModel):
 
@@ -78,6 +82,10 @@ class CountriesAndSectorsOfInterest(BaseModel):
         {'schema': 'public'},
     )
 
+    @property
+    def exporter_status(self):
+        return 'interested'
+
 
 class CountriesOfInterest(BaseModel):
 
@@ -94,6 +102,10 @@ class CountriesOfInterest(BaseModel):
         PrimaryKeyConstraint(source, source_id),
         {'schema': 'public'},
     )
+
+    @property
+    def exporter_status(self):
+        return 'interested'
 
 
 class ExportCountries(BaseModel):
@@ -112,6 +124,10 @@ class ExportCountries(BaseModel):
         {'schema': 'public'},
     )
 
+    @property
+    def exporter_status(self):
+        return 'exporting'
+
 
 class SectorsOfInterest(BaseModel):
 
@@ -127,6 +143,10 @@ class SectorsOfInterest(BaseModel):
         PrimaryKeyConstraint(source, source_id),
         {'schema': 'public'},
     )
+
+    @property
+    def exporter_status(self):
+        return 'interested'
 
 
 class InteractionsAnalysed(BaseModel):

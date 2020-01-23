@@ -5,7 +5,7 @@ from functools import wraps
 process_depth = -1
 
 
-def log(description):
+def write(description):
     def dec(f):
         @wraps(f)
         def outer(*args, **kwargs):

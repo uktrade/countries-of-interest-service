@@ -19,7 +19,7 @@ def analyse_interactions():
 
 
 class InteractionAnalyser:
-    @log('extracting coi from interactions')
+    @log.write('extracting coi from interactions')
     def analyse(self):
         process_interactions(
             input_table,

@@ -8,6 +8,7 @@ from sqlalchemy.engine.url import make_url
 
 from app import config
 from app.commands.algorithm import cmd_group as algorithm_cmd
+from app.commands.csv import cmd_group as csv_cmd
 from app.commands.database import cmd_group as database_cmd
 from app.commands.dev import cmd_group as dev_cmd
 from app.sso.register import register_sso_component
@@ -61,6 +62,7 @@ def _create_base_app():
     flask_app.cli.add_command(dev_cmd)
     flask_app.cli.add_command(algorithm_cmd)
     flask_app.cli.add_command(database_cmd)
+    flask_app.cli.add_command(csv_cmd)
 
     postgres_db_config = (
         os.environ.get('DATABASE_URL')
