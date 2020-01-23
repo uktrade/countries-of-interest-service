@@ -11,13 +11,17 @@ class App extends React.Component {
 
 
     componentDidMount() {
-	let url = "/data-visualisation-data";
+	let url = "/data-visualisation-data?";
 	if(this.state.cumulative == true) {
-	    url = url + "?cumulative";
+	    url = url + "cumulative=1&";
 	}
-        axios.get(url)
-            .then(response => this.setData(response.data))
-            .catch(response => alert(`failed to get data. ${response}`));
+	if(this.state.interestsOnly == true) {
+	    url = url + "interested=1&";
+	}
+
+    axios.get(url)
+        .then(response => this.setData(response.data))
+        .catch(response => alert(`failed to get data. ${response}`));
     }
 
     constructor(props){
@@ -25,33 +29,40 @@ class App extends React.Component {
         this.state = {
 	    barRaceVariable: "nInterests", //"shareOfInterest",
 	    cumulative: true,
+	    interestsOnly: true,
             intervals: [],
             playing: false,
             category: "country"
         };
 
         this.play = this.play.bind(this);
-	this.setCumulative = this.setCumulative.bind(this);
-	this.setBarRaceVariable = this.setBarRaceVariable.bind(this);
+        this.setCumulative = this.setCumulative.bind(this);
+        this.setInterestsOnly = this.setInterestsOnly.bind(this);
+        this.setBarRaceVariable = this.setBarRaceVariable.bind(this);
         this.setData = this.setData.bind(this);
         this.setDate = this.setDate.bind(this);
         this.setNextDate = this.setNextDate.bind(this);
         this.setPlaying = this.setPlaying.bind(this);
-	this.toggleCumulative = this.toggleCumulative.bind(this);
+        this.toggleCumulative = this.toggleCumulative.bind(this);
         this.togglePlaying = this.togglePlaying.bind(this);
+        this.toggleInterestsOnly = this.toggleInterestsOnly.bind(this);
     }
 
     getSnapshotBeforeUpdate(prevProps, prevState) {
-	if(prevState.cumulative !== this.state.cumulative) {
-            let url = "/data-visualisation-data";
+	if(prevState.cumulative !== this.state.cumulative || prevState.interestsOnly !== this.state.interestsOnly) {
+        let url = "/data-visualisation-data?";
 	    if(this.state.cumulative == true) {
-	        url = url + "?cumulative";
+	        url = url + "cumulative=1&";
 	    }
-            axios.get(url)
-                .then(response => this.setData(response.data))
-                .catch(response => alert(`failed to get data. ${response}`));
-	}
-    }
+	    if(this.state.interestsOnly == true) {
+	        url = url + "interested=1&";
+	    }
+
+        axios.get(url)
+            .then(response => this.setData(response.data))
+            .catch(response => alert(`failed to get data. ${response}`));
+	    }
+	 }
     
     play() {
         console.log("App.play");
@@ -64,6 +75,10 @@ class App extends React.Component {
     
     setCumulative(cumulative) {
 	this.setState({cumulative: cumulative});
+    }
+
+    setInterestsOnly(interestsOnly) {
+    this.setState({interestsOnly: interestsOnly})
     }
     
     setData(data) {
@@ -170,6 +185,11 @@ class App extends React.Component {
     toggleCumulative() {
 	let cumulative = !(this.state.cumulative);
 	this.setCumulative(cumulative);
+    }
+
+    toggleInterestsOnly() {
+	let interestsOnly = !(this.state.interestsOnly);
+	this.setInterestsOnly(interestsOnly);
     }
     
     togglePlaying() {
@@ -285,6 +305,18 @@ class App extends React.Component {
                     checked={this.state.cumulative === true}
                   />
                   <span style={{paddingLeft: 10}} >Cumulative</span>
+                </label>
+              </div>
+
+              <div className="checkbox" style={{paddingTop: 5}}>
+                <label>
+                  <input
+                    onChange={this.toggleInterestsOnly}
+                    type="checkbox"
+                    value=""
+                    checked={this.state.interestsOnly === true}
+                  />
+                  <span style={{paddingLeft: 10}} >Interested Only</span>
                 </label>
               </div>
               {barRaceVariableSelector}
