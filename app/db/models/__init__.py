@@ -26,6 +26,14 @@ class BaseModel(db.Model):
         _sa.session.commit()
 
     @classmethod
+    def create_table(cls):
+        db.metadata.create_all(bind=db.engine, tables=[cls.__table__], checkfirst=True)
+
+    @classmethod
+    def drop_table(cls):
+        cls.__table__.drop(db.engine)
+
+    @classmethod
     def get_schema(cls):
         if 'schema' in cls.__table_args__:
             return cls.__table_args__['schema']

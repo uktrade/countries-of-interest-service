@@ -1,39 +1,32 @@
 from app.db.db_utils import (
-    create_index,
-    create_table,
-    drop_table,
     execute_query,
     insert_data,
 )
 
 
 class ETLTask:
-    def __init__(self, sql, table_fields, table_name, drop_table=False, index=None):
+    def __init__(self, sql, model, drop_table=False):
         self.drop_table = drop_table
-        self.index = index
         self.sql = sql
-        self.table_fields = table_fields
-        self.table_name = table_name
+        self.model = model
+        self.table = model.__tablename__
 
     def __call__(self):
 
         if self.drop_table is True:
-            drop_table(self.table_name)
+            self.model.drop_table()
 
-        create_table(self.table_fields, self.table_name)
+        self.model.create_table()
 
         df = execute_query(self.sql, raise_if_fail=True)
+        table_name = self.model.get_fq_table_name()
+        insert_data(df, table_name)
 
-        insert_data(df, self.table_name)
-
-        if self.index is not None:
-            create_index(self.index, self.table_name)
-
-        sql = ''' select count(1) from {} '''.format(self.table_name)
+        sql = f''' select count(1) from {table_name} '''
         df = execute_query(sql)
 
         return {
             'status': 'success',
             'rows': int(df.values[0][0]),
-            'table': self.table_name,
+            'table': self.table,
         }
