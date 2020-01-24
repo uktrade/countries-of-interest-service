@@ -71,10 +71,15 @@ class ExportWins(BaseModel):
     __tablename__ = 'export_wins'
     __table_args__ = {'schema': 'public'}
 
-    id = _col(UUID(as_uuid=True), primary_key=True)
-    company_id = _col(_text)
+    id = _col(_int, primary_key=True, autoincrement=True)
+    export_wins_id = _col(UUID(as_uuid=True), unique=True)
+    company_name = _col(_text)
+    export_wins_company_id = _col(_text)
+    contact_email_address = _col(_text)
+    created_on = _col(_dt)
+    sector = _col(_text)
     country = _col(_text)
-    timestamp = _col(_dt)
+    date_won = _col(_date)
 
 
 class DITCountryTerritoryRegister(BaseModel):

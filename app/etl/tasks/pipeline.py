@@ -18,6 +18,7 @@ from app.etl.tasks.source_data_extraction import (
     extract_datahub_future_interest_countries,
     extract_datahub_interactions,
     extract_datahub_omis,
+    extract_export_wins,
 )
 
 
@@ -27,6 +28,7 @@ DATAHUB_EXPORT_TO_COUNTRIES = 'datahub_export_to_countries'
 DATAHUB_INTERACTIONS = 'datahub_interactions'
 DATAHUB_FUTURE_INTEREST_COUNTRIES = 'datahub_future_interest_countries'
 DATAHUB_OMIS = 'datahub_omis'
+EXPORT_WINS = 'export_wins'
 
 
 STANDARDISE_COUNTRIES = 'standardise_countries'
@@ -45,6 +47,7 @@ EXTRACTORS_DICT = OrderedDict(
         DATAHUB_INTERACTIONS: extract_datahub_interactions,
         DATAHUB_FUTURE_INTEREST_COUNTRIES: extract_datahub_future_interest_countries,
         DATAHUB_OMIS: extract_datahub_omis,
+        EXPORT_WINS: extract_export_wins,
     }
 )
 
