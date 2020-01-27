@@ -449,7 +449,7 @@ class BarRace extends React.Component {
                     d3.axisTop(this.xAxis.scale)
             );
         this.yAxis.element.transition().call(d3.axisLeft(this.yAxis.scale));
-        
+
         let selection = this.plotArea.element.selectAll(".bar")
             .data(dataNormalised, d=>d[this.category]);
 
@@ -646,9 +646,7 @@ class LineChart extends React.Component {
         console.log(this.props);
 
         if(this.props.data !== undefined) {
-            //if(this.plotArea.element.selectAll(".line").size() == 0) {
             this.draw();
-            //}
         }
         
         if (this.props.data !== undefined && this.props.date !== undefined) {
@@ -708,30 +706,35 @@ class LineChart extends React.Component {
             .attr("d", d=>plotLine(d.values))
             .style("stroke", d=>this.props.colourScale(d.category));
 
-
         let legendItems = this.legend.element.selectAll(".legend-item")
-            .data(groupedData, d=>d[this.category])
-            .join("g")
-            .attr("class", "legend-item");
+            .data(groupedData, d=>d.category)
 
         let legendBlockWidth = 20;
-        legendItems
-            .data(groupedData)
+
+	let newLegendItems = legendItems
+	    .enter()
+            .append("g")
+            .attr("class", "legend-item")
+	    .attr("transform", (d, i)=>`translate(0, ${i * legendBlockWidth + 1})`);
+
+	legendItems
+	    .transition()
+	    .attr("transform", (d, i)=>`translate(0, ${i * legendBlockWidth + 1})`);
+
+        newLegendItems
             .append("rect")
             .attr("class", "legend-block")
             .attr("x", 10)
-            .attr("y", (d,i)=>i * legendBlockWidth + 1)
             .attr("rx", 3)        
             .attr("width", legendBlockWidth - 2)
             .attr("height", legendBlockWidth - 2)
             .style("fill", d=>this.props.colourScale(d.category));
 
-        legendItems
-            .data(groupedData)
+        newLegendItems
             .append("text")
             .attr("class", "legend-block")
             .attr("x", 10 + legendBlockWidth + 10)
-            .attr("y", (d, i)=>i * legendBlockWidth + 1 + (legendBlockWidth / 2))
+            .attr("y", legendBlockWidth / 2)
             .html(d=>d.category)
             .attr("text-anchor", "start")
             .attr("dominant-baseline", "middle");
