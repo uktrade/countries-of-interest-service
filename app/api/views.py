@@ -546,6 +546,8 @@ def populate_database():
 @api.route('/data-visualisation-data')
 @login_required
 def data_visualisation_data():
+    interested_only = 'interested' in request.args
+
     import datetime
     import os
     import pandas as pd
@@ -553,6 +555,9 @@ def data_visualisation_data():
     df = pd.read_csv(f'{os.getcwd()}/data/coi_combined_view.csv')
     df = pd.DataFrame(df[:-1])
     df = df[df.standardised_country != 'United Kingdom']
+    if interested_only:
+        df = df[df.exporter_status == 'interested']
+
     df = df[df['timestamp'].notnull()]
     df['country'] = df['standardised_country']
     df['timestamp'] = pd.to_datetime(df['timestamp'])
