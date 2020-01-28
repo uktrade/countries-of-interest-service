@@ -12,6 +12,7 @@ from werkzeug.exceptions import BadRequest, NotFound, Unauthorized
 from app.api.access_control import AccessControl
 from app.api.tasks import populate_database_task
 from app.api.utils import response_orientation_decorator, to_web_dict
+from app.config import data_sources
 from app.db.db_utils import execute_query, execute_statement, table_exists
 from app.db.models import internal as internal_models
 from app.db.models.internal import HawkUsers
@@ -543,83 +544,149 @@ def populate_database():
         return flask_app.make_response(response)
 
 
-@api.route('/data-visualisation-data')
+@api.route('/api/data-visualisation-data/<field>')
 @login_required
-def data_visualisation_data():
-    interested_only = 'interested' in request.args
+def data_visualisation_data(field):
+    date_trunc = request.args.get('date_trunc', 'day')
+    exporter_status = request.args.getlist('exporter-status')
+    include_interests = 'interested' in exporter_status
+    include_mentions = 'mentioned' in exporter_status
+    interests_table = internal_models.CountriesAndSectorsOfInterest.__tablename__
+    mentions_table = internal_models.MentionedInInteractions.__tablename__
+    omis_data_source = data_sources.omis
 
-    import datetime
-    import os
-    import pandas as pd
-
-    df = pd.read_csv(f'{os.getcwd()}/data/coi_combined_view.csv')
-    df = pd.DataFrame(df[:-1])
-    df = df[df.standardised_country != 'United Kingdom']
-    if interested_only:
-        df = df[df.exporter_status == 'interested']
-
-    df = df[df['timestamp'].notnull()]
-    df['country'] = df['standardised_country']
-    df['timestamp'] = pd.to_datetime(df['timestamp'])
-
-    df_top_sectors = (
-        df.groupby('sector').size().sort_values(ascending=False).reset_index()
+    assert field in [
+        'country_of_interest',
+        'sector_of_interest',
+        'standardised_country'
+    ], f'invalid field: {field}'
+    assert not (field == 'sector_of_interest' and include_mentions is True), (
+        'invalid arguments: exporter-status: mentioned not supported by sector_of_interest'
     )
-    df_top_sectors = df_top_sectors.rename(columns={0: 'n_interests'})
 
-    df_sector_ts = df.copy()
+    sql = '''
+    with n_interests as (
+        select
+            date_trunc('{date_trunc}', timestamp) as date,
+            {field},
+            count(1)
 
-    df_sector_ts['quarter'] = df_sector_ts['timestamp'].map(
-        lambda dt: datetime.datetime(dt.year, 3 * ((dt.month - 1) // 3) + 1, 1)
+        from {interests_table}
+
+        where source = '{omis_data_source}'
+            and {include_interests} = True
+
+        group by 1, 2
+    
+    ), n_mentioned as (
+        select
+            date_trunc('{date_trunc}', timestamp) as date,
+            country_of_interest,
+            count(1)
+
+       from {mentions_table}
+
+       where {include_mentions} = True
+
+       group by 1, 2
+            
+    ), combined as (
+        select
+            date,
+            {field},
+            count as n_interests
+
+        from n_interests
+
+        union all
+
+        select
+            date,
+            country_of_interest,
+            count as n_mentions
+
+        from n_mentioned
+
+    ), dates as (
+        select distinct date from combined
+    ), fields as (
+        select distinct {field} from combined
+    ), zero_inflated as (
+        select
+            date,
+            {field},
+            coalesce(n_interests, 0) as n_interests
+
+        from dates
+            left join fields on 1=1
+            left join combined using (date, {field})
+
+    ), cumulative as (
+        select
+            date,
+            {field},
+            sum(n_interests::int) over (partition by {field} order by date) 
+                as n_interests_cumulative
+
+        from zero_inflated
+        
+    ), total_interest as (
+        select
+            date,
+            sum(n_interests) as total_interest
+
+        from zero_inflated
+
+       group by 1
+
+    ), total_interest_cumulative as (
+        select
+            date,
+            sum(total_interest::int) over (order by date) as total_interest_cumulative
+
+        from total_interest
+
+    ), results as (
+        select
+            date,
+            {field},
+            n_interests,
+            n_interests::float / total_interest as share_of_interest,
+            n_interests_cumulative,
+            n_interests_cumulative::float / total_interest_cumulative 
+                as share_of_interest_cumulative
+
+        from zero_inflated 
+            join total_interest using (date)
+            join cumulative using (date, {field})
+            join total_interest_cumulative using (date)
+
     )
-    df_sector_ts = df_sector_ts.groupby(['sector', 'quarter']).size().reset_index()
-    df_sector_ts = df_sector_ts.rename(columns={0: 'n_interests'})
 
-    df_top_countries = (
-        df.groupby('country').size().sort_values(ascending=False).reset_index()
+    select * from results order by (date, {field})
+
+    '''.format(
+        date_trunc=date_trunc,
+        field=field,
+        include_interests=include_interests,
+        include_mentions=include_mentions,
+        interests_table=interests_table,
+        mentions_table=mentions_table,
+        omis_data_source=omis_data_source,
     )
-    df_top_countries = df_top_countries.rename(columns={0: 'n_interests'})
 
-    df_country_ts = df.copy()
+    df = execute_query(sql)
 
-    df_country_ts['quarter'] = df_country_ts['timestamp'].map(
-        lambda dt: datetime.datetime(dt.year, 3 * ((dt.month - 1) // 3) + 1, 1)
-    )
-    df_country_ts = df_country_ts.groupby(['country', 'quarter']).size().reset_index()
-    df_country_ts = df_country_ts.rename(columns={0: 'n_interests'})
-
-    # cumulative
-    if 'cumulative' in request.args:
-        df_quarters = pd.DataFrame(
-            df_country_ts['quarter'].unique(), columns=['quarter']
-        )
-        df_countries = pd.DataFrame(
-            df_country_ts['country'].unique(), columns=['country']
-        )
-
-        df_quarters['on'] = 1
-        df_countries['on'] = 1
-        df_combo = pd.merge(df_quarters, df_countries, on='on').drop('on', axis=1)
-        df_country_ts = pd.merge(
-            df_combo, df_country_ts, on=['country', 'quarter'], how='left'
-        )
-        df_country_ts = df_country_ts.fillna(0)
-        df_country_ts = (
-            df_country_ts.groupby(['country', 'quarter'])
-            .sum()
-            .groupby(level=[0])
-            .cumsum()
-            .reset_index()
-        )
+    df_top = df.groupby(field)[['n_interests_cumulative']].max()
+    df_top = df_top.reset_index()
+    df_top = df_top.sort_values('n_interests_cumulative', ascending=False)
 
     output = {
-        'top_countries': to_web_dict(df_top_countries)['results'],
-        'interest_by_countries_and_quarter': to_web_dict(df_country_ts)['results'],
-        'top_sectors': to_web_dict(df_top_sectors)['results'],
-        'interest_by_sectors_and_quarter': to_web_dict(df_sector_ts)['results'],
+        'nInterests': to_web_dict(df)['results'],
+        'top': df_top[field].tolist(),
     }
-    return output
 
+    return output
 
 @api.route('/data-visualisation')
 @login_required
