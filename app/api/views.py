@@ -558,11 +558,11 @@ def data_visualisation_data(field):
     assert field in [
         'country_of_interest',
         'sector_of_interest',
-        'standardised_country'
+        'standardised_country',
     ], f'invalid field: {field}'
-    assert not (field == 'sector_of_interest' and include_mentions is True), (
-        'invalid arguments: exporter-status: mentioned not supported by sector_of_interest'
-    )
+    assert not (
+        field == 'sector_of_interest' and include_mentions is True
+    ), 'invalid args: exporter-status: mentioned not supported by sector_of_interest'
 
     sql = '''
     with n_interests as (
