@@ -29,7 +29,7 @@ class App extends React.Component {
             intervals: [],
             nTop: 10,
             playing: false,
-            groupby: "standardised_country", // "sector_of_interest"
+            groupby: "country", // "sector"
         };
 
         this.play = this.play.bind(this);
@@ -200,9 +200,11 @@ class App extends React.Component {
                        max={dates.length - 1}
                        onChange={e=>this.setDate(dates[e.target.value])}
                        type="range"
-                       value={this.state.date === undefined || this.state.dates  === undefined
-                              ? 0
-                              : this.state.dates.indexOf(this.state.date)}
+                       value={
+                           this.state.date === undefined
+                               || this.state.dates  === undefined
+                               ? 0
+                               : this.state.dates.indexOf(this.state.date)}
                      />;
         }
 
@@ -243,10 +245,12 @@ class App extends React.Component {
                 onChange={(e)=>this.setGroupby(e.target.value)}
                 value={this.state.groupby}
               >
-                <option value="standardised_country">
+                <option value="country">
                   Country
                 </option>
-                <option value="sector_of_interest">
+                <option
+                  value="sector"
+                  disabled={this.state.exporterStatus === "mentioned"}>
                   Sector
                 </option>
               </select>
@@ -258,7 +262,7 @@ class App extends React.Component {
             {value: "interested", html: "Interested"},
             {value: "mentioned", html: "Mentioned in interactions"}
         ];
-        if(this.state.groupby == "sector_of_interest") {
+        if(this.state.groupby == "sector") {
             options = options.filter(o=>o.value !== "mentioned");
         }
 
@@ -364,8 +368,12 @@ class BarRace extends React.Component {
         
         this.plotArea = {
             element: this.canvas.element.select(".plot-area"),
-            height: this.canvas.height - this.canvas.padding.bottom - this.canvas.padding.top,
-            width: this.canvas.width - this.canvas.padding.left - this.canvas.padding.right,
+            height: this.canvas.height
+                - this.canvas.padding.bottom
+                - this.canvas.padding.top,
+            width: this.canvas.width
+                - this.canvas.padding.left
+                - this.canvas.padding.right,
             x: this.canvas.padding.left,
             y: this.canvas.padding.top,
         };
@@ -418,7 +426,9 @@ class BarRace extends React.Component {
         let nTop = this.props.nTop;
         let variable = this.props.variable;
 
-        let dataDate = data.filter(d=>d.date.toISOString() == this.props.date.toISOString());
+        let dataDate = data.filter(
+            d=>d.date.toISOString() == this.props.date.toISOString()
+        );
         dataDate = dataDate.filter(d=>d[variable] > 0);
         dataDate = dataDate.sort((a, b)=>b[variable] - a[variable]);
         dataDate = dataDate.map((d, i)=>({...d, rank: i}));
@@ -547,8 +557,12 @@ class LineChart extends React.Component {
         
         this.plotArea = {
             element: this.canvas.element.select(".plot-area"),
-            height: this.canvas.height - this.canvas.padding.bottom - this.canvas.padding.top,
-            width: this.canvas.width - this.canvas.padding.left - this.canvas.padding.right,
+            height: this.canvas.height
+                - this.canvas.padding.bottom
+                - this.canvas.padding.top,
+            width: this.canvas.width
+                - this.canvas.padding.left
+                - this.canvas.padding.right,
             x: this.canvas.padding.left,
             y: this.canvas.padding.top,
         };
@@ -642,7 +656,9 @@ class LineChart extends React.Component {
         let nTop = this.props.nTop;
         let top = data.top;
         let topGroups = top.slice(0, nTop);
-        nInterests = nInterests.filter(d=>topGroups.indexOf(d[this.props.groupby]) !== -1);
+        nInterests = nInterests.filter(
+            d=>topGroups.indexOf(d[this.props.groupby]) !== -1
+        );
 
         let startDate = d3.min(nInterests, d=>d.date);
         let endDate = d3.max(nInterests, d=>d.date);

@@ -12,8 +12,8 @@ from werkzeug.exceptions import BadRequest, NotFound, Unauthorized
 from app.api.access_control import AccessControl
 from app.api.tasks import populate_database_task
 from app.api.utils import response_orientation_decorator, to_web_dict
-from app.config import data_sources
 from app.db.db_utils import execute_query, execute_statement, table_exists
+from app.db.models import internal as internal_models
 from app.db.models.internal import CountriesAndSectorsInterest
 from app.db.models.internal import HawkUsers
 from app.sso.token import login_required
@@ -276,21 +276,19 @@ def populate_database():
 @login_required
 def data_visualisation_data(field):
     date_trunc = request.args.get('date_trunc', 'day')
-    exporter_status = request.args.getlist('exporter-status')
-    include_interests = 'interested' in exporter_status
-    include_mentions = 'mentioned' in exporter_status
-    interests_table = internal_models.CountriesAndSectorsOfInterest.__tablename__
-    mentions_table = internal_models.MentionedInInteractions.__tablename__
-    omis_data_source = data_sources.omis
+    exporter_status = request.args['exporter-status']
+    interests_table = internal_models.CountriesAndSectorsInterest.__tablename__
 
-    assert field in [
-        'country_of_interest',
-        'sector_of_interest',
-        'standardised_country',
-    ], f'invalid field: {field}'
+    assert field in ['country', 'sector'], f'invalid field: {field}'
+
+    assert exporter_status in [
+        'interested',
+        'mentioned',
+    ], f'invalid exporter_status: {exporter_status}'
+
     assert not (
-        field == 'sector_of_interest' and include_mentions is True
-    ), 'invalid args: exporter-status: mentioned not supported by sector_of_interest'
+        field == 'sector' and exporter_status == 'mentioned'
+    ), 'invalid args: exporter-status: mentioned not supported by sector'
 
     sql = '''
     with n_interests as (
@@ -301,53 +299,23 @@ def data_visualisation_data(field):
 
         from {interests_table}
 
-        where source = '{omis_data_source}'
-            and {include_interests} = True
+        where type = '{exporter_status}'
 
         group by 1, 2
 
-    ), n_mentioned as (
-        select
-            date_trunc('{date_trunc}', timestamp) as date,
-            country_of_interest,
-            count(1)
-
-       from {mentions_table}
-
-       where {include_mentions} = True
-
-       group by 1, 2
-
-    ), combined as (
-        select
-            date,
-            {field},
-            count as n_interests
-
-        from n_interests
-
-        union all
-
-        select
-            date,
-            country_of_interest,
-            count as n_mentions
-
-        from n_mentioned
-
     ), dates as (
-        select distinct date from combined
+        select distinct date from n_interests
     ), fields as (
-        select distinct {field} from combined
+        select distinct {field} from n_interests
     ), zero_inflated as (
         select
             date,
             {field},
-            coalesce(n_interests, 0) as n_interests
+            coalesce(count, 0) as n_interests
 
         from dates
             left join fields on 1=1
-            left join combined using (date, {field})
+            left join n_interests using (date, {field})
 
     ), cumulative as (
         select
@@ -395,15 +363,16 @@ def data_visualisation_data(field):
 
     '''.format(
         date_trunc=date_trunc,
+        exporter_status=exporter_status,
         field=field,
-        include_interests=include_interests,
-        include_mentions=include_mentions,
         interests_table=interests_table,
-        mentions_table=mentions_table,
-        omis_data_source=omis_data_source,
     )
 
+    print('sql:', sql)
+
     df = execute_query(sql)
+
+    print('df:', df)
 
     df_top = df.groupby(field)[['n_interests_cumulative']].max()
     df_top = df_top.reset_index()
