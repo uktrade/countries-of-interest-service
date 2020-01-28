@@ -17,6 +17,9 @@ class App extends React.Component {
             .catch(response => alert(`failed to get data. ${response}`));
     }
 
+    componentDidUpdate() {
+    }
+
     constructor(props){
         super(props);
         this.state = {
@@ -48,7 +51,6 @@ class App extends React.Component {
 
     getSnapshotBeforeUpdate(prevProps, prevState) {
         // refresh data if the groupby changes, e.g. country to sector
-
         let groupbyChanged = prevState.groupby !== this.state.groupby;
         let exporterStatusChanged = prevState.exporterStatus !=
             this.state.exporterStatus;
@@ -59,6 +61,7 @@ class App extends React.Component {
                 .then(response => this.setData(response.data))
                 .catch(response => alert(`failed to get data. ${response}`));
         }
+        return null;
     }
     
     play() {
@@ -238,17 +241,12 @@ class App extends React.Component {
               <select
                 className="custom-select col-md-9"
                 onChange={(e)=>this.setGroupby(e.target.value)}
+                value={this.state.groupby}
               >
-                <option
-                  value="standardised_country"
-                  selected={this.state.groupby === "standardised_country"}
-                >
+                <option value="standardised_country">
                   Country
                 </option>
-                <option
-                  value="sector_of_interest"
-                  selected={this.state.groupby === "sector_of_interest"}
-                >
+                <option value="sector_of_interest">
                   Sector
                 </option>
               </select>
@@ -270,14 +268,15 @@ class App extends React.Component {
               <select
                 className="custom-select col-md-9"
                 onChange={(e)=>this.setExporterStatus(e.target.value)}
+                value={this.state.exporterStatus}
               >
                 {
                     options.map(
-                        option => {
+                        (option, i) => {
                             return (
                                 <option
+                                  key={i}
                                   value={option.value}
-                                  selected={this.state.exporterStatus === option.value}
                                 >
                                   {option.html}
                                 </option>
@@ -295,29 +294,18 @@ class App extends React.Component {
               <select
                 className="custom-select col-md-9"
                 onChange={(e)=>this.setBarRaceVariable(e.target.value)}
+                value={this.state.barRaceVariable}
               >
-                <option
-                  value="nInterests"
-                  selected={this.state.barRaceVariable === "nInterests"}
-                >
+                <option value="nInterests">
                   Number of Interests
                 </option>
-                <option
-                  selected={this.state.barRaceVariable === "nInterestsCumulative"}
-                  value="nInterestsCumulative"
-                >
+                <option value="nInterestsCumulative">
                   Cumulative number of interests
                 </option>
-                <option
-                  selected={this.state.barRaceVariable === "shareOfInterest"}
-                  value="shareOfInterest"
-                >
+                <option value="shareOfInterest">
                   Share of interest on date
                 </option>
-                <option
-                  selected={this.state.barRaceVariable === "shareOfInterestCumulative"}
-                  value="shareOfInterestCumulative"
-                >
+                <option value="shareOfInterestCumulative">
                   Cumulative Share of interest
                 </option>
               </select>
