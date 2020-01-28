@@ -577,7 +577,7 @@ def data_visualisation_data(field):
             and {include_interests} = True
 
         group by 1, 2
-    
+
     ), n_mentioned as (
         select
             date_trunc('{date_trunc}', timestamp) as date,
@@ -589,7 +589,7 @@ def data_visualisation_data(field):
        where {include_mentions} = True
 
        group by 1, 2
-            
+
     ), combined as (
         select
             date,
@@ -625,11 +625,11 @@ def data_visualisation_data(field):
         select
             date,
             {field},
-            sum(n_interests::int) over (partition by {field} order by date) 
+            sum(n_interests::int) over (partition by {field} order by date)
                 as n_interests_cumulative
 
         from zero_inflated
-        
+
     ), total_interest as (
         select
             date,
@@ -653,10 +653,10 @@ def data_visualisation_data(field):
             n_interests,
             n_interests::float / total_interest as share_of_interest,
             n_interests_cumulative,
-            n_interests_cumulative::float / total_interest_cumulative 
+            n_interests_cumulative::float / total_interest_cumulative
                 as share_of_interest_cumulative
 
-        from zero_inflated 
+        from zero_inflated
             join total_interest using (date)
             join cumulative using (date, {field})
             join total_interest_cumulative using (date)
@@ -687,6 +687,7 @@ def data_visualisation_data(field):
     }
 
     return output
+
 
 @api.route('/data-visualisation')
 @login_required
