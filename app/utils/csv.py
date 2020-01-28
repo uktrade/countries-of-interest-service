@@ -2,80 +2,29 @@ import csv
 import time
 
 from flask import current_app as flask_app
-from sqlalchemy.sql.expression import func
 
 from app.db.models import external as external_models
 from app.db.models import internal as internal_models
 
 
 def get_coi_csv(output, limit=None):
-    coi_fields = [
-        'company_id',
-        'country_of_interest',
-        'standardised_country',
-        'sector',
-        'timestamp',
-        'exporter_status',
-        'source',
-        'source_id',
-    ]
     coi_and_sectors_fields = [
-        'company_id',
-        'country_of_interest',
-        'standardised_country',
-        'sector_of_interest',
-        'timestamp',
-        'exporter_status',
+        'service_company_id',
+        'company_match_id',
+        'country',
+        'sector',
+        'type',
+        'service',
         'source',
         'source_id',
-    ]
-
-    export_country_fields = [
-        'company_id',
-        'export_country',
-        'standardised_country',
-        '_sector',
         'timestamp',
-        'exporter_status',
-        'source',
-        'source_id',
-    ]
-
-    interaction_fields = [
-        'company_id',
-        '_interaction_coi',
-        'country_of_interest',
-        '_sector',
-        'timestamp',
-        'exporter_status',
-        'interaction_source',
-        'interaction_id',
     ]
 
     data_sets = [
-        (internal_models.CountriesOfInterest, coi_fields, True),
-        (internal_models.CountriesAndSectorsOfInterest, coi_and_sectors_fields, False),
-        (internal_models.ExportCountries, export_country_fields, False),
-        (internal_models.MentionedInInteractions, interaction_fields, False),
+        (internal_models.CountriesAndSectorsInterest, coi_and_sectors_fields, True),
     ]
 
     return output_csv(data_sets, output, 'timestamp', limit)
-
-
-def get_interactions_csv(output, order_by='timestamp', limit=None):
-    interaction_fields = [
-        'interaction_id',
-        'country_of_interest',
-        'interaction_notes',
-        'timestamp',
-    ]
-
-    data_sets = [
-        (internal_models.MentionedInInteractions, interaction_fields, True),
-    ]
-    if order_by == 'random':
-        order_by = func.random()
-    return output_csv(data_sets, output, order_by, limit)
 
 
 def output_csv(data_sets, output, order_by, limit):

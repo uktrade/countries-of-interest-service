@@ -103,3 +103,5 @@ ENV/
 # user / local configuration
 app/config/local.yml
 
+# npm
+node_modules/

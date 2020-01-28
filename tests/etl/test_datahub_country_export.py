@@ -1,5 +1,6 @@
 from app.db.db_utils import execute_query
-from app.etl.tasks.export_countries import Task
+from app.db.models.internal import CountriesAndSectorsInterest
+from app.etl.tasks.datahub_country_export import Task
 
 
 class TestExportCountries:
@@ -45,21 +46,23 @@ class TestExportCountries:
         task = Task()
         task()
 
-        sql = ''' select * from coi_export_countries '''
+        sql = f''' select * from {CountriesAndSectorsInterest.__tablename__} '''
         df = execute_query(sql)
 
         assert len(df) == 2
 
-        assert df['company_id'].values[0] == '08c5f419-f85f-4051-b640-d3cfef8ef85d'
-        assert df['export_country'].values[0] == 'UK'
-        assert df['standardised_country'].values[0] == 'United Kingdom'
+        assert (
+            df['service_company_id'].values[0] == '08c5f419-f85f-4051-b640-d3cfef8ef85d'
+        )
+        assert df['country'].values[0] == 'United Kingdom'
         assert df['source'].values[0] == 'datahub_export_countries'
         assert df['source_id'].values[0] == '0'
         assert not df['timestamp'].values[0]
 
-        assert df['company_id'].values[1] == '08c5f419-f85f-4051-b640-d3cfef8ef85d'
-        assert df['export_country'].values[1] == 'CN'
-        assert df['standardised_country'].values[1] is None
+        assert (
+            df['service_company_id'].values[1] == '08c5f419-f85f-4051-b640-d3cfef8ef85d'
+        )
+        assert df['country'].values[1] is None
         assert df['source'].values[1] == 'datahub_export_countries'
         assert df['source_id'].values[1] == '1'
         assert not df['timestamp'].values[1]
