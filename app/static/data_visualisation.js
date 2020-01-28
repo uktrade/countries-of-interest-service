@@ -11,58 +11,55 @@ class App extends React.Component {
 
 
     componentDidMount() {
-	let url = "/data-visualisation-data?";
-	if(this.state.cumulative == true) {
-	    url = url + "cumulative=1&";
-	}
-	if(this.state.interestsOnly == true) {
-	    url = url + "interested=1&";
-	}
-
-    axios.get(url)
-        .then(response => this.setData(response.data))
-        .catch(response => alert(`failed to get data. ${response}`));
+        let url = this.getDatasetUrl();
+        axios.get(url)
+            .then(response => this.setData(response.data))
+            .catch(response => alert(`failed to get data. ${response}`));
     }
 
     constructor(props){
         super(props);
         this.state = {
-	    barRaceVariable: "nInterests", //"shareOfInterest",
+	    barRaceVariable: "nInterestsCumulative", //"shareOfInterest",
 	    cumulative: true,
-	    interestsOnly: true,
+            exporterStatus: "interested",
             intervals: [],
+            nTop: 10,
             playing: false,
-            category: "country"
+            groupby: "standardised_country", // "sector_of_interest"
         };
 
         this.play = this.play.bind(this);
-        this.setCumulative = this.setCumulative.bind(this);
-        this.setInterestsOnly = this.setInterestsOnly.bind(this);
         this.setBarRaceVariable = this.setBarRaceVariable.bind(this);
         this.setData = this.setData.bind(this);
         this.setDate = this.setDate.bind(this);
+        this.setExporterStatus = this.setExporterStatus.bind(this);
+        this.setGroupby = this.setGroupby.bind(this);
         this.setNextDate = this.setNextDate.bind(this);
         this.setPlaying = this.setPlaying.bind(this);
-        this.toggleCumulative = this.toggleCumulative.bind(this);
         this.togglePlaying = this.togglePlaying.bind(this);
-        this.toggleInterestsOnly = this.toggleInterestsOnly.bind(this);
+    }
+
+    getDatasetUrl() {
+        let url = `/api/data-visualisation-data/${this.state.groupby}?`;
+        url += `exporter-status=${this.state.exporterStatus}`;
+        return url;
     }
 
     getSnapshotBeforeUpdate(prevProps, prevState) {
-	if(prevState.cumulative !== this.state.cumulative || prevState.interestsOnly !== this.state.interestsOnly) {
-        let url = "/data-visualisation-data?";
-	    if(this.state.cumulative == true) {
-	        url = url + "cumulative=1&";
-	    }
-	    if(this.state.interestsOnly == true) {
-	        url = url + "interested=1&";
-	    }
+        // refresh data if the groupby changes, e.g. country to sector
 
-        axios.get(url)
-            .then(response => this.setData(response.data))
-            .catch(response => alert(`failed to get data. ${response}`));
-	    }
-	 }
+        let groupbyChanged = prevState.groupby !== this.state.groupby;
+        let exporterStatusChanged = prevState.exporterStatus !=
+            this.state.exporterStatus;
+
+        if(groupbyChanged || exporterStatusChanged) {
+            let url = this.getDatasetUrl();
+            axios.get(url)
+                .then(response => this.setData(response.data))
+                .catch(response => alert(`failed to get data. ${response}`));
+        }
+    }
     
     play() {
         console.log("App.play");
@@ -73,98 +70,73 @@ class App extends React.Component {
 	this.setState({barRaceVariable: variable});
     }
     
-    setCumulative(cumulative) {
-	this.setState({cumulative: cumulative});
-    }
-
-    setInterestsOnly(interestsOnly) {
-    this.setState({interestsOnly: interestsOnly})
-    }
-    
     setData(data) {
-        let processedData = {...data};
-        processedData = Object.keys(processedData).reduce(
-            (acc, key)=>{
-                let data = processedData[key];
-                data = data.map(d=>({...d, quarter: new Date(d.quarter)}));
-                data = data.sort((a, b)=>a.quarter - b.quarter);
-                acc[key] = data;
-                return acc;
-            },
-            {}
-        );
+	console.log("App.setData");
+	console.log(data);
 
-        let datesData = processedData["interest_by_countries_and_quarter"];
-        let dates = datesData.reduce(
-            (acc, d)=> {
-                acc[[d.quarter]] = d.quarter;
-                return acc;
-            },
-            {}
+        // convert datestrings to date objects
+        let processedData = {
+            ...data,
+            nInterests: data.nInterests.map(
+                d=>({...d, date: new Date(d.date)})
+            )
+        };
+
+        let dates = Object.values(
+            processedData.nInterests.reduce(
+                (acc, d)=> ({...acc, [d.date]: d.date}),
+                {}
+            )
         );
-        dates = Object.values(dates);
         dates = dates.sort((a, b)=>a - b);
 
-        let countriesData = processedData["top_countries"];
-        let countries = datesData.reduce(
-            (acc, d) => {
-                acc[[d.country]] = d.country;
-                return acc;
-            },
-            {}
-        );
-        countries = Object.values(countries);
-        countries.sort(); 
-        let countryColourScale = d3.scaleOrdinal()
-            .domain(countries)
-            .range(d3.schemeTableau10);
+        let date = dates.length > 0 ? dates[0] : undefined;
 
-        let sectorsData = processedData["top_sectors"];
-        let sectors = datesData.reduce(
-            (acc, d) => {
-                acc[[d.country]] = d.country;
-                return acc;
-            },
-            {}
-        );
-        let schema = d3.schemeTableau10; // d3.schemeSet3
-        sectors = Object.values(sectors);
-        let sectorColourScale = d3.scaleOrdinal()
-            .domain(sectors)
-            .range(schema);
+        let groups = processedData.top;
+
+        let groupColourScale = d3.scaleOrdinal()
+            .domain(groups)
+            .range(d3.schemeTableau10);
         
         this.setState(
             {
-                countries: countries,
-                countryColourScale: countryColourScale,
                 data: processedData,
+                date: date,
                 dates: dates,
-                sectorColourScale: sectorColourScale,
+                groups: groups,
+                groupColourScale: groupColourScale,
             }
         );
     }
 
     setDate(date) {
-        if(this.interval !== undefined && date === this.state.dates[this.state.dates.length - 1]) {
-            window.clearInterval(this.interval);
+        console.log("setDate");
+        console.log(`date: ${date}`);
+        let index = this.state.dates.indexOf(date);
+        if(index !== -1) {
+            this.setState({date: date});
         }
-        this.setState({date: date});
+        let lastDate = this.state.dates[this.state.dates.length - 1];
+        if(date === undefined || date === lastDate) {
+            this.setPlaying(false);
+        }
+        
+    }
+
+    setExporterStatus(status) {
+        this.setState({exporterStatus: status});
+    }
+
+    setGroupby(groupby) {
+        this.setState({groupby: groupby});
     }
 
     setNextDate() {
-        console.log("App.setNextDate");
         let date = this.state.date;
-        if(
-            date !== undefined &&
-                this.state.dates.length > 0 &&
-                date != this.state.dates[this.state.dates.length - 1]) {
-            let index = this.state.dates.indexOf(this.state.date);
+        let index = this.state.dates.indexOf(date);
+        if(index !== -1) {
             let nextDate = this.state.dates[index+1];
             this.setDate(nextDate);
-            let lastDate = this.state.dates[this.state.dates.length - 1];
-            if(nextDate === this.state.dates[this.state.dates.length - 1]) {
-                this.setPlaying(false);
-            }
         }
     }
 
@@ -182,14 +154,29 @@ class App extends React.Component {
         this.setState({playing: playing, intervals: intervals});
     }
 
-    toggleCumulative() {
-	let cumulative = !(this.state.cumulative);
-	this.setCumulative(cumulative);
-    }
-
-    toggleInterestsOnly() {
-	let interestsOnly = !(this.state.interestsOnly);
-	this.setInterestsOnly(interestsOnly);
+    toCamelCase(d) {
+        let length = d.length;
+        let output = "";
+        let index = 0;
+        let previousChar = null;
+        
+        while(index != length) {
+            let char = d[index];
+            if (previousChar === "_" && char !== "_") {
+                if(output.length === 0) {
+                    output += char.toLowerCase();
+                } else {
+                    output += char.toUpperCase();
+                }
+            } else if (previousChar !== "_" && char !== "_") {
+                output += char.toLowerCase();
+            }
+            previousChar = char;
+            index += 1;
+        }
+        
+        return output;
+        
     }
     
     togglePlaying() {
@@ -206,79 +193,133 @@ class App extends React.Component {
         if(dates !== undefined  && dates.length > 0) {
             slider = <input
                        className="custom-range"
-                       min="0"
+                       min={0}
                        max={dates.length - 1}
                        onChange={e=>this.setDate(dates[e.target.value])}
                        type="range"
-                       value={this.state.date === undefined || this.state.dates  === undefined ?
-                              1 :
-                              this.state.dates.indexOf(this.state.date) + 1}
+                       value={this.state.date === undefined || this.state.dates  === undefined
+                              ? 0
+                              : this.state.dates.indexOf(this.state.date)}
                      />;
-            
-            if(this.state.date === undefined && dates.length > 0) {
-                this.state.date = dates[0];
-            }
         }
 
         let charts = "";
-        if(this.state.category === "country") {
-            let id="country";
-            let data = this.state.data !== undefined ?
-                this.state.data["interest_by_countries_and_quarter"] :
-                undefined;
-            let date = this.state.date;
-            let colourScale = this.state.countryColourScale;
-            
-            charts = (
-                <div>
-                  <CountryLineChart
-                    id="country"
-                    data={data}
-                    date={date}
-                    colourScale={colourScale}
-                    topCategories={this.state.data !== undefined ?
-                           this.state.data["top_countries"]:
-                           undefined}
-                  />
-                  <CountryBarRace
-		    barRaceVariable={this.state.barRaceVariable}
-                    id="country"
-                    data={data}
-                    date={date}
-                    colourScale={colourScale}
-                  />
-                </div>
-            );
+        let data = this.state.data;
+        let date = this.state.date;
+        let colourScale = this.state.groupColourScale;
+        let variable = this.state.barRaceVariable;
+        
+        charts = (
+            <div>
+              <LineChart
+                groupby={this.toCamelCase(this.state.groupby)}
+                colourScale={colourScale}
+                data={data}
+                date={date}
+                id="line-chart"
+                nTop={this.state.nTop}
+                variable={variable}
+              />
+              <BarRace
+                groupby={this.toCamelCase(this.state.groupby)}
+                colourScale={colourScale}
+                data={data}
+                date={date}
+                id="bar-race"
+                nTop={this.state.nTop}
+                variable={variable}
+              />
+            </div>
+        );
 
-        } else if (this.state.category == "sector") {
-            charts = (
-                <div>
-                  <SectorLineChart />
-                  <SectorBarRace
-                    barRaceVarible={this.state.barRaceVariable}
-                    id="country"
-                    data={
-                        this.state.data !== undefined ?
-                        this.state.data["interest_by_countries_and_quarter"] :
-                        undefined
-                    }
-                    date={this.state.date}
-                    colourScale={this.state.countryColourScale}
-                  />
-                </div>
-            );
-            
+        let groupbySelector = (
+            <div className="form-group row">
+              <label className="col-md-3 col-form-label text-right">Groupby</label>
+              <select
+                className="custom-select col-md-9"
+                onChange={(e)=>this.setGroupby(e.target.value)}
+              >
+                <option
+                  value="standardised_country"
+                  selected={this.state.groupby === "standardised_country"}
+                >
+                  Country
+                </option>
+                <option
+                  value="sector_of_interest"
+                  selected={this.state.groupby === "sector_of_interest"}
+                >
+                  Sector
+                </option>
+              </select>
+              
+            </div>
+        );
+
+        let options = [
+            {value: "interested", html: "Interested"},
+            {value: "mentioned", html: "Mentioned in interactions"}
+        ];
+        if(this.state.groupby == "sector_of_interest") {
+            options = options.filter(o=>o.value !== "mentioned");
         }
 
+        let exporterStatusSelector = (
+            <div className="form-group row">
+              <label className="col-md-3 col-form-label text-right">Exporter status</label>
+              <select
+                className="custom-select col-md-9"
+                onChange={(e)=>this.setExporterStatus(e.target.value)}
+              >
+                {
+                    options.map(
+                        option => {
+                            return (
+                                <option
+                                  value={option.value}
+                                  selected={this.state.exporterStatus === option.value}
+                                >
+                                  {option.html}
+                                </option>
+                            );
+                        }
+                    )
+                }
+              </select>
+            </div>
+        );
+        
         let barRaceVariableSelector = (
             <div className="form-group row">
-              <label className="col-md-3 col-form-label text-right">Bar Race Variable</label>
+              <label className="col-md-3 col-form-label text-right">Variable</label>
               <select
                 className="custom-select col-md-9"
                 onChange={(e)=>this.setBarRaceVariable(e.target.value)}
               >
-                <option value="nInterests" selected>nInterests</option>
-                <option value="shareOfInterest">shareOfInterest</option>
+                <option
+                  value="nInterests"
+                  selected={this.state.barRaceVariable === "nInterests"}
+                >
+                  Number of Interests
+                </option>
+                <option
+                  selected={this.state.barRaceVariable === "nInterestsCumulative"}
+                  value="nInterestsCumulative"
+                >
+                  Cumulative number of interests
+                </option>
+                <option
+                  selected={this.state.barRaceVariable === "shareOfInterest"}
+                  value="shareOfInterest"
+                >
+                  Share of interest on date
+                </option>
+                <option
+                  selected={this.state.barRaceVariable === "shareOfInterestCumulative"}
+                  value="shareOfInterestCumulative"
+                >
+                  Cumulative Share of interest
+                </option>
               </select>
               
             </div>
@@ -296,31 +337,9 @@ class App extends React.Component {
                 {this.state.playing === true ? "Stop" : "Play"}
               </button>
 
-              <div className="checkbox" style={{paddingTop: 5}}>
-                <label>
-                  <input
-                    onChange={this.toggleCumulative}
-                    type="checkbox"
-                    value=""
-                    checked={this.state.cumulative === true}
-                  />
-                  <span style={{paddingLeft: 10}} >Cumulative</span>
-                </label>
-              </div>
-
-              <div className="checkbox" style={{paddingTop: 5}}>
-                <label>
-                  <input
-                    onChange={this.toggleInterestsOnly}
-                    type="checkbox"
-                    value=""
-                    checked={this.state.interestsOnly === true}
-                  />
-                  <span style={{paddingLeft: 10}} >Interested Only</span>
-                </label>
-              </div>
+              {groupbySelector}
+              {exporterStatusSelector}
               {barRaceVariableSelector}
-
 	      
             </div>
         );
@@ -338,7 +357,7 @@ class BarRace extends React.Component {
     componentDidMount() {
         console.log("BarRace.componentDidMount");
         this.container = {
-            element: d3.select(`#${this.category}`),
+            element: d3.select(`#${this.groupby}`),
             height: 300,
         };
 
@@ -406,123 +425,86 @@ class BarRace extends React.Component {
     
     draw() {
         console.log("BarRace.draw()");
-        console.log(this.props.barRaceVariable);
-        let data = this.props.data;
-        let nTopRanks = 10;
-        let ranks = [];
-        for(let i=1; i<=nTopRanks; i++){
-            ranks.push(i);
-        }
-
-        let dataDate = data.filter(d=>d.quarter.toISOString() == this.props.date.toISOString());
         
-        let totalInterest = dataDate.reduce(
-            (acc, d)=>{
-                acc = acc + d.nInterests;
-                return acc;
-            },
-            0
-        );
+        let data = this.props.data.nInterests;
+        let nTop = this.props.nTop;
+        let variable = this.props.variable;
 
-        let dataNormalised = [...dataDate];
-        dataNormalised = dataNormalised.sort((a, b)=>b.nInterests - a.nInterests);
-        for(let i=0; i<dataNormalised.length; i++) {
-            dataNormalised[i] = {
-                ...dataNormalised[i],
-                shareOfInterest: dataNormalised[i].nInterests/totalInterest,
-                rank: i+1
-            };
-        }
-        dataNormalised = dataNormalised.filter(d=>d.rank <= nTopRanks);
+        let dataDate = data.filter(d=>d.date.toISOString() == this.props.date.toISOString());
+        dataDate = dataDate.filter(d=>d[variable] > 0);
+        dataDate = dataDate.sort((a, b)=>b[variable] - a[variable]);
+        dataDate = dataDate.map((d, i)=>({...d, rank: i}));
+        dataDate = dataDate.splice(0, nTop);
 
-        let maxShareOfInterest = d3.max(dataNormalised, d=>d[this.props.barRaceVariable]);
-
-        this.xAxis.scale.domain([0, maxShareOfInterest]);
-        this.yAxis.scale.domain(ranks);
+        console.log(dataDate);
+        
+        let xMin = 0;
+        let xMax = d3.max(dataDate, d=>d[this.props.variable]);
+        this.xAxis.scale.domain([xMin, xMax]);
         this.xAxis.element
             .transition()
+            .duration(1000)
             .call(
-                this.props.barRaceVariable === "shareOfInterest" ? 
-                    d3.axisTop(this.xAxis.scale)
+                this.props.variable === "shareOfInterest"
+                    || this.props.variable === "shareOfInterestCumulative"
+                    ? d3.axisTop(this.xAxis.scale)
                     .tickFormat(d=>`${parseInt(10000*d)/100} %`)
-                    :
-                    d3.axisTop(this.xAxis.scale)
+                    : d3.axisTop(this.xAxis.scale)
             );
+
+        let ranks = [];
+        for(let i=0; i<nTop; i++){
+            ranks.push(i);
+        }
+        this.yAxis.scale.domain(ranks);
         this.yAxis.element.transition().call(d3.axisLeft(this.yAxis.scale));
 
-        let selection = this.plotArea.element.selectAll(".bar")
-            .data(dataNormalised, d=>d[this.category]);
+        let groups = this.plotArea.element.selectAll(".group")
+            .data(dataDate, d=>d[this.props.groupby]);
 
-        selection.enter()
+        let newGroups = groups
+            .enter()
+            .append("g")
+            .attr("class", "group");
+
+        newGroups
+            .attr("transform", `translate(0, ${this.canvas.height})`)
+            .transition()
+            .duration(1000)
+            .attr("transform", d=> `translate(0, ${this.yAxis.scale(d.rank)})`);
+
+        newGroups
             .append("rect")
             .attr("class", "bar")
-            .attr("width", d=>this.xAxis.scale(d[this.props.barRaceVariable]))
+            .attr("width", d=>this.xAxis.scale(d[variable]))
             .attr("height", this.yAxis.scale.bandwidth() - 1)
-            .attr("x", 0)
-            .attr("y", this.canvas.height)
-            .style("fill", d=>this.props.colourScale(d[this.category]))
-            .attr("rx", 3)
-            .transition()
-            .duration(1000)
-            .attr("y", d=>d.rank > nTopRanks ? this.container.height : this.yAxis.scale(d.rank));
-
-        selection
-            .transition()
-            .duration(1000)
-            .attr("width", d=>this.xAxis.scale(d[this.props.barRaceVariable]))
-            .attr("y", d=>d.rank > nTopRanks ? this.container.height : this.yAxis.scale(d.rank));
-
+            .style("fill", d=>this.props.colourScale(d[this.props.groupby]))
+            .attr("rx", 3);
         
-        selection.exit()
-            .transition()
-            .duration(1000)
-            .attr("y", this.container.height)
-            .remove();
-
-
-        selection = this.plotArea.element.selectAll(`.${this.category}-tag`)
-            .data(dataNormalised, d=>d[this.category]);
-
-        selection.enter()
+        newGroups
             .append("text")
-            .attr("class", `${this.category}-tag`)
-            .attr("x", this.plotArea.width)
-            .attr("y", d=>this.canvas.height)
+            .attr("x", this.plotArea.width - 10)
+            .attr("y", this.yAxis.scale.bandwidth() / 2 + 1)
             .attr("text-anchor", "end")
             .attr("dominant-baseline", "middle")
-            .html(d=>d[this.props.barRaceVariable] === 0 ? "" : d[this.category])
-            .transition()
-            .duration(1000)
-            .attr(
-                "y",
-                d=> {
-                    if(d.rank > 10) {
-                        return this.canvas.height;
-                    } else {
-                        return this.yAxis.scale(d.rank) + this.yAxis.scale.bandwidth() / 2;
-                    }
-                }
-            );
+            .html(d=>d[this.props.groupby]);
 
-        selection
-            .html(d=>d[this.props.barRaceVariable] === 0 ? "" : d[this.category])
+        groups
             .transition()
             .duration(1000)
-            .attr(
-                "y",
-                d=> {
-                    if(d.rank > 10) {
-                        return this.canvas.height;
-                    } else {
-                        return this.yAxis.scale(d.rank) + this.yAxis.scale.bandwidth() / 2;
-                    }
-                }
-            );
+            .attr("transform", d=> `translate(0, ${this.yAxis.scale(d.rank)})`);
         
-        selection.exit()
+        groups.selectAll(".bar")
+            .data(dataDate, d=>d[this.props.groupby])
             .transition()
             .duration(1000)
-            .attr("y", this.canvas.height)
+            .attr("width", d=>this.xAxis.scale(d[variable]));
+
+        groups
+            .exit()
+            .transition()
+            .duration(1000)
+            .attr("transform", `translate(0, ${this.canvas.height})`)
             .remove();
         
     }
@@ -530,9 +512,8 @@ class BarRace extends React.Component {
     render() {
 
         console.log("BarRace.render()");
-	console.log(this.props.barRaceVariable);
         return (
-            <div className="container bar-race" id={`${this.category}`}>
+            <div className="container bar-race" id={`${this.groupby}`}>
               <svg className="canvas">
                 <g className="plot-area">
                   <g className="x-axis"></g>
@@ -549,22 +530,24 @@ class BarRace extends React.Component {
 
 class LineChart extends React.Component {
 
+
     constructor(props) {
         super(props);
         this.state = {};
+        this.container = {
+            id: "line-chart",
+            height: 300,
+        };
     }
 
     componentDidMount() {
         console.log("LineChart.componentDidMount");
-        this.container = {
-            element: d3.select(`#${this.category}-line-chart`),
-            height: 300,
-        };
-
+        this.container.element = d3.select(`#${this.container.id}`),
         this.container.width = parseInt(
             this.container.element.style("width"),
             10
         );
+        
         this.canvas = {
             element: this.container.element.select(".canvas"),
             padding: {left: 50, right: 30, bottom: 50, top: 15},
@@ -651,74 +634,75 @@ class LineChart extends React.Component {
         
         if (this.props.data !== undefined && this.props.date !== undefined) {
             let x = this.xAxis.scale(this.props.date);
-            this.coverUp.element
-                .transition()
-                .ease(d3.easeLinear)
-                .duration(1000)
-                .attr("x", x)
-                .attr("width", this.plotArea.width - x);
+            let width = this.plotArea.width - x;
+            if(x !== undefined && !isNaN(x)) {
+                this.coverUp.element
+                    .transition()
+                    .ease(d3.easeLinear)
+                    .duration(1000)
+                    .attr("x", x)
+                    .attr("width", width);
+            }
         }
     }
     
     draw() {
         console.log("LineChart.draw()");
+        console.log(this.props);
         let data = this.props.data;
-        let top10 = this.props.topCategories.map(d=>d[this.category]);
-        top10 = top10.splice(0, 10);
-        data = data.filter(d=>top10.indexOf(d[this.category]) != -1);
+        let nInterests = data.nInterests;
+        let nTop = this.props.nTop;
+        let top = data.top;
+        let topGroups = top.slice(0, nTop);
+        nInterests = nInterests.filter(d=>topGroups.indexOf(d[this.props.groupby]) !== -1);
 
-        let startDate = d3.min(data, d=>d.quarter);
-        let endDate = d3.max(data, d=>d.quarter);
-        
+        let startDate = d3.min(nInterests, d=>d.date);
+        let endDate = d3.max(nInterests, d=>d.date);
         this.xAxis.scale.domain([startDate, endDate]);
-        this.xAxis.element.transition().call(d3.axisBottom(this.xAxis.scale));
+        this.xAxis.element.call(d3.axisBottom(this.xAxis.scale));
 
-        let minNInterests = d3.min(data, d=>d.nInterests);
-        let maxNInterests = d3.max(data, d=>d.nInterests);
-        this.yAxis.scale.domain([minNInterests, maxNInterests]);
+        let minY = 0;
+        let maxY = d3.max(nInterests, d=>d[this.props.variable]);
+        this.yAxis.scale.domain([minY, maxY]);
         this.yAxis.element.transition().call(d3.axisLeft(this.yAxis.scale));
 
         let plotLine = d3.line()
-            .x(d => this.xAxis.scale(d.quarter))
-            .y(d => this.yAxis.scale(d.nInterests))
+            .x(d => this.xAxis.scale(d.date))
+            .y(d => this.yAxis.scale(d[this.props.variable]))
             .curve(d3.curveMonotoneX);
 
-        let groupedData = data.reduce(
+        let groupedData = nInterests.reduce(
             (acc, d) => {
-                if(acc[[d[this.category]]] === undefined) {
-                    acc[[d[this.category]]] = {
-                        category: d[this.category],
+                if(acc[[d[this.props.groupby]]] === undefined) {
+                    acc[[d[this.props.groupby]]] = {
+                        group: d[this.props.groupby],
                         values: []
                     };                    
                 }
-                acc[[d[this.category]]].values.push(d);
+                acc[[d[this.props.groupby]]].values.push(d);
                 return acc;
             },
             {}
         );
         groupedData = Object.values(groupedData);
-        groupedData.sort((a, b)=>a.category > b.category ? 1 : -1);
 
         this.layer0.element.selectAll(".line")
-            .data(groupedData, d=>d.category)
+            .data(groupedData, d=>d.group)
             .join("path")
             .attr("class", "line")
-            .attr("d", d=>plotLine(d.values))
-            .style("stroke", d=>this.props.colourScale(d.category));
-
-        let legendItems = this.legend.element.selectAll(".legend-item")
-            .data(groupedData, d=>d.category)
+            .style("stroke", d=>this.props.colourScale(d.group))
+            .transition()
+            .attr("d", d=>plotLine(d.values));
 
         let legendBlockWidth = 20;
+        
+        let legendItems = this.legend.element.selectAll(".legend-item")
+            .data(groupedData, d=>d.group);
 
-	let newLegendItems = legendItems
-	    .enter()
+        let newLegendItems = legendItems
+            .enter()
             .append("g")
             .attr("class", "legend-item")
-	    .attr("transform", (d, i)=>`translate(0, ${i * legendBlockWidth + 1})`);
-
-	legendItems
-	    .transition()
 	    .attr("transform", (d, i)=>`translate(0, ${i * legendBlockWidth + 1})`);
 
         newLegendItems
@@ -728,23 +712,25 @@ class LineChart extends React.Component {
             .attr("rx", 3)        
             .attr("width", legendBlockWidth - 2)
             .attr("height", legendBlockWidth - 2)
-            .style("fill", d=>this.props.colourScale(d.category));
-
+            .style("fill", d=>this.props.colourScale(d.group));
+        
         newLegendItems
             .append("text")
-            .attr("class", "legend-block")
+            .attr("class", "legend-text")
             .attr("x", 10 + legendBlockWidth + 10)
             .attr("y", legendBlockWidth / 2)
-            .html(d=>d.category)
+            .html(d=>d.group)
             .attr("text-anchor", "start")
             .attr("dominant-baseline", "middle");
+
+        legendItems.exit().remove();
         
     }
     
     render() {
-        console.log("Line.render()");
+        console.log("LineChart.render()");
         return (
-            <div className="container line-chart" id={`${this.category}-line-chart`}>
+            <div className="container line-chart" id={`${this.container.id}`}>
             <svg className="canvas">
               <g className="plot-area">
                 <g className="layer-0"></g>            
@@ -758,43 +744,6 @@ class LineChart extends React.Component {
             </div>
         );
     }
-}
-
-class CountryBarRace extends BarRace {
-
-    constructor(props) {
-        super(props);
-        this.category = "country";
-    }
-    
-}
-
-class SectorBarRace extends BarRace {
-
-    constructor(props) {
-        super(props);
-        this.category = "sector";
-    }
-    
-}
-
-class CountryLineChart extends LineChart {
-
-    constructor(props) {
-        super(props);
-        this.category = "country";
-    }
-
-    
-}
-
-class SectorLineChart extends LineChart {
-
-    constructor(props) {
-        super(props);
-        this.category = "sector";
-    }
-    
 }
 
 render(<App/>, document.getElementById('react-container'));
