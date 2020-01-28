@@ -371,12 +371,7 @@ def data_visualisation_data(field):
         interests_table=interests_table,
     )
 
-    print('sql:', sql)
-
     df = execute_query(sql)
-
-    print('df:', df)
-
     df_top = df.groupby(field)[['n_interests_cumulative']].max()
     df_top = df_top.reset_index()
     df_top = df_top.sort_values('n_interests_cumulative', ascending=False)
