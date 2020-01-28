@@ -187,34 +187,38 @@ class App extends React.Component {
         console.log("App.render");
         console.log(this.state);
 
-        let slider = "";
         let dates = this.state.dates;
-        if(dates !== undefined  && dates.length > 0) {
-            slider = <input
-                       className="custom-range"
-                       min={0}
-                       max={dates.length - 1}
-                       onChange={e=>this.setDate(dates[e.target.value])}
-                       type="range"
-                       value={
-                           this.state.date === undefined
-                               || this.state.dates  === undefined
-                               ? 0
-                               : this.state.dates.indexOf(this.state.date)}
-                     />;
-        }
 
         let charts = "";
         let data = this.state.data;
         let date = this.state.date;
         let colourScale = this.state.groupColourScale;
         let variable = this.state.barRaceVariable;
-        let loadingBar = (
-            <div className="progress" style={{marginTop: "1em"}}>
-              <div
-                className="progress-bar progress-bar-striped"
-                style={{width:"100%"}}>
-                Loading...
+
+
+        let slider = (
+            <div style={
+                {
+                    marginLeft: 45,
+                    marginRight: 10,
+                    marginTop: "1em",
+                    marginBottom: "1em"}
+            }
+            >
+              <input
+                className="custom-range"
+                min={0}
+                max={dates !== undefined ? dates.length - 1 : 0}
+                onChange={e=>this.setDate(dates[e.target.value])}
+                type="range"
+                value={
+                    this.state.date === undefined
+                        || this.state.dates  === undefined
+                        ? 0
+                        : this.state.dates.indexOf(this.state.date)}
+              />
+	      <div style={{textAlign: "right"}}>
+                {this.state.date ? this.state.date.toLocaleDateString() : ""}
               </div>
             </div>
         );
@@ -241,6 +245,40 @@ class App extends React.Component {
                 nTop={this.state.nTop}
                 variable={variable}
               />
+
+              {slider}
+            </div>
+        );
+
+        let loadingBar = (
+            <div
+              className="progress-bar progress-bar-striped"
+              style={{position: "fixed", top: 0, height: 30, width:"100%"}}>
+              Loading...
+            </div>
+        );
+
+        let title = "";
+        if(this.state.groupby === "country" && this.state.loading === false){
+            if(this.state.exporterStatus === "interested"){
+                title = "Countries of interest";
+            } else if (this.state.exporterStatus === "mentioned") {
+                title = "Countries mentioned in interactions";
+            }
+        } else if (this.state.groupby === "sector" && this.state.loading === false) {
+            title = "Sectors of interest";
+        }
+        title = <h2 style={{marginBottom: "1em", marginTop: 40}}>{title}</h2>;
+
+        let playButton = (
+            <div className="form-group row">
+              <label className="col-md-3 col-form-label text-right"></label>
+	      <button
+                className="btn btn-primary col-md-9"
+                onClick={this.togglePlaying}
+                style={{marginTop: 10}}>
+                {this.state.playing === true ? "Stop" : "Play"}
+              </button>
             </div>
         );
 
@@ -275,7 +313,9 @@ class App extends React.Component {
 
         let exporterStatusSelector = (
             <div className="form-group row">
-              <label className="col-md-3 col-form-label text-right">Exporter status</label>
+              <label className="col-md-3 col-form-label text-right">
+                Exporter status
+              </label>
               <select
                 className="custom-select col-md-9"
                 onChange={(e)=>this.setExporterStatus(e.target.value)}
@@ -325,23 +365,19 @@ class App extends React.Component {
         );
         
         return (
-	    <div>
-	      {charts}
-              {slider}
-	      <div>{this.state.date ? this.state.date.toLocaleDateString() : ""}</div>
+            <div>
               {this.state.loading ? loadingBar : ""}
-	      <button
-                className="btn btn-primary"
-                onClick={this.togglePlaying}
-                style={{marginTop: 10}}>
-                {this.state.playing === true ? "Stop" : "Play"}
-              </button>
-
-              {groupbySelector}
-              {exporterStatusSelector}
-              {barRaceVariableSelector}
-	      
-            </div>
+	      <div className="container">
+                {title}
+	        {charts}
+                <div className="container" style={{marginTop: "1em"}}>
+                  {playButton}
+                  {groupbySelector}
+                  {exporterStatusSelector}
+                  {barRaceVariableSelector}
+                </div>            
+              </div>
+            </div>            
         );
     }
 }
@@ -372,7 +408,7 @@ class BarRace extends React.Component {
             height: this.container.height
         };
         this.canvas.element.attr("width", this.canvas.width);
-        this.canvas.element.attr("height", this.canvas.height);
+        // this.canvas.element.attr("height", this.canvas.height);
         
         this.plotArea = {
             element: this.canvas.element.select(".plot-area"),
@@ -421,6 +457,17 @@ class BarRace extends React.Component {
     
     componentDidUpdate() {
         console.log("BarRace.componentDidUpdate");
+
+        if(this.props.loading === true) {
+            this.canvas.element.transition().duration(1000).attr("height", 0);
+        } else {
+            this.canvas
+                .element
+                .transition()
+                .duration(1000)
+                .attr("height", this.canvas.height);
+        };
+        
         let data = this.props.data;
         if (data !== undefined && this.props.loading === false) {
             this.draw();
@@ -561,7 +608,7 @@ class LineChart extends React.Component {
             height: this.container.height
         };
         this.canvas.element.attr("width", this.canvas.width);
-        this.canvas.element.attr("height", this.canvas.height);
+        // this.canvas.element.attr("height", this.canvas.height);
         
         this.plotArea = {
             element: this.canvas.element.select(".plot-area"),
@@ -638,6 +685,16 @@ class LineChart extends React.Component {
         console.log("LineChart.componentDidUpdate");
         console.log(this.props);
 
+        if(this.props.loading === true) {
+            this.canvas.element.transition().duration(1000).attr("height", 0);
+        } else {
+            this.canvas
+                .element
+                .transition()
+                .duration(1000)
+                .attr("height", this.canvas.height);
+        };
+
         if(this.props.data !== undefined && this.props.loading === false) {
             this.draw();
         }
@@ -661,6 +718,7 @@ class LineChart extends React.Component {
     draw() {
         console.log("LineChart.draw()");
         console.log(this.props);
+        
         let data = this.props.data;
         let nInterests = data.nInterests;
         let nTop = this.props.nTop;
