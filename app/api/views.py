@@ -300,6 +300,9 @@ def data_visualisation_data(field):
         from {interests_table}
 
         where type = '{exporter_status}'
+            and {field} != ''
+            and {field} is not null
+            and {field} != 'United Kingdom'
 
         group by 1, 2
 

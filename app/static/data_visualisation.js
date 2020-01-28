@@ -27,6 +27,7 @@ class App extends React.Component {
 	    cumulative: true,
             exporterStatus: "interested",
             intervals: [],
+            loading: false,
             nTop: 10,
             playing: false,
             groupby: "country", // "sector"
@@ -43,25 +44,22 @@ class App extends React.Component {
         this.togglePlaying = this.togglePlaying.bind(this);
     }
 
+    getDataset() {
+        console.log("App.getDataset()");
+        console.log(this.state);
+        let url = this.getDatasetUrl();
+        this.setState({loading: true});
+        axios.get(url)
+            .then(response => this.setData(response.data))
+            .catch(response => alert(`failed to get data. ${response}`))
+            .finally(()=>this.setState({loading: false}));
+        
+    }
+
     getDatasetUrl() {
         let url = `/api/v1/get-data-visualisation-data/${this.state.groupby}?`;
         url += `exporter-status=${this.state.exporterStatus}`;
         return url;
-    }
-
-    getSnapshotBeforeUpdate(prevProps, prevState) {
-        // refresh data if the groupby changes, e.g. country to sector
-        let groupbyChanged = prevState.groupby !== this.state.groupby;
-        let exporterStatusChanged = prevState.exporterStatus !=
-            this.state.exporterStatus;
-
-        if(groupbyChanged || exporterStatusChanged) {
-            let url = this.getDatasetUrl();
-            axios.get(url)
-                .then(response => this.setData(response.data))
-                .catch(response => alert(`failed to get data. ${response}`));
-        }
-        return null;
     }
     
     play() {
@@ -127,11 +125,12 @@ class App extends React.Component {
     }
 
     setExporterStatus(status) {
-        this.setState({exporterStatus: status});
+        this.setState({exporterStatus: status, loading: true}, this.getDataset);
     }
 
     setGroupby(groupby) {
-        this.setState({groupby: groupby});
+        this.setState({groupby: groupby, loading: true}, this.getDataset);
+        ;
     }
 
     setNextDate() {
@@ -222,6 +221,7 @@ class App extends React.Component {
                 data={data}
                 date={date}
                 id="line-chart"
+                loading={this.state.loading}
                 nTop={this.state.nTop}
                 variable={variable}
               />
@@ -231,6 +231,7 @@ class App extends React.Component {
                 data={data}
                 date={date}
                 id="bar-race"
+                loading={this.state.loading}
                 nTop={this.state.nTop}
                 variable={variable}
               />
@@ -414,7 +415,7 @@ class BarRace extends React.Component {
     componentDidUpdate() {
         console.log("BarRace.componentDidUpdate");
         let data = this.props.data;
-        if (data !== undefined) {
+        if (data !== undefined && this.props.loading === false) {
             this.draw();
         }
     }
@@ -630,11 +631,13 @@ class LineChart extends React.Component {
         console.log("LineChart.componentDidUpdate");
         console.log(this.props);
 
-        if(this.props.data !== undefined) {
+        if(this.props.data !== undefined && this.props.loading === false) {
             this.draw();
         }
         
-        if (this.props.data !== undefined && this.props.date !== undefined) {
+        if (this.props.data !== undefined
+            && this.props.date !== undefined
+            && this.props.loading === false) {
             let x = this.xAxis.scale(this.props.date);
             let width = this.plotArea.width - x;
             if(x !== undefined && !isNaN(x)) {
@@ -726,6 +729,16 @@ class LineChart extends React.Component {
             .html(d=>d.group)
             .attr("text-anchor", "start")
             .attr("dominant-baseline", "middle");
+
+        legendItems.
+            transition()
+            .attr("transform", (d, i)=>`translate(0, ${i * legendBlockWidth + 1})`);
+
+        legendItems
+            .selectAll("rect")
+            .data(groupedData, d=>d.group)
+            .transition()
+            .style("fill", d=>this.props.colourScale(d.group));        
 
         legendItems.exit().remove();
         
