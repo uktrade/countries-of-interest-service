@@ -11,10 +11,7 @@ class App extends React.Component {
 
 
     componentDidMount() {
-        let url = this.getDatasetUrl();
-        axios.get(url)
-            .then(response => this.setData(response.data))
-            .catch(response => alert(`failed to get data. ${response}`));
+        this.getDataset();
     }
 
     componentDidUpdate() {
@@ -27,7 +24,7 @@ class App extends React.Component {
 	    cumulative: true,
             exporterStatus: "interested",
             intervals: [],
-            loading: false,
+            loading: true,
             nTop: 10,
             playing: false,
             groupby: "country", // "sector"
@@ -212,6 +209,15 @@ class App extends React.Component {
         let date = this.state.date;
         let colourScale = this.state.groupColourScale;
         let variable = this.state.barRaceVariable;
+        let loadingBar = (
+            <div className="progress" style={{marginTop: "1em"}}>
+              <div
+                className="progress-bar progress-bar-striped"
+                style={{width:"100%"}}>
+                Loading...
+              </div>
+            </div>
+        );
         
         charts = (
             <div>
@@ -323,6 +329,7 @@ class App extends React.Component {
 	      {charts}
               {slider}
 	      <div>{this.state.date ? this.state.date.toLocaleDateString() : ""}</div>
+              {this.state.loading ? loadingBar : ""}
 	      <button
                 className="btn btn-primary"
                 onClick={this.togglePlaying}
