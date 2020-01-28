@@ -272,10 +272,10 @@ def populate_database():
         return flask_app.make_response(response)
 
 
-@api.route('/api/data-visualisation-data/<field>')
+@api.route('/api/v1/get-data-visualisation-data/<field>')
 @login_required
 def data_visualisation_data(field):
-    date_trunc = request.args.get('date_trunc', 'day')
+    date_trunc = request.args.get('date_trunc', 'quarter')
     exporter_status = request.args['exporter-status']
     interests_table = internal_models.CountriesAndSectorsInterest.__tablename__
 

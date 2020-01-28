@@ -44,7 +44,7 @@ class App extends React.Component {
     }
 
     getDatasetUrl() {
-        let url = `/api/data-visualisation-data/${this.state.groupby}?`;
+        let url = `/api/v1/get-data-visualisation-data/${this.state.groupby}?`;
         url += `exporter-status=${this.state.exporterStatus}`;
         return url;
     }
