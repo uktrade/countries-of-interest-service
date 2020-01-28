@@ -10,13 +10,9 @@ from app.db.models.external import (
     Interactions,
 )
 from app.db.models.internal import (
-    CountriesAndSectorsOfInterest,
-    CountriesOfInterest,
-    ExportCountries,
+    CountriesAndSectorsInterest,
     InteractionsAnalysed,
     InteractionsAnalysedInteractionIdLog,
-    MentionedInInteractions,
-    SectorsOfInterest,
     StandardisedCountries,
 )
 
@@ -26,89 +22,18 @@ def add_countries_and_sectors_of_interest(app_with_db_module):
     def _method(records):
         for record in records:
             defaults = {
-                'company_id': record.get('company_id', None),
-                'country_of_interest': record.get('country_of_interest', None),
-                'standardised_country': record.get('standardised_country', None),
-                'sector_of_interest': record.get('sector_of_interest', None),
+                'service_company_id': record.get('service_company_id', None),
+                'company_match_id': record.get('company_match_id', None),
+                'country': record.get('country', None),
+                'sector': record.get('sector', None),
+                'type': record.get('type', None),
+                'service': record.get('service', None),
+                'source': record.get('source', None),
+                'source_id': record.get('source_id', None),
                 'timestamp': record.get('timestamp', None),
             }
-            CountriesAndSectorsOfInterest.get_or_create(
-                source=record.get('source', None),
-                source_id=record.get('source_id', None),
-                defaults=defaults,
-            )
-
-    return _method
-
-
-@pytest.fixture(scope='module')
-def add_company_countries_of_interest(app_with_db_module):
-    def _method(records):
-        for record in records:
-            defaults = {
-                'company_id': record.get('company_id', None),
-                'country_of_interest': record.get('country_of_interest', None),
-                'standardised_country': record.get('standardised_country', None),
-                'timestamp': record.get('timestamp', None),
-            }
-            CountriesOfInterest.get_or_create(
-                source=record.get('source', None),
-                source_id=record.get('source_id', None),
-                defaults=defaults,
-            )
-
-    return _method
-
-
-@pytest.fixture(scope='module')
-def add_company_export_countries(app_with_db_module):
-    def _method(records):
-        for record in records:
-            defaults = {
-                'company_id': record.get('company_id', None),
-                'export_country': record.get('export_country', None),
-                'standardised_country': record.get('standardised_country', None),
-                'timestamp': record.get('timestamp', None),
-            }
-            ExportCountries.get_or_create(
-                source=record.get('source', None),
-                source_id=record.get('source_id', None),
-                defaults=defaults,
-            )
-
-    return _method
-
-
-@pytest.fixture(scope='module')
-def add_mentioned_in_interactions(app_with_db_module):
-    def _method(records):
-        for record in records:
-            defaults = {
-                'company_id': record.get('company_id', None),
-                'country_of_interest': record.get('country_of_interest', None),
-                'interaction_id': record.get('interaction_id', None),
-                'timestamp': record.get('timestamp', None),
-            }
-            MentionedInInteractions.get_or_create(
-                id=record.get('id', None), defaults=defaults
-            )
-
-    return _method
-
-
-@pytest.fixture(scope='module')
-def add_sectors_of_interest(app_with_db_module):
-    def _method(records):
-        for record in records:
-            defaults = {
-                'company_id': record.get('company_id', None),
-                'sector_of_interest': record.get('sector_of_interest', None),
-                'timestamp': record.get('timestamp', None),
-            }
-            SectorsOfInterest.get_or_create(
-                source=record.get('source', None),
-                source_id=record.get('source_id', None),
-                defaults=defaults,
+            CountriesAndSectorsInterest.get_or_create(
+                id=record.get('id', None), defaults=defaults,
             )
 
     return _method
@@ -204,12 +129,18 @@ def add_export_wins(app_with_db_module):
     def _method(records):
         for record in records:
             defaults = {
-                'company_id': record.get('company_id', None),
+                'export_wins_id': record.get('export_wins_id', None),
+                'sector': record.get('sector', None),
+                'company_name': record.get('company_name', None),
+                'export_wins_company_id': record.get('export_wins_company_id', None),
+                'contact_email_address': record.get('contact_email_address', None),
                 'country': record.get('country', None),
-                'id': record.get('id', None),
-                'timestamp': record.get('timestamp', None),
+                'date_won': record.get('date_won', None),
+                'created_on': record.get('created_on', None),
             }
-            ExportWins.get_or_create(id=record.get('id', None), defaults=defaults)
+            ExportWins.get_or_create(
+                export_wins_id=record.get('export_wins_id', None), defaults=defaults
+            )
 
     return _method
 

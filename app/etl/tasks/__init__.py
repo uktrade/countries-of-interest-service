@@ -42,15 +42,17 @@ def populate_database(drop_table, extractors, tasks):
 
     for name, task in TASKS_DICT.items():
         if name in tasks:
-            task = task(drop_table=drop_table)
-            logger.info(f'task: {task.name}')
-            try:
-                output = output + [task()]
-            except Exception as e:
-                print(task)
-                output = output + [
-                    {'table': task.table_name, 'status': 500, 'error': str(e)}
-                ]
+            subtask_list = [task] if not isinstance(task, list) else task
+            for position, subtask in enumerate(subtask_list):
+                subtask = subtask(drop_table=drop_table if position == 0 else False)
+                logger.info(f'task: {subtask.name}')
+                try:
+                    output = output + [subtask()]
+                except Exception as e:
+                    print(subtask)
+                    output = output + [
+                        {'table': subtask.table, 'status': 500, 'error': str(e)}
+                    ]
 
     sql = 'insert into etl_runs (timestamp) values (%s)'
     ts_finish = datetime.datetime.now()

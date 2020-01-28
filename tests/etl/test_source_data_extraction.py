@@ -344,25 +344,61 @@ class TestExtractDatahubSectors(SourceDataExtractBaseTestCase):
 class TestExtractExportWins(SourceDataExtractBaseTestCase):
     __test__ = True
     dataset_id_config_key = 'export_wins_dataset_id'
+    item_pk = 'export_wins_id'
     expected_data = [
         {
-            'id': '23f66b0e-05be-40a5-9bf2-fa44dc7714a8',
-            'company_id': 'asdf',
-            'country': 'IT',
-            'timestamp': '2019-01-01 01:00:00',
+            'export_wins_id': '23f66b0e-05be-40a5-9bf2-fa44dc7714a8',
+            'sector': 'Aerospace',
+            'company_name': 'Spaceship',
+            'export_wins_company_id': '20302012',
+            'contact_email_address': 'test@spaceship.com',
+            'created_on': '2019-01-02 18:00:00',
+            'country': 'ES',
+            'date_won': '2019-01-02',
         },
         {
-            'id': 'f50d892d-388a-405b-9e30-16b9971ac0d4',
-            'company_id': 'ffff',
-            'country': 'GO',
-            'timestamp': '2019-01-02 18:00:00',
+            'export_wins_id': 'f50d892d-388a-405b-9e30-16b9971ac0d4',
+            'sector': 'Food',
+            'company_name': 'Cake',
+            'export_wins_company_id': '9292929',
+            'contact_email_address': 'test@cake.com',
+            'created_on': '2020-01-20 11:00:00',
+            'country': 'IR',
+            'date_won': '2018-07-02',
         },
     ]
     source_data = {
-        'headers': ['id', 'company_id', 'country', 'timestamp'],
+        'headers': [
+            'id',
+            'sector',
+            'company_name',
+            'cdms_reference',
+            'customer_email_address',
+            'created',
+            'country',
+            'date',
+        ],
         'values': [
-            ['23f66b0e-05be-40a5-9bf2-fa44dc7714a8', 'asdf', 'IT', '2019-01-01 1:00'],
-            ['f50d892d-388a-405b-9e30-16b9971ac0d4', 'ffff', 'GO', '2019-01-02 18:00'],
+            [
+                '23f66b0e-05be-40a5-9bf2-fa44dc7714a8',
+                'Aerospace',
+                'Spaceship',
+                '20302012',
+                'test@spaceship.com',
+                '2019-01-02 18:00',
+                'ES',
+                '2019-01-02 18:00',
+            ],
+            [
+                'f50d892d-388a-405b-9e30-16b9971ac0d4',
+                'Food',
+                'Cake',
+                '9292929',
+                'test@cake.com',
+                '2020-01-20 11:00',
+                'IR',
+                '2018-07-02 10:00',
+            ],
         ],
         'next': None,
     }

@@ -14,7 +14,7 @@ from app.api.tasks import populate_database_task
 from app.api.utils import response_orientation_decorator, to_web_dict
 from app.config import data_sources
 from app.db.db_utils import execute_query, execute_statement, table_exists
-from app.db.models import internal as internal_models
+from app.db.models.internal import CountriesAndSectorsInterest
 from app.db.models.internal import HawkUsers
 from app.sso.token import login_required
 
@@ -87,46 +87,67 @@ def json_error(f):
 @ac.authorization_required
 def get_company_countries_and_sectors_of_interest(orientation):
     pagination_size = flask_app.config['app']['pagination_size']
-    next_source = request.args.get('next-source')
-
-    next_source_id = request.args.get('next-source-id')
-    company_ids = request.args.getlist('company-id')
+    next_id = request.args.get('next-id')
+    service_company_ids = request.args.getlist('service-company-id')
+    company_match_ids = request.args.getlist('company-match-id')
     countries = request.args.getlist('country')
     sectors = request.args.getlist('sector')
+    types = request.args.getlist('type')
+    services = request.args.getlist('service')
     sources = request.args.getlist('source')
 
     where = ''
-    values = countries + sectors + sources + company_ids
+    values = (
+        countries
+        + sectors
+        + service_company_ids
+        + company_match_ids
+        + types
+        + sources
+        + services
+    )
     if len(countries) == 1:
-        where = 'where country_of_interest=%s'
+        where = 'where country=%s'
     elif len(countries) > 1:
         where = (
-            'where country_of_interest in ('
-            + ','.join('%s' for i in range(len(countries)))
-            + ')'
+            'where country in (' + ','.join('%s' for i in range(len(countries))) + ')'
         )
     if len(sectors) == 1:
         where = where + ' and' if where != '' else 'where'
-        where = where + ' sector_of_interest=%s'
+        where = where + ' sector=%s'
     elif len(sectors) > 1:
         where = where + ' and' if where != '' else 'where'
         where = (
-            where
-            + ' sector_of_interest in ('
-            + ','.join(['%s' for i in range(len(sectors))])
-            + ')'
+            where + ' sector in (' + ','.join(['%s' for i in range(len(sectors))]) + ')'
         )
-    if len(company_ids) == 1:
+    if len(service_company_ids) == 1:
         where = where + ' and' if where != '' else 'where'
-        where = where + ' company_id=%s'
-    elif len(company_ids) > 1:
+        where = where + ' service_company_id=%s'
+    elif len(service_company_ids) > 1:
         where = where + ' and' if where != '' else 'where'
         where = (
             where
-            + ' company_id in ('
-            + ','.join(['%s' for i in range(len(company_ids))])
+            + ' service_company_id in ('
+            + ','.join(['%s' for i in range(len(service_company_ids))])
             + ')'
         )
+    if len(company_match_ids) == 1:
+        where = where + ' and' if where != '' else 'where'
+        where = where + ' company_match_id=%s'
+    elif len(company_match_ids) > 1:
+        where = where + ' and' if where != '' else 'where'
+        where = (
+            where
+            + ' company_match_id in ('
+            + ','.join(['%s' for i in range(len(company_match_ids))])
+            + ')'
+        )
+    if len(types) == 1:
+        where = where + ' and' if where != '' else 'where'
+        where = where + ' type=%s'
+    elif len(types) > 1:
+        where = where + ' and' if where != '' else 'where'
+        where = where + ' type in (' + ','.join(['%s' for i in range(len(types))]) + ')'
     if len(sources) == 1:
         where = where + ' and' if where != '' else 'where'
         where = where + ' source=%s'
@@ -135,160 +156,15 @@ def get_company_countries_and_sectors_of_interest(orientation):
         where = (
             where + ' source in (' + ','.join(['%s' for i in range(len(sources))]) + ')'
         )
-    if next_source is not None and next_source_id is not None:
+    if len(services) == 1:
         where = where + ' and' if where != '' else 'where'
-        where = where + ' (source, source_id) >= (%s, %s)'
-        values = values + [next_source, next_source_id]
-
-    sql_query = f'''
-        select
-          company_id,
-          country_of_interest,
-          standardised_country,
-          sector_of_interest,
-          source,
-          source_id,
-          timestamp
-        from coi_countries_and_sectors_of_interest
-        {where}
-        order by (source, source_id)
-        limit {pagination_size} + 1
-    '''
-
-    df = execute_query(sql_query, data=values)
-    if len(df) == pagination_size + 1:
-        next_ = '{}{}?'.format(request.host_url[:-1], request.path)
-        next_ += '&'.join(
-            ['company-id={}'.format(company_id) for company_id in company_ids]
-        )
-        next_ += '&'.join(['country={}'.format(country) for country in countries])
-        next_ += '&'.join(['sector={}'.format(sector) for sector in sectors])
-        next_ += '&'.join(['source={}'.format(source) for source in sources])
-        next_ += '&' if next_[-1] != '?' else ''
-        next_ += 'orientation={}'.format(orientation)
-        next_ += '&next-source={}&next-source-id={}'.format(
-            df['source'].values[-1], df['source_id'].values[-1],
-        )
-        df = df[:-1]
-    else:
-        next_ = None
-    web_dict = to_web_dict(df, orientation)
-    web_dict['next'] = next_
-    return flask_app.make_response(web_dict)
-
-
-@api.route('/api/v1/get-company-countries-of-interest')
-@json_error
-@response_orientation_decorator
-@ac.authentication_required
-@ac.authorization_required
-def get_company_countries_of_interest(orientation):
-    pagination_size = flask_app.config['app']['pagination_size']
-    next_source = request.args.get('next-source')
-    next_source_id = request.args.get('next-source-id')
-    company_ids = request.args.getlist('company-id')
-    countries = request.args.getlist('country')
-    sources = request.args.getlist('source')
-
-    values = countries + sources + company_ids
-    where = ''
-    if len(countries) == 1:
-        where = 'where country_of_interest=%s'
-    elif len(countries) > 1:
-        where = (
-            'where country_of_interest in ('
-            + ','.join('%s' for i in range(len(countries)))
-            + ')'
-        )
-    if len(company_ids) == 1:
-        where = where + ' and' if where != '' else 'where'
-        where = where + ' company_id=%s'
-    elif len(company_ids) > 1:
+        where = where + ' service=%s'
+    elif len(services) > 1:
         where = where + ' and' if where != '' else 'where'
         where = (
             where
-            + ' company_id in ('
-            + ','.join(['%s' for i in range(len(company_ids))])
-            + ')'
-        )
-    if len(sources) == 1:
-        where = where + ' and' if where != '' else 'where'
-        where = where + ' source=%s'
-    elif len(sources) > 1:
-        where = where + ' and' if where != '' else 'where'
-        where = (
-            where + ' source in (' + ','.join(['%s' for i in range(len(sources))]) + ')'
-        )
-    if next_source is not None and next_source_id is not None:
-        where = where + ' and' if where != '' else 'where'
-        where = where + ' (source, source_id) >= (%s, %s)'
-        values = values + [next_source, next_source_id]
-
-    sql_query = f'''
-        select
-          company_id,
-          country_of_interest,
-          standardised_country,
-          source,
-          source_id,
-          timestamp
-        from coi_countries_of_interest
-        {where}
-        order by (source, source_id)
-        limit {pagination_size} + 1
-    '''
-    df = execute_query(sql_query, data=values)
-    if len(df) == pagination_size + 1:
-        next_ = '{}{}'.format(request.host_url[:-1], request.path)
-        next_ += '?'
-        next_ += '&'.join(
-            ['company-id={}'.format(company_id) for company_id in company_ids]
-        )
-        next_ += '&'.join(['country={}'.format(country) for country in countries])
-        next_ += '&'.join(['source={}'.format(source) for source in sources])
-        next_ += '&' if next_[-1] != '?' else ''
-        next_ += 'orientation={}'.format(orientation)
-        next_ += '&next-source={}&next-source-id={}'.format(
-            df['source'].values[-1], df['source_id'].values[-1],
-        )
-        df = df[:-1]
-    else:
-        next_ = None
-    web_dict = to_web_dict(df, orientation)
-    web_dict['next'] = next_
-    return flask_app.make_response(web_dict)
-
-
-@api.route('/api/v1/get-company-countries-mentioned-in-interactions')
-@json_error
-@response_orientation_decorator
-@ac.authentication_required
-@ac.authorization_required
-def get_company_countries_mentioned_in_interactions(orientation):
-    pagination_size = flask_app.config['app']['pagination_size']
-    next_id = request.args.get('next-id')
-    company_ids = request.args.getlist('company-id')
-    countries = request.args.getlist('country')
-
-    values = countries + company_ids
-    where = ''
-    if len(countries) == 1:
-        where = 'where country_of_interest=%s'
-    elif len(countries) > 1:
-        where = (
-            'where country_of_interest in ('
-            + ','.join('%s' for i in range(len(countries)))
-            + ')'
-        )
-    if len(company_ids) == 1:
-        where = where + ' and' if where != '' else 'where'
-        where = where + ' company_id=%s'
-    elif len(company_ids) > 1:
-        where = where + ' and' if where != '' else 'where'
-        where = (
-            where
-            + ' company_id in ('
-            + ','.join(['%s' for i in range(len(company_ids))])
+            + ' service in ('
+            + ','.join(['%s' for i in range(len(services))])
             + ')'
         )
     if next_id is not None:
@@ -296,199 +172,51 @@ def get_company_countries_mentioned_in_interactions(orientation):
         where = where + ' id >= %s'
         values = values + [next_id]
 
-    mentioned_in_interactions = internal_models.MentionedInInteractions.__tablename__
-
     sql_query = f'''
         select
-          id,
-          company_id,
-          country_of_interest,
-          interaction_id,
-          timestamp
-
-        from {mentioned_in_interactions}
-
+            id,
+            service_company_id,
+            company_match_id,
+            country,
+            sector,
+            type,
+            service,
+            source,
+            source_id,
+            timestamp
+        from {CountriesAndSectorsInterest.get_fq_table_name()}
         {where}
         order by id
         limit {pagination_size} + 1
     '''
+
     df = execute_query(sql_query, data=values)
     if len(df) == pagination_size + 1:
-        next_ = '{}{}'.format(request.host_url[:-1], request.path)
-        next_ += '?'
+        next_ = '{}{}?'.format(request.host_url[:-1], request.path)
         next_ += '&'.join(
-            ['company-id={}'.format(company_id) for company_id in company_ids]
+            [
+                'service-company-id={}'.format(company_id)
+                for company_id in service_company_ids
+            ]
+        )
+        next_ += '&'.join(
+            [
+                'company-match-id={}'.format(company_match_id)
+                for company_match_id in company_match_ids
+            ]
         )
         next_ += '&'.join(['country={}'.format(country) for country in countries])
-        next_ += '&' if next_[-1] != '?' else ''
-        next_ += 'orientation={}'.format(orientation)
-        next_ += '&next-id={}'.format(df['id'].values[-1],)
-        df = df[:-1]
-    else:
-        next_ = None
-    df = df.drop('id', axis=1)
-    web_dict = to_web_dict(df, orientation)
-    web_dict['next'] = next_
-    return flask_app.make_response(web_dict)
-
-
-@api.route('/api/v1/get-company-export-countries')
-@json_error
-@response_orientation_decorator
-@ac.authentication_required
-@ac.authorization_required
-def get_company_export_countries(orientation):
-    pagination_size = flask_app.config['app']['pagination_size']
-    next_source = request.args.get('next-source')
-    next_source_id = request.args.get('next-source-id')
-    company_ids = request.args.getlist('company-id')
-    countries = request.args.getlist('country')
-    sources = request.args.getlist('source')
-
-    values = countries + sources + company_ids
-    where = ''
-    if len(countries) == 1:
-        where = 'where export_country=%s'
-    elif len(countries) > 1:
-        where = (
-            'where export_country in ('
-            + ','.join('%s' for i in range(len(countries)))
-            + ')'
-        )
-    if len(company_ids) == 1:
-        where = where + ' and' if where != '' else 'where'
-        where = where + ' company_id=%s'
-    elif len(company_ids) > 1:
-        where = where + ' and' if where != '' else 'where'
-        where = (
-            where
-            + ' company_id in ('
-            + ','.join(['%s' for i in range(len(company_ids))])
-            + ')'
-        )
-    if len(sources) == 1:
-        where = where + ' and' if where != '' else 'where'
-        where = where + ' source=%s'
-    elif len(sources) > 1:
-        where = where + ' and' if where != '' else 'where'
-        where = (
-            where + ' source in (' + ','.join(['%s' for i in range(len(sources))]) + ')'
-        )
-    if next_source is not None and next_source_id is not None:
-        where = where + ' and' if where != '' else 'where'
-        where = where + ' (source, source_id) >= (%s, %s)'
-        values = values + [next_source, next_source_id]
-
-    sql_query = f'''
-        select
-          company_id,
-          export_country,
-          standardised_country,
-          source,
-          source_id,
-          timestamp
-        from coi_export_countries
-        {where}
-        order by (source, source_id)
-        limit {pagination_size} + 1
-    '''
-    df = execute_query(sql_query, data=values)
-    if len(df) == pagination_size + 1:
-        next_ = '{}{}'.format(request.host_url[:-1], request.path)
-        next_ += '?'
-        next_ += '&'.join(
-            ['company-id={}'.format(company_id) for company_id in company_ids]
-        )
-        next_ += '&'.join(['country={}'.format(country) for country in countries])
-        next_ += '&'.join(['source={}'.format(source) for source in sources])
-        next_ += '&' if next_[-1] != '?' else ''
-        next_ += 'orientation={}'.format(orientation)
-        next_ += '&next-source={}&next-source-id={}'.format(
-            df['source'].values[-1], df['source_id'].values[-1],
-        )
-        df = df[:-1]
-    else:
-        next_ = None
-    web_dict = to_web_dict(df, orientation)
-    web_dict['next'] = next_
-    return flask_app.make_response(web_dict)
-
-
-@api.route('/api/v1/get-company-sectors-of-interest')
-@json_error
-@response_orientation_decorator
-@ac.authentication_required
-@ac.authorization_required
-def get_company_sectors_of_interest(orientation):
-    pagination_size = flask_app.config['app']['pagination_size']
-    next_source = request.args.get('next-source')
-    next_source_id = request.args.get('next-source-id')
-    company_ids = request.args.getlist('company-id')
-    sectors = request.args.getlist('sector')
-    sources = request.args.getlist('source')
-
-    values = sectors + sources + company_ids
-    where = ''
-    if len(sectors) == 1:
-        where = 'where sector_of_interest=%s'
-    elif len(sectors) > 1:
-        where = (
-            'where sector_of_interest in ('
-            + ','.join('%s' for i in range(len(sectors)))
-            + ')'
-        )
-    if len(company_ids) == 1:
-        where = where + ' and' if where != '' else 'where'
-        where = where + ' company_id=%s'
-    elif len(company_ids) > 1:
-        where = where + ' and' if where != '' else 'where'
-        where = (
-            where
-            + ' company_id in ('
-            + ','.join(['%s' for i in range(len(company_ids))])
-            + ')'
-        )
-    if len(sources) == 1:
-        where = where + ' and' if where != '' else 'where'
-        where = where + ' source=%s'
-    elif len(sources) > 1:
-        where = where + ' and' if where != '' else 'where'
-        where = (
-            where + ' source in (' + ','.join(['%s' for i in range(len(sectors))]) + ')'
-        )
-    if next_source is not None and next_source_id is not None:
-        where = where + ' and' if where != '' else 'where'
-        where = where + ' (source, source_id) >= (%s, %s)'
-        values = values + [next_source, next_source_id]
-
-    sql_query = f'''
-        select
-          company_id,
-          sector_of_interest,
-          source,
-          source_id,
-          timestamp
-        from coi_sectors_of_interest
-        {where}
-        order by (source, source_id)
-        limit {pagination_size} + 1
-    '''
-    df = execute_query(sql_query, data=values)
-
-    if len(df) == pagination_size + 1:
-        next_ = '{}{}'.format(request.host_url[:-1], request.path)
-        next_ += '?'
         next_ += '&'.join(['sector={}'.format(sector) for sector in sectors])
+        next_ += '&'.join(['type={}'.format(type) for type in types])
+        next_ += '&'.join(['service={}'.format(service) for service in services])
         next_ += '&'.join(['source={}'.format(source) for source in sources])
         next_ += '&' if next_[-1] != '?' else ''
         next_ += 'orientation={}'.format(orientation)
-        next_ += '&next-source={}&next-source-id={}'.format(
-            df['source'].values[-1], df['source_id'].values[-1],
-        )
+        next_ += '&next-id={}'.format(df['id'].values[-1])
         df = df[:-1]
     else:
         next_ = None
-    web_dict = to_web_dict(df, orientation)
+    web_dict = to_web_dict(df.iloc[:, 1:], orientation)
     web_dict['next'] = next_
     return flask_app.make_response(web_dict)
 
