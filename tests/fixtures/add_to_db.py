@@ -204,12 +204,18 @@ def add_export_wins(app_with_db_module):
     def _method(records):
         for record in records:
             defaults = {
-                'company_id': record.get('company_id', None),
+                'export_wins_id': record.get('export_wins_id', None),
+                'sector': record.get('sector', None),
+                'company_name': record.get('company_name', None),
+                'export_wins_company_id': record.get('export_wins_company_id', None),
+                'contact_email_address': record.get('contact_email_address', None),
                 'country': record.get('country', None),
-                'id': record.get('id', None),
-                'timestamp': record.get('timestamp', None),
+                'date_won': record.get('date_won', None),
+                'created_on': record.get('created_on', None),
             }
-            ExportWins.get_or_create(id=record.get('id', None), defaults=defaults)
+            ExportWins.get_or_create(
+                export_wins_id=record.get('export_wins_id', None), defaults=defaults
+            )
 
     return _method
 

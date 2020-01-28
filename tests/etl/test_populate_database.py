@@ -5,6 +5,7 @@ from app.db.db_utils import execute_query, execute_statement
 from app.etl.tasks import populate_database
 
 
+@patch('app.etl.tasks.source_data_extraction.' 'ExtractExportWins.__call__')
 @patch(
     'app.etl.tasks.source_data_extraction.'
     'ExtractCountriesAndTerritoriesReferenceDataset.__call__'
@@ -46,6 +47,7 @@ class TestPopulateDatabase:
         extract_datahub_export_to_countries,
         extract_datahub_company_dataset,
         extract_countries_and_territories_reference_dataset,
+        extract_export_wins,
     ):
         execute_statement.return_value = None
         extract_countries_and_territories_reference_dataset.return_value = (
@@ -58,6 +60,7 @@ class TestPopulateDatabase:
         )
         extract_datahub_interactions.return_value = 'datahub_interaction'
         extract_datahub_omis.return_value = 'datahub_omis'
+        extract_export_wins.return_value = 'export_wins'
 
         populate_standardised_countries_task.return_value = (
             'populate_standardised_countries'
@@ -85,6 +88,7 @@ class TestPopulateDatabase:
         assert extract_datahub_future_interest_countries.called is True
         assert extract_datahub_interactions.called is True
         assert extract_datahub_omis.called is True
+        assert extract_export_wins.called is True
 
         assert populate_standardised_countries_task.called is True
         assert populate_interactions_analysed_task.called is True
@@ -102,6 +106,7 @@ class TestPopulateDatabase:
                 'datahub_interaction',
                 'datahub_future_interest_countries',
                 'datahub_omis',
+                'export_wins',
                 'populate_standardised_countries',
                 'populate_interactions_analysed',
                 'populate_export_to_countries',
@@ -129,6 +134,7 @@ class TestPopulateDatabase:
         extract_datahub_export_to_countries,
         extract_datahub_company_dataset,
         extract_countries_and_territories_reference_dataset,
+        extract_export_wins,
     ):
         execute_statement.return_value = None
         extract_countries_and_territories_reference_dataset.return_value = (
@@ -141,6 +147,7 @@ class TestPopulateDatabase:
         )
         extract_datahub_interactions.return_value = 'datahub_interaction'
         extract_datahub_omis.return_value = 'datahub_omis'
+        extract_export_wins.return_value = 'export_wins'
 
         populate_standardised_countries_task.return_value = (
             'populate_standardised_countries'
@@ -168,6 +175,7 @@ class TestPopulateDatabase:
         assert extract_datahub_future_interest_countries.called is False
         assert extract_datahub_interactions.called is False
         assert extract_datahub_omis.called is False
+        assert extract_export_wins.called is False
 
         assert populate_standardised_countries_task.called is False
         assert populate_interactions_analysed_task.called is False
@@ -198,6 +206,7 @@ class TestPopulateDatabase:
         extract_datahub_export_to_countries,
         extract_datahub_company_dataset,
         extract_countries_and_territories_reference_dataset,
+        extract_export_wins,
         app_with_db,
     ):
         mock_datetime.datetime.now.return_value = datetime.datetime(2019, 1, 1, 2)
@@ -219,6 +228,7 @@ class TestPopulateDatabase:
         extract_datahub_future_interest_countries.assert_called_once()
         extract_datahub_interactions.assert_called_once()
         extract_datahub_omis.assert_called_once()
+        extract_export_wins.assert_called_once()
 
         populate_standardised_countries_task.assert_called_once_with()
         populate_interactions_analysed_task.assert_called_once_with()

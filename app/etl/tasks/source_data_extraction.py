@@ -225,20 +225,52 @@ class ExtractDatahubSectors(SourceDataExtractor):
 class ExtractExportWins(SourceDataExtractor):
     dataset_id_config_key = 'export_wins_dataset_id'
     mapping = {
-        'company_id': 'company_id',
-        'timestamp': 'timestamp',
+        'id': 'export_wins_id',
+        'sector': 'sector',
+        'company_name': 'company_name',
+        'cdms_reference': 'export_wins_company_id',
+        'customer_email_address': 'contact_email_address',
+        'created': 'created_on',
         'country': 'country',
-        'id': 'id',
+        'date': 'date_won',
     }
     model = models.ExportWins
     source_table_id_config_key = 'export_wins_source_table_id'
     stub_data = {
-        'headers': ['id', 'company_id', 'country', 'timestamp'],
+        'headers': [
+            'id',
+            'sector',
+            'company_name',
+            'cdms_reference',
+            'customer_email_address',
+            'created',
+            'country',
+            'date',
+        ],
         'values': [
-            ['23f66b0e-05be-40a5-9bf2-fa44dc7714a8', 'asdf', 'IT', '2019-01-01 1:00'],
-            ['f50d892d-388a-405b-9e30-16b9971ac0d4', 'ffff', 'GO', '2019-01-02 18:00'],
+            [
+                '23f66b0e-05be-40a5-9bf2-fa44dc7714a8',
+                'Aerospace',
+                'Spaceship',
+                '20302012',
+                'test@spaceship.com',
+                '2019-01-02 18:00',
+                'ES',
+                '2019-01-02 18:00',
+            ],
+            [
+                'f50d892d-388a-405b-9e30-16b9971ac0d4',
+                'Food',
+                'Cake',
+                '9292929',
+                'test@cake.com',
+                '2020-01-20 11:00',
+                'IR',
+                '2018-07-02 10:00',
+            ],
         ],
     }
+    unique_key = 'export_wins_id'
 
 
 def get_hawk_headers(
