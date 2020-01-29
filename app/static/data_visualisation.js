@@ -122,11 +122,11 @@ class App extends React.Component {
     }
 
     setExporterStatus(status) {
-        this.setState({exporterStatus: status, loading: true}, this.getDataset);
+        this.setState({data: null, exporterStatus: status, loading: true}, this.getDataset);
     }
 
     setGroupby(groupby) {
-        this.setState({groupby: groupby, loading: true}, this.getDataset);
+        this.setState({data: undefined, groupby: groupby, loading: true}, this.getDataset);
         ;
     }
 
@@ -458,7 +458,7 @@ class BarRace extends React.Component {
     componentDidUpdate() {
         console.log("BarRace.componentDidUpdate");
 
-        if(this.props.loading === true) {
+        if(this.props.data === undefined || this.props.loading === true) {
             this.canvas.element.transition().duration(1000).attr("height", 0);
         } else {
             this.canvas
@@ -685,7 +685,7 @@ class LineChart extends React.Component {
         console.log("LineChart.componentDidUpdate");
         console.log(this.props);
 
-        if(this.props.loading === true) {
+        if(this.props.data === undefined || this.props.loading === true) {
             this.canvas.element.transition().duration(1000).attr("height", 0);
         } else {
             this.canvas
