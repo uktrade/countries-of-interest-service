@@ -278,17 +278,22 @@ def data_visualisation_data(field):
     date_trunc = request.args.get('date_trunc', 'quarter')
     exporter_status = request.args['exporter-status']
     interests_table = internal_models.CountriesAndSectorsInterest.__tablename__
+    valid_exporter_statuses = ['interested', 'mentioned']
+    valid_fields = ['country', 'sector']
 
-    assert field in ['country', 'sector'], f'invalid field: {field}'
+    if field not in valid_fields:
+        raise BadRequest(f'invalid field: {field}, valid values: {valid_fields}')
 
-    assert exporter_status in [
-        'interested',
-        'mentioned',
-    ], f'invalid exporter_status: {exporter_status}'
+    if exporter_status not in valid_exporter_statuses:
+        raise BadRequest(
+            f'invalid exporter-status: {exporter_status}, '
+            f'valid values: {valid_exporter_statuses}'
+        )
 
-    assert not (
-        field == 'sector' and exporter_status == 'mentioned'
-    ), 'invalid args: exporter-status: mentioned not supported by sector'
+    if field == 'sector' and exporter_status == 'mentioned':
+        raise BadRequest(
+            'invalid args: exporter-status: mentioned not supported by sector'
+        )
 
     sql = '''
     with n_interests as (
