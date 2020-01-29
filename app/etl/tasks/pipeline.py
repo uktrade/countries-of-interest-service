@@ -13,6 +13,7 @@ from app.etl.tasks.datahub_interaction_country import (
 from app.etl.tasks.datahub_omis_country_sector_interest import (
     Task as PopulateDatahubOmisCountrySectorInterestTask,
 )
+from app.etl.tasks.export_wins_country import Task as PopulateExportWinsTask
 from app.etl.tasks.interactions_analysed import Task as PopulateAnalysedInteractionsTask
 from app.etl.tasks.source_data_extraction import (
     extract_countries_and_territories_reference_dataset,
@@ -60,6 +61,7 @@ TASKS_DICT = OrderedDict(
             PopulateDatahubCountryExportedTask,
             PopulateDatahubCountryInterestTask,
             PopulateDatahubOmisCountrySectorInterestTask,
+            PopulateExportWinsTask,
             PopulateMentionedInInteractionsTask,
         ],
     }

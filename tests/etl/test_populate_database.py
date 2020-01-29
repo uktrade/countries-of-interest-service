@@ -25,6 +25,7 @@ from app.etl.tasks.pipeline import COUNTRY_SECTOR_INTEREST, DATAHUB_COMPANY
 @patch(
     'app.etl.tasks.country_standardisation.PopulateStandardisedCountriesTask.__call__'
 )
+@patch('app.etl.tasks.export_wins_country.Task.__call__')
 @patch('app.etl.tasks.datahub_country_interest.Task.__call__')
 @patch('app.etl.tasks.datahub_country_export.Task.__call__')
 @patch('app.etl.tasks.datahub_omis_country_sector_interest.Task.__call__')
@@ -38,6 +39,7 @@ class TestPopulateDatabase:
         populate_datahub_omis_country_sector_interest_task,
         populate_datahub_country_export_task,
         populate_datahub_country_interest_task,
+        populate_export_wins_task,
         populate_standardised_countries_task,
         extract_datahub_omis,
         extract_datahub_interactions,
@@ -80,6 +82,7 @@ class TestPopulateDatabase:
         populate_interactions_analysed_task.return_value = (
             'populate_interactions_analysed'
         )
+        populate_export_wins_task.return_value = 'populate_export_wins'
 
     @patch('app.etl.tasks.execute_statement')
     def test_tasks_are_run(
@@ -90,6 +93,7 @@ class TestPopulateDatabase:
         populate_datahub_omis_country_sector_interest_task,
         populate_datahub_country_export_task,
         populate_datahub_country_interest_task,
+        populate_export_wins_task,
         populate_standardised_countries_task,
         extract_datahub_omis,
         extract_datahub_interactions,
@@ -106,6 +110,7 @@ class TestPopulateDatabase:
             populate_datahub_omis_country_sector_interest_task,
             populate_datahub_country_export_task,
             populate_datahub_country_interest_task,
+            populate_export_wins_task,
             populate_standardised_countries_task,
             extract_datahub_omis,
             extract_datahub_interactions,
@@ -131,6 +136,7 @@ class TestPopulateDatabase:
         assert populate_datahub_country_export_task.called is True
         assert populate_datahub_omis_country_sector_interest_task.called is True
         assert populate_datahub_interaction_country_task.called is True
+        assert populate_export_wins_task.called is True
         assert populate_interactions_analysed_task.called is True
 
         assert output == {
@@ -147,6 +153,7 @@ class TestPopulateDatabase:
                 'populate_datahub_country_export',
                 'populate_datahub_country_interest',
                 'populate_datahub_omis_country_sector_interest',
+                'populate_export_wins',
                 'populate_datahub_interaction_country',
             ]
         }
@@ -160,6 +167,7 @@ class TestPopulateDatabase:
         populate_datahub_omis_country_sector_interest_task,
         populate_datahub_country_export_task,
         populate_datahub_country_interest_task,
+        populate_export_wins_task,
         populate_standardised_countries_task,
         extract_datahub_omis,
         extract_datahub_interactions,
@@ -176,6 +184,7 @@ class TestPopulateDatabase:
             populate_datahub_omis_country_sector_interest_task,
             populate_datahub_country_export_task,
             populate_datahub_country_interest_task,
+            populate_export_wins_task,
             populate_standardised_countries_task,
             extract_datahub_omis,
             extract_datahub_interactions,
@@ -201,6 +210,7 @@ class TestPopulateDatabase:
         assert populate_datahub_country_export_task.called is True
         assert populate_datahub_omis_country_sector_interest_task.called is True
         assert populate_datahub_interaction_country_task.called is True
+        assert populate_export_wins_task.called is True
         assert populate_interactions_analysed_task.called is False
 
         assert output == {
@@ -209,6 +219,7 @@ class TestPopulateDatabase:
                 'populate_datahub_country_export',
                 'populate_datahub_country_interest',
                 'populate_datahub_omis_country_sector_interest',
+                'populate_export_wins',
                 'populate_datahub_interaction_country',
             ]
         }
@@ -222,6 +233,7 @@ class TestPopulateDatabase:
         populate_datahub_omis_country_sector_interest_task,
         populate_datahub_country_export_task,
         populate_datahub_country_interest_task,
+        populate_export_wins_task,
         populate_standardised_countries_task,
         extract_datahub_omis,
         extract_datahub_interactions,
@@ -238,6 +250,7 @@ class TestPopulateDatabase:
             populate_datahub_omis_country_sector_interest_task,
             populate_datahub_country_export_task,
             populate_datahub_country_interest_task,
+            populate_export_wins_task,
             populate_standardised_countries_task,
             extract_datahub_omis,
             extract_datahub_interactions,
