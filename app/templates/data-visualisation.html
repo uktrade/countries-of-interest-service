@@ -1,0 +1,16 @@
+<html>
+  <head>
+    <title>Data visualisation</title>
+    <script src="{{ url_for('static', filename='dist/vendors.bundle.js') }}"></script>
+    <link rel="stylesheet" type="text/css" href={{ url_for('static', filename="styles.css") }} />
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon-16x16.png') }}">
+  </head>
+
+  <body>
+    
+    <div id="react-container">
+    </div>
+    <script src="{{ url_for('static', filename='dist/data_visualisation.bundle.js') }}"></script>
+    
+  </body>
+</html>

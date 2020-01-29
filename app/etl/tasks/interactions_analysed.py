@@ -5,6 +5,7 @@ from app.db.models.internal import InteractionsAnalysed
 class Task:
 
     name = 'interactions_analysed_task'
+    table_name = InteractionsAnalysed.__tablename__
 
     def __init__(self, *args, **kwargs):
         pass
