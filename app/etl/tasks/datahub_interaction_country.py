@@ -22,6 +22,7 @@ with results as (
     from {Interactions.get_fq_table_name()}
         join {InteractionsAnalysed.get_fq_table_name()}
         using (datahub_interaction_id)
+    where standardized_place is not null
     order by source, source_id
 )
 

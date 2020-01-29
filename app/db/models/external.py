@@ -39,9 +39,24 @@ class DatahubCompany(BaseModel):
     __table_args__ = {'schema': 'public'}
 
     id = _col(_int, primary_key=True, autoincrement=True)
+    company_name = _col(_text)
     datahub_company_id = _col(UUID(as_uuid=True), unique=True)
-    company_number = _col(_text)
+    companies_house_id = _col(_text)
     sector = _col(_text)
+    reference_code = _col(_text)
+    postcode = _col(_text)
+    modified_on = _col(_dt)
+
+
+class DatahubContact(BaseModel):
+
+    __tablename__ = 'datahub_contact'
+    __table_args__ = {'schema': 'public'}
+
+    id = _col(_int, primary_key=True, autoincrement=True)
+    datahub_contact_id = _col(UUID(as_uuid=True), unique=True)
+    datahub_company_id = _col(UUID(as_uuid=True))
+    email = _col(_text)
 
 
 class DatahubExportToCountries(BaseModel):

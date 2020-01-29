@@ -65,6 +65,24 @@ class CountriesAndSectorsInterest(BaseModel):
     __table_args__ = ({'schema': 'public'},)
 
 
+class CountriesAndSectorsInterestTemp(BaseModel):
+
+    __tablename__ = "countries_and_sectors_interest_temp"
+
+    id = _col(_int, primary_key=True, autoincrement=True)
+    service_company_id = _col(_text)
+    company_match_id = _col(_int, index=True)
+    country = _col(_text)
+    sector = _col(_text)
+    type = _col(_text, index=True)
+    service = _col(_text, index=True)
+    source = _col(_text, index=True)
+    source_id = _col(_text)
+    timestamp = _col(_dt)
+
+    __table_args__ = ({'schema': 'public'},)
+
+
 class InteractionsAnalysed(BaseModel):
 
     __tablename__ = 'interactions_analysed'

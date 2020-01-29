@@ -1,5 +1,6 @@
 from collections import OrderedDict
 
+from app.etl.tasks.company_matching import Task as PopulateCompanyMatchingTask
 from app.etl.tasks.country_standardisation import PopulateStandardisedCountriesTask
 from app.etl.tasks.datahub_country_export import (
     Task as PopulateDatahubCountryExportedTask,
@@ -18,6 +19,7 @@ from app.etl.tasks.interactions_analysed import Task as PopulateAnalysedInteract
 from app.etl.tasks.source_data_extraction import (
     extract_countries_and_territories_reference_dataset,
     extract_datahub_company_dataset,
+    extract_datahub_contact_dataset,
     extract_datahub_export_to_countries,
     extract_datahub_future_interest_countries,
     extract_datahub_interactions,
@@ -27,6 +29,7 @@ from app.etl.tasks.source_data_extraction import (
 
 COUNTRIES_AND_TERRITORIES = 'countries_and_territories'
 DATAHUB_COMPANY = 'datahub_company'
+DATAHUB_CONTACT = 'datahub_contact'
 DATAHUB_EXPORT_TO_COUNTRIES = 'datahub_export_to_countries'
 DATAHUB_INTERACTIONS = 'datahub_interactions'
 DATAHUB_FUTURE_INTEREST_COUNTRIES = 'datahub_future_interest_countries'
@@ -42,6 +45,7 @@ EXTRACTORS_DICT = OrderedDict(
     {
         COUNTRIES_AND_TERRITORIES: extract_countries_and_territories_reference_dataset,
         DATAHUB_COMPANY: extract_datahub_company_dataset,
+        DATAHUB_CONTACT: extract_datahub_contact_dataset,
         DATAHUB_EXPORT_TO_COUNTRIES: extract_datahub_export_to_countries,
         DATAHUB_INTERACTIONS: extract_datahub_interactions,
         DATAHUB_FUTURE_INTEREST_COUNTRIES: extract_datahub_future_interest_countries,
@@ -63,6 +67,7 @@ TASKS_DICT = OrderedDict(
             PopulateDatahubOmisCountrySectorInterestTask,
             PopulateExportWinsTask,
             PopulateMentionedInInteractionsTask,
+            PopulateCompanyMatchingTask,
         ],
     }
 )

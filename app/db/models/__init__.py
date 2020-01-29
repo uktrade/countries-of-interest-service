@@ -31,7 +31,12 @@ class BaseModel(db.Model):
 
     @classmethod
     def drop_table(cls):
-        cls.__table__.drop(db.engine)
+        cls.__table__.drop(db.engine, checkfirst=True)
+
+    @classmethod
+    def recreate_table(cls):
+        cls.drop_table()
+        cls.create_table()
 
     @classmethod
     def get_schema(cls):
@@ -57,6 +62,7 @@ class BaseModel(db.Model):
         :return: (Object, boolean) (Object, created)
         """
         instance = _sa.session.query(cls).filter_by(**kwargs).first()
+        _sa.session.close()
         if instance:
             return instance, False
         else:

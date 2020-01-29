@@ -80,19 +80,74 @@ class ExtractDatahubCompanyDataset(SourceDataExtractor):
     dataset_id_config_key = 'datahub_companies_dataset_id'
     mapping = {
         'id': 'datahub_company_id',
-        'company_number': 'company_number',
+        'name': 'company_name',
+        'company_number': 'companies_house_id',
         'sector': 'sector',
+        'cdms_reference_code': 'reference_code',
+        'address_postcode': 'postcode',
+        'modified_on': 'modified_on',
     }
     model = models.DatahubCompany
     source_table_id_config_key = 'datahub_companies_source_table_id'
     stub_data = {
-        'headers': ['id', 'company_number', 'sector'],
+        'headers': [
+            'id',
+            'name',
+            'company_number',
+            'sector',
+            'reference_code',
+            'address_postcode',
+            'modified_on',
+        ],
         'values': [
-            ['c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'asdf', 'Food'],
-            ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'asdf2', 'Aerospace'],
+            [
+                'c31e4492-1f16-48a2-8c5e-8c0334d959a3',
+                'company 1',
+                '01298764',
+                'Food',
+                'ORG-127698',
+                'PE12 8KL',
+                '2019-08-20 00:00:00',
+            ],
+            [
+                'd0af8e52-ff34-4088-98e3-d2d22cd250ae',
+                'company 2',
+                '19089376',
+                'Aerospace',
+                'ORG-18778',
+                '123457',
+                '2019-08-21 00:00:00',
+            ],
         ],
     }
     unique_key = 'datahub_company_id'
+
+
+class ExtractDatahubContactDataset(SourceDataExtractor):
+    dataset_id_config_key = 'datahub_contacts_dataset_id'
+    mapping = {
+        'id': 'datahub_contact_id',
+        'company_id': 'datahub_company_id',
+        'email': 'email',
+    }
+    model = models.DatahubContact
+    source_table_id_config_key = 'datahub_contacts_source_table_id'
+    stub_data = {
+        'headers': ['id', 'company_id', 'email'],
+        'values': [
+            [
+                'c31e4492-1f16-48a2-8c5e-8c0334d959a3',
+                '6294212e-f863-44cc-b98c-6041384d6d56',
+                'test@test.com',
+            ],
+            [
+                'd0af8e52-ff34-4088-98e3-d2d22cd250ae',
+                'a86018c3-e811-4472-af0f-125d36e858a6',
+                'john@test.com',
+            ],
+        ],
+    }
+    unique_key = 'datahub_contact_id'
 
 
 class ExtractDatahubExportToCountries(SourceDataExtractor):
@@ -315,10 +370,9 @@ def populate_table_paginated(model, mapping, unique_key, url):
 def populate_table(data, model, mapping, unique_key, overwrite=True):
     connection = sql_alchemy.engine.connect()
     transaction = connection.begin()
-    n_rows = 0
     try:
         if overwrite:
-            connection.execute(model.__table__.delete())
+            model.recreate_table()
         items = []
         for item in data['values']:
             data_item = dict(zip(data['headers'], item))
@@ -359,6 +413,7 @@ extract_countries_and_territories_reference_dataset = (
     ExtractCountriesAndTerritoriesReferenceDataset()
 )
 extract_datahub_company_dataset = ExtractDatahubCompanyDataset()
+extract_datahub_contact_dataset = ExtractDatahubContactDataset()
 extract_datahub_export_to_countries = ExtractDatahubExportToCountries()
 extract_datahub_future_interest_countries = ExtractDatahubFutureInterestCountries()
 extract_datahub_interactions = ExtractDatahubInteractions()
