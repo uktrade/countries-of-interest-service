@@ -21,14 +21,14 @@ class Task:
     valid_email = re.compile(r"[^@]+@[^@]+\.[^@]+")
 
     def __init__(self, **kwargs):
-        self.table = CountriesAndSectorsInterest.__tablename__
+        self.table_name = CountriesAndSectorsInterest.__tablename__
 
     def __call__(self):
         self._datahub_company_matching()
         return {
             'status': 'success',
             'rows': -1,
-            'table': self.table,
+            'table': self.table_name,
         }
 
     def _datahub_company_matching(self):
