@@ -1,5 +1,5 @@
 from app.config import data_sources
-from app.db.models.external import DITCountryTerritoryRegister
+from app.db.models.external import DatahubExportToCountries, DITCountryTerritoryRegister
 from app.db.models.internal import CountriesAndSectorsInterest, StandardisedCountries
 from app.etl import ETLTask
 
@@ -19,7 +19,7 @@ with results as (
         '{data_sources.datahub_export_countries}' as source,
         d.id::text as source_id,
         null::timestamp as timestamp
-    from datahub_export_countries d
+    from {DatahubExportToCountries.get_fq_table_name()} d
         left join {DITCountryTerritoryRegister.get_fq_table_name()} c
             on d.country_iso_alpha2_code = c.country_iso_alpha2_code
         left join {StandardisedCountries.get_fq_table_name()} s

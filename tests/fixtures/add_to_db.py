@@ -1,6 +1,8 @@
 import pytest
 
 from app.db.models.external import (
+    DatahubCompany,
+    DatahubContact,
     DatahubExportToCountries,
     DatahubFutureInterestCountries,
     DatahubOmis,
@@ -101,6 +103,38 @@ def add_datahub_sectors(app_with_db_module):
                 'sector': record.get('sector', None),
             }
             DatahubSectors.get_or_create(id=record.get('id', None), defaults=defaults)
+
+    return _method
+
+
+@pytest.fixture(scope='module')
+def add_datahub_company(app_with_db_module):
+    def _method(records):
+        for record in records:
+            defaults = {
+                'company_name': record.get('company_name', None),
+                'datahub_company_id': record.get('datahub_company_id', None),
+                'companies_house_id': record.get('companies_house_id', None),
+                'sector': record.get('sector', None),
+                'reference_code': record.get('reference_code', None),
+                'postcode': record.get('postcode', None),
+                'modified_on': record.get('modified_on', None),
+            }
+            DatahubCompany.get_or_create(id=record.get('id', None), defaults=defaults)
+
+    return _method
+
+
+@pytest.fixture(scope='module')
+def add_datahub_contact(app_with_db_module):
+    def _method(records):
+        for record in records:
+            defaults = {
+                'datahub_contact_id': record.get('datahub_contact_id', None),
+                'datahub_company_id': record.get('datahub_company_id', None),
+                'email': record.get('email', None),
+            }
+            DatahubContact.get_or_create(id=record.get('id', None), defaults=defaults)
 
     return _method
 

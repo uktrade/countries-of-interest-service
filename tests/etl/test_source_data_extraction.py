@@ -137,12 +137,12 @@ class TestExtractDatahubCompany(SourceDataExtractBaseTestCase):
     expected_data = [
         {
             'datahub_company_id': 'c31e4492-1f16-48a2-8c5e-8c0334d959a3',
-            'company_number': 'asdf',
+            'companies_house_id': 'asdf',
             'sector': 'Food',
         },
         {
             'datahub_company_id': 'd0af8e52-ff34-4088-98e3-d2d22cd250ae',
-            'company_number': 'asdf2',
+            'companies_house_id': 'asdf2',
             'sector': 'Aerospace',
         },
     ]
@@ -456,7 +456,7 @@ class TestPopulateTable:
                 self.sector_model,
                 {'id': 'id', 'sector': 'sector'},
                 'id',
-                overwrite=True,
+                overwrite=False,
             )
 
         rows = self.get_rows()
