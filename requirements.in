@@ -11,6 +11,7 @@ celery==4.4.0
 codecov==2.0.15
 flake8-import-order==0.18.1
 flake8==3.7.9
+flask-shell-ipython==0.4.1
 flask-oauthlib==0.9.5
 flask-security==3.0.0
 flask-sqlalchemy==2.4.1
