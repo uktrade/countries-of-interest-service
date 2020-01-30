@@ -14,7 +14,7 @@ class ETLTask:
         self.drop_table = drop_table
         self.sql = sql
         self.model = model
-        self.table = model.__tablename__
+        self.table_name = model.__tablename__
 
     def __call__(self, *args, **kwargs):
         connection = current_app.db.engine.connect()
@@ -29,7 +29,7 @@ class ETLTask:
             return {
                 'status': 200,
                 'rows': result.rowcount,
-                'table': self.table,
+                'table': self.table_name,
             }
         except sqlalchemy.exc.ProgrammingError as err:
             transaction.rollback()

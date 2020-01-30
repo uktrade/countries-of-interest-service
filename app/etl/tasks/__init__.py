@@ -51,7 +51,7 @@ def populate_database(drop_table, extractors, tasks):
                 except Exception as e:
                     print(subtask)
                     output = output + [
-                        {'table': subtask.table, 'status': 500, 'error': str(e)}
+                        {'table': subtask.table_name, 'status': 500, 'error': str(e)}
                     ]
 
     sql = 'insert into etl_runs (timestamp) values (%s)'
