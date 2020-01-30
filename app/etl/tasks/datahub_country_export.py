@@ -1,6 +1,9 @@
 from app.config import data_sources
 from app.db.models.external import DatahubExportToCountries, DITCountryTerritoryRegister
-from app.db.models.internal import CountriesAndSectorsInterestTemp, StandardisedCountries
+from app.db.models.internal import (
+    CountriesAndSectorsInterestTemp,
+    StandardisedCountries,
+)
 from app.etl import ETLTask
 
 sql = f'''
