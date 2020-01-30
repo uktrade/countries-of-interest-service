@@ -1,32 +1,39 @@
-from app.db.db_utils import (
-    execute_query,
-    insert_data,
-)
+import logging
+
+import sqlalchemy.exc
+from flask import current_app
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 class ETLTask:
+    name = ''
+
     def __init__(self, sql, model, drop_table=False):
         self.drop_table = drop_table
         self.sql = sql
         self.model = model
         self.table = model.__tablename__
 
-    def __call__(self):
+    def __call__(self, *args, **kwargs):
+        connection = current_app.db.engine.connect()
+        transaction = connection.begin()
+        try:
+            if self.drop_table is True:
+                self.model.drop_table()
+            self.model.create_table()
 
-        if self.drop_table is True:
-            self.model.drop_table()
-
-        self.model.create_table()
-
-        df = execute_query(self.sql, raise_if_fail=True)
-        table_name = self.model.get_fq_table_name()
-        insert_data(df, table_name)
-
-        sql = f''' select count(1) from {table_name} '''
-        df = execute_query(sql)
-
-        return {
-            'status': 'success',
-            'rows': int(df.values[0][0]),
-            'table': self.table,
-        }
+            result = connection.execute(self.sql)
+            transaction.commit()
+            return {
+                'status': 200,
+                'rows': result.rowcount,
+                'table': self.table,
+            }
+        except sqlalchemy.exc.ProgrammingError as err:
+            transaction.rollback()
+            logger.error(f'Error running task, "{self.name}". Error: {err}')
+            raise err
+        finally:
+            connection.close()
