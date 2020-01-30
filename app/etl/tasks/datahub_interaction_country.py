@@ -51,7 +51,7 @@ class Task:
     def __init__(self, drop_table=False, *args, **kwargs):
         self.drop_table = drop_table
         self.model = internal_models.CountriesAndSectorsInterest
-        self.table = self.model.__tablename__
+        self.table_name = self.model.__tablename__
 
     def __call__(self, *args, **kwargs):
         connection = current_app.db.engine.connect()
@@ -66,7 +66,7 @@ class Task:
             return {
                 'status': 200,
                 'rows': result.rowcount,
-                'table': self.table,
+                'table': self.table_name,
             }
         except sqlalchemy.exc.ProgrammingError as err:
             transaction.rollback()

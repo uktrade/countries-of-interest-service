@@ -9,7 +9,7 @@ class ETLTask:
         self.drop_table = drop_table
         self.sql = sql
         self.model = model
-        self.table = model.__tablename__
+        self.table_name = model.__tablename__
 
     def __call__(self):
 
@@ -28,5 +28,5 @@ class ETLTask:
         return {
             'status': 'success',
             'rows': int(df.values[0][0]),
-            'table': self.table,
+            'table': self.table_name,
         }
