@@ -1,7 +1,7 @@
 import numpy as np
 
 from app.db.db_utils import execute_query
-from app.db.models.internal import CountriesAndSectorsInterest
+from app.db.models.internal import CountriesAndSectorsInterestTemp
 from app.etl.tasks.datahub_omis_country_sector_interest import Task
 
 
@@ -38,7 +38,7 @@ class TestCountriesAndSectorsOfInterest:
         task = Task()
         task()
 
-        sql = f'''select * from {CountriesAndSectorsInterest.get_fq_table_name()}'''
+        sql = f'''select * from {CountriesAndSectorsInterestTemp.get_fq_table_name()}'''
         df = execute_query(sql)
 
         assert len(df) == 2

@@ -1,7 +1,7 @@
 from app.config import data_sources
 from app.db.models.external import Interactions
 from app.db.models.internal import (
-    CountriesAndSectorsInterest,
+    CountriesAndSectorsInterestTemp,
     InteractionsAnalysed,
 )
 from app.etl import ETLTask
@@ -26,7 +26,7 @@ with results as (
     order by source, source_id
 )
 
-insert into {CountriesAndSectorsInterest.get_fq_table_name()} (
+insert into {CountriesAndSectorsInterestTemp.get_fq_table_name()} (
     service_company_id,
     company_match_id,
     country,
@@ -45,7 +45,7 @@ class Task(ETLTask):
 
     name = "mentioned_in_interactions"
 
-    def __init__(self, sql=sql, model=CountriesAndSectorsInterest, *args, **kwargs):
+    def __init__(self, sql=sql, model=CountriesAndSectorsInterestTemp, *args, **kwargs):
         super().__init__(
             sql=sql, model=model, *args, **kwargs,
         )

@@ -2,7 +2,7 @@ import datetime
 
 from flask import current_app
 
-from app.db.models.internal import CountriesAndSectorsInterest
+from app.db.models.internal import CountriesAndSectorsInterestTemp
 from app.etl.tasks.datahub_interaction_country import Task
 
 
@@ -69,7 +69,7 @@ class TestTask:
         task()
 
         session = current_app.db.session
-        mentioned_in_interactions = session.query(CountriesAndSectorsInterest).all()
+        mentioned_in_interactions = session.query(CountriesAndSectorsInterestTemp).all()
 
         assert len(mentioned_in_interactions) == 2
         mention_0, mention_1 = mentioned_in_interactions
