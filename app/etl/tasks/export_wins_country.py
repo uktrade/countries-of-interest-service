@@ -1,29 +1,36 @@
 from app.config import data_sources
-from app.db.models.external import DITCountryTerritoryRegister
-from app.db.models.internal import CountriesAndSectorsInterest, StandardisedCountries
+from app.db.models.external import (
+    DITCountryTerritoryRegister,
+    ExportWins,
+)
+from app.db.models.internal import (
+    CountriesAndSectorsInterest,
+    StandardisedCountries,
+)
 from app.etl import ETLTask
+
 
 sql = f'''
 with results as (
     select
-        company_id::text as service_company_id,
+        d.export_wins_company_id::text as service_company_id,
         null::int4 as company_match_id,
         case
             when c.name is not null then c.name
             when s.standardised_country is not null then s.standardised_country
             else NULL
         end as country,
-        null as sector,
+        d.sector as sector,
         'exported' as type,
-        'datahub' as service,
-        '{data_sources.datahub_export_countries}' as source,
-        d.id::text as source_id,
-        null::timestamp as timestamp
-    from datahub_export_countries d
+        'export_wins' as service,
+        '{data_sources.export_wins}' as source,
+        d.export_wins_id::text as source_id,
+        d.date_won::timestamp as timestamp
+    from {ExportWins.get_fq_table_name()} d
         left join {DITCountryTerritoryRegister.get_fq_table_name()} c
-            on d.country_iso_alpha2_code = c.country_iso_alpha2_code
+            on d.country = c.country_iso_alpha2_code
         left join {StandardisedCountries.get_fq_table_name()} s
-            on d.country = s.country and s.similarity > 90
+            on d.country = s.country and similarity > 90
     order by source, source_id
 )
 
@@ -44,7 +51,7 @@ insert into {CountriesAndSectorsInterest.get_fq_table_name()} (
 
 class Task(ETLTask):
 
-    name = 'export_countries'
+    name = 'export_wins'
 
     def __init__(self, sql=sql, model=CountriesAndSectorsInterest, *args, **kwargs):
         super().__init__(
