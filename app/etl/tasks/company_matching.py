@@ -6,6 +6,7 @@ import requests
 from flask import current_app
 from mohawk import Sender
 
+from app.db import db_utils
 from app.db.db_utils import execute_statement
 from app.db.models import db
 from app.db.models.external import DatahubCompany, DatahubContact
@@ -187,8 +188,10 @@ class Task:
                 select distinct id, match_id from company_matching
             ) cm on cm.id = csi.service_company_id;
             DROP TABLE IF EXISTS {CountriesAndSectorsInterest.get_fq_table_name()};
-            ALTER TABLE {CountriesAndSectorsInterestTemp.__tablename__}
-            RENAME TO {CountriesAndSectorsInterest.__tablename__};
             COMMIT;
         """
         execute_statement(stmt)
+        db_utils.rename_table(
+            CountriesAndSectorsInterestTemp.__tablename__,
+            CountriesAndSectorsInterest.__tablename__,
+        )

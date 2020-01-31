@@ -58,11 +58,6 @@ def drop_table(fq_name):
     execute_statement(stmt)
 
 
-def rename_table(table_name_1, table_name_2):
-    sql = f'alter table {table_name_1} rename to {table_name_2}'
-    execute_statement(sql)
-
-
 def create_table(fields, table_name):
     sql = f'create table if not exists {table_name} {fields}'
     execute_statement(sql)
@@ -150,3 +145,33 @@ def create_schemas(engine):
 def _create_schema_if_not_exists(engine, schema_name):
     if not engine.dialect.has_schema(engine, schema_name):
         engine.execute(CreateSchema(schema_name))
+
+
+def rename_table(table_name, new_table_name):
+    stmt = f"""
+        select indexname
+        from pg_indexes
+        where tablename = '{table_name}';
+    """
+    indices = execute_query(stmt, df=False)
+    for index in indices:
+        stmt = f"""
+            alter index {index[0]}
+            rename to {index[0].replace(table_name, new_table_name)}
+        """
+        execute_statement(stmt)
+    stmt = f"""
+        SELECT relname FROM pg_class c WHERE c.relkind = 'S'
+        and relname = '{table_name}_id_seq';
+    """
+    sequences = execute_query(stmt, df=False)
+    if sequences:
+        stmt = f"""
+            alter sequence {sequences[0][0]}
+            rename to {sequences[0][0].replace(table_name, new_table_name)}
+        """
+        execute_statement(stmt)
+    stmt = f"""
+        alter table {table_name} rename to {new_table_name};
+    """
+    execute_statement(stmt)
