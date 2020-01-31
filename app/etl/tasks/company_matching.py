@@ -9,7 +9,7 @@ from mohawk import Sender
 from app.db import db_utils
 from app.db.db_utils import execute_statement
 from app.db.models import db
-from app.db.models.external import DatahubCompany, DatahubContact
+from app.db.models.external import DatahubCompany, DatahubContact, ExportWins
 from app.db.models.internal import (
     CountriesAndSectorsInterest,
     CountriesAndSectorsInterestTemp,
@@ -25,26 +25,26 @@ class Task:
         self.table_name = CountriesAndSectorsInterest.__tablename__
 
     def __call__(self):
-        self._datahub_company_matching()
+        self._company_matching()
         return {
             'status': 'success',
             'rows': -1,
             'table': self.table_name,
         }
 
-    def _datahub_company_matching(self):
+    def _company_matching(self):
         connection = db.engine.raw_connection()
-        cursor = self._fetch_datahub_companies(connection)
+        cursor = self._fetch_companies(connection)
         self._match_and_store_results(cursor)
         cursor.close()
         connection.close()
         self._populate_csi_temp_table_and_swap()
 
-    def _fetch_datahub_companies(self, connection):
+    def _fetch_companies(self, connection):
         cursor = connection.cursor(name='fetch_companies')
-        dh_query = f'''
-            SELECT distinct
-                company.datahub_company_id,
+        query = f'''
+            (SELECT distinct
+                csi.service_company_id,
                 company.company_name,
                 contact.email,
                 NULLIF(company.reference_code, '') AS cdms_ref,
@@ -53,15 +53,29 @@ class Task:
                 'dit.datahub' as source,
                 company.modified_on as datetime
             FROM {CountriesAndSectorsInterest.get_fq_table_name()} csi
-            LEFT JOIN {DatahubCompany.get_fq_table_name()} company
+            INNER JOIN {DatahubCompany.get_fq_table_name()} company
                 on csi.service_company_id = company.datahub_company_id::text
             LEFT JOIN
                 (select * from {DatahubContact.get_fq_table_name()}
                 where email is not null) contact
                 using (datahub_company_id)
-            WHERE service = 'datahub'
+            WHERE service = 'datahub')
+            UNION
+            (SELECT distinct
+                csi.source_id,
+                ew.company_name,
+                ew.contact_email_address,
+                NULLIF(ew.export_wins_company_id, '') AS cdms_ref,
+                null as postcode,
+                null as copmanies_house_id,
+                'dit.export-wins' as source,
+                ew.created_on::timestamp
+            FROM {CountriesAndSectorsInterest.get_fq_table_name()} csi
+            INNER JOIN {ExportWins.get_fq_table_name()} ew
+                on csi.source_id = ew.export_wins_id::text
+            WHERE service = 'export_wins')
         '''
-        cursor.execute(dh_query)
+        cursor.execute(query)
         return cursor
 
     def _match_and_store_results(self, cursor):
@@ -174,8 +188,19 @@ class Task:
                 timestamp
             )
             SELECT
+                service_company_id,
+                match_id,
+                country,
+                sector,
+                type,
+                service,
+                source,
+                source_id,
+                timestamp
+            FROM ((SELECT
+                csi.id,
                 csi.service_company_id,
-                cm.match_id,
+                dh_cm.match_id,
                 csi.country,
                 csi.sector,
                 csi.type,
@@ -186,7 +211,25 @@ class Task:
             FROM {CountriesAndSectorsInterest.get_fq_table_name()} csi
             LEFT JOIN (
                 select distinct id, match_id from company_matching
-            ) cm on cm.id = csi.service_company_id;
+            ) dh_cm on dh_cm.id = csi.service_company_id
+            WHERE csi.service = 'datahub')
+            UNION
+            (SELECT
+                csi.id,
+                csi.service_company_id,
+                ew_cm.match_id,
+                csi.country,
+                csi.sector,
+                csi.type,
+                csi.service,
+                csi.source,
+                csi.source_id,
+                csi.timestamp
+            FROM {CountriesAndSectorsInterest.get_fq_table_name()} csi
+            LEFT JOIN (
+                select distinct id, match_id from company_matching
+            ) ew_cm on ew_cm.id = csi.source_id and csi.service = 'export_wins'
+            WHERE csi.service = 'export_wins')) SQ ORDER BY id;
             DROP TABLE IF EXISTS {CountriesAndSectorsInterest.get_fq_table_name()};
             COMMIT;
         """

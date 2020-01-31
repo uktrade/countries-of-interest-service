@@ -10,6 +10,7 @@ def test_company_matching(
     app,
     add_datahub_company,
     add_datahub_contact,
+    add_export_wins,
     add_countries_and_sectors_of_interest,
 ):
     add_datahub_company(
@@ -43,6 +44,20 @@ def test_company_matching(
             }
         ]
     )
+    add_export_wins(
+        [
+            {
+                'export_wins_company_id': 'ORG-01244',
+                'contact_email_address': 'john@test.com',
+                'sector': 'Aerospace',
+                'company_name': 'company_name2',
+                'country': 'China',
+                'export_wins_id': 'ffa75985-7bc0-4e9f-8d58-28a7f234b7fc',
+                'created_on': '2011-10-10 12:12:12',
+                'date_won': '2010-11-11 12:12:12',
+            },
+        ]
+    )
     add_countries_and_sectors_of_interest(
         [
             {
@@ -53,7 +68,7 @@ def test_company_matching(
                 'type': 'interested',
                 'service': 'datahub',
                 'source': 'source1',
-                'source_id': 'source_id_1',
+                'source_id': 'f17645ba-c38e-4215-b09e-47451edb9125',
                 'timestamp': '2009-10-10T12:12:12',
             },
             {
@@ -64,8 +79,19 @@ def test_company_matching(
                 'type': 'exported',
                 'service': 'datahub',
                 'source': 'source2',
-                'source_id': 'source_id_2',
+                'source_id': '5965b49e-dae5-4a06-81fa-c894e652cd52',
                 'timestamp': '2009-10-10T13:00:00',
+            },
+            {
+                'service_company_id': 'ORG-01244',
+                'company_match_id': None,
+                'country': 'China',
+                'sector': 'Aerospace',
+                'type': 'exported',
+                'service': 'export_wins',
+                'source': 'export_wins',
+                'source_id': 'ffa75985-7bc0-4e9f-8d58-28a7f234b7fc',
+                'timestamp': '2010-11-11 12:12:12',
             },
         ]
     )
@@ -83,6 +109,11 @@ def test_company_matching(
                     "id": '5965b49e-dae5-4a06-81fa-c894e652cd52',
                     "match_id": 2,
                     "similarity": "101110",
+                },
+                {
+                    "id": 'ffa75985-7bc0-4e9f-8d58-28a7f234b7fc',
+                    "match_id": 2,
+                    "similarity": "001110",
                 },
             ]
         },
@@ -102,7 +133,7 @@ def test_company_matching(
             'interested',
             'datahub',
             'source1',
-            'source_id_1',
+            'f17645ba-c38e-4215-b09e-47451edb9125',
             '2009-10-10 12:12:12',
         ),
         (
@@ -114,8 +145,20 @@ def test_company_matching(
             'exported',
             'datahub',
             'source2',
-            'source_id_2',
+            '5965b49e-dae5-4a06-81fa-c894e652cd52',
             '2009-10-10 13:00:00',
+        ),
+        (
+            3,
+            'ORG-01244',
+            2,
+            'China',
+            'Aerospace',
+            'exported',
+            'export_wins',
+            'export_wins',
+            'ffa75985-7bc0-4e9f-8d58-28a7f234b7fc',
+            '2010-11-11 12:12:12',
         ),
     ]
 
