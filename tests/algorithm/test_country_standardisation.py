@@ -117,7 +117,8 @@ def test_country_mapping(
         (5, 'netherlands antilles', 'Saba', 100),
         (6, 'netherlands antilles', 'Curaçao', 100),
         (7, 'netherlands antilles', 'Sint Maarten (Dutch part)', 100),
-        (8, 'usa', 'United States', 100),
+        (8, 'uae', 'United Arab Emirates', 100),
+        (9, 'usa', 'United States', 100),
     ]
     assert rows_equal_query_results(
         expected_rows, f'SELECT * FROM "{mapper.output_schema}"."{mapper.output_table}"'
