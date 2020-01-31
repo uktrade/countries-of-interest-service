@@ -17,7 +17,7 @@ class TestGetClientScope(unittest.TestCase):
 
 
 class TestSeenNonce(unittest.TestCase):
-    @unittest.mock.patch('app.api.views.logging')
+    @unittest.mock.patch('app.api.views.flask_app.logger')
     @unittest.mock.patch('app.api.views.flask_app')
     def test_if_there_is_a_redis_error_assume_nonce_has_been_seen(self, app, logging):
         sender_id = 0

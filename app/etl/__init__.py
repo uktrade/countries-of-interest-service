@@ -1,10 +1,5 @@
-import logging
-
 import sqlalchemy.exc
-from flask import current_app
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+from flask import current_app as flask_app
 
 
 class ETLTask:
@@ -17,7 +12,7 @@ class ETLTask:
         self.table_name = model.__tablename__
 
     def __call__(self, *args, **kwargs):
-        connection = current_app.db.engine.connect()
+        connection = flask_app.db.engine.connect()
         transaction = connection.begin()
         try:
             if self.drop_table is True:
@@ -33,7 +28,7 @@ class ETLTask:
             }
         except sqlalchemy.exc.ProgrammingError as err:
             transaction.rollback()
-            logger.error(f'Error running task, "{self.name}". Error: {err}')
+            flask_app.logger.error(f'Error running task, "{self.name}". Error: {err}')
             raise err
         finally:
             connection.close()

@@ -1,17 +1,11 @@
-import logging
-
 import mohawk
 import requests
-from flask import current_app
+from flask import current_app as flask_app
 from sqlalchemy import exc
 from sqlalchemy.dialects import postgresql
 
 import app.db.models.external as models
 from app.db.models import sql_alchemy
-
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
 
 
 class SourceDataExtractor:
@@ -21,7 +15,7 @@ class SourceDataExtractor:
     unique_key = 'id'
 
     def __call__(self):
-        if current_app.config['app']['stub_source_data']:
+        if flask_app.config['app']['stub_source_data']:
             return populate_table(
                 self.stub_data, self.model, self.mapping, self.unique_key
             )
@@ -32,7 +26,7 @@ class SourceDataExtractor:
             )
 
     def get_url(self):
-        dataworkspace_config = current_app.config['dataworkspace']
+        dataworkspace_config = flask_app.config['dataworkspace']
         dataset_id = dataworkspace_config[self.dataset_id_config_key]
         source_table_id = dataworkspace_config[self.source_table_id_config_key]
         endpoint = f'api/v1/dataset/{dataset_id}/{source_table_id}'
@@ -42,7 +36,7 @@ class SourceDataExtractor:
 
 class ReferenceDatasetExtractor(SourceDataExtractor):
     def get_url(self):
-        dataworkspace_config = current_app.config['dataworkspace']
+        dataworkspace_config = flask_app.config['dataworkspace']
         group_slug = dataworkspace_config[self.group_slug]
         reference_slug = dataworkspace_config[self.reference_slug]
         endpoint = f'api/v1/reference-dataset/{group_slug}/reference/{reference_slug}'
@@ -350,8 +344,8 @@ def get_hawk_headers(
 
 
 def populate_table_paginated(model, mapping, unique_key, url):
-    client_id = current_app.config['dataworkspace']['hawk_client_id']
-    client_key = current_app.config['dataworkspace']['hawk_client_key']
+    client_id = flask_app.config['dataworkspace']['hawk_client_id']
+    client_key = flask_app.config['dataworkspace']['hawk_client_key']
 
     next_page = url
     n_rows = 0
@@ -390,8 +384,8 @@ def populate_table(data, model, mapping, unique_key, overwrite=True):
         n_rows = int(status.rowcount)
         transaction.commit()
     except (exc.ProgrammingError, exc.DataError) as err:
-        logger.error(f'Error populating {model.__tablename__} table')
-        logger.error(err)
+        flask_app.logger.error(f'Error populating {model.__tablename__} table')
+        flask_app.logger.error(err)
         transaction.rollback()
         raise err
     finally:

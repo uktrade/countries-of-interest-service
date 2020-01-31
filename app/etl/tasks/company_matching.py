@@ -1,9 +1,9 @@
 import json
 import re
-import urllib
+import urllib.parse
 
 import requests
-from flask import current_app
+from flask import current_app as flask_app
 from mohawk import Sender
 
 from app.db.db_utils import execute_statement
@@ -78,7 +78,7 @@ class Task:
             status_code, data = self._post_request(
                 params='',
                 endpoint=urllib.parse.urljoin(
-                    current_app.config['cms']['base_url'], '/api/v1/company/match/'
+                    flask_app.config['cms']['base_url'], '/api/v1/company/match/'
                 ),
                 json_query=request,
             )
@@ -106,7 +106,7 @@ class Task:
                 break
             start_count = batch_count * batch_size
             end_count = batch_count * batch_size + len(rows)
-            print(f"matching company {f'{start_count}-{end_count}'}")
+            flask_app.logger.info(f"matching company {f'{start_count}-{end_count}'}")
             for row in rows:
                 description = {
                     'id': str(row[0]),
@@ -134,8 +134,8 @@ class Task:
         def get_sender():
             return Sender(
                 credentials={
-                    'id': current_app.config['cms']['hawk_client_id'],
-                    'key': current_app.config['cms']['hawk_client_key'],
+                    'id': flask_app.config['cms']['hawk_client_id'],
+                    'key': flask_app.config['cms']['hawk_client_key'],
                     'algorithm': 'sha256',
                 },
                 url=url,

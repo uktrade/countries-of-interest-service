@@ -4,9 +4,11 @@ import traceback
 import pandas as pd
 import sqlalchemy
 import sqlalchemy.exc
+from flask import current_app as flask_app
 from sqlalchemy.schema import CreateSchema
 
 from app.db.models import sql_alchemy
+
 
 SCHEMAS = ['public', 'admin', 'algorithm']
 
@@ -29,7 +31,7 @@ def execute_statement(stmt, data=None, raise_if_fail=False):
         return status
     except sqlalchemy.exc.ProgrammingError as err:
         transaction.rollback()
-        print("Execute statement error:")
+        flask_app.logger.error("Execute statement error:")
         exc_type, exc_value, exc_traceback = sys.exc_info()
         traceback.print_exception(exc_type, exc_value, exc_traceback, file=sys.stdout)
         if raise_if_fail:
@@ -114,7 +116,7 @@ def dsv_buffer_to_table(
         connection.commit()
     except Exception as err:
         exc_type, exc_value, exc_traceback = sys.exc_info()
-        print("DSV buffer to table error:")
+        flask_app.logger.error("DSV buffer to table error:")
         traceback.print_exception(exc_type, exc_value, exc_traceback, file=sys.stdout)
         if reraise is True:
             raise err

@@ -1,5 +1,4 @@
 import datetime
-import logging
 from functools import wraps
 
 import pandas as pd
@@ -52,7 +51,7 @@ def seen_nonce(sender_id, nonce, timestamp):
             flask_app.cache.set(key, 'True', ex=300)
             return False
     except redis.exceptions.ConnectionError as e:
-        logging.error(f'failed to connect to caching server: {str(e)}')
+        flask_app.logger.error(f'failed to connect to caching server: {str(e)}')
         return True
 
 
@@ -71,7 +70,7 @@ def json_error(f):
             response = make_response('')
             response.status_code = 401
         except Exception as e:
-            logging.error(f'unexpected exception for API request: {str(e)}')
+            flask_app.logger.error(f'unexpected exception for API request: {str(e)}')
             response = make_response('')
             response.status_code = 500
         return response

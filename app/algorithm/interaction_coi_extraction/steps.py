@@ -284,7 +284,7 @@ def process_interactions(
             rows = cursor.fetchmany(batch_size)
             if not rows:
                 break
-            print(
+            flask_app.logger.info(
                 "uploading events"
                 f"{f'{batch_count*batch_size}-{batch_count*batch_size+len(rows)}'}"
             )
