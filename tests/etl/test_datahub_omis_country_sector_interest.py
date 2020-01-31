@@ -50,7 +50,7 @@ class TestCountriesAndSectorsOfInterest:
         assert df['company_match_id'].values[0] is None
         assert df['country'].values[0] is None
         assert df['sector'].values[0] == 'Food'
-        assert df['source'].values[0] == 'omis'
+        assert df['source'].values[0] == 'datahub_omis'
         assert df['source_id'].values[0] == '1ee5a16b-1a4b-4c84-838f-0d043579c9ba'
         assert df['timestamp'].values[0] == np.datetime64('2019-01-01 01:00')
 
@@ -61,6 +61,6 @@ class TestCountriesAndSectorsOfInterest:
         assert df['company_match_id'].values[1] is None
         assert df['country'].values[1] == 'United Kingdom'
         assert df['sector'].values[1] == 'Engineering'
-        assert df['source'].values[1] == 'omis'
+        assert df['source'].values[1] == 'datahub_omis'
         assert df['source_id'].values[1] == 'c0794724-c070-4c7e-a52c-89c0006bf7e6'
         assert df['timestamp'].values[1] == np.datetime64('2019-02-02 02:00')

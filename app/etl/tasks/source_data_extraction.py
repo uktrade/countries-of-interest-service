@@ -403,7 +403,7 @@ def map_headers(data_item, db_headers):
     return mapped_item
 
 
-extract_countries_and_territories_reference_dataset = (
+extract_countries_and_territories_reference = (
     ExtractCountriesAndTerritoriesReferenceDataset()
 )
 extract_datahub_company_dataset = ExtractDatahubCompanyDataset()

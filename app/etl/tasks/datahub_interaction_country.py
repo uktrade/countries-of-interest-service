@@ -1,4 +1,4 @@
-from app.config import data_sources
+from app.config import constants
 from app.db.models.external import Interactions
 from app.db.models.internal import (
     CountriesAndSectorsInterestTemp,
@@ -14,9 +14,9 @@ with results as (
         null::int4 as company_match_id,
         standardized_place::text as country,
         null as sector,
-        'mentioned' as type,
-        'datahub' as service,
-        '{data_sources.datahub_interactions}' as source,
+        '{constants.Type.MENTIONED.value}' as type,
+        '{constants.Service.DATAHUB.value}' as service,
+        '{constants.Source.DATAHUB_INTERACTIONS.value}' as source,
         datahub_interaction_id as source_id,
         created_on::timestamp as timestamp
     from {Interactions.get_fq_table_name()}

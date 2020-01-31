@@ -124,9 +124,7 @@ class TestExtractCountriesAndTerritoriesReferenceDataset(
             ['AO', 'Angola', 'Country', '1975-11-11', None],
         ],
     }
-    extractor = (
-        source_data_extraction.extract_countries_and_territories_reference_dataset
-    )
+    extractor = source_data_extraction.extract_countries_and_territories_reference
 
 
 class TestExtractDatahubCompany(SourceDataExtractBaseTestCase):

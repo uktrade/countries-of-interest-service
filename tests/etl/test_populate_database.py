@@ -1,10 +1,9 @@
 import datetime
 from unittest.mock import patch
 
-
+from app.config.constants import Source, Task
 from app.db.db_utils import execute_query, execute_statement
 from app.etl.tasks import populate_database
-from app.etl.tasks.pipeline import COUNTRY_SECTOR_INTEREST, DATAHUB_COMPANY
 
 
 @patch('app.etl.tasks.source_data_extraction.' 'ExtractExportWins.__call__')
@@ -213,7 +212,9 @@ class TestPopulateDatabase:
             extract_export_wins,
         )
 
-        output = populate_database(True, [DATAHUB_COMPANY], [COUNTRY_SECTOR_INTEREST])
+        output = populate_database(
+            True, [Source.DATAHUB_COMPANY.value], [Task.COUNTRY_SECTOR_INTEREST.value]
+        )
 
         assert extract_countries_and_territories_reference_dataset.called is False
         assert extract_datahub_contact_dataset.called is False

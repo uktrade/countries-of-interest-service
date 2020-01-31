@@ -1,4 +1,4 @@
-from app.config import data_sources
+from app.config import constants
 from app.db.models.external import DatahubOmis, DITCountryTerritoryRegister
 from app.db.models.internal import (
     CountriesAndSectorsInterestTemp,
@@ -18,9 +18,9 @@ with results as (
             else NULL
         end as country,
         sector as sector,
-        'interested' as type,
-        'datahub' as service,
-        '{data_sources.omis}' as source,
+        '{constants.Type.INTERESTED.value}' as type,
+        '{constants.Service.DATAHUB.value}' as service,
+        '{constants.Source.DATAHUB_OMIS.value}' as source,
         o.datahub_omis_order_id::text as source_id,
         created_date as timestamp
     from {DatahubOmis.get_fq_table_name()} o

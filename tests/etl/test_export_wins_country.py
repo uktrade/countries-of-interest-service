@@ -69,6 +69,6 @@ class TestExportCountries:
         assert df['service_company_id'].values[0] == '3'
         assert not df['country'].values[0]
         assert df['source'].values[0] == 'export_wins'
-        assert df['type'].values[1] == 'exported'
+        assert df['type'].values[0] == 'exported'
         assert df['source_id'].values[0] == '08c5f419-f85f-4051-b640-d3cfef8e1213'
         assert not df['timestamp'].values[0]
