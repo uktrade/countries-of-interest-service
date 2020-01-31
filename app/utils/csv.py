@@ -58,16 +58,22 @@ def populate_csv(
         query = session.query(db_model).order_by(order_by)
 
     paginator = Paginator(query, 10000, limit=limit)
-    print(f'Found {paginator.total_count} total items')
-    print(f'Processing only first {paginator.required_items_count} items')
-    print(f'Total number of pages to process {paginator.required_pages}')
+    flask_app.logger.info(f'Found {paginator.total_count} total items')
+    flask_app.logger.info(
+        f'Processing only first {paginator.required_items_count} items'
+    )
+    flask_app.logger.info(
+        f'Total number of pages to process {paginator.required_pages}'
+    )
 
     start_time = time.time()
     for result in paginator.get_all_pages():
         for item in result.items:
             row = [_get_field_value(item, field) for field in db_fields]
             writer.writerow(row)
-    print('Finished: Took {0:0.1f} seconds to process'.format(time.time() - start_time))
+    flask_app.logger.info(
+        'Finished: Took {0:0.1f} seconds to process'.format(time.time() - start_time)
+    )
 
 
 def _get_field_value(item, field):
@@ -132,5 +138,5 @@ class Paginator:
 
     def get_all_pages(self):
         for page_number in range(1, self.required_pages + 1):
-            print(f'Processing page: {page_number}')
+            flask_app.logger.info(f'Processing page: {page_number}')
             yield self.get_page(page_number)
