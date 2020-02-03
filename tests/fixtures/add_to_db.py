@@ -13,6 +13,7 @@ from app.db.models.external import (
 )
 from app.db.models.internal import (
     CountriesAndSectorsInterest,
+    CountriesAndSectorsInterestTemp,
     InteractionsAnalysed,
     InteractionsAnalysedInteractionIdLog,
     StandardisedCountries,
@@ -21,7 +22,7 @@ from app.db.models.internal import (
 
 @pytest.fixture(scope='module')
 def add_countries_and_sectors_of_interest(app_with_db_module):
-    def _method(records):
+    def _method(records, temp=False):
         for record in records:
             defaults = {
                 'service_company_id': record.get('service_company_id', None),
@@ -34,9 +35,14 @@ def add_countries_and_sectors_of_interest(app_with_db_module):
                 'source_id': record.get('source_id', None),
                 'timestamp': record.get('timestamp', None),
             }
-            CountriesAndSectorsInterest.get_or_create(
-                id=record.get('id', None), defaults=defaults,
-            )
+            if temp:
+                CountriesAndSectorsInterestTemp.get_or_create(
+                    id=record.get('id', None), defaults=defaults,
+                )
+            else:
+                CountriesAndSectorsInterest.get_or_create(
+                    id=record.get('id', None), defaults=defaults,
+                )
 
     return _method
 
