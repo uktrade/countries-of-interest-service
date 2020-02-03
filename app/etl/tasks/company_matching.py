@@ -6,6 +6,7 @@ import requests
 from flask import current_app as flask_app
 from mohawk import Sender
 
+from app.config import constants
 from app.db import db_utils
 from app.db.db_utils import execute_statement
 from app.db.models import db
@@ -19,18 +20,17 @@ from app.db.models.internal import (
 
 class Task:
 
-    name = 'CompanyMatchingTask'
+    name = constants.Task.COMPANY_MATCHING.value
     valid_email = re.compile(r"[^@]+@[^@]+\.[^@]+")
 
     def __init__(self, **kwargs):
-        self.table_name = CountriesAndSectorsInterest.__tablename__
+        pass
 
     def __call__(self):
         self._company_matching()
         return {
-            'status': 'success',
-            'rows': -1,
-            'table': self.table_name,
+            'status': 200,
+            'task': self.name,
         }
 
     def _company_matching(self):

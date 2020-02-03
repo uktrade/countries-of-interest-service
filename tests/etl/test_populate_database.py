@@ -109,6 +109,7 @@ class TestPopulateDatabase:
         extract_datahub_company_dataset,
         extract_countries_and_territories_reference_dataset,
         extract_export_wins,
+        app_with_db,
     ):
         execute_statement.return_value = None
         self._patch_tasks(
@@ -191,6 +192,7 @@ class TestPopulateDatabase:
         extract_datahub_company_dataset,
         extract_countries_and_territories_reference_dataset,
         extract_export_wins,
+        app_with_db,
     ):
         execute_statement.return_value = None
         self._patch_tasks(

@@ -43,7 +43,7 @@ insert into {CountriesAndSectorsInterestTemp.get_fq_table_name()} (
 
 class Task(ETLTask):
 
-    name = "mentioned_in_interactions"
+    name = constants.Task.MENTIONED_IN_INTERACTIONS.value
 
     def __init__(self, sql=sql, model=CountriesAndSectorsInterestTemp, *args, **kwargs):
         super().__init__(
