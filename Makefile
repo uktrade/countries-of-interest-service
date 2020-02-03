@@ -2,8 +2,13 @@ PORT ?= 5000
 TEST ?=.
 COV ?= --cov
 
+.PHONY: build_assets
+build_assets:
+	npm run build
+
+
 .PHONY: run_server
-run_server:
+run_server: build_assets
 	exec gunicorn 'app.application:get_or_create()' -b 0.0.0.0:${PORT} --config 'app/config/gunicorn.conf'
 
 
