@@ -418,16 +418,28 @@ class TestPopulateTable:
     def test_rollback_when_there_is_an_error(self, add_datahub_contact):
         add_datahub_contact(
             [
-                {'id': 1, 'datahub_company_id': '5e45d6d4-1fee-4065-9510-17fdaf63aff3',
-                 'datahub_contact_id': '5ab0f5f2-a984-4252-ac2f-5a7a8037ad99', 'email': 'test1@test.com'},
-                {'id': 2, 'datahub_company_id': 'c3467472-3a97-4359-91f4-f860597e1837',
-                 'datahub_contact_id': 'b99377a5-39f6-4474-8b84-dd96a6fd4832', 'email': 'test2@test.com'},
+                {
+                    'id': 1,
+                    'datahub_company_id': '5e45d6d4-1fee-4065-9510-17fdaf63aff3',
+                    'datahub_contact_id': '5ab0f5f2-a984-4252-ac2f-5a7a8037ad99',
+                    'email': 'test1@test.com',
+                },
+                {
+                    'id': 2,
+                    'datahub_company_id': 'c3467472-3a97-4359-91f4-f860597e1837',
+                    'datahub_contact_id': 'b99377a5-39f6-4474-8b84-dd96a6fd4832',
+                    'email': 'test2@test.com',
+                },
             ]
         )
         data = {
             'headers': ['id', 'company_id', 'email'],
             'values': [
-                ('5ab0f5f2-a984-4252-ac2f-5a7a8037ad99', '5e45d6d4-1fee-4065-9510-17fdaf63aff3', 'test1@test.com'),
+                (
+                    '5ab0f5f2-a984-4252-ac2f-5a7a8037ad99',
+                    '5e45d6d4-1fee-4065-9510-17fdaf63aff3',
+                    'test1@test.com',
+                ),
                 ('1', 'c3467472-3a97-4359-91f4-f860597e1837', 'test2@test.com'),
             ],
         }
@@ -450,26 +462,50 @@ class TestPopulateTable:
         rows = self.get_rows()
         assert len(rows) == 2
         assert rows == [
-            (1, uuid.UUID('5ab0f5f2-a984-4252-ac2f-5a7a8037ad99'), uuid.UUID('5e45d6d4-1fee-4065-9510-17fdaf63aff3'),
-             'test1@test.com'),
-            (2, uuid.UUID('b99377a5-39f6-4474-8b84-dd96a6fd4832'), uuid.UUID('c3467472-3a97-4359-91f4-f860597e1837'),
-             'test2@test.com'),
+            (
+                1,
+                uuid.UUID('5ab0f5f2-a984-4252-ac2f-5a7a8037ad99'),
+                uuid.UUID('5e45d6d4-1fee-4065-9510-17fdaf63aff3'),
+                'test1@test.com',
+            ),
+            (
+                2,
+                uuid.UUID('b99377a5-39f6-4474-8b84-dd96a6fd4832'),
+                uuid.UUID('c3467472-3a97-4359-91f4-f860597e1837'),
+                'test2@test.com',
+            ),
         ]
 
     def test_if_overwrite_is_true_deletes_existing_data(self, add_datahub_contact):
         add_datahub_contact(
             [
-                {'id': 1, 'datahub_company_id': '5e45d6d4-1fee-4065-9510-17fdaf63aff3',
-                 'datahub_contact_id': '5ab0f5f2-a984-4252-ac2f-5a7a8037ad99', 'email': 'test1@test.com'},
-                {'id': 2, 'datahub_company_id': 'c3467472-3a97-4359-91f4-f860597e1837',
-                 'datahub_contact_id': 'b99377a5-39f6-4474-8b84-dd96a6fd4832', 'email': 'test2@test.com'},
+                {
+                    'id': 1,
+                    'datahub_company_id': '5e45d6d4-1fee-4065-9510-17fdaf63aff3',
+                    'datahub_contact_id': '5ab0f5f2-a984-4252-ac2f-5a7a8037ad99',
+                    'email': 'test1@test.com',
+                },
+                {
+                    'id': 2,
+                    'datahub_company_id': 'c3467472-3a97-4359-91f4-f860597e1837',
+                    'datahub_contact_id': 'b99377a5-39f6-4474-8b84-dd96a6fd4832',
+                    'email': 'test2@test.com',
+                },
             ]
         )
         data = {
             'headers': ['id', 'company_id', 'email'],
             'values': [
-                ('5ab0f5f2-a984-4252-ac2f-5a7a8037ad99', '5e45d6d4-1fee-4065-9510-17fdaf63aff3', 'test1@test.com'),
-                ('b99377a5-39f6-4474-8b84-dd96a6fd4832', 'c3467472-3a97-4359-91f4-f860597e1837', 'test2@test.com'),
+                (
+                    '5ab0f5f2-a984-4252-ac2f-5a7a8037ad99',
+                    '5e45d6d4-1fee-4065-9510-17fdaf63aff3',
+                    'test1@test.com',
+                ),
+                (
+                    'b99377a5-39f6-4474-8b84-dd96a6fd4832',
+                    'c3467472-3a97-4359-91f4-f860597e1837',
+                    'test2@test.com',
+                ),
             ],
         }
         response = source_data_extraction.populate_table(
@@ -484,31 +520,59 @@ class TestPopulateTable:
             'datahub_contact_id',
             overwrite=True,
         )
-        assert response == {'rows': 2, 'status': 200, 'extractor': source_data_extraction.ExtractDatahubContactDataset.name}
+        assert response == {
+            'rows': 2,
+            'status': 200,
+            'extractor': source_data_extraction.ExtractDatahubContactDataset.name,
+        }
 
         rows = self.get_rows()
         assert len(rows) == 2
         assert rows == [
-            (1, uuid.UUID('5ab0f5f2-a984-4252-ac2f-5a7a8037ad99'), uuid.UUID('5e45d6d4-1fee-4065-9510-17fdaf63aff3'),
-             'test1@test.com'),
-            (2, uuid.UUID('b99377a5-39f6-4474-8b84-dd96a6fd4832'), uuid.UUID('c3467472-3a97-4359-91f4-f860597e1837'),
-             'test2@test.com'),
+            (
+                1,
+                uuid.UUID('5ab0f5f2-a984-4252-ac2f-5a7a8037ad99'),
+                uuid.UUID('5e45d6d4-1fee-4065-9510-17fdaf63aff3'),
+                'test1@test.com',
+            ),
+            (
+                2,
+                uuid.UUID('b99377a5-39f6-4474-8b84-dd96a6fd4832'),
+                uuid.UUID('c3467472-3a97-4359-91f4-f860597e1837'),
+                'test2@test.com',
+            ),
         ]
 
     def test_if_overwrite_is_false_upserts_to_table(self, add_datahub_contact):
         add_datahub_contact(
             [
-                {'id': 1, 'datahub_company_id': '5e45d6d4-1fee-4065-9510-17fdaf63aff3',
-                 'datahub_contact_id': '5ab0f5f2-a984-4252-ac2f-5a7a8037ad99', 'email': 'test1@test.com'},
-                {'id': 2, 'datahub_company_id': 'c3467472-3a97-4359-91f4-f860597e1837',
-                 'datahub_contact_id': 'b99377a5-39f6-4474-8b84-dd96a6fd4832', 'email': 'test2@test.com'},
+                {
+                    'id': 1,
+                    'datahub_company_id': '5e45d6d4-1fee-4065-9510-17fdaf63aff3',
+                    'datahub_contact_id': '5ab0f5f2-a984-4252-ac2f-5a7a8037ad99',
+                    'email': 'test1@test.com',
+                },
+                {
+                    'id': 2,
+                    'datahub_company_id': 'c3467472-3a97-4359-91f4-f860597e1837',
+                    'datahub_contact_id': 'b99377a5-39f6-4474-8b84-dd96a6fd4832',
+                    'email': 'test2@test.com',
+                },
             ]
         )
         data = {
             'headers': ['id', 'company_id', 'email'],
             'values': [
-                ('5ab0f5f2-a984-4252-ac2f-5a7a8037ad99', '5e45d6d4-1fee-4065-9510-17fdaf63aff3', 'test1@test.com'),
-                ('9703e296-cbcc-4b62-8ae9-68063cdd0275', 'c3467472-3a97-4359-91f4-f860597e1837', 'test2@test.com'),
+                (
+                    '5ab0f5f2-a984-4252-ac2f-5a7a8037ad99',
+                    '5e45d6d4-1fee-4065-9510-17fdaf63aff3',
+                    'test1@test.com',
+                ),
+                (
+                    '9703e296-cbcc-4b62-8ae9-68063cdd0275',
+                    'c3467472-3a97-4359-91f4-f860597e1837',
+                    'test2@test.com',
+                ),
             ],
         }
         response = source_data_extraction.populate_table(
@@ -523,17 +587,33 @@ class TestPopulateTable:
             'datahub_contact_id',
             overwrite=False,
         )
-        assert response == {'rows': 2, 'status': 200, 'extractor': source_data_extraction.ExtractDatahubContactDataset.name}
+        assert response == {
+            'rows': 2,
+            'status': 200,
+            'extractor': source_data_extraction.ExtractDatahubContactDataset.name,
+        }
 
         rows = self.get_rows()
         assert len(rows) == 3
         assert rows == [
-            (1, uuid.UUID('5ab0f5f2-a984-4252-ac2f-5a7a8037ad99'), uuid.UUID('5e45d6d4-1fee-4065-9510-17fdaf63aff3'),
-             'test1@test.com'),
-            (2, uuid.UUID('b99377a5-39f6-4474-8b84-dd96a6fd4832'), uuid.UUID('c3467472-3a97-4359-91f4-f860597e1837'),
-             'test2@test.com'),
-            (4, uuid.UUID('9703e296-cbcc-4b62-8ae9-68063cdd0275'), uuid.UUID('c3467472-3a97-4359-91f4-f860597e1837'),
-             'test2@test.com'),
+            (
+                1,
+                uuid.UUID('5ab0f5f2-a984-4252-ac2f-5a7a8037ad99'),
+                uuid.UUID('5e45d6d4-1fee-4065-9510-17fdaf63aff3'),
+                'test1@test.com',
+            ),
+            (
+                2,
+                uuid.UUID('b99377a5-39f6-4474-8b84-dd96a6fd4832'),
+                uuid.UUID('c3467472-3a97-4359-91f4-f860597e1837'),
+                'test2@test.com',
+            ),
+            (
+                4,
+                uuid.UUID('9703e296-cbcc-4b62-8ae9-68063cdd0275'),
+                uuid.UUID('c3467472-3a97-4359-91f4-f860597e1837'),
+                'test2@test.com',
+            ),
         ]
 
     def test_if_overwrite_is_false_upserts_to_interaction_table(
