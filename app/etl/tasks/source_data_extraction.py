@@ -263,23 +263,6 @@ class ExtractDatahubOmis(SourceDataExtractor):
     unique_key = 'datahub_omis_order_id'
 
 
-class ExtractDatahubSectors(SourceDataExtractor):
-    dataset_id_config_key = 'datahub_sectors_dataset_id'
-    mapping = {
-        'id': 'id',
-        'sector': 'sector',
-    }
-    model = models.DatahubSectors
-    source_table_id_config_key = 'datahub_sectors_source_table_id'
-    stub_data = {
-        'headers': ['id', 'sector'],
-        'values': [
-            ['c3467472-3a97-4359-91f4-f860597e1837', 'Aerospace'],
-            ['698d0cc3-ce8e-453b-b3c4-99818c5a9070', 'Food'],
-        ],
-    }
-
-
 class ExtractExportWins(SourceDataExtractor):
     name = Source.EXPORT_WINS.value
     dataset_id_config_key = 'export_wins_dataset_id'

@@ -322,25 +322,6 @@ class TestExtractDatahubOmis(SourceDataExtractBaseTestCase):
     extractor = source_data_extraction.ExtractDatahubOmis
 
 
-class TestExtractDatahubSectors(SourceDataExtractBaseTestCase):
-    __test__ = True
-    dataset_id_config_key = 'datahub_sectors_dataset_id'
-    expected_data = [
-        {'id': 'c3467472-3a97-4359-91f4-f860597e1837', 'sector': 'Aerospace'},
-        {'id': '698d0cc3-ce8e-453b-b3c4-99818c5a9070', 'sector': 'Food'},
-    ]
-    source_data = {
-        'headers': ['id', 'sector'],
-        'values': [
-            ['c3467472-3a97-4359-91f4-f860597e1837', 'Aerospace'],
-            ['698d0cc3-ce8e-453b-b3c4-99818c5a9070', 'Food'],
-        ],
-        'next': None,
-    }
-    source_table_id_config_key = 'datahub_sectors_source_table_id'
-    extractor = source_data_extraction.ExtractDatahubSectors
-
-
 class TestExtractExportWins(SourceDataExtractBaseTestCase):
     __test__ = True
     dataset_id_config_key = 'export_wins_dataset_id'
@@ -427,108 +408,132 @@ class TestPopulateTable:
     @pytest.fixture(autouse=True)
     def setup(self):
         self.url = 'some_url'
-        self.sector_model = models.DatahubSectors
+        self.model = models.DatahubContact
 
     def get_rows(self):
-        sql = f'select * from {self.sector_model.__tablename__} order by sector'
+        sql = f'select * from {self.model.__tablename__} order by id'
         status = execute_statement(sql, raise_if_fail=True)
         return status.fetchall()
 
-    def test_rollback_when_there_is_an_error(self, add_datahub_sectors):
-        add_datahub_sectors(
+    def test_rollback_when_there_is_an_error(self, add_datahub_contact):
+        add_datahub_contact(
             [
-                {'id': '5e45d6d4-1fee-4065-9510-17fdaf63aff3', 'sector': 'OLD'},
-                {'id': 'c3467472-3a97-4359-91f4-f860597e1837', 'sector': 'Aerospace'},
+                {'id': 1, 'datahub_company_id': '5e45d6d4-1fee-4065-9510-17fdaf63aff3',
+                 'datahub_contact_id': '5ab0f5f2-a984-4252-ac2f-5a7a8037ad99', 'email': 'test1@test.com'},
+                {'id': 2, 'datahub_company_id': 'c3467472-3a97-4359-91f4-f860597e1837',
+                 'datahub_contact_id': 'b99377a5-39f6-4474-8b84-dd96a6fd4832', 'email': 'test2@test.com'},
             ]
         )
-
         data = {
-            'headers': ['id', 'sector'],
+            'headers': ['id', 'company_id', 'email'],
             'values': [
-                ('c3467472-3a97-4359-91f4-f860597e1837', 'Space'),
-                ('1', 'Food'),
+                ('5ab0f5f2-a984-4252-ac2f-5a7a8037ad99', '5e45d6d4-1fee-4065-9510-17fdaf63aff3', 'test1@test.com'),
+                ('1', 'c3467472-3a97-4359-91f4-f860597e1837', 'test2@test.com'),
             ],
         }
-
         with pytest.raises(sqlalchemy.exc.DataError):
             source_data_extraction.populate_table(
                 data,
-                self.sector_model,
-                'datahub_sectors',
-                {'id': 'id', 'sector': 'sector'},
-                'id',
+                self.model,
+                source_data_extraction.ExtractDatahubContactDataset.name,
+                {
+                    'id': 'datahub_contact_id',
+                    'company_id': 'datahub_company_id',
+                    'email': 'email',
+                },
+                'datahub_contact_id',
                 overwrite=False,
             )
 
         rows = self.get_rows()
         assert len(rows) == 2
+        rows = self.get_rows()
+        assert len(rows) == 2
         assert rows == [
-            (uuid.UUID('c3467472-3a97-4359-91f4-f860597e1837'), 'Aerospace'),
-            (uuid.UUID('5e45d6d4-1fee-4065-9510-17fdaf63aff3'), 'OLD'),
+            (1, uuid.UUID('5ab0f5f2-a984-4252-ac2f-5a7a8037ad99'), uuid.UUID('5e45d6d4-1fee-4065-9510-17fdaf63aff3'),
+             'test1@test.com'),
+            (2, uuid.UUID('b99377a5-39f6-4474-8b84-dd96a6fd4832'), uuid.UUID('c3467472-3a97-4359-91f4-f860597e1837'),
+             'test2@test.com'),
         ]
 
-    def test_if_overwrite_is_true_deletes_existing_data(self, add_datahub_sectors):
-        add_datahub_sectors(
+    def test_if_overwrite_is_true_deletes_existing_data(self, add_datahub_contact):
+        add_datahub_contact(
             [
-                {'id': '5e45d6d4-1fee-4065-9510-17fdaf63aff3', 'sector': 'OLD'},
-                {'id': 'c3467472-3a97-4359-91f4-f860597e1837', 'sector': 'Aerospace'},
+                {'id': 1, 'datahub_company_id': '5e45d6d4-1fee-4065-9510-17fdaf63aff3',
+                 'datahub_contact_id': '5ab0f5f2-a984-4252-ac2f-5a7a8037ad99', 'email': 'test1@test.com'},
+                {'id': 2, 'datahub_company_id': 'c3467472-3a97-4359-91f4-f860597e1837',
+                 'datahub_contact_id': 'b99377a5-39f6-4474-8b84-dd96a6fd4832', 'email': 'test2@test.com'},
             ]
         )
         data = {
-            'headers': ['id', 'sector'],
+            'headers': ['id', 'company_id', 'email'],
             'values': [
-                ('c3467472-3a97-4359-91f4-f860597e1837', 'Space'),
-                ('1c043517-fc1a-4e96-8d16-69f477e56678', 'Food'),
+                ('5ab0f5f2-a984-4252-ac2f-5a7a8037ad99', '5e45d6d4-1fee-4065-9510-17fdaf63aff3', 'test1@test.com'),
+                ('b99377a5-39f6-4474-8b84-dd96a6fd4832', 'c3467472-3a97-4359-91f4-f860597e1837', 'test2@test.com'),
             ],
         }
         response = source_data_extraction.populate_table(
             data,
-            self.sector_model,
-            'datahub_sectors',
-            {'id': 'id', 'sector': 'sector'},
-            'id',
+            self.model,
+            source_data_extraction.ExtractDatahubContactDataset.name,
+            {
+                'id': 'datahub_contact_id',
+                'company_id': 'datahub_company_id',
+                'email': 'email',
+            },
+            'datahub_contact_id',
             overwrite=True,
         )
-        assert response == {'rows': 2, 'status': 200, 'extractor': 'datahub_sectors'}
+        assert response == {'rows': 2, 'status': 200, 'extractor': source_data_extraction.ExtractDatahubContactDataset.name}
 
         rows = self.get_rows()
         assert len(rows) == 2
         assert rows == [
-            (uuid.UUID('1c043517-fc1a-4e96-8d16-69f477e56678'), 'Food'),
-            (uuid.UUID('c3467472-3a97-4359-91f4-f860597e1837'), 'Space'),
+            (1, uuid.UUID('5ab0f5f2-a984-4252-ac2f-5a7a8037ad99'), uuid.UUID('5e45d6d4-1fee-4065-9510-17fdaf63aff3'),
+             'test1@test.com'),
+            (2, uuid.UUID('b99377a5-39f6-4474-8b84-dd96a6fd4832'), uuid.UUID('c3467472-3a97-4359-91f4-f860597e1837'),
+             'test2@test.com'),
         ]
 
-    def test_if_overwrite_is_false_upserts_to_table(self, add_datahub_sectors):
-        add_datahub_sectors(
+    def test_if_overwrite_is_false_upserts_to_table(self, add_datahub_contact):
+        add_datahub_contact(
             [
-                {'id': '5e45d6d4-1fee-4065-9510-17fdaf63aff3', 'sector': 'OLD'},
-                {'id': 'c3467472-3a97-4359-91f4-f860597e1837', 'sector': 'Aerospace'},
+                {'id': 1, 'datahub_company_id': '5e45d6d4-1fee-4065-9510-17fdaf63aff3',
+                 'datahub_contact_id': '5ab0f5f2-a984-4252-ac2f-5a7a8037ad99', 'email': 'test1@test.com'},
+                {'id': 2, 'datahub_company_id': 'c3467472-3a97-4359-91f4-f860597e1837',
+                 'datahub_contact_id': 'b99377a5-39f6-4474-8b84-dd96a6fd4832', 'email': 'test2@test.com'},
             ]
         )
-
         data = {
-            'headers': ['id', 'sector'],
+            'headers': ['id', 'company_id', 'email'],
             'values': [
-                ('c3467472-3a97-4359-91f4-f860597e1837', 'Space'),
-                ('1c043517-fc1a-4e96-8d16-69f477e56678', 'Food'),
+                ('5ab0f5f2-a984-4252-ac2f-5a7a8037ad99', '5e45d6d4-1fee-4065-9510-17fdaf63aff3', 'test1@test.com'),
+                ('9703e296-cbcc-4b62-8ae9-68063cdd0275', 'c3467472-3a97-4359-91f4-f860597e1837', 'test2@test.com'),
             ],
         }
         response = source_data_extraction.populate_table(
             data,
-            self.sector_model,
-            'datahub_sectors',
-            {'id': 'id', 'sector': 'sector'},
-            'id',
+            self.model,
+            source_data_extraction.ExtractDatahubContactDataset.name,
+            {
+                'id': 'datahub_contact_id',
+                'company_id': 'datahub_company_id',
+                'email': 'email',
+            },
+            'datahub_contact_id',
             overwrite=False,
         )
-        assert response == {'rows': 2, 'status': 200, 'extractor': 'datahub_sectors'}
+        assert response == {'rows': 2, 'status': 200, 'extractor': source_data_extraction.ExtractDatahubContactDataset.name}
 
         rows = self.get_rows()
         assert len(rows) == 3
         assert rows == [
-            (uuid.UUID('1c043517-fc1a-4e96-8d16-69f477e56678'), 'Food'),
-            (uuid.UUID('5e45d6d4-1fee-4065-9510-17fdaf63aff3'), 'OLD'),
-            (uuid.UUID('c3467472-3a97-4359-91f4-f860597e1837'), 'Space'),
+            (1, uuid.UUID('5ab0f5f2-a984-4252-ac2f-5a7a8037ad99'), uuid.UUID('5e45d6d4-1fee-4065-9510-17fdaf63aff3'),
+             'test1@test.com'),
+            (2, uuid.UUID('b99377a5-39f6-4474-8b84-dd96a6fd4832'), uuid.UUID('c3467472-3a97-4359-91f4-f860597e1837'),
+             'test2@test.com'),
+            (4, uuid.UUID('9703e296-cbcc-4b62-8ae9-68063cdd0275'), uuid.UUID('c3467472-3a97-4359-91f4-f860597e1837'),
+             'test2@test.com'),
         ]
 
     def test_if_overwrite_is_false_upserts_to_interaction_table(

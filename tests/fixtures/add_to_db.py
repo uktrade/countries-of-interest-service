@@ -6,7 +6,6 @@ from app.db.models.external import (
     DatahubExportToCountries,
     DatahubFutureInterestCountries,
     DatahubOmis,
-    DatahubSectors,
     DITCountryTerritoryRegister,
     ExportWins,
     Interactions,
@@ -90,19 +89,6 @@ def add_datahub_omis(app_with_db_module):
                 datahub_omis_order_id=record.get('datahub_omis_order_id', None),
                 defaults=defaults,
             )
-
-    return _method
-
-
-@pytest.fixture(scope='module')
-def add_datahub_sectors(app_with_db_module):
-    def _method(records):
-        for record in records:
-            defaults = {
-                'id': record.get('id', None),
-                'sector': record.get('sector', None),
-            }
-            DatahubSectors.get_or_create(id=record.get('id', None), defaults=defaults)
 
     return _method
 
