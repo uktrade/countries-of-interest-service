@@ -5,7 +5,7 @@ from flask import current_app as flask_app
 from app.db.db_utils import execute_statement
 from app.etl.tasks.pipeline import (
     EXTRACTORS,
-    EXTRACTORS_DICT,
+    EXTRACTORS_LIST,
     TASKS,
     TASKS_DICT,
 )
@@ -23,7 +23,8 @@ def populate_database(drop_table, extractors, tasks):
         flask_app.logger.info(f'Running {", ".join(tasks)} tasks')
 
     output = []
-    for name, extractor in EXTRACTORS_DICT.items():
+    for extractor in EXTRACTORS_LIST:
+        name = extractor.name
         if name in extractors:
             flask_app.logger.info(f'Running extractor: {name}')
             extractor = extractor()

@@ -5,7 +5,6 @@ import pytest
 import sqlalchemy.exc
 
 import app.db.models.external as models
-from app.config.constants import Source
 from app.db.db_utils import execute_statement
 from app.etl.tasks import source_data_extraction
 
