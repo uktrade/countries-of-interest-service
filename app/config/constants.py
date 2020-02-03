@@ -13,11 +13,11 @@ class BaseEnum(Enum):
 
 class Source(BaseEnum):
     COUNTRIES_AND_TERRITORIES = 'countries_and_territories'
-    DATAHUB_CONTACT = 'datahub_contact'
-    DATAHUB_COMPANY = 'datahub_company'
-    DATAHUB_EXPORT_TO_COUNTRIES = 'datahub_export_countries'
-    DATAHUB_INTERACTIONS = 'datahub_interactions'
-    DATAHUB_FUTURE_INTEREST_COUNTRIES = 'datahub_future_interest_countries'
+    DATAHUB_CONTACT = 'contact'
+    DATAHUB_COMPANY = 'company'
+    DATAHUB_EXPORT_TO_COUNTRIES = 'export_countries'
+    DATAHUB_INTERACTIONS = 'interactions'
+    DATAHUB_FUTURE_INTEREST_COUNTRIES = 'future_interest_countries'
     DATAHUB_OMIS = 'omis'
     EXPORT_WINS = 'export_wins'
 
