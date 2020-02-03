@@ -1,17 +1,12 @@
-import logging
-
 import mohawk
 import requests
-from flask import current_app
+from flask import current_app as flask_app
 from sqlalchemy import exc
 from sqlalchemy.dialects import postgresql
 
 import app.db.models.external as models
+from app.config.constants import Source
 from app.db.models import sql_alchemy
-
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
 
 
 class SourceDataExtractor:
@@ -19,20 +14,21 @@ class SourceDataExtractor:
     model = None
     mapping = {}
     unique_key = 'id'
+    name = None
 
     def __call__(self):
-        if current_app.config['app']['stub_source_data']:
+        if flask_app.config['app']['stub_source_data']:
             return populate_table(
-                self.stub_data, self.model, self.mapping, self.unique_key
+                self.stub_data, self.model, self.name, self.mapping, self.unique_key
             )
         else:
             url = self.get_url()
             return populate_table_paginated(
-                self.model, self.mapping, self.unique_key, url
+                self.model, self.name, self.mapping, self.unique_key, url
             )
 
     def get_url(self):
-        dataworkspace_config = current_app.config['dataworkspace']
+        dataworkspace_config = flask_app.config['dataworkspace']
         dataset_id = dataworkspace_config[self.dataset_id_config_key]
         source_table_id = dataworkspace_config[self.source_table_id_config_key]
         endpoint = f'api/v1/dataset/{dataset_id}/{source_table_id}'
@@ -42,7 +38,7 @@ class SourceDataExtractor:
 
 class ReferenceDatasetExtractor(SourceDataExtractor):
     def get_url(self):
-        dataworkspace_config = current_app.config['dataworkspace']
+        dataworkspace_config = flask_app.config['dataworkspace']
         group_slug = dataworkspace_config[self.group_slug]
         reference_slug = dataworkspace_config[self.reference_slug]
         endpoint = f'api/v1/reference-dataset/{group_slug}/reference/{reference_slug}'
@@ -51,6 +47,7 @@ class ReferenceDatasetExtractor(SourceDataExtractor):
 
 
 class ExtractCountriesAndTerritoriesReferenceDataset(ReferenceDatasetExtractor):
+    name = Source.COUNTRIES_AND_TERRITORIES.value
     group_slug = 'countries_and_territories_group_slug'
     mapping = {
         'ID': 'country_iso_alpha2_code',
@@ -77,25 +74,83 @@ class ExtractCountriesAndTerritoriesReferenceDataset(ReferenceDatasetExtractor):
 
 
 class ExtractDatahubCompanyDataset(SourceDataExtractor):
+    name = Source.DATAHUB_COMPANY.value
     dataset_id_config_key = 'datahub_companies_dataset_id'
     mapping = {
         'id': 'datahub_company_id',
-        'company_number': 'company_number',
+        'name': 'company_name',
+        'company_number': 'companies_house_id',
         'sector': 'sector',
+        'cdms_reference_code': 'reference_code',
+        'address_postcode': 'postcode',
+        'modified_on': 'modified_on',
     }
     model = models.DatahubCompany
     source_table_id_config_key = 'datahub_companies_source_table_id'
     stub_data = {
-        'headers': ['id', 'company_number', 'sector'],
+        'headers': [
+            'id',
+            'name',
+            'company_number',
+            'sector',
+            'reference_code',
+            'address_postcode',
+            'modified_on',
+        ],
         'values': [
-            ['c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'asdf', 'Food'],
-            ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'asdf2', 'Aerospace'],
+            [
+                'c31e4492-1f16-48a2-8c5e-8c0334d959a3',
+                'company 1',
+                '01298764',
+                'Food',
+                'ORG-127698',
+                'PE12 8KL',
+                '2019-08-20 00:00:00',
+            ],
+            [
+                'd0af8e52-ff34-4088-98e3-d2d22cd250ae',
+                'company 2',
+                '19089376',
+                'Aerospace',
+                'ORG-18778',
+                '123457',
+                '2019-08-21 00:00:00',
+            ],
         ],
     }
     unique_key = 'datahub_company_id'
 
 
+class ExtractDatahubContactDataset(SourceDataExtractor):
+    name = Source.DATAHUB_CONTACT.value
+    dataset_id_config_key = 'datahub_contacts_dataset_id'
+    mapping = {
+        'id': 'datahub_contact_id',
+        'company_id': 'datahub_company_id',
+        'email': 'email',
+    }
+    model = models.DatahubContact
+    source_table_id_config_key = 'datahub_contacts_source_table_id'
+    stub_data = {
+        'headers': ['id', 'company_id', 'email'],
+        'values': [
+            [
+                'c31e4492-1f16-48a2-8c5e-8c0334d959a3',
+                '6294212e-f863-44cc-b98c-6041384d6d56',
+                'test@test.com',
+            ],
+            [
+                'd0af8e52-ff34-4088-98e3-d2d22cd250ae',
+                'a86018c3-e811-4472-af0f-125d36e858a6',
+                'john@test.com',
+            ],
+        ],
+    }
+    unique_key = 'datahub_contact_id'
+
+
 class ExtractDatahubExportToCountries(SourceDataExtractor):
+    name = Source.DATAHUB_EXPORT_TO_COUNTRIES.value
     dataset_id_config_key = 'datahub_export_countries_dataset_id'
     mapping = {
         'company_id': 'company_id',
@@ -115,6 +170,7 @@ class ExtractDatahubExportToCountries(SourceDataExtractor):
 
 
 class ExtractDatahubFutureInterestCountries(SourceDataExtractor):
+    name = Source.DATAHUB_FUTURE_INTEREST_COUNTRIES.value
     dataset_id_config_key = 'datahub_future_interest_countries_dataset_id'
     mapping = {
         'company_id': 'company_id',
@@ -134,6 +190,7 @@ class ExtractDatahubFutureInterestCountries(SourceDataExtractor):
 
 
 class ExtractDatahubInteractions(SourceDataExtractor):
+    name = Source.DATAHUB_INTERACTIONS.value
     dataset_id_config_key = 'datahub_interactions_dataset_id'
     mapping = {
         'id': 'datahub_interaction_id',
@@ -173,6 +230,7 @@ class ExtractDatahubInteractions(SourceDataExtractor):
 
 
 class ExtractDatahubOmis(SourceDataExtractor):
+    name = Source.DATAHUB_OMIS.value
     dataset_id_config_key = 'datahub_omis_dataset_id'
     mapping = {
         'company_id': 'company_id',
@@ -205,40 +263,56 @@ class ExtractDatahubOmis(SourceDataExtractor):
     unique_key = 'datahub_omis_order_id'
 
 
-class ExtractDatahubSectors(SourceDataExtractor):
-    dataset_id_config_key = 'datahub_sectors_dataset_id'
-    mapping = {
-        'id': 'id',
-        'sector': 'sector',
-    }
-    model = models.DatahubSectors
-    source_table_id_config_key = 'datahub_sectors_source_table_id'
-    stub_data = {
-        'headers': ['id', 'sector'],
-        'values': [
-            ['c3467472-3a97-4359-91f4-f860597e1837', 'Aerospace'],
-            ['698d0cc3-ce8e-453b-b3c4-99818c5a9070', 'Food'],
-        ],
-    }
-
-
 class ExtractExportWins(SourceDataExtractor):
+    name = Source.EXPORT_WINS.value
     dataset_id_config_key = 'export_wins_dataset_id'
     mapping = {
-        'company_id': 'company_id',
-        'timestamp': 'timestamp',
+        'id': 'export_wins_id',
+        'sector': 'sector',
+        'company_name': 'company_name',
+        'cdms_reference': 'export_wins_company_id',
+        'customer_email_address': 'contact_email_address',
+        'created': 'created_on',
         'country': 'country',
-        'id': 'id',
+        'date': 'date_won',
     }
     model = models.ExportWins
     source_table_id_config_key = 'export_wins_source_table_id'
     stub_data = {
-        'headers': ['id', 'company_id', 'country', 'timestamp'],
+        'headers': [
+            'id',
+            'sector',
+            'company_name',
+            'cdms_reference',
+            'customer_email_address',
+            'created',
+            'country',
+            'date',
+        ],
         'values': [
-            ['23f66b0e-05be-40a5-9bf2-fa44dc7714a8', 'asdf', 'IT', '2019-01-01 1:00'],
-            ['f50d892d-388a-405b-9e30-16b9971ac0d4', 'ffff', 'GO', '2019-01-02 18:00'],
+            [
+                '23f66b0e-05be-40a5-9bf2-fa44dc7714a8',
+                'Aerospace',
+                'Spaceship',
+                '20302012',
+                'test@spaceship.com',
+                '2019-01-02 18:00',
+                'ES',
+                '2019-01-02 18:00',
+            ],
+            [
+                'f50d892d-388a-405b-9e30-16b9971ac0d4',
+                'Food',
+                'Cake',
+                '9292929',
+                'test@cake.com',
+                '2020-01-20 11:00',
+                'IR',
+                '2018-07-02 10:00',
+            ],
         ],
     }
+    unique_key = 'export_wins_id'
 
 
 def get_hawk_headers(
@@ -262,10 +336,9 @@ def get_hawk_headers(
     return headers
 
 
-def populate_table_paginated(model, mapping, unique_key, url):
-    client_id = current_app.config['dataworkspace']['hawk_client_id']
-    client_key = current_app.config['dataworkspace']['hawk_client_key']
-
+def populate_table_paginated(model, extractor_name, mapping, unique_key, url):
+    client_id = flask_app.config['dataworkspace']['hawk_client_id']
+    client_key = flask_app.config['dataworkspace']['hawk_client_key']
     next_page = url
     n_rows = 0
     while next_page is not None:
@@ -273,20 +346,19 @@ def populate_table_paginated(model, mapping, unique_key, url):
         response = requests.get(next_page, headers=headers)
         data = response.json()
         output = populate_table(
-            data, model, mapping, unique_key, overwrite=next_page == url
+            data, model, extractor_name, mapping, unique_key, overwrite=next_page == url
         )
         n_rows = n_rows + output['rows']
         next_page = data['next']
-    return {'table': model.__tablename__, 'rows': n_rows, 'status': 200}
+    return {'extractor': extractor_name, 'rows': n_rows, 'status': 200}
 
 
-def populate_table(data, model, mapping, unique_key, overwrite=True):
+def populate_table(data, model, extractor_name, mapping, unique_key, overwrite=True):
     connection = sql_alchemy.engine.connect()
     transaction = connection.begin()
-    n_rows = 0
     try:
         if overwrite:
-            connection.execute(model.__table__.delete())
+            model.recreate_table()
         items = []
         for item in data['values']:
             data_item = dict(zip(data['headers'], item))
@@ -304,14 +376,14 @@ def populate_table(data, model, mapping, unique_key, overwrite=True):
         n_rows = int(status.rowcount)
         transaction.commit()
     except (exc.ProgrammingError, exc.DataError) as err:
-        logger.error(f'Error populating {model.__tablename__} table')
-        logger.error(err)
+        flask_app.logger.error(f'Error populating {model.__tablename__} table')
+        flask_app.logger.error(err)
         transaction.rollback()
         raise err
     finally:
         connection.close()
 
-    return {'table': model.__tablename__, 'rows': n_rows, 'status': 200}
+    return {'extractor': extractor_name, 'rows': n_rows, 'status': 200}
 
 
 def map_headers(data_item, db_headers):
@@ -321,15 +393,3 @@ def map_headers(data_item, db_headers):
         if header:
             mapped_item[header] = v
     return mapped_item
-
-
-extract_countries_and_territories_reference_dataset = (
-    ExtractCountriesAndTerritoriesReferenceDataset()
-)
-extract_datahub_company_dataset = ExtractDatahubCompanyDataset()
-extract_datahub_export_to_countries = ExtractDatahubExportToCountries()
-extract_datahub_future_interest_countries = ExtractDatahubFutureInterestCountries()
-extract_datahub_interactions = ExtractDatahubInteractions()
-extract_datahub_omis = ExtractDatahubOmis()
-extract_datahub_sectors = ExtractDatahubSectors()
-extract_export_wins = ExtractExportWins()

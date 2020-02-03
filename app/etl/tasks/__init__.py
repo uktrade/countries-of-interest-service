@@ -1,56 +1,50 @@
 import datetime
-import logging
+
+from flask import current_app as flask_app
 
 from app.db.db_utils import execute_statement
 from app.etl.tasks.pipeline import (
     EXTRACTORS,
-    EXTRACTORS_DICT,
+    EXTRACTORS_LIST,
     TASKS,
     TASKS_DICT,
 )
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
 
 def populate_database(drop_table, extractors, tasks):
-    logger.info(f'populate_database')
+    flask_app.logger.info(f'populate_database')
     if not extractors and not tasks:
         extractors = EXTRACTORS
         tasks = TASKS
 
     if extractors:
-        logger.info(f'Running {", ".join(extractors)} extractors')
+        flask_app.logger.info(f'Running {", ".join(extractors)} extractors')
     if tasks:
-        logger.info(f'Running {", ".join(tasks)} tasks')
+        flask_app.logger.info(f'Running {", ".join(tasks)} tasks')
 
     output = []
-    for name, extractor in EXTRACTORS_DICT.items():
+    for extractor in EXTRACTORS_LIST:
+        name = extractor.name
         if name in extractors:
-            logger.info(f'extractor: {extractor.__class__.__name__}')
+            flask_app.logger.info(f'Running extractor: {name}')
+            extractor = extractor()
             try:
                 output = output + [extractor()]
             except Exception as e:
-                print(extractor)
-                output = output + [
-                    {
-                        'table': extractor.model.__tablename__,
-                        'status': 500,
-                        'error': str(e),
-                    }
-                ]
+                output = output + [{'extractor': name, 'status': 500, 'error': str(e)}]
 
     for name, task in TASKS_DICT.items():
         if name in tasks:
-            task = task(drop_table=drop_table)
-            logger.info(f'task: {task.name}')
-            try:
-                output = output + [task()]
-            except Exception as e:
-                print(task)
-                output = output + [
-                    {'table': task.table_name, 'status': 500, 'error': str(e)}
-                ]
+            subtask_list = [task] if not isinstance(task, list) else task
+            for position, subtask in enumerate(subtask_list):
+                subtask = subtask(drop_table=drop_table if position == 0 else False)
+                flask_app.logger.info(f'Running task: {subtask.name}')
+                try:
+                    output = output + [subtask()]
+                except Exception as e:
+                    output = output + [
+                        {'task': subtask.name, 'status': 500, 'error': str(e)}
+                    ]
 
     sql = 'insert into etl_runs (timestamp) values (%s)'
     ts_finish = datetime.datetime.now()
@@ -61,5 +55,11 @@ def populate_database(drop_table, extractors, tasks):
     execute_statement(sql, ['SUCCESS', ts_finish])
 
     output = {'output': output}
-    logger.info(output)
+    pretty_log_output(output)
     return output
+
+
+def pretty_log_output(output):
+    flask_app.logger.info('\n --OUTPUT-- \n')
+    for log_entry in output['output']:
+        flask_app.logger.info(log_entry)

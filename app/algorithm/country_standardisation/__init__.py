@@ -13,7 +13,7 @@ def standardise_countries():
 
 
 class CountryMapper:
-    @log('rebuilding country mapping')
+    @log.write('rebuilding country mapping')
     def map(self):
         db_utils.execute_statement(
             "SET statement_timeout TO '1h' "

@@ -1,20 +1,20 @@
-import logging
 from functools import wraps
 
+from flask import current_app as flask_app
 
 process_depth = -1
 
 
-def log(description):
+def write(description):
     def dec(f):
         @wraps(f)
         def outer(*args, **kwargs):
             global process_depth
             process_depth += 1
             prefix = '  ' * process_depth
-            logging.debug(f'{prefix}{description} starting...')
+            flask_app.logger.debug(f'{prefix}{description} starting...')
             rv = f(*args, **kwargs)
-            logging.debug(f'{prefix}{description} done.')
+            flask_app.logger.debug(f'{prefix}{description} done.')
             process_depth -= 1
             return rv
 

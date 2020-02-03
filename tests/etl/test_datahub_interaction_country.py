@@ -2,8 +2,8 @@ import datetime
 
 from flask import current_app
 
-from app.db.models.internal import MentionedInInteractions
-from app.etl.tasks.mentioned_in_interactions import Task
+from app.db.models.internal import CountriesAndSectorsInterestTemp
+from app.etl.tasks.datahub_interaction_country import Task
 
 
 class TestTask:
@@ -69,17 +69,17 @@ class TestTask:
         task()
 
         session = current_app.db.session
-        mentioned_in_interactions = session.query(MentionedInInteractions).all()
+        mentioned_in_interactions = session.query(CountriesAndSectorsInterestTemp).all()
 
         assert len(mentioned_in_interactions) == 2
         mention_0, mention_1 = mentioned_in_interactions
 
-        assert mention_0.company_id == 'eb75deae-1ce8-4cff-a0e9-645330614db6'
-        assert mention_0.country_of_interest == 'Italy'
-        assert mention_0.interaction_id == '48599843-2d10-490b-854d-7d97f16f0d13'
+        assert mention_0.service_company_id == 'eb75deae-1ce8-4cff-a0e9-645330614db6'
+        assert mention_0.country == 'Italy'
+        assert mention_0.source_id == '48599843-2d10-490b-854d-7d97f16f0d13'
         assert mention_0.timestamp == datetime.datetime(2019, 1, 1)
 
-        assert mention_1.company_id == 'cc97941e-8cf8-4949-a880-b0b08f6265ff'
-        assert mention_1.country_of_interest == 'Moldova'
-        assert mention_1.interaction_id == '7c7636c5-d50e-4bb5-9b1c-195754b048a1'
+        assert mention_1.service_company_id == 'cc97941e-8cf8-4949-a880-b0b08f6265ff'
+        assert mention_1.country == 'Moldova'
+        assert mention_1.source_id == '7c7636c5-d50e-4bb5-9b1c-195754b048a1'
         assert mention_1.timestamp == datetime.datetime(2019, 1, 3)

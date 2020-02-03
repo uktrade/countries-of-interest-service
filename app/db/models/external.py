@@ -24,24 +24,30 @@ class DatahubOmis(BaseModel):
     sector = _col(_text)
 
 
-class DatahubSectors(BaseModel):
-
-    __tablename__ = 'datahub_sectors'
-    __table_args__ = {'schema': 'public'}
-
-    id = _col(UUID(as_uuid=True), primary_key=True)
-    sector = _col(_text)
-
-
 class DatahubCompany(BaseModel):
 
     __tablename__ = 'datahub_company'
     __table_args__ = {'schema': 'public'}
 
     id = _col(_int, primary_key=True, autoincrement=True)
+    company_name = _col(_text)
     datahub_company_id = _col(UUID(as_uuid=True), unique=True)
-    company_number = _col(_text)
+    companies_house_id = _col(_text)
     sector = _col(_text)
+    reference_code = _col(_text)
+    postcode = _col(_text)
+    modified_on = _col(_dt)
+
+
+class DatahubContact(BaseModel):
+
+    __tablename__ = 'datahub_contact'
+    __table_args__ = {'schema': 'public'}
+
+    id = _col(_int, primary_key=True, autoincrement=True)
+    datahub_contact_id = _col(UUID(as_uuid=True), unique=True)
+    datahub_company_id = _col(UUID(as_uuid=True))
+    email = _col(_text)
 
 
 class DatahubExportToCountries(BaseModel):
@@ -71,10 +77,15 @@ class ExportWins(BaseModel):
     __tablename__ = 'export_wins'
     __table_args__ = {'schema': 'public'}
 
-    id = _col(UUID(as_uuid=True), primary_key=True)
-    company_id = _col(_text)
+    id = _col(_int, primary_key=True, autoincrement=True)
+    export_wins_id = _col(UUID(as_uuid=True), unique=True)
+    company_name = _col(_text)
+    export_wins_company_id = _col(_text)
+    contact_email_address = _col(_text)
+    created_on = _col(_dt)
+    sector = _col(_text)
     country = _col(_text)
-    timestamp = _col(_dt)
+    date_won = _col(_date)
 
 
 class DITCountryTerritoryRegister(BaseModel):

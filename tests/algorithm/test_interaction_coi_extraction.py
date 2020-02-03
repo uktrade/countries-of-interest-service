@@ -46,6 +46,43 @@ def add_side_effect(mocker):
     return _method
 
 
+def test_interaction_coi_extraction_when_interaction_does_not_have_a_note(
+    add_objects, add_side_effect, mock_datetime
+):
+    # Test mapping
+    add_objects(
+        Interactions,
+        [
+            {
+                'datahub_interaction_id': '18c3e449-ce56-45b4-93d3-362960622ca2',
+                'datahub_company_id': 'df14625d-c89b-4efd-bc5a-9b46f68b71bb',
+                'notes': None,
+            }
+        ],
+    )
+
+    output = [()]
+    add_side_effect(output)
+
+    mock_datetime.datetime.now.return_value = datetime.datetime(2020, 1, 1)
+
+    mapper.analyse_interactions()
+
+    expected_rows = []
+    assert rows_equal_query_results(
+        expected_rows, f'SELECT * FROM "{mapper.output_schema}"."{mapper.output_table}"'
+    )
+
+    session = flask_app.db.session
+    interaction_ids = session.query(InteractionsAnalysedInteractionIdLog).all()
+    assert len(interaction_ids) == 1
+    assert (
+        str(interaction_ids[0].datahub_interaction_id)
+        == '18c3e449-ce56-45b4-93d3-362960622ca2'
+    )
+    assert interaction_ids[0].analysed_at == datetime.datetime(2020, 1, 1)
+
+
 def test_interaction_coi_extraction(add_objects, add_side_effect, mock_datetime):
     # Test mapping
     add_objects(

@@ -5,27 +5,34 @@ from fuzzywuzzy import fuzz, process
 
 from app.db import db_utils
 from app.db.db_utils import dsv_buffer_to_table
-from app.db.models.external import DITCountryTerritoryRegister
+from app.db.models.external import (
+    DatahubExportToCountries,
+    DatahubFutureInterestCountries,
+    DatahubOmis,
+    DITCountryTerritoryRegister,
+    ExportWins,
+)
 from app.utils import log
 
 
-@log('Step 1/2 - extract all market interested/exported country sources')
+@log.write('Step 1/2 - extract all market interested/exported country sources')
 def extract_interested_exported_countries():
     stmt = f"""
     with countries as (
-    select distinct country from (
-    select trim(country) as country from datahub_export_countries
-    union
-    select trim(country) as country
-        from datahub_future_interest_countries
-    union
-    select trim(market) as country from datahub_omis
-    --TODO: add export wins data post MVP
-    --union
-    --select trim(country) as country from export_wins
-    ) u where country is not null
+        select distinct country from (
+            select trim(country) as country
+            from {DatahubExportToCountries.get_fq_table_name()}
+            union
+            select trim(country) as country
+            from {DatahubFutureInterestCountries.get_fq_table_name()}
+            union
+            select trim(market) as country
+            from {DatahubOmis.get_fq_table_name()}
+            union
+            select trim(country) as country
+            from {ExportWins.get_fq_table_name()}
+        ) u where country is not null
     )
-
     select country from countries order by LOWER(country)
     """
     rows = db_utils.execute_query(stmt, df=False)
@@ -33,7 +40,7 @@ def extract_interested_exported_countries():
     return countries
 
 
-@log('Step 2/2 - create standardised country table')
+@log.write('Step 2/2 - create standardised country table')
 def create_standardised_interested_exported_country_table(
     countries, output_schema, output_table
 ):

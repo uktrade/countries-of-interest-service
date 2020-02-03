@@ -1,4 +1,5 @@
 import os
+from logging.config import dictConfig
 
 import certifi
 import redis
@@ -8,9 +9,27 @@ from sqlalchemy.engine.url import make_url
 
 from app import config
 from app.commands.algorithm import cmd_group as algorithm_cmd
+from app.commands.csv import cmd_group as csv_cmd
 from app.commands.database import cmd_group as database_cmd
 from app.commands.dev import cmd_group as dev_cmd
 from app.sso.register import register_sso_component
+
+
+logging_config = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'root': {'level': 'INFO', 'handlers': ['console']},
+    'formatters': {'verbose': {'format': '[%(levelname)s] [%(name)s] %(message)s'}},
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        }
+    },
+}
+
+dictConfig(logging_config)
 
 
 def make_celery(flask_app):
@@ -61,6 +80,7 @@ def _create_base_app():
     flask_app.cli.add_command(dev_cmd)
     flask_app.cli.add_command(algorithm_cmd)
     flask_app.cli.add_command(database_cmd)
+    flask_app.cli.add_command(csv_cmd)
 
     postgres_db_config = (
         os.environ.get('DATABASE_URL')

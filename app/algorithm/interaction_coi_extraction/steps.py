@@ -253,7 +253,7 @@ def _analyse_interaction(interaction_doc):
     return places
 
 
-@log('Step 1/1 - process interactions')
+@log.write('Step 1/1 - process interactions')
 def process_interactions(
     input_table, input_schema, log_table, output_schema, output_table, batch_size=1000
 ):
@@ -284,7 +284,7 @@ def process_interactions(
             rows = cursor.fetchmany(batch_size)
             if not rows:
                 break
-            print(
+            flask_app.logger.info(
                 "uploading events"
                 f"{f'{batch_count*batch_size}-{batch_count*batch_size+len(rows)}'}"
             )
@@ -292,9 +292,7 @@ def process_interactions(
             datahub_interaction_ids = []
             for row in rows:
                 datahub_interaction_id = str(row[1])
-                interaction = row[2]
-                if interaction is None or interaction == '':
-                    continue
+                interaction = row[2] or ''
                 interaction_doc = nlp(interaction)
                 places = _analyse_interaction(interaction_doc)
                 for place in places:
@@ -356,15 +354,11 @@ def process_interactions(
             connection.execute(sql, [[d, analysed_at] for d in datahub_interaction_ids])
             transaction.commit()
 
-        except Exception as err:
+        except Exception:
             exc_type, exc_value, exc_traceback = sys.exc_info()
-            print("error:")
-            traceback.print_tb(exc_traceback, file=sys.stdout)
-            # exc_type below is ignored on 3.5 and later
             traceback.print_exception(
                 exc_type, exc_value, exc_traceback, file=sys.stdout
             )
-            print(err)
             transaction.rollback()
         finally:
             connection.close()

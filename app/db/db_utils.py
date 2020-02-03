@@ -4,9 +4,11 @@ import traceback
 import pandas as pd
 import sqlalchemy
 import sqlalchemy.exc
+from flask import current_app as flask_app
 from sqlalchemy.schema import CreateSchema
 
 from app.db.models import sql_alchemy
+
 
 SCHEMAS = ['public', 'admin', 'algorithm']
 
@@ -29,12 +31,9 @@ def execute_statement(stmt, data=None, raise_if_fail=False):
         return status
     except sqlalchemy.exc.ProgrammingError as err:
         transaction.rollback()
+        flask_app.logger.error("Execute statement error:")
         exc_type, exc_value, exc_traceback = sys.exc_info()
-        print("error:")
-        traceback.print_tb(exc_traceback, file=sys.stdout)
-        # exc_type below is ignored on 3.5 and later
         traceback.print_exception(exc_type, exc_value, exc_traceback, file=sys.stdout)
-        print(err)
         if raise_if_fail:
             raise err
         connection.close()
@@ -59,11 +58,6 @@ def table_exists(table_name, schema='public', materialized_view=False):
 def drop_table(fq_name):
     stmt = f'DROP TABLE IF EXISTS {fq_name} CASCADE'
     execute_statement(stmt)
-
-
-def rename_table(table_name_1, table_name_2):
-    sql = f'alter table {table_name_1} rename to {table_name_2}'
-    execute_statement(sql)
 
 
 def create_table(fields, table_name):
@@ -116,13 +110,9 @@ def dsv_buffer_to_table(
         cursor.copy_expert(sql, csv_buffer)
         connection.commit()
     except Exception as err:
-
         exc_type, exc_value, exc_traceback = sys.exc_info()
-        print("error:")
-        traceback.print_tb(exc_traceback, file=sys.stdout)
-        # exc_type below is ignored on 3.5 and later
+        flask_app.logger.error("DSV buffer to table error:")
         traceback.print_exception(exc_type, exc_value, exc_traceback, file=sys.stdout)
-        print(err)
         if reraise is True:
             raise err
     cursor.close()
@@ -157,3 +147,33 @@ def create_schemas(engine):
 def _create_schema_if_not_exists(engine, schema_name):
     if not engine.dialect.has_schema(engine, schema_name):
         engine.execute(CreateSchema(schema_name))
+
+
+def rename_table(table_name, new_table_name):
+    stmt = f"""
+        select indexname
+        from pg_indexes
+        where tablename = '{table_name}';
+    """
+    indices = execute_query(stmt, df=False)
+    for index in indices:
+        stmt = f"""
+            alter index {index[0]}
+            rename to {index[0].replace(table_name, new_table_name)}
+        """
+        execute_statement(stmt)
+    stmt = f"""
+        SELECT relname FROM pg_class c WHERE c.relkind = 'S'
+        and relname = '{table_name}_id_seq';
+    """
+    sequences = execute_query(stmt, df=False)
+    if sequences:
+        stmt = f"""
+            alter sequence {sequences[0][0]}
+            rename to {sequences[0][0].replace(table_name, new_table_name)}
+        """
+        execute_statement(stmt)
+    stmt = f"""
+        alter table {table_name} rename to {new_table_name};
+    """
+    execute_statement(stmt)

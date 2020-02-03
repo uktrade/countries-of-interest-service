@@ -52,16 +52,24 @@ def test_country_mapping(
     add_export_wins(
         [
             {
-                'company_id': '04fba8d6-5e83-425c-a22e-69879767a26c',
+                'export_wins_company_id': '12345678',
+                'contact_email_address': 'test@testcompany.com',
+                'sector': 'Aerospace',
+                'company_name': 'Test Company',
                 'country': 'uae',
-                'id': 'ffa75985-7bc0-4e9f-8d58-28a7f234b7fc',
-                'timestamp': '2009-10-10 12:12:12',
+                'export_wins_id': 'ffa75985-7bc0-4e9f-8d58-28a7f234b7fc',
+                'created_on': '2009-10-10 12:12:12',
+                'date_won': '2010-11-11 12:12:12',
             },
             {
-                'company_id': '5b1f6cdb-1347-4452-9fac-41163cb52841',
+                'export_wins_company_id': '12345678',
+                'contact_email_address': 'test@testcompany.com',
+                'sector': 'Aerospace',
+                'company_name': 'Company testing',
                 'country': 'unknown',
-                'id': '2f3e1939-fba7-4e4e-b53b-3fd829c7d606',
-                'timestamp': '2009-10-10 12:12:12',
+                'export_wins_id': 'ffa75985-7bc0-4e9f-8d58-28a7f234b7fc',
+                'created_on': '2009-10-10 12:12:12',
+                'date_won': '2010-11-11 12:12:12',
             },
         ]
     )
@@ -109,7 +117,8 @@ def test_country_mapping(
         (5, 'netherlands antilles', 'Saba', 100),
         (6, 'netherlands antilles', 'Curaçao', 100),
         (7, 'netherlands antilles', 'Sint Maarten (Dutch part)', 100),
-        (8, 'usa', 'United States', 100),
+        (8, 'uae', 'United Arab Emirates', 100),
+        (9, 'usa', 'United States', 100),
     ]
     assert rows_equal_query_results(
         expected_rows, f'SELECT * FROM "{mapper.output_schema}"."{mapper.output_table}"'

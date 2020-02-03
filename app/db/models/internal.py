@@ -1,4 +1,3 @@
-from sqlalchemy import PrimaryKeyConstraint
 from sqlalchemy.dialects.postgresql import UUID
 
 from app.db.models import (
@@ -48,85 +47,58 @@ class HawkUsers(BaseModel):
         )
 
 
-class MentionedInInteractions(BaseModel):
+class CountriesAndSectorsInterest(BaseModel):
 
-    __tablename__ = "coi_mentioned_in_interactions"
+    __tablename__ = "countries_and_sectors_interest"
 
     id = _col(_int, primary_key=True, autoincrement=True)
-    company_id = _col(_text)
-    country_of_interest = _col(_text)
-    interaction_id = _col(_text)
+    service_company_id = _col(_text)
+    company_match_id = _col(_int, index=True)
+    country = _col(_text)
+    sector = _col(_text)
+    type = _col(_text, index=True)
+    service = _col(_text, index=True)
+    source = _col(_text, index=True)
+    source_id = _col(_text)
     timestamp = _col(_dt)
 
     __table_args__ = ({'schema': 'public'},)
 
 
-class CountriesAndSectorsOfInterest(BaseModel):
+class CountriesAndSectorsInterestTemp(BaseModel):
 
-    __tablename__ = 'coi_countries_and_sectors_of_interest'
+    __tablename__ = "countries_and_sectors_interest_temp"
 
-    company_id = _col(_text)
-    country_of_interest = _col(_text)
-    standardised_country = _col(_text)
-    sector_of_interest = _col(_text)
+    id = _col(_int, primary_key=True, autoincrement=True)
+    service_company_id = _col(_text)
+    company_match_id = _col(_int)
+    country = _col(_text)
+    sector = _col(_text)
+    type = _col(_text)
+    service = _col(_text)
     source = _col(_text)
     source_id = _col(_text)
     timestamp = _col(_dt)
 
-    __table_args__ = (
-        PrimaryKeyConstraint(source, source_id),
-        {'schema': 'public'},
-    )
+    __table_args__ = ({'schema': 'public'},)
 
 
-class CountriesOfInterest(BaseModel):
+class CountriesAndSectorsInterestMatched(BaseModel):
 
-    __tablename__ = 'coi_countries_of_interest'
+    __tablename__ = "countries_and_sectors_interest_matched"
 
-    company_id = _col(_text)
-    country_of_interest = _col(_text)
-    standardised_country = _col(_text)
-    source = _col(_text)
+    id = _col(_int, primary_key=True, autoincrement=True)
+    service_company_id = _col(_text)
+    company_match_id = _col(_int, index=True)
+    country = _col(_text)
+    sector = _col(_text)
+    type = _col(_text, index=True)
+    service = _col(_text, index=True)
+    source = _col(_text, index=True)
     source_id = _col(_text)
     timestamp = _col(_dt)
 
-    __table_args__ = (
-        PrimaryKeyConstraint(source, source_id),
-        {'schema': 'public'},
-    )
-
-
-class ExportCountries(BaseModel):
-
-    __tablename__ = 'coi_export_countries'
-
-    company_id = _col(_text)
-    export_country = _col(_text)
-    source = _col(_text)
-    source_id = _col(_text)
-    standardised_country = _col(_text)
-    timestamp = _col(_dt)
-
-    __table_args__ = (
-        PrimaryKeyConstraint(source, source_id),
-        {'schema': 'public'},
-    )
-
-
-class SectorsOfInterest(BaseModel):
-
-    __tablename__ = 'coi_sectors_of_interest'
-
-    company_id = _col(_text)
-    sector_of_interest = _col(_text)
-    source = _col(_text)
-    source_id = _col(_text)
-    timestamp = _col(_dt)
-
-    __table_args__ = (
-        PrimaryKeyConstraint(source, source_id),
-        {'schema': 'public'},
-    )
+    __table_args__ = ({'schema': 'public'},)
 
 
 class InteractionsAnalysed(BaseModel):

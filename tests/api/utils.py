@@ -32,7 +32,7 @@ def _request(params, endpoint, app_context):
 
 def _ordered(obj):
     if isinstance(obj, dict):
-        return sorted((k, _ordered(v)) for k, v in obj.items())
+        return sorted((k, _ordered(str(v))) for k, v in obj.items())
     if isinstance(obj, list):
         return sorted(_ordered(x) for x in obj)
     else:

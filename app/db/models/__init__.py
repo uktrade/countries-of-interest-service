@@ -26,6 +26,19 @@ class BaseModel(db.Model):
         _sa.session.commit()
 
     @classmethod
+    def create_table(cls):
+        db.metadata.create_all(bind=db.engine, tables=[cls.__table__], checkfirst=True)
+
+    @classmethod
+    def drop_table(cls):
+        cls.__table__.drop(db.engine, checkfirst=True)
+
+    @classmethod
+    def recreate_table(cls):
+        cls.drop_table()
+        cls.create_table()
+
+    @classmethod
     def get_schema(cls):
         if 'schema' in cls.__table_args__:
             return cls.__table_args__['schema']
@@ -49,6 +62,7 @@ class BaseModel(db.Model):
         :return: (Object, boolean) (Object, created)
         """
         instance = _sa.session.query(cls).filter_by(**kwargs).first()
+        _sa.session.close()
         if instance:
             return instance, False
         else:
