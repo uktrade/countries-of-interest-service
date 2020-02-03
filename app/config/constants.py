@@ -18,7 +18,7 @@ class Source(BaseEnum):
     DATAHUB_EXPORT_TO_COUNTRIES = 'datahub_export_countries'
     DATAHUB_INTERACTIONS = 'datahub_interactions'
     DATAHUB_FUTURE_INTEREST_COUNTRIES = 'datahub_future_interest_countries'
-    DATAHUB_OMIS = 'datahub_omis'
+    DATAHUB_OMIS = 'omis'
     EXPORT_WINS = 'export_wins'
 
 
