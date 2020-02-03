@@ -275,23 +275,23 @@ def populate_database():
 @login_required
 def data_visualisation_data(field):
     date_trunc = request.args.get('date_trunc', 'quarter')
-    exporter_status = request.args['exporter-status']
+    data_source = request.args['data-source']
     interests_table = internal_models.CountriesAndSectorsInterest.__tablename__
-    valid_exporter_statuses = ['interested', 'mentioned']
+    valid_data_sources = ['export_wins', 'datahub_interactions', 'omis']
     valid_fields = ['country', 'sector']
 
     if field not in valid_fields:
         raise BadRequest(f'invalid field: {field}, valid values: {valid_fields}')
 
-    if exporter_status not in valid_exporter_statuses:
+    if data_source not in valid_data_sources:
         raise BadRequest(
-            f'invalid exporter-status: {exporter_status}, '
-            f'valid values: {valid_exporter_statuses}'
+            f'invalid data-source: {data_source}, '
+            f'valid values: {valid_data_sources}'
         )
 
-    if field == 'sector' and exporter_status == 'mentioned':
+    if field == 'sector' and data_source == 'interactions':
         raise BadRequest(
-            'invalid args: exporter-status: mentioned not supported by sector'
+            'invalid args: data-source: intreactions not supported by sector'
         )
 
     sql = '''
@@ -303,7 +303,7 @@ def data_visualisation_data(field):
 
         from {interests_table}
 
-        where type = '{exporter_status}'
+        where source = '{data_source}'
             and {field} != ''
             and {field} is not null
             and {field} != 'United Kingdom'
@@ -370,7 +370,7 @@ def data_visualisation_data(field):
 
     '''.format(
         date_trunc=date_trunc,
-        exporter_status=exporter_status,
+        data_source=data_source,
         field=field,
         interests_table=interests_table,
     )
