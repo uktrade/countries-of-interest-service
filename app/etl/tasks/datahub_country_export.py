@@ -8,7 +8,7 @@ from app.etl import ETLTask
 
 sql = f'''
 with results as (
-    select
+    select distinct
         company_id::text as service_company_id,
         null::int4 as company_match_id,
         case

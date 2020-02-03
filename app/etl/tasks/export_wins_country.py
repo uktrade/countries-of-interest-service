@@ -12,7 +12,7 @@ from app.etl import ETLTask
 
 sql = f'''
 with results as (
-    select
+    select distinct
         d.export_wins_company_id::text as service_company_id,
         null::int4 as company_match_id,
         case
