@@ -14,15 +14,18 @@ class SourceDataExtractor:
     mapping = {}
     unique_key = 'id'
 
+    def __init__(self, name):
+        self.name = name
+
     def __call__(self):
         if flask_app.config['app']['stub_source_data']:
             return populate_table(
-                self.stub_data, self.model, self.mapping, self.unique_key
+                self.stub_data, self.model, self.name, self.mapping, self.unique_key
             )
         else:
             url = self.get_url()
             return populate_table_paginated(
-                self.model, self.mapping, self.unique_key, url
+                self.model, self.name, self.mapping, self.unique_key, url
             )
 
     def get_url(self):
@@ -343,10 +346,9 @@ def get_hawk_headers(
     return headers
 
 
-def populate_table_paginated(model, mapping, unique_key, url):
+def populate_table_paginated(model, extractor_name, mapping, unique_key, url):
     client_id = flask_app.config['dataworkspace']['hawk_client_id']
     client_key = flask_app.config['dataworkspace']['hawk_client_key']
-
     next_page = url
     n_rows = 0
     while next_page is not None:
@@ -354,14 +356,14 @@ def populate_table_paginated(model, mapping, unique_key, url):
         response = requests.get(next_page, headers=headers)
         data = response.json()
         output = populate_table(
-            data, model, mapping, unique_key, overwrite=next_page == url
+            data, model, extractor_name, mapping, unique_key, overwrite=next_page == url
         )
         n_rows = n_rows + output['rows']
         next_page = data['next']
-    return {'table': model.__tablename__, 'rows': n_rows, 'status': 200}
+    return {'extractor': extractor_name, 'rows': n_rows, 'status': 200}
 
 
-def populate_table(data, model, mapping, unique_key, overwrite=True):
+def populate_table(data, model, extractor_name, mapping, unique_key, overwrite=True):
     connection = sql_alchemy.engine.connect()
     transaction = connection.begin()
     try:
@@ -391,7 +393,7 @@ def populate_table(data, model, mapping, unique_key, overwrite=True):
     finally:
         connection.close()
 
-    return {'table': model.__tablename__, 'rows': n_rows, 'status': 200}
+    return {'extractor': extractor_name, 'rows': n_rows, 'status': 200}
 
 
 def map_headers(data_item, db_headers):
@@ -401,16 +403,3 @@ def map_headers(data_item, db_headers):
         if header:
             mapped_item[header] = v
     return mapped_item
-
-
-extract_countries_and_territories_reference = (
-    ExtractCountriesAndTerritoriesReferenceDataset()
-)
-extract_datahub_company_dataset = ExtractDatahubCompanyDataset()
-extract_datahub_contact_dataset = ExtractDatahubContactDataset()
-extract_datahub_export_to_countries = ExtractDatahubExportToCountries()
-extract_datahub_future_interest_countries = ExtractDatahubFutureInterestCountries()
-extract_datahub_interactions = ExtractDatahubInteractions()
-extract_datahub_omis = ExtractDatahubOmis()
-extract_datahub_sectors = ExtractDatahubSectors()
-extract_export_wins = ExtractExportWins()

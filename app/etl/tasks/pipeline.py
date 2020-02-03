@@ -21,14 +21,14 @@ from app.etl.tasks.datahub_omis_country_sector_interest import (
 from app.etl.tasks.export_wins_country import Task as PopulateExportWinsTask
 from app.etl.tasks.interactions_analysed import Task as PopulateAnalysedInteractionsTask
 from app.etl.tasks.source_data_extraction import (
-    extract_countries_and_territories_reference as ext_countries_and_territories,
-    extract_datahub_company_dataset as ext_company,
-    extract_datahub_contact_dataset as ext_contact,
-    extract_datahub_export_to_countries as ext_export_to_countries,
-    extract_datahub_future_interest_countries as ext_future_interest_countries,
-    extract_datahub_interactions as ext_interactions,
-    extract_datahub_omis as ext_omis,
-    extract_export_wins as ext_export_wins,
+    ExtractCountriesAndTerritoriesReferenceDataset as ext_countries_and_territories,
+    ExtractDatahubCompanyDataset as ext_company,
+    ExtractDatahubContactDataset as ext_contact,
+    ExtractDatahubExportToCountries as ext_export_to_countries,
+    ExtractDatahubFutureInterestCountries as ext_interactions,
+    ExtractDatahubInteractions as ext_future_interest_countries,
+    ExtractDatahubOmis as ext_omis,
+    ExtractExportWins as ext_export_wins,
 )
 
 

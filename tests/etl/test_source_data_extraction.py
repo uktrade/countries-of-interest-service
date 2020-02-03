@@ -5,9 +5,9 @@ import pytest
 import sqlalchemy.exc
 
 import app.db.models.external as models
-import app.etl.tasks.source_data_extraction
-import app.etl.tasks.source_data_extraction as source_data_extraction
+from app.config.constants import Source
 from app.db.db_utils import execute_statement
+from app.etl.tasks import source_data_extraction
 
 
 @pytest.fixture()
@@ -26,6 +26,7 @@ def stub_data_off(app):
 
 class SourceDataExtractBaseTestCase:
     item_pk = 'id'
+    extractor_name = None
 
     __test__ = False
 
@@ -39,12 +40,13 @@ class SourceDataExtractBaseTestCase:
         }
 
     def test_stub_data(self, stub_data_on, app_with_db):
-        response = self.extractor.__call__()
+        extractor = self.extractor(name=self.extractor_name)
+        response = extractor()
         number_of_rows = len(self.extractor.stub_data['values'])
         assert response == {
             'rows': number_of_rows,
             'status': 200,
-            'table': self.extractor.model.__tablename__,
+            'extractor': self.extractor_name,
         }
         objects = self.extractor.model.query.all()
         assert len(objects) == number_of_rows
@@ -55,12 +57,13 @@ class SourceDataExtractBaseTestCase:
         response = Mock()
         response.json.return_value = self.source_data
         requests.get.return_value = response
-        response = self.extractor.__call__()
+        extractor = self.extractor(name=self.extractor_name)
+        response = extractor()
         number_of_rows = len(self.expected_data)
         assert response == {
             'rows': number_of_rows,
             'status': 200,
-            'table': self.extractor.model.__tablename__,
+            'extractor': self.extractor_name,
         }
         for expected_item in self.expected_data:
             actual_object = self.extractor.model.query.filter_by(
@@ -124,7 +127,8 @@ class TestExtractCountriesAndTerritoriesReferenceDataset(
             ['AO', 'Angola', 'Country', '1975-11-11', None],
         ],
     }
-    extractor = source_data_extraction.extract_countries_and_territories_reference
+    extractor = source_data_extraction.ExtractCountriesAndTerritoriesReferenceDataset
+    extractor_name = Source.COUNTRIES_AND_TERRITORIES.value
 
 
 class TestExtractDatahubCompany(SourceDataExtractBaseTestCase):
@@ -153,7 +157,8 @@ class TestExtractDatahubCompany(SourceDataExtractBaseTestCase):
         ],
     }
     source_table_id_config_key = 'datahub_companies_source_table_id'
-    extractor = source_data_extraction.extract_datahub_company_dataset
+    extractor = source_data_extraction.ExtractDatahubCompanyDataset
+    extractor_name = Source.DATAHUB_COMPANY.value
 
 
 class TestExtractDatahubExportCountries(SourceDataExtractBaseTestCase):
@@ -188,7 +193,8 @@ class TestExtractDatahubExportCountries(SourceDataExtractBaseTestCase):
         ],
     }
     source_table_id_config_key = 'datahub_export_countries_source_table_id'
-    extractor = source_data_extraction.extract_datahub_export_to_countries
+    extractor = source_data_extraction.ExtractDatahubExportToCountries
+    extractor_name = Source.DATAHUB_EXPORT_TO_COUNTRIES.value
 
 
 class TestExtractDatahubFutureInterestCountries(SourceDataExtractBaseTestCase):
@@ -223,7 +229,8 @@ class TestExtractDatahubFutureInterestCountries(SourceDataExtractBaseTestCase):
         ],
     }
     source_table_id_config_key = 'datahub_future_interest_countries_source_table_id'
-    extractor = source_data_extraction.extract_datahub_future_interest_countries
+    extractor = source_data_extraction.ExtractDatahubFutureInterestCountries
+    extractor_name = Source.DATAHUB_FUTURE_INTEREST_COUNTRIES.value
 
 
 class TestExtractDatahubInteractions(SourceDataExtractBaseTestCase):
@@ -273,7 +280,8 @@ class TestExtractDatahubInteractions(SourceDataExtractBaseTestCase):
         'next': None,
     }
     source_table_id_config_key = 'datahub_interactions_source_table_id'
-    extractor = source_data_extraction.extract_datahub_interactions
+    extractor = source_data_extraction.ExtractDatahubInteractions
+    extractor_name = Source.DATAHUB_INTERACTIONS.value
 
 
 class TestExtractDatahubOmis(SourceDataExtractBaseTestCase):
@@ -317,7 +325,8 @@ class TestExtractDatahubOmis(SourceDataExtractBaseTestCase):
         'next': None,
     }
     source_table_id_config_key = 'datahub_omis_source_table_id'
-    extractor = app.etl.tasks.source_data_extraction.extract_datahub_omis
+    extractor = source_data_extraction.ExtractDatahubOmis
+    extractor_name = Source.DATAHUB_OMIS.value
 
 
 class TestExtractDatahubSectors(SourceDataExtractBaseTestCase):
@@ -336,7 +345,7 @@ class TestExtractDatahubSectors(SourceDataExtractBaseTestCase):
         'next': None,
     }
     source_table_id_config_key = 'datahub_sectors_source_table_id'
-    extractor = app.etl.tasks.source_data_extraction.extract_datahub_sectors
+    extractor = source_data_extraction.ExtractDatahubSectors
 
 
 class TestExtractExportWins(SourceDataExtractBaseTestCase):
@@ -401,7 +410,8 @@ class TestExtractExportWins(SourceDataExtractBaseTestCase):
         'next': None,
     }
     source_table_id_config_key = 'export_wins_source_table_id'
-    extractor = app.etl.tasks.source_data_extraction.extract_export_wins
+    extractor = source_data_extraction.ExtractExportWins
+    extractor_name = Source.EXPORT_WINS.value
 
 
 class TestGetHawkHeaders:
@@ -452,6 +462,7 @@ class TestPopulateTable:
             source_data_extraction.populate_table(
                 data,
                 self.sector_model,
+                'datahub_sectors',
                 {'id': 'id', 'sector': 'sector'},
                 'id',
                 overwrite=False,
@@ -481,11 +492,12 @@ class TestPopulateTable:
         response = source_data_extraction.populate_table(
             data,
             self.sector_model,
+            'datahub_sectors',
             {'id': 'id', 'sector': 'sector'},
             'id',
             overwrite=True,
         )
-        assert response == {'rows': 2, 'status': 200, 'table': 'datahub_sectors'}
+        assert response == {'rows': 2, 'status': 200, 'extractor': 'datahub_sectors'}
 
         rows = self.get_rows()
         assert len(rows) == 2
@@ -512,11 +524,12 @@ class TestPopulateTable:
         response = source_data_extraction.populate_table(
             data,
             self.sector_model,
+            'datahub_sectors',
             {'id': 'id', 'sector': 'sector'},
             'id',
             overwrite=False,
         )
-        assert response == {'rows': 2, 'status': 200, 'table': 'datahub_sectors'}
+        assert response == {'rows': 2, 'status': 200, 'extractor': 'datahub_sectors'}
 
         rows = self.get_rows()
         assert len(rows) == 3
@@ -589,11 +602,16 @@ class TestPopulateTable:
         response = source_data_extraction.populate_table(
             data,
             models.Interactions,
+            'datahub_interactions',
             mapping,
             'datahub_interaction_id',
             overwrite=False,
         )
-        assert response == {'rows': 3, 'status': 200, 'table': 'interactions'}
+        assert response == {
+            'rows': 3,
+            'status': 200,
+            'extractor': 'datahub_interactions',
+        }
 
         sql = (
             f'select '

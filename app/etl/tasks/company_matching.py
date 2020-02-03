@@ -18,18 +18,17 @@ from app.db.models.internal import (
 
 class Task:
 
-    name = 'CompanyMatchingTask'
+    name = 'company_matching'
     valid_email = re.compile(r"[^@]+@[^@]+\.[^@]+")
 
     def __init__(self, **kwargs):
-        self.table_name = CountriesAndSectorsInterest.__tablename__
+        pass
 
     def __call__(self):
         self._company_matching()
         return {
-            'status': 'success',
-            'rows': -1,
-            'table': self.table_name,
+            'status': 200,
+            'task': self.name,
         }
 
     def _company_matching(self):

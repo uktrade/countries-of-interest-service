@@ -1,7 +1,7 @@
 import unittest
 from unittest import mock
 
-from app.db.models.internal import InteractionsAnalysed
+from app.config.constants import Task as TaskConstant
 from app.etl.tasks.interactions_analysed import Task
 
 
@@ -15,7 +15,6 @@ class TestTask(unittest.TestCase):
         analyse_interactions.assert_called_once_with()
         expected = {
             'status': 200,
-            'n_rows': None,
-            'table': InteractionsAnalysed.__tablename__,
+            'task': TaskConstant.INTERACTIONS_ANALYSED.value,
         }
         self.assertEqual(output, expected)
