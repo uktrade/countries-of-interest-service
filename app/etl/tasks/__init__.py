@@ -26,7 +26,7 @@ def populate_database(drop_table, extractors, tasks):
     for name, extractor in EXTRACTORS_DICT.items():
         if name in extractors:
             flask_app.logger.info(f'Running extractor: {name}')
-            extractor = extractor(name=name)
+            extractor = extractor()
             try:
                 output = output + [extractor()]
             except Exception as e:

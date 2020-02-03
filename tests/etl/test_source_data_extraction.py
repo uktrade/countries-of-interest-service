@@ -40,13 +40,13 @@ class SourceDataExtractBaseTestCase:
         }
 
     def test_stub_data(self, stub_data_on, app_with_db):
-        extractor = self.extractor(name=self.extractor_name)
+        extractor = self.extractor()
         response = extractor()
         number_of_rows = len(self.extractor.stub_data['values'])
         assert response == {
             'rows': number_of_rows,
             'status': 200,
-            'extractor': self.extractor_name,
+            'extractor': self.extractor.name,
         }
         objects = self.extractor.model.query.all()
         assert len(objects) == number_of_rows
@@ -57,13 +57,13 @@ class SourceDataExtractBaseTestCase:
         response = Mock()
         response.json.return_value = self.source_data
         requests.get.return_value = response
-        extractor = self.extractor(name=self.extractor_name)
+        extractor = self.extractor()
         response = extractor()
         number_of_rows = len(self.expected_data)
         assert response == {
             'rows': number_of_rows,
             'status': 200,
-            'extractor': self.extractor_name,
+            'extractor': self.extractor.name,
         }
         for expected_item in self.expected_data:
             actual_object = self.extractor.model.query.filter_by(
@@ -128,7 +128,6 @@ class TestExtractCountriesAndTerritoriesReferenceDataset(
         ],
     }
     extractor = source_data_extraction.ExtractCountriesAndTerritoriesReferenceDataset
-    extractor_name = Source.COUNTRIES_AND_TERRITORIES.value
 
 
 class TestExtractDatahubCompany(SourceDataExtractBaseTestCase):
@@ -158,7 +157,6 @@ class TestExtractDatahubCompany(SourceDataExtractBaseTestCase):
     }
     source_table_id_config_key = 'datahub_companies_source_table_id'
     extractor = source_data_extraction.ExtractDatahubCompanyDataset
-    extractor_name = Source.DATAHUB_COMPANY.value
 
 
 class TestExtractDatahubExportCountries(SourceDataExtractBaseTestCase):
@@ -194,7 +192,6 @@ class TestExtractDatahubExportCountries(SourceDataExtractBaseTestCase):
     }
     source_table_id_config_key = 'datahub_export_countries_source_table_id'
     extractor = source_data_extraction.ExtractDatahubExportToCountries
-    extractor_name = Source.DATAHUB_EXPORT_TO_COUNTRIES.value
 
 
 class TestExtractDatahubFutureInterestCountries(SourceDataExtractBaseTestCase):
@@ -230,7 +227,6 @@ class TestExtractDatahubFutureInterestCountries(SourceDataExtractBaseTestCase):
     }
     source_table_id_config_key = 'datahub_future_interest_countries_source_table_id'
     extractor = source_data_extraction.ExtractDatahubFutureInterestCountries
-    extractor_name = Source.DATAHUB_FUTURE_INTEREST_COUNTRIES.value
 
 
 class TestExtractDatahubInteractions(SourceDataExtractBaseTestCase):
@@ -281,7 +277,6 @@ class TestExtractDatahubInteractions(SourceDataExtractBaseTestCase):
     }
     source_table_id_config_key = 'datahub_interactions_source_table_id'
     extractor = source_data_extraction.ExtractDatahubInteractions
-    extractor_name = Source.DATAHUB_INTERACTIONS.value
 
 
 class TestExtractDatahubOmis(SourceDataExtractBaseTestCase):
@@ -326,7 +321,6 @@ class TestExtractDatahubOmis(SourceDataExtractBaseTestCase):
     }
     source_table_id_config_key = 'datahub_omis_source_table_id'
     extractor = source_data_extraction.ExtractDatahubOmis
-    extractor_name = Source.DATAHUB_OMIS.value
 
 
 class TestExtractDatahubSectors(SourceDataExtractBaseTestCase):
@@ -411,7 +405,6 @@ class TestExtractExportWins(SourceDataExtractBaseTestCase):
     }
     source_table_id_config_key = 'export_wins_source_table_id'
     extractor = source_data_extraction.ExtractExportWins
-    extractor_name = Source.EXPORT_WINS.value
 
 
 class TestGetHawkHeaders:

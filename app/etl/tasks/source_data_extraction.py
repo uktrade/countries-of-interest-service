@@ -5,6 +5,7 @@ from sqlalchemy import exc
 from sqlalchemy.dialects import postgresql
 
 import app.db.models.external as models
+from app.config.constants import Source
 from app.db.models import sql_alchemy
 
 
@@ -13,9 +14,7 @@ class SourceDataExtractor:
     model = None
     mapping = {}
     unique_key = 'id'
-
-    def __init__(self, name):
-        self.name = name
+    name = None
 
     def __call__(self):
         if flask_app.config['app']['stub_source_data']:
@@ -48,6 +47,7 @@ class ReferenceDatasetExtractor(SourceDataExtractor):
 
 
 class ExtractCountriesAndTerritoriesReferenceDataset(ReferenceDatasetExtractor):
+    name = Source.COUNTRIES_AND_TERRITORIES.value
     group_slug = 'countries_and_territories_group_slug'
     mapping = {
         'ID': 'country_iso_alpha2_code',
@@ -74,6 +74,7 @@ class ExtractCountriesAndTerritoriesReferenceDataset(ReferenceDatasetExtractor):
 
 
 class ExtractDatahubCompanyDataset(SourceDataExtractor):
+    name = Source.DATAHUB_COMPANY.value
     dataset_id_config_key = 'datahub_companies_dataset_id'
     mapping = {
         'id': 'datahub_company_id',
@@ -121,6 +122,7 @@ class ExtractDatahubCompanyDataset(SourceDataExtractor):
 
 
 class ExtractDatahubContactDataset(SourceDataExtractor):
+    name = Source.DATAHUB_CONTACT.value
     dataset_id_config_key = 'datahub_contacts_dataset_id'
     mapping = {
         'id': 'datahub_contact_id',
@@ -148,6 +150,7 @@ class ExtractDatahubContactDataset(SourceDataExtractor):
 
 
 class ExtractDatahubExportToCountries(SourceDataExtractor):
+    name = Source.DATAHUB_EXPORT_TO_COUNTRIES.value
     dataset_id_config_key = 'datahub_export_countries_dataset_id'
     mapping = {
         'company_id': 'company_id',
@@ -167,6 +170,7 @@ class ExtractDatahubExportToCountries(SourceDataExtractor):
 
 
 class ExtractDatahubFutureInterestCountries(SourceDataExtractor):
+    name = Source.DATAHUB_FUTURE_INTEREST_COUNTRIES.value
     dataset_id_config_key = 'datahub_future_interest_countries_dataset_id'
     mapping = {
         'company_id': 'company_id',
@@ -186,6 +190,7 @@ class ExtractDatahubFutureInterestCountries(SourceDataExtractor):
 
 
 class ExtractDatahubInteractions(SourceDataExtractor):
+    name = Source.DATAHUB_INTERACTIONS.value
     dataset_id_config_key = 'datahub_interactions_dataset_id'
     mapping = {
         'id': 'datahub_interaction_id',
@@ -225,6 +230,7 @@ class ExtractDatahubInteractions(SourceDataExtractor):
 
 
 class ExtractDatahubOmis(SourceDataExtractor):
+    name = Source.DATAHUB_OMIS.value
     dataset_id_config_key = 'datahub_omis_dataset_id'
     mapping = {
         'company_id': 'company_id',
@@ -275,6 +281,7 @@ class ExtractDatahubSectors(SourceDataExtractor):
 
 
 class ExtractExportWins(SourceDataExtractor):
+    name = Source.EXPORT_WINS.value
     dataset_id_config_key = 'export_wins_dataset_id'
     mapping = {
         'id': 'export_wins_id',
