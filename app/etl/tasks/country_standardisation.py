@@ -1,11 +1,12 @@
 import app.algorithm.country_standardisation.steps as country_standardisation
+from app.config import constants
 from app.db.db_utils import drop_table
 from app.db.models.internal import StandardisedCountries
 
 
 class PopulateStandardisedCountriesTask:
 
-    name = 'populate_standardised_countries'
+    name = constants.Task.STANDARDISE_COUNTRIES.value
 
     def __init__(self, **kwargs):
         super().__init__()

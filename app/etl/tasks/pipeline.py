@@ -38,8 +38,8 @@ EXTRACTORS_DICT = OrderedDict(
         Source.DATAHUB_COMPANY.value: ext_company,
         Source.DATAHUB_CONTACT.value: ext_contact,
         Source.DATAHUB_EXPORT_TO_COUNTRIES.value: ext_export_to_countries,
-        Source.DATAHUB_INTERACTIONS.value: ext_interactions,
         Source.DATAHUB_FUTURE_INTEREST_COUNTRIES.value: ext_future_interest_countries,
+        Source.DATAHUB_INTERACTIONS.value: ext_interactions,
         Source.DATAHUB_OMIS.value: ext_omis,
         Source.EXPORT_WINS.value: ext_export_wins,
     }
