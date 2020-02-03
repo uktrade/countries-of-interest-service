@@ -1,4 +1,4 @@
-from app.config import data_sources
+from app.config import constants
 from app.db.models.external import (
     DatahubFutureInterestCountries,
     DITCountryTerritoryRegister,
@@ -20,9 +20,9 @@ with results as (
             else NULL
         end as country,
         null as sector,
-        'interested' as type,
-        'datahub' as service,
-        '{data_sources.datahub_future_interest_countries}' as source,
+        '{constants.Type.INTERESTED.value}' as type,
+        '{constants.Service.DATAHUB.value}' as service,
+        '{constants.Source.DATAHUB_FUTURE_INTEREST_COUNTRIES.value}' as source,
         d.id::text as source_id,
         null::timestamp as timestamp
     from {DatahubFutureInterestCountries.get_fq_table_name()} d

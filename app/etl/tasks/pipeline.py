@@ -1,5 +1,9 @@
 from collections import OrderedDict
 
+from app.config.constants import (
+    Source,
+    Task,
+)
 from app.etl.tasks.company_matching import Task as PopulateCompanyMatchingTask
 from app.etl.tasks.country_standardisation import PopulateStandardisedCountriesTask
 from app.etl.tasks.datahub_country_export import (
@@ -17,40 +21,27 @@ from app.etl.tasks.datahub_omis_country_sector_interest import (
 from app.etl.tasks.export_wins_country import Task as PopulateExportWinsTask
 from app.etl.tasks.interactions_analysed import Task as PopulateAnalysedInteractionsTask
 from app.etl.tasks.source_data_extraction import (
-    extract_countries_and_territories_reference_dataset,
-    extract_datahub_company_dataset,
-    extract_datahub_contact_dataset,
-    extract_datahub_export_to_countries,
-    extract_datahub_future_interest_countries,
-    extract_datahub_interactions,
-    extract_datahub_omis,
-    extract_export_wins,
+    extract_countries_and_territories_reference as ext_countries_and_territories,
+    extract_datahub_company_dataset as ext_company,
+    extract_datahub_contact_dataset as ext_contact,
+    extract_datahub_export_to_countries as ext_export_to_countries,
+    extract_datahub_future_interest_countries as ext_future_interest_countries,
+    extract_datahub_interactions as ext_interactions,
+    extract_datahub_omis as ext_omis,
+    extract_export_wins as ext_export_wins,
 )
 
-COUNTRIES_AND_TERRITORIES = 'countries_and_territories'
-DATAHUB_COMPANY = 'datahub_company'
-DATAHUB_CONTACT = 'datahub_contact'
-DATAHUB_EXPORT_TO_COUNTRIES = 'datahub_export_to_countries'
-DATAHUB_INTERACTIONS = 'datahub_interactions'
-DATAHUB_FUTURE_INTEREST_COUNTRIES = 'datahub_future_interest_countries'
-DATAHUB_OMIS = 'datahub_omis'
-EXPORT_WINS = 'export_wins'
-
-
-STANDARDISE_COUNTRIES = 'standardise_countries'
-INTERACTIONS_ANALYSED = 'interactions_analysed'
-COUNTRY_SECTOR_INTEREST = 'country_sector_interest'
 
 EXTRACTORS_DICT = OrderedDict(
     {
-        COUNTRIES_AND_TERRITORIES: extract_countries_and_territories_reference_dataset,
-        DATAHUB_COMPANY: extract_datahub_company_dataset,
-        DATAHUB_CONTACT: extract_datahub_contact_dataset,
-        DATAHUB_EXPORT_TO_COUNTRIES: extract_datahub_export_to_countries,
-        DATAHUB_INTERACTIONS: extract_datahub_interactions,
-        DATAHUB_FUTURE_INTEREST_COUNTRIES: extract_datahub_future_interest_countries,
-        DATAHUB_OMIS: extract_datahub_omis,
-        EXPORT_WINS: extract_export_wins,
+        Source.COUNTRIES_AND_TERRITORIES.value: ext_countries_and_territories,
+        Source.DATAHUB_COMPANY.value: ext_company,
+        Source.DATAHUB_CONTACT.value: ext_contact,
+        Source.DATAHUB_EXPORT_TO_COUNTRIES.value: ext_export_to_countries,
+        Source.DATAHUB_INTERACTIONS.value: ext_interactions,
+        Source.DATAHUB_FUTURE_INTEREST_COUNTRIES.value: ext_future_interest_countries,
+        Source.DATAHUB_OMIS.value: ext_omis,
+        Source.EXPORT_WINS.value: ext_export_wins,
     }
 )
 
@@ -59,9 +50,9 @@ EXTRACTORS = EXTRACTORS_DICT.keys()
 
 TASKS_DICT = OrderedDict(
     {
-        STANDARDISE_COUNTRIES: PopulateStandardisedCountriesTask,
-        INTERACTIONS_ANALYSED: PopulateAnalysedInteractionsTask,
-        COUNTRY_SECTOR_INTEREST: [
+        Task.STANDARDISE_COUNTRIES.value: PopulateStandardisedCountriesTask,
+        Task.INTERACTIONS_ANALYSED.value: PopulateAnalysedInteractionsTask,
+        Task.COUNTRY_SECTOR_INTEREST.value: [
             PopulateDatahubCountryExportedTask,
             PopulateDatahubCountryInterestTask,
             PopulateDatahubOmisCountrySectorInterestTask,

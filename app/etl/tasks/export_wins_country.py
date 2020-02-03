@@ -1,4 +1,4 @@
-from app.config import data_sources
+from app.config import constants
 from app.db.models.external import (
     DITCountryTerritoryRegister,
     ExportWins,
@@ -21,9 +21,9 @@ with results as (
             else NULL
         end as country,
         d.sector as sector,
-        'exported' as type,
-        'export_wins' as service,
-        '{data_sources.export_wins}' as source,
+        '{constants.Type.EXPORTED.value}' as type,
+        '{constants.Service.EXPORT_WINS.value}' as service,
+        '{constants.Source.EXPORT_WINS.value}' as source,
         d.export_wins_id::text as source_id,
         d.date_won::timestamp as timestamp
     from {ExportWins.get_fq_table_name()} d
