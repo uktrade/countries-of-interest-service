@@ -12,6 +12,7 @@ from app.db.models import db
 from app.db.models.external import DatahubCompany, DatahubContact, ExportWins
 from app.db.models.internal import (
     CountriesAndSectorsInterest,
+    CountriesAndSectorsInterestMatched,
     CountriesAndSectorsInterestTemp,
 )
 
@@ -38,7 +39,7 @@ class Task:
         self._match_and_store_results(cursor)
         cursor.close()
         connection.close()
-        self._populate_csi_temp_table_and_swap()
+        self._populate_csi_matched_table_and_swap()
 
     def _fetch_companies(self, connection):
         cursor = connection.cursor(name='fetch_companies')
@@ -52,7 +53,7 @@ class Task:
                 company.companies_house_id,
                 'dit.datahub' as source,
                 company.modified_on as datetime
-            FROM {CountriesAndSectorsInterest.get_fq_table_name()} csi
+            FROM {CountriesAndSectorsInterestTemp.get_fq_table_name()} csi
             INNER JOIN {DatahubCompany.get_fq_table_name()} company
                 on csi.service_company_id = company.datahub_company_id::text
             LEFT JOIN
@@ -70,7 +71,7 @@ class Task:
                 null as copmanies_house_id,
                 'dit.export-wins' as source,
                 ew.created_on::timestamp
-            FROM {CountriesAndSectorsInterest.get_fq_table_name()} csi
+            FROM {CountriesAndSectorsInterestTemp.get_fq_table_name()} csi
             INNER JOIN {ExportWins.get_fq_table_name()} ew
                 on csi.source_id = ew.export_wins_id::text
             WHERE service = 'export_wins')
@@ -171,12 +172,11 @@ class Task:
             data = None
         return status_code, data
 
-    def _populate_csi_temp_table_and_swap(self):
-        CountriesAndSectorsInterestTemp.drop_table()
-        CountriesAndSectorsInterestTemp.create_table()
+    def _populate_csi_matched_table_and_swap(self):
+        CountriesAndSectorsInterestMatched.drop_table()
+        CountriesAndSectorsInterestMatched.create_table()
         stmt = f"""
-            BEGIN;
-            INSERT INTO {CountriesAndSectorsInterestTemp.get_fq_table_name()} (
+            INSERT INTO {CountriesAndSectorsInterestMatched.get_fq_table_name()} (
                 service_company_id,
                 company_match_id,
                 country,
@@ -208,7 +208,7 @@ class Task:
                 csi.source,
                 csi.source_id,
                 csi.timestamp
-            FROM {CountriesAndSectorsInterest.get_fq_table_name()} csi
+            FROM {CountriesAndSectorsInterestTemp.get_fq_table_name()} csi
             LEFT JOIN (
                 select distinct id, match_id from company_matching
             ) dh_cm on dh_cm.id = csi.service_company_id
@@ -225,16 +225,15 @@ class Task:
                 csi.source,
                 csi.source_id,
                 csi.timestamp
-            FROM {CountriesAndSectorsInterest.get_fq_table_name()} csi
+            FROM {CountriesAndSectorsInterestTemp.get_fq_table_name()} csi
             LEFT JOIN (
                 select distinct id, match_id from company_matching
             ) ew_cm on ew_cm.id = csi.source_id and csi.service = 'export_wins'
             WHERE csi.service = 'export_wins')) SQ ORDER BY id;
-            DROP TABLE IF EXISTS {CountriesAndSectorsInterest.get_fq_table_name()};
-            COMMIT;
         """
         execute_statement(stmt)
+        CountriesAndSectorsInterest.drop_table()
         db_utils.rename_table(
-            CountriesAndSectorsInterestTemp.__tablename__,
+            CountriesAndSectorsInterestMatched.__tablename__,
             CountriesAndSectorsInterest.__tablename__,
         )

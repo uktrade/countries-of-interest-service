@@ -93,7 +93,8 @@ def test_company_matching(
                 'source_id': 'ffa75985-7bc0-4e9f-8d58-28a7f234b7fc',
                 'timestamp': '2010-11-11 12:12:12',
             },
-        ]
+        ],
+        temp=True,
     )
 
     _api_mock(
