@@ -11,7 +11,7 @@ entry_1 = {
     'sector': 'sector1',
     'type': 'interested',
     'service': 'datahub',
-    'source': 'source1',
+    'source': 'omis',
     'source_id': 'source_id_1',
     'timestamp': '2009-10-10T12:12:12',
 }
@@ -22,8 +22,8 @@ entry_2 = {
     'country': 'country2',
     'sector': None,
     'type': 'exported',
-    'service': 'datahub',
-    'source': 'source2',
+    'service': 'export_wins',
+    'source': 'export_wins',
     'source_id': 'source_id_2',
     'timestamp': '2009-10-10T13:00:00',
 }
@@ -35,7 +35,7 @@ entry_3 = {
     'sector': 'sector3',
     'type': 'interested',
     'service': 'export-wins',
-    'source': 'source3',
+    'source': 'omis',
     'source_id': 'source_id_1',
     'timestamp': '2009-10-11T13:00:00',
 }
@@ -58,38 +58,40 @@ def setup_function(app, add_countries_and_sectors_of_interest):
     add_countries_and_sectors_of_interest([entry_1, entry_2, entry_3, entry_4])
 
 
-def test_get_countries(app, sso_authenticated_request):
-    url = 'http://localhost:80/api/v1/get-data-visualisation-data/country'
-    with app.test_client() as app_context:
-        utils.assert_api_response(
-            app_context=app_context,
-            api=url,
-            params='exporter-status=interested',
-            expected_response=(
-                200,
-                {
-                    'nInterests': [
-                        {
-                            'country': 'country1',
-                            'date': '2009-10-01T00:00:00',
-                            'nInterests': 1,
-                            'nInterestsCumulative': 1,
-                            'shareOfInterest': 0.5,
-                            'shareOfInterestCumulative': 0.5,
-                        },
-                        {
-                            'country': 'country3',
-                            'date': '2009-10-01T00:00:00',
-                            'nInterests': 1,
-                            'nInterestsCumulative': 1,
-                            'shareOfInterest': 0.5,
-                            'shareOfInterestCumulative': 0.5,
-                        },
-                    ],
-                    'top': ['country1', 'country3'],
-                },
-            ),
-        )
+def test_get_countries(app):
+    with mock.patch('app.sso.token.is_authenticated') as mock_is_authenticated:
+        mock_is_authenticated.return_value = True
+        url = 'http://localhost:80/api/v1/get-data-visualisation-data/country'
+        with app.test_client() as app_context:
+            utils.assert_api_response(
+                app_context=app_context,
+                api=url,
+                params='data-source=omis',
+                expected_response=(
+                    200,
+                    {
+                        'nInterests': [
+                            {
+                                'country': 'country1',
+                                'date': '2009-10-01T00:00:00',
+                                'nInterests': 1,
+                                'nInterestsCumulative': 1,
+                                'shareOfInterest': 0.5,
+                                'shareOfInterestCumulative': 0.5,
+                            },
+                            {
+                                'country': 'country3',
+                                'date': '2009-10-01T00:00:00',
+                                'nInterests': 1,
+                                'nInterestsCumulative': 1,
+                                'shareOfInterest': 0.5,
+                                'shareOfInterestCumulative': 0.5,
+                            },
+                        ],
+                        'top': ['country1', 'country3'],
+                    },
+                ),
+            )
 
 
 def test_get_sectors(app):
@@ -100,7 +102,7 @@ def test_get_sectors(app):
             utils.assert_api_response(
                 app_context=app_context,
                 api=url,
-                params='exporter-status=interested',
+                params='data-source=omis',
                 expected_response=(
                     200,
                     {
@@ -128,60 +130,68 @@ def test_get_sectors(app):
             )
 
 
-def test_get_countries_mentioned(app, sso_authenticated_request):
-    url = 'http://localhost:80/api/v1/get-data-visualisation-data/country'
-    with app.test_client() as app_context:
-        utils.assert_api_response(
-            app_context=app_context,
-            api=url,
-            params='exporter-status=mentioned',
-            expected_response=(
-                200,
-                {
-                    'nInterests': [
-                        {
-                            'country': 'country4',
-                            'date': '2009-10-01T00:00:00',
-                            'nInterests': 1,
-                            'nInterestsCumulative': 1,
-                            'shareOfInterest': 1.0,
-                            'shareOfInterestCumulative': 1.0,
-                        },
-                    ],
-                    'top': ['country4'],
-                },
-            ),
-        )
+def test_get_countries_interactions(app):
+    with mock.patch('app.sso.token.is_authenticated') as mock_is_authenticated:
+        mock_is_authenticated.return_value = True
+        url = 'http://localhost:80/api/v1/get-data-visualisation-data/country'
+        with app.test_client() as app_context:
+            utils.assert_api_response(
+                app_context=app_context,
+                api=url,
+                params='data-source=interactions',
+                expected_response=(
+                    200,
+                    {
+                        'nInterests': [
+                            {
+                                'country': 'country4',
+                                'date': '2009-10-01T00:00:00',
+                                'nInterests': 1,
+                                'nInterestsCumulative': 1,
+                                'shareOfInterest': 1.0,
+                                'shareOfInterestCumulative': 1.0,
+                            },
+                        ],
+                        'top': ['country4'],
+                    },
+                ),
+            )
 
 
-def test_invalid_exporter_status(app, sso_authenticated_request):
-    url = 'http://localhost:80/api/v1/get-data-visualisation-data/country'
-    with app.test_client() as app_context:
-        utils.assert_api_response(
-            app_context=app_context,
-            api=url,
-            params='exporter-status=invalid',
-            expected_response=(400, None),
-        )
+def test_invalid_data_source(app):
+    with mock.patch('app.sso.token.is_authenticated') as mock_is_authenticated:
+        mock_is_authenticated.return_value = True
+        url = 'http://localhost:80/api/v1/get-data-visualisation-data/country'
+        with app.test_client() as app_context:
+            utils.assert_api_response(
+                app_context=app_context,
+                api=url,
+                params='data-source=invalid',
+                expected_response=(400, None),
+            )
 
 
-def test_invalid_fields_status(app, sso_authenticated_request):
-    url = 'http://localhost:80/api/v1/get-data-visualisation-data/invalid'
-    with app.test_client() as app_context:
-        utils.assert_api_response(
-            app_context=app_context,
-            api=url,
-            params='exporter-status=invalid',
-            expected_response=(400, None),
-        )
+def test_invalid_fields_status(app):
+    with mock.patch('app.sso.token.is_authenticated') as mock_is_authenticated:
+        mock_is_authenticated.return_value = True
+        url = 'http://localhost:80/api/v1/get-data-visualisation-data/invalid'
+        with app.test_client() as app_context:
+            utils.assert_api_response(
+                app_context=app_context,
+                api=url,
+                params='data-source=invalid',
+                expected_response=(400, None),
+            )
 
 
-def test_invalid_sector_exporter_status(app, sso_authenticated_request):
-    url = 'http://localhost:80/api/v1/get-data-visualisation-data/sector'
-    with app.test_client() as app_context:
-        utils.assert_api_response(
-            app_context=app_context,
-            api=url,
-            params='exporter-status=mentioned',
-            expected_response=(400, None),
-        )
+def test_invalid_sector_data_source(app):
+    with mock.patch('app.sso.token.is_authenticated') as mock_is_authenticated:
+        mock_is_authenticated.return_value = True
+        url = 'http://localhost:80/api/v1/get-data-visualisation-data/sector'
+        with app.test_client() as app_context:
+            utils.assert_api_response(
+                app_context=app_context,
+                api=url,
+                params='data-source=interactions',
+                expected_response=(400, None),
+            )

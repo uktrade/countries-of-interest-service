@@ -273,25 +273,32 @@ def populate_database():
 
 @api.route('/api/v1/get-data-visualisation-data/<field>')
 @login_required
-def data_visualisation_data(field):
+def get_data_visualisation_data(field):
     date_trunc = request.args.get('date_trunc', 'quarter')
-    exporter_status = request.args['exporter-status']
+    data_source = request.args['data-source']
     interests_table = internal_models.CountriesAndSectorsInterest.__tablename__
-    valid_exporter_statuses = ['interested', 'mentioned']
+    from app.config import constants
+
+    valid_data_sources = [
+        constants.Source.EXPORT_WINS.value,
+        constants.Source.DATAHUB_INTERACTIONS.value,
+        constants.Source.DATAHUB_OMIS.value,
+    ]
     valid_fields = ['country', 'sector']
 
     if field not in valid_fields:
         raise BadRequest(f'invalid field: {field}, valid values: {valid_fields}')
 
-    if exporter_status not in valid_exporter_statuses:
+    if data_source not in valid_data_sources:
         raise BadRequest(
-            f'invalid exporter-status: {exporter_status}, '
-            f'valid values: {valid_exporter_statuses}'
+            f'invalid data-source: {data_source}, '
+            f'valid values: {valid_data_sources}'
         )
 
-    if field == 'sector' and exporter_status == 'mentioned':
+    if field == 'sector' and data_source == constants.Source.DATAHUB_INTERACTIONS.value:
         raise BadRequest(
-            'invalid args: exporter-status: mentioned not supported by sector'
+            f'invalid args: data-source: {constants.Source.DATAHUB_INTERACTIONS.value}'
+            ' not supported by sector'
         )
 
     sql = '''
@@ -303,7 +310,7 @@ def data_visualisation_data(field):
 
         from {interests_table}
 
-        where type = '{exporter_status}'
+        where source = '{data_source}'
             and {field} != ''
             and {field} is not null
             and {field} != 'United Kingdom'
@@ -370,7 +377,7 @@ def data_visualisation_data(field):
 
     '''.format(
         date_trunc=date_trunc,
-        exporter_status=exporter_status,
+        data_source=data_source,
         field=field,
         interests_table=interests_table,
     )

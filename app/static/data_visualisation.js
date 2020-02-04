@@ -8,8 +8,7 @@ import { render } from "react-dom";
 window.React = React;
 
 class App extends React.Component {
-
-
+    
     componentDidMount() {
         this.getDataset();
     }
@@ -19,10 +18,40 @@ class App extends React.Component {
 
     constructor(props){
         super(props);
+
+        this.dataSources = [
+            {
+                name: 'omis',
+                service: 'datahub',
+                title: 'OMIS',
+                groups: [
+                    {value: 'country', title: "Country"},
+                    {value: 'sector', title: "Sector"}
+                ]
+            },
+            {
+                name: 'export_wins',
+                service: 'export_wins',
+                title: 'Export wins',
+                groups: [
+                    {value: 'country', title: "Country"},
+                    {value: 'sector', title: "Sector"}
+                ]
+            },
+            {
+                name: 'interactions',
+                service: 'datahub',
+                title: 'Interactions',
+                groups: [
+                    {value: 'country', title: "Country"},
+                ]
+            },
+        ];
+        
         this.state = {
 	    barRaceVariable: "nInterestsCumulative", //"shareOfInterest",
 	    cumulative: true,
-            exporterStatus: "interested",
+            dataSource: this.dataSources[0],
             intervals: [],
             loading: true,
             nTop: 10,
@@ -34,7 +63,7 @@ class App extends React.Component {
         this.setBarRaceVariable = this.setBarRaceVariable.bind(this);
         this.setData = this.setData.bind(this);
         this.setDate = this.setDate.bind(this);
-        this.setExporterStatus = this.setExporterStatus.bind(this);
+        this.setDataSource = this.setDataSource.bind(this);
         this.setGroupby = this.setGroupby.bind(this);
         this.setNextDate = this.setNextDate.bind(this);
         this.setPlaying = this.setPlaying.bind(this);
@@ -55,12 +84,11 @@ class App extends React.Component {
 
     getDatasetUrl() {
         let url = `/api/v1/get-data-visualisation-data/${this.state.groupby}?`;
-        url += `exporter-status=${this.state.exporterStatus}`;
+        url += `data-source=${this.state.dataSource.name}`;
         return url;
     }
     
     play() {
-        console.log("App.play");
         return window.setInterval(this.setNextDate, 1000);
     }
 
@@ -108,8 +136,6 @@ class App extends React.Component {
     }
 
     setDate(date) {
-        console.log("setDate");
-        console.log(`date: ${date}`);
         let index = this.state.dates.indexOf(date);
         if(index !== -1) {
             this.setState({date: date});
@@ -121,8 +147,8 @@ class App extends React.Component {
         
     }
 
-    setExporterStatus(status) {
-        this.setState({data: null, exporterStatus: status, loading: true}, this.getDataset);
+    setDataSource(dataSource) {
+        this.setState({data: null, dataSource: dataSource, loading: true}, this.getDataset);
     }
 
     setGroupby(groupby) {
@@ -260,13 +286,19 @@ class App extends React.Component {
 
         let title = "";
         if(this.state.groupby === "country" && this.state.loading === false){
-            if(this.state.exporterStatus === "interested"){
+            if(this.state.dataSource.name === "omis"){
                 title = "Countries of interest";
-            } else if (this.state.exporterStatus === "mentioned") {
+            } else if (this.state.dataSource.name === "datahub_interactions") {
                 title = "Countries mentioned in interactions";
+            } else if (this.state.dataSource.name === "export_wins") {
+                title = "Export Countries";
             }
         } else if (this.state.groupby === "sector" && this.state.loading === false) {
-            title = "Sectors of interest";
+            if(this.state.dataSource.name === "omis"){
+                title = "Sectors of interest";
+            } else if (this.state.dataSource.name === "export_wins") {
+                title = "Export Sectors";
+            }
         }
         title = <h2 style={{marginBottom: "1em", marginTop: 40}}>{title}</h2>;
 
@@ -290,46 +322,40 @@ class App extends React.Component {
                 onChange={(e)=>this.setGroupby(e.target.value)}
                 value={this.state.groupby}
               >
-                <option value="country">
-                  Country
-                </option>
-                <option
-                  value="sector"
-                  disabled={this.state.exporterStatus === "mentioned"}>
-                  Sector
-                </option>
+                {
+                    this.state.dataSource !== undefined ? this.state.dataSource.groups.map(
+                        (group, i) => {
+                            return (
+                                <option key={i} value={group.value}>
+                                  {group.title}
+                                </option>
+                            );
+                        }
+                    ) : ""
+                }
               </select>
-              
             </div>
         );
 
-        let options = [
-            {value: "interested", html: "Interested"},
-            {value: "mentioned", html: "Mentioned in interactions"}
-        ];
-        if(this.state.groupby == "sector") {
-            options = options.filter(o=>o.value !== "mentioned");
-        }
-
-        let exporterStatusSelector = (
+        let dataSourceSelector = (
             <div className="form-group row">
               <label className="col-md-3 col-form-label text-right">
-                Exporter status
+                Data Source
               </label>
               <select
                 className="custom-select col-md-9"
-                onChange={(e)=>this.setExporterStatus(e.target.value)}
-                value={this.state.exporterStatus}
+                onChange={(e)=>this.setDataSource(this.dataSources.find(d=>d.name === e.target.value))}
+                value={this.state.dataSource.name}
               >
                 {
-                    options.map(
+                    this.dataSources.map(
                         (option, i) => {
                             return (
                                 <option
                                   key={i}
-                                  value={option.value}
+                                  value={option.name}
                                 >
-                                  {option.html}
+                                  {option.title}
                                 </option>
                             );
                         }
@@ -373,7 +399,7 @@ class App extends React.Component {
                 <div className="container" style={{marginTop: "1em"}}>
                   {playButton}
                   {groupbySelector}
-                  {exporterStatusSelector}
+                  {dataSourceSelector}
                   {barRaceVariableSelector}
                 </div>            
               </div>
@@ -391,7 +417,6 @@ class BarRace extends React.Component {
     }
 
     componentDidMount() {
-        console.log("BarRace.componentDidMount");
         this.container = {
             element: d3.select(`#${this.groupby}`),
             height: 300,
@@ -488,8 +513,6 @@ class BarRace extends React.Component {
         dataDate = dataDate.sort((a, b)=>b[variable] - a[variable]);
         dataDate = dataDate.map((d, i)=>({...d, rank: i}));
         dataDate = dataDate.splice(0, nTop);
-
-        console.log(dataDate);
         
         let xMin = 0;
         let xMax = d3.max(dataDate, d=>d[this.props.variable]);
@@ -594,7 +617,6 @@ class LineChart extends React.Component {
     }
 
     componentDidMount() {
-        console.log("LineChart.componentDidMount");
         this.container.element = d3.select(`#${this.container.id}`),
         this.container.width = parseInt(
             this.container.element.style("width"),
