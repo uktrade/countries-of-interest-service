@@ -1,9 +1,9 @@
 import unittest
 import unittest.mock
+from urllib.error import URLError
 
 import pytest
 from flask_oauthlib.client import OAuthException
-from urllib.error import URLError
 from werkzeug.exceptions import HTTPException
 
 import app.sso.token as token
@@ -42,7 +42,10 @@ class TestLoginRequired:
     @unittest.mock.patch('app.sso.token.is_authenticated')
     def test_if_authenticated_return_view(self, is_authenticated):
         is_authenticated.return_value = True
-        view = lambda: "view"
+
+        def view():
+            return "view"
+
         wrapped_view = token.login_required(view)
         assert view() == wrapped_view()
 
@@ -50,14 +53,18 @@ class TestLoginRequired:
     @unittest.mock.patch('app.sso.token.redirect')
     @unittest.mock.patch('app.sso.token.request')
     @unittest.mock.patch('app.sso.token.url_for')
-    def test_if_authenticated_return_view(
+    def test_if_not_authenticated_redirect(
         self, url_for, request, redirect, is_authenticated
     ):
         is_authenticated.return_value = False
-        view = lambda: "view"
+
+        def view():
+            return "view"
+
         wrapped_view = token.login_required(view)
-        redirect.asser_called_once()
         response = wrapped_view()
+        redirect.assert_called_once()
+        print('response:', response)
 
 
 class TestIsAuthenticated:
@@ -66,7 +73,7 @@ class TestIsAuthenticated:
 
         flask_app.sso_client = unittest.mock.Mock()
         response = token.is_authenticated()
-        assert response == True
+        assert response is True
 
     def test_if_get_profile_error_is_caught_return_false(self, app):
         from flask import current_app as flask_app
@@ -76,7 +83,7 @@ class TestIsAuthenticated:
         flask_app.sso_client.get_profile.side_effect = handled_exceptions
         for e in handled_exceptions:
             response = token.is_authenticated()
-            assert response == False
+            assert response is False
 
     def test_if_unhandled_exception_raise_exception(self, app):
         from flask import current_app as flask_app
@@ -84,4 +91,4 @@ class TestIsAuthenticated:
         flask_app.sso_client = unittest.mock.Mock()
         flask_app.sso_client.get_profile.side_effect = Exception('unhandled')
         with pytest.raises(Exception):
-            response = token.is_authenticated()
+            token.is_authenticated()
