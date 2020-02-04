@@ -55,9 +55,7 @@ class TestPopulateDatabase:
             populate_database()
         populate_database_task.delay.assert_called_once()
 
-    def test_if_force_update_rerun_while_another_task_is_running(
-        self, populate_database_task
-    ):
+    def test_if_force_update_rerun_while_another_task_is_running(self, populate_database_task):
         sql = 'insert into etl_status (status, timestamp) values (%s, %s)'
         execute_statement(sql, data=['RUNNING', '2019-01-01 01:00'])
         with self.app.test_request_context() as request:
@@ -107,9 +105,7 @@ class TestGetIndex:
 
     @patch('app.sso.token.is_authenticated')
     @patch('app.api.views.render_template')
-    def test_returns_message_if_there_are_no_prior_runs(
-        self, render_template, is_authenticated
-    ):
+    def test_returns_message_if_there_are_no_prior_runs(self, render_template, is_authenticated):
         is_authenticated.return_value = True
         with self.app.test_request_context():
             get_index()

@@ -1,6 +1,8 @@
 PORT ?= 5000
 TEST ?=.
 COV ?= --cov
+BLACK_CONFIG ?= --exclude=venv --skip-string-normalization --line-length 100
+CHECK ?= --check
 
 .PHONY: build_assets
 build_assets:
@@ -29,12 +31,20 @@ run_dev_celery:
 run_tests:
 	TESTING=1 pytest -p no:sugar ${TEST} ${COV}
 
+
 .PHONY: check
-check:
-	flake8 . --max-line-length=88
-	black --exclude=venv --skip-string-normalization --check .
+check: flake8 black
 
 
 .PHONY: format
-format:
-	black --exclude=venv --skip-string-normalization .
+format: CHECK=
+format: black
+
+
+.PHONY: black
+black:
+	black ${BLACK_CONFIG} ${CHECK} .
+
+.PHONY: flake8
+flake8:
+	flake8 .

@@ -33,14 +33,7 @@ class TestExportCountries:
         )
 
         add_standardised_countries(
-            [
-                {
-                    'id': 0,
-                    'country': 'CN',
-                    'standardised_country': 'China',
-                    'similarity': 1,
-                }
-            ]
+            [{'id': 0, 'country': 'CN', 'standardised_country': 'China', 'similarity': 1}]
         )
 
         task = Task()
@@ -51,17 +44,13 @@ class TestExportCountries:
 
         assert len(df) == 2
 
-        assert (
-            df['service_company_id'].values[0] == '08c5f419-f85f-4051-b640-d3cfef8ef85d'
-        )
+        assert df['service_company_id'].values[0] == '08c5f419-f85f-4051-b640-d3cfef8ef85d'
         assert df['country'].values[0] == 'United Kingdom'
         assert df['source'].values[0] == 'export_countries'
         assert df['source_id'].values[0] == '0'
         assert not df['timestamp'].values[0]
 
-        assert (
-            df['service_company_id'].values[1] == '08c5f419-f85f-4051-b640-d3cfef8ef85d'
-        )
+        assert df['service_company_id'].values[1] == '08c5f419-f85f-4051-b640-d3cfef8ef85d'
         assert df['country'].values[1] is None
         assert df['source'].values[1] == 'export_countries'
         assert df['source_id'].values[1] == '1'

@@ -21,11 +21,7 @@ logging_config = {
     'root': {'level': 'INFO', 'handlers': ['console']},
     'formatters': {'verbose': {'format': '[%(levelname)s] [%(name)s] %(message)s'}},
     'handlers': {
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'verbose',
-        }
+        'console': {'level': 'DEBUG', 'class': 'logging.StreamHandler', 'formatter': 'verbose'}
     },
 }
 
@@ -90,9 +86,7 @@ def _create_base_app():
     flask_app.config.update(
         {
             'TESTING': False,
-            'SQLALCHEMY_DATABASE_URI': _create_sql_alchemy_connection_str(
-                postgres_db_config
-            ),
+            'SQLALCHEMY_DATABASE_URI': _create_sql_alchemy_connection_str(postgres_db_config),
             # set SQLALCHEMY_TRACK_MODIFICATIONS to False because
             # default of None produces warnings, and track modifications
             # are not required
@@ -137,9 +131,7 @@ def _get_redis_url(flask_app):
         redis_uri = (
             f"user:{password}"
             if password
-            else ""
-            f"{flask_app.config['cache']['host']}:"
-            f"{flask_app.config['cache']['port']}"
+            else "" f"{flask_app.config['cache']['host']}:" f"{flask_app.config['cache']['port']}"
         )
     if redis_uri.startswith('rediss://'):
         return f"{redis_uri}?ssl_ca_certs={certifi.where()}"

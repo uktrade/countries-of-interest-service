@@ -36,8 +36,7 @@ def rows_equal_query_results(expected_rows, query, order_matters=False):
 
     if len(expected_rows) != len(db_rows):
         print(
-            'Number of rows are not equal:'
-            f'{len(expected_rows)} expected, db has {len(db_rows)}'
+            'Number of rows are not equal:' f'{len(expected_rows)} expected, db has {len(db_rows)}'
         )
         return False
 

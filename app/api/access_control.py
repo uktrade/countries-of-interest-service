@@ -66,9 +66,7 @@ class AccessControl:
         @wraps(view_func)
         def wrapped_view_func(*args, **kwargs):
             hawk_enabled = current_app.config['access_control']['hawk_enabled']
-            hawk_response_header = current_app.config['access_control'][
-                'hawk_response_header'
-            ]
+            hawk_response_header = current_app.config['access_control']['hawk_response_header']
 
             if hawk_enabled:
                 receiver = self._auth_by_signature()

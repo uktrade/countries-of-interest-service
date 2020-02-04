@@ -56,10 +56,7 @@ class TestToRecordsWebDict(unittest.TestCase):
         df = pd.DataFrame([[0, 1, 2], [3, 4, 5]], columns=['col_1', 'col_2', 'col_3'])
         output = utils.to_records_web_dict(df)
         expected = {
-            'results': [
-                {'col1': 0, 'col2': 1, 'col3': 2},
-                {'col1': 3, 'col2': 4, 'col3': 5},
-            ]
+            'results': [{'col1': 0, 'col2': 1, 'col3': 2}, {'col1': 3, 'col2': 4, 'col3': 5}]
         }
         self.assertEqual(output, expected)
 

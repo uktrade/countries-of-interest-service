@@ -97,28 +97,18 @@ def get_company_countries_and_sectors_of_interest(orientation):
 
     where = ''
     values = (
-        countries
-        + sectors
-        + service_company_ids
-        + company_match_ids
-        + types
-        + sources
-        + services
+        countries + sectors + service_company_ids + company_match_ids + types + sources + services
     )
     if len(countries) == 1:
         where = 'where country=%s'
     elif len(countries) > 1:
-        where = (
-            'where country in (' + ','.join('%s' for i in range(len(countries))) + ')'
-        )
+        where = 'where country in (' + ','.join('%s' for i in range(len(countries))) + ')'
     if len(sectors) == 1:
         where = where + ' and' if where != '' else 'where'
         where = where + ' sector=%s'
     elif len(sectors) > 1:
         where = where + ' and' if where != '' else 'where'
-        where = (
-            where + ' sector in (' + ','.join(['%s' for i in range(len(sectors))]) + ')'
-        )
+        where = where + ' sector in (' + ','.join(['%s' for i in range(len(sectors))]) + ')'
     if len(service_company_ids) == 1:
         where = where + ' and' if where != '' else 'where'
         where = where + ' service_company_id=%s'
@@ -152,20 +142,13 @@ def get_company_countries_and_sectors_of_interest(orientation):
         where = where + ' source=%s'
     elif len(sources) > 1:
         where = where + ' and' if where != '' else 'where'
-        where = (
-            where + ' source in (' + ','.join(['%s' for i in range(len(sources))]) + ')'
-        )
+        where = where + ' source in (' + ','.join(['%s' for i in range(len(sources))]) + ')'
     if len(services) == 1:
         where = where + ' and' if where != '' else 'where'
         where = where + ' service=%s'
     elif len(services) > 1:
         where = where + ' and' if where != '' else 'where'
-        where = (
-            where
-            + ' service in ('
-            + ','.join(['%s' for i in range(len(services))])
-            + ')'
-        )
+        where = where + ' service in (' + ','.join(['%s' for i in range(len(services))]) + ')'
     if next_id is not None:
         where = where + ' and' if where != '' else 'where'
         where = where + ' id >= %s'
@@ -193,10 +176,7 @@ def get_company_countries_and_sectors_of_interest(orientation):
     if len(df) == pagination_size + 1:
         next_ = '{}{}?'.format(request.host_url[:-1], request.path)
         next_ += '&'.join(
-            [
-                'service-company-id={}'.format(company_id)
-                for company_id in service_company_ids
-            ]
+            ['service-company-id={}'.format(company_id) for company_id in service_company_ids]
         )
         next_ += '&'.join(
             [
@@ -259,9 +239,7 @@ def populate_database():
         execute_statement(sql)
         sql = '''insert into etl_status (status, timestamp) values (%s, %s)'''
         execute_statement(sql, data=['RUNNING', datetime.datetime.now()])
-        return flask_app.make_response(
-            {'status': 200, 'message': 'started populate_database task'}
-        )
+        return flask_app.make_response({'status': 200, 'message': 'started populate_database task'})
     else:
         timestamp = df['timestamp'].values[0]
         response = {
@@ -291,8 +269,7 @@ def get_data_visualisation_data(field):
 
     if data_source not in valid_data_sources:
         raise BadRequest(
-            f'invalid data-source: {data_source}, '
-            f'valid values: {valid_data_sources}'
+            f'invalid data-source: {data_source}, ' f'valid values: {valid_data_sources}'
         )
 
     if field == 'sector' and data_source == constants.Source.DATAHUB_INTERACTIONS.value:

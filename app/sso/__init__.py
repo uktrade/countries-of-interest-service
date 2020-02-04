@@ -52,9 +52,7 @@ class BaseSSOClient:
         self.oauth_broker = oauth_broker
 
     def login(self):
-        return self.oauth_broker.authorize(
-            callback=url_for('sso.callback', _external=True)
-        )
+        return self.oauth_broker.authorize(callback=url_for('sso.callback', _external=True))
 
     def logout(self):
         session.pop(self.sso_session_token_key, None)

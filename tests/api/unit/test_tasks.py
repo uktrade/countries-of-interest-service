@@ -14,16 +14,9 @@ class TestTasks:
         ),
     )
     def test_populate_database_task(
-        self,
-        app_with_db,
-        drop_table,
-        extractors,
-        tasks,
-        expected_called_with_parameters,
+        self, app_with_db, drop_table, extractors, tasks, expected_called_with_parameters,
     ):
         with mock.patch('app.etl.tasks.populate_database') as mock_populate_database:
             mock_populate_database.return_value = None
-            populate_database_task(
-                drop_table=drop_table, extractors=extractors, tasks=tasks
-            )
+            populate_database_task(drop_table=drop_table, extractors=extractors, tasks=tasks)
         mock_populate_database.assert_called_once_with(*expected_called_with_parameters)

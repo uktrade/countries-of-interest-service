@@ -86,9 +86,7 @@ class ReferenceDatasetExtractBaseTestCase(SourceDataExtractBaseTestCase):
         }
 
 
-class TestExtractCountriesAndTerritoriesReferenceDataset(
-    ReferenceDatasetExtractBaseTestCase
-):
+class TestExtractCountriesAndTerritoriesReferenceDataset(ReferenceDatasetExtractBaseTestCase):
 
     __test__ = True
     group_slug_config_key = 'countries_and_territories_group_slug'
@@ -176,13 +174,7 @@ class TestExtractDatahubExportCountries(SourceDataExtractBaseTestCase):
         },
     ]
     source_data = {
-        'headers': [
-            'id',
-            'company_id',
-            'country_iso_alpha2_code',
-            'country',
-            'extraField',
-        ],
+        'headers': ['id', 'company_id', 'country_iso_alpha2_code', 'country', 'extraField'],
         'next': None,
         'values': [
             [0, 'c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'SK', 'slovakia', 'extra'],
@@ -211,13 +203,7 @@ class TestExtractDatahubFutureInterestCountries(SourceDataExtractBaseTestCase):
         },
     ]
     source_data = {
-        'headers': [
-            'id',
-            'company_id',
-            'country_iso_alpha2_code',
-            'country',
-            'extra_field',
-        ],
+        'headers': ['id', 'company_id', 'country_iso_alpha2_code', 'country', 'extra_field'],
         'next': None,
         'values': [
             [0, 'c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'SK', 'slovakia', 'extra'],
@@ -249,13 +235,7 @@ class TestExtractDatahubInteractions(SourceDataExtractBaseTestCase):
         },
     ]
     source_data = {
-        'headers': [
-            'id',
-            'company_id',
-            'interaction_notes',
-            'interaction_subject',
-            'created_on',
-        ],
+        'headers': ['id', 'company_id', 'interaction_notes', 'interaction_subject', 'created_on'],
         'values': [
             [
                 '798c74ef-7de6-4c3a-aa46-51692c2093b8',
@@ -448,11 +428,7 @@ class TestPopulateTable:
                 data,
                 self.model,
                 source_data_extraction.ExtractDatahubContactDataset.name,
-                {
-                    'id': 'datahub_contact_id',
-                    'company_id': 'datahub_company_id',
-                    'email': 'email',
-                },
+                {'id': 'datahub_contact_id', 'company_id': 'datahub_company_id', 'email': 'email'},
                 'datahub_contact_id',
                 overwrite=False,
             )
@@ -512,11 +488,7 @@ class TestPopulateTable:
             data,
             self.model,
             source_data_extraction.ExtractDatahubContactDataset.name,
-            {
-                'id': 'datahub_contact_id',
-                'company_id': 'datahub_company_id',
-                'email': 'email',
-            },
+            {'id': 'datahub_contact_id', 'company_id': 'datahub_company_id', 'email': 'email'},
             'datahub_contact_id',
             overwrite=True,
         )
@@ -579,11 +551,7 @@ class TestPopulateTable:
             data,
             self.model,
             source_data_extraction.ExtractDatahubContactDataset.name,
-            {
-                'id': 'datahub_contact_id',
-                'company_id': 'datahub_company_id',
-                'email': 'email',
-            },
+            {'id': 'datahub_contact_id', 'company_id': 'datahub_company_id', 'email': 'email'},
             'datahub_contact_id',
             overwrite=False,
         )
@@ -616,9 +584,7 @@ class TestPopulateTable:
             ),
         ]
 
-    def test_if_overwrite_is_false_upserts_to_interaction_table(
-        self, add_datahub_interaction
-    ):
+    def test_if_overwrite_is_false_upserts_to_interaction_table(self, add_datahub_interaction):
         add_datahub_interaction(
             [
                 {

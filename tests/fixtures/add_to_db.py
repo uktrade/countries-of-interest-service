@@ -56,9 +56,7 @@ def add_datahub_export_to_countries(app_with_db_module):
                 'country_iso_alpha2_code': record.get('country_iso_alpha2_code', None),
                 'id': record.get('id', None),
             }
-            DatahubExportToCountries.get_or_create(
-                id=record.get('id', None), defaults=defaults
-            )
+            DatahubExportToCountries.get_or_create(id=record.get('id', None), defaults=defaults)
 
     return _method
 
@@ -92,8 +90,7 @@ def add_datahub_omis(app_with_db_module):
                 'datahub_omis_order_id': record.get('datahub_omis_order_id', None),
             }
             DatahubOmis.get_or_create(
-                datahub_omis_order_id=record.get('datahub_omis_order_id', None),
-                defaults=defaults,
+                datahub_omis_order_id=record.get('datahub_omis_order_id', None), defaults=defaults,
             )
 
     return _method
@@ -181,9 +178,7 @@ def add_standardised_countries(app_with_db_module):
                 'standardised_country': record.get('standardised_country', None),
                 'similarity': record.get('similarity', None),
             }
-            StandardisedCountries.get_or_create(
-                id=record.get('id', None), defaults=defaults
-            )
+            StandardisedCountries.get_or_create(id=record.get('id', None), defaults=defaults)
 
     return _method
 

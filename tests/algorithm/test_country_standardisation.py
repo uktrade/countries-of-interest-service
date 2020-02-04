@@ -144,44 +144,28 @@ def test_standardise_country():
 
     # test sensible matches (threshold > 85)
     assert _standardise_country('Belgium', choices, lower_choices) == [('Belgium', 100)]
-    assert _standardise_country('South Africa', choices, lower_choices) == [
-        ('South Africa', 100)
-    ]
-    assert _standardise_country('uae', choices, lower_choices) == [
-        ('United Arab Emirates', 100)
-    ]
-    assert _standardise_country('usa', choices, lower_choices) == [
-        ('United States', 100)
-    ]
-    assert _standardise_country('Africa Belgium', choices, lower_choices) == [
-        ('Belgium', 90)
-    ]
+    assert _standardise_country('South Africa', choices, lower_choices) == [('South Africa', 100)]
+    assert _standardise_country('uae', choices, lower_choices) == [('United Arab Emirates', 100)]
+    assert _standardise_country('usa', choices, lower_choices) == [('United States', 100)]
+    assert _standardise_country('Africa Belgium', choices, lower_choices) == [('Belgium', 90)]
     assert _standardise_country('Africa Belgium Austria', choices, lower_choices) == [
         ('Belgium', 90),
         ('Austria', 90),
     ]
-    assert _standardise_country('Africa and Belgium', choices, lower_choices) == [
-        ('Belgium', 90)
-    ]
+    assert _standardise_country('Africa and Belgium', choices, lower_choices) == [('Belgium', 90)]
     assert _standardise_country('german', choices, lower_choices) == [('Germany', 88)]
     assert _standardise_country('Belgiun', choices, lower_choices) == [('Belgium', 86)]
     assert _standardise_country('Belgiu', choices, lower_choices) == [('Belgium', 88)]
-    assert _standardise_country(
-        'democratic republic of congo', choices, lower_choices
-    ) == [('Congo (Democratic Republic)', 91)]
-    assert _standardise_country('bahamas', choices, lower_choices) == [
-        ('The Bahamas', 90)
+    assert _standardise_country('democratic republic of congo', choices, lower_choices) == [
+        ('Congo (Democratic Republic)', 91)
     ]
+    assert _standardise_country('bahamas', choices, lower_choices) == [('The Bahamas', 90)]
     assert _standardise_country('ao', choices, lower_choices) == [('Laos', 86)]
 
     # test mismatches
     assert _standardise_country('Africa', choices, lower_choices) == [('Belgium', 0)]
-    assert _standardise_country('Unknown', choices, lower_choices) == [
-        ('United Arab Emirates', 19)
-    ]
-    assert _standardise_country('africa (any)', choices, lower_choices) == [
-        ('South Africa', 71)
-    ]
+    assert _standardise_country('Unknown', choices, lower_choices) == [('United Arab Emirates', 19)]
+    assert _standardise_country('africa (any)', choices, lower_choices) == [('South Africa', 71)]
     assert _standardise_country('a', choices, lower_choices) == [
         ('Austria', 66),
         ('Germany', 66),
@@ -190,9 +174,9 @@ def test_standardise_country():
     assert _standardise_country('anywhere in the world', choices, lower_choices) == [
         ('The Bahamas', 82)
     ]
-    assert _standardise_country(
-        'Central African Replublic', choices, lower_choices
-    ) == [('Central African Replublic', 100)]
+    assert _standardise_country('Central African Replublic', choices, lower_choices) == [
+        ('Central African Replublic', 100)
+    ]
     assert _standardise_country('Netherlands Anilles', choices, lower_choices) == [
         ('Bonaire', 93),
         ('Saint Eustatius', 93),
