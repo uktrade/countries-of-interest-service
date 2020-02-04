@@ -39,9 +39,7 @@ class TestSSoClient:
 
 
 class TestLoginRequired:
-
     def test_if_authenticated_return_view(self, sso_authenticated_request):
-
         def view():
             return "view"
 

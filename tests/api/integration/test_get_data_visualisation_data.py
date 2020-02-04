@@ -163,7 +163,7 @@ def test_invalid_exporter_status(app, sso_authenticated_request):
             params='exporter-status=invalid',
             expected_response=(400, None),
         )
-        
+
 
 def test_invalid_fields_status(app, sso_authenticated_request):
     url = 'http://localhost:80/api/v1/get-data-visualisation-data/invalid'
@@ -174,7 +174,7 @@ def test_invalid_fields_status(app, sso_authenticated_request):
             params='exporter-status=invalid',
             expected_response=(400, None),
         )
-        
+
 
 def test_invalid_sector_exporter_status(app, sso_authenticated_request):
     url = 'http://localhost:80/api/v1/get-data-visualisation-data/sector'
@@ -185,4 +185,3 @@ def test_invalid_sector_exporter_status(app, sso_authenticated_request):
             params='exporter-status=mentioned',
             expected_response=(400, None),
         )
-        
