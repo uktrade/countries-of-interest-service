@@ -30,19 +30,12 @@ def get_coi_csv(output, limit=None):
 def output_csv(data_sets, output, order_by, limit):
     for db_model, db_fields, set_headers in data_sets:
         populate_csv(
-            output,
-            db_model,
-            db_fields,
-            limit,
-            order_by=order_by,
-            set_headers=set_headers,
+            output, db_model, db_fields, limit, order_by=order_by, set_headers=set_headers,
         )
     return output
 
 
-def populate_csv(
-    stream, db_model, db_fields, limit, order_by='timestamp', set_headers=False
-):
+def populate_csv(stream, db_model, db_fields, limit, order_by='timestamp', set_headers=False):
     writer = csv.writer(stream)
 
     session = flask_app.db.session
@@ -51,20 +44,14 @@ def populate_csv(
         writer.writerow(db_fields)
 
     if getattr(db_model, '__tablename__', None) == 'coi_countries_of_interest':
-        query = (
-            session.query(db_model).filter(db_model.source != 'omis').order_by(order_by)
-        )
+        query = session.query(db_model).filter(db_model.source != 'omis').order_by(order_by)
     else:
         query = session.query(db_model).order_by(order_by)
 
     paginator = Paginator(query, 10000, limit=limit)
     flask_app.logger.info(f'Found {paginator.total_count} total items')
-    flask_app.logger.info(
-        f'Processing only first {paginator.required_items_count} items'
-    )
-    flask_app.logger.info(
-        f'Total number of pages to process {paginator.required_pages}'
-    )
+    flask_app.logger.info(f'Processing only first {paginator.required_items_count} items')
+    flask_app.logger.info(f'Total number of pages to process {paginator.required_pages}')
 
     start_time = time.time()
     for result in paginator.get_all_pages():
@@ -82,11 +69,7 @@ def _get_field_value(item, field):
     if field == 'interaction_notes':
         return ""
         model = external_models.Interactions
-        item = (
-            session.query(model)
-            .filter_by(datahub_interaction_id=item.interaction_id)
-            .first()
-        )
+        item = session.query(model).filter_by(datahub_interaction_id=item.interaction_id).first()
         return getattr(item, 'notes', "")
 
     fields_with_defaults = {
@@ -132,9 +115,7 @@ class Paginator:
         return self.calculate_pages(count)
 
     def get_page(self, page_number):
-        return self.query.paginate(
-            page=page_number, per_page=self.per_page, error_out=False
-        )
+        return self.query.paginate(page=page_number, per_page=self.per_page, error_out=False)
 
     def get_all_pages(self):
         for page_number in range(1, self.required_pages + 1):

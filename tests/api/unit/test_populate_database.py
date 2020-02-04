@@ -54,9 +54,7 @@ class TestPopulateDatabase:
             populate_database()
         populate_database_task.delay.assert_called_once()
 
-    def test_if_force_update_rerun_while_another_task_is_running(
-        self, populate_database_task
-    ):
+    def test_if_force_update_rerun_while_another_task_is_running(self, populate_database_task):
         sql = 'insert into etl_status (status, timestamp) values (%s, %s)'
         execute_statement(sql, data=['RUNNING', '2019-01-01 01:00'])
         with self.app.test_request_context() as request:

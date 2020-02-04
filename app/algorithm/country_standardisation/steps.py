@@ -41,9 +41,7 @@ def extract_interested_exported_countries():
 
 
 @log.write('Step 2/2 - create standardised country table')
-def create_standardised_interested_exported_country_table(
-    countries, output_schema, output_table
-):
+def create_standardised_interested_exported_country_table(countries, output_schema, output_table):
     stmt = f"""
     SELECT distinct name FROM {DITCountryTerritoryRegister.__tablename__}
 """
@@ -133,10 +131,7 @@ def _standardise_country(country, choices, lower_choices):
                 match[0],
                 max(
                     match[1]
-                    - math.ceil(
-                        abs(len(country) - len(match[0])) / (max(len(country), 1))
-                    )
-                    * 4,
+                    - math.ceil(abs(len(country) - len(match[0])) / (max(len(country), 1))) * 4,
                     0,
                 )
                 if match[0].lower().replace('the ', '') not in country.lower()

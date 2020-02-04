@@ -19,9 +19,7 @@ cmd_group = AppGroup('dev', help='Commands to build database')
     help='Create database using database name specified in (local) config',
 )
 @click.option(
-    '--drop',
-    is_flag=True,
-    help='Drop database using database name specified in (local) config',
+    '--drop', is_flag=True, help='Drop database using database name specified in (local) config',
 )
 @click.option('--create_tables', is_flag=True, help='Create database tables')
 @click.option(

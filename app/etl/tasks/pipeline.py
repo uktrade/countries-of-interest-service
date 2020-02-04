@@ -3,15 +3,9 @@ from collections import OrderedDict
 from app.config.constants import Task as TaskConstant
 from app.etl.tasks.company_matching import Task as PopulateCompanyMatchingTask
 from app.etl.tasks.country_standardisation import PopulateStandardisedCountriesTask
-from app.etl.tasks.datahub_country_export import (
-    Task as PopulateDatahubCountryExportedTask,
-)
-from app.etl.tasks.datahub_country_interest import (
-    Task as PopulateDatahubCountryInterestTask,
-)
-from app.etl.tasks.datahub_interaction_country import (
-    Task as PopulateMentionedInInteractionsTask,
-)
+from app.etl.tasks.datahub_country_export import Task as PopulateDatahubCountryExportedTask
+from app.etl.tasks.datahub_country_interest import Task as PopulateDatahubCountryInterestTask
+from app.etl.tasks.datahub_interaction_country import Task as PopulateMentionedInInteractionsTask
 from app.etl.tasks.datahub_omis_country_sector_interest import (
     Task as PopulateDatahubOmisCountrySectorInterestTask,
 )

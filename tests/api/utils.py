@@ -1,9 +1,7 @@
 import json
 
 
-def assert_api_response(
-    app_context, api, expected_response, params='', order_matters=False
-):
+def assert_api_response(app_context, api, expected_response, params='', order_matters=False):
     status_code, data = _request(params, api, app_context)
 
     assert status_code == expected_response[0]
