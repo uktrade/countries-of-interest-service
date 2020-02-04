@@ -158,7 +158,7 @@ def test_get_countries_interactions(app):
             )
 
 
-def test_invalid_exporter_status(app):
+def test_invalid_data_source(app):
     with mock.patch('app.sso.token.is_authenticated') as mock_is_authenticated:
         mock_is_authenticated.return_value = True
         url = 'http://localhost:80/api/v1/get-data-visualisation-data/country'
@@ -184,7 +184,7 @@ def test_invalid_fields_status(app):
             )
 
 
-def test_invalid_sector_exporter_status(app):
+def test_invalid_sector_data_source(app):
     with mock.patch('app.sso.token.is_authenticated') as mock_is_authenticated:
         mock_is_authenticated.return_value = True
         url = 'http://localhost:80/api/v1/get-data-visualisation-data/sector'
