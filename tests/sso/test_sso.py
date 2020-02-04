@@ -4,7 +4,6 @@ import pytest
 from flask import session
 
 import app.sso as sso
-import app.sso.token as token
 
 
 @pytest.fixture(scope="function")
@@ -131,4 +130,3 @@ class TestGetNextUrl:
             session['next'] = '/oranges'
             response = sso_client._get_next_url()
         assert response == '/apples'
-
