@@ -49,6 +49,6 @@ class TestCountriesAndSectorsOfInterest:
         )
         assert df['company_match_id'].values[0] is None
         assert df['country'].values[0] == 'United Kingdom'
-        assert df['source'].values[0] == 'datahub_future_interest_countries'
+        assert df['source'].values[0] == 'future_interest_countries'
         assert df['source_id'].values[0] == '0'
         assert df['timestamp'].values[0] is None

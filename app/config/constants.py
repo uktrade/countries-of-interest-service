@@ -13,11 +13,11 @@ class BaseEnum(Enum):
 
 class Source(BaseEnum):
     COUNTRIES_AND_TERRITORIES = 'countries_and_territories'
-    DATAHUB_CONTACT = 'datahub_contact'
-    DATAHUB_COMPANY = 'datahub_company'
-    DATAHUB_EXPORT_TO_COUNTRIES = 'datahub_export_countries'
-    DATAHUB_INTERACTIONS = 'datahub_interactions'
-    DATAHUB_FUTURE_INTEREST_COUNTRIES = 'datahub_future_interest_countries'
+    DATAHUB_CONTACT = 'contact'
+    DATAHUB_COMPANY = 'company'
+    DATAHUB_EXPORT_TO_COUNTRIES = 'export_countries'
+    DATAHUB_INTERACTIONS = 'interactions'
+    DATAHUB_FUTURE_INTEREST_COUNTRIES = 'future_interest_countries'
     DATAHUB_OMIS = 'omis'
     EXPORT_WINS = 'export_wins'
 
@@ -26,6 +26,12 @@ class Task(BaseEnum):
     STANDARDISE_COUNTRIES = 'standardise_countries'
     INTERACTIONS_ANALYSED = 'interactions_analysed'
     COUNTRY_SECTOR_INTEREST = 'country_sector_interest'
+    COMPANY_MATCHING = 'company_matching'
+    EXPORT_COUNTRIES = 'export_countries'
+    COUNTRIES_OF_INTEREST = 'countries_of_interest'
+    MENTIONED_IN_INTERACTIONS = 'mentioned_in_interactions'
+    COUNTRIES_AND_SECTORS_OF_INTEREST = 'countries_and_sectors_of_interest'
+    EXPORT_WINS = 'export_wins'
 
 
 class Service(BaseEnum):

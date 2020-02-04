@@ -24,15 +24,6 @@ class DatahubOmis(BaseModel):
     sector = _col(_text)
 
 
-class DatahubSectors(BaseModel):
-
-    __tablename__ = 'datahub_sectors'
-    __table_args__ = {'schema': 'public'}
-
-    id = _col(UUID(as_uuid=True), primary_key=True)
-    sector = _col(_text)
-
-
 class DatahubCompany(BaseModel):
 
     __tablename__ = 'datahub_company'

@@ -5,6 +5,7 @@ from sqlalchemy import exc
 from sqlalchemy.dialects import postgresql
 
 import app.db.models.external as models
+from app.config.constants import Source
 from app.db.models import sql_alchemy
 
 
@@ -13,16 +14,17 @@ class SourceDataExtractor:
     model = None
     mapping = {}
     unique_key = 'id'
+    name = None
 
     def __call__(self):
         if flask_app.config['app']['stub_source_data']:
             return populate_table(
-                self.stub_data, self.model, self.mapping, self.unique_key
+                self.stub_data, self.model, self.name, self.mapping, self.unique_key
             )
         else:
             url = self.get_url()
             return populate_table_paginated(
-                self.model, self.mapping, self.unique_key, url
+                self.model, self.name, self.mapping, self.unique_key, url
             )
 
     def get_url(self):
@@ -45,6 +47,7 @@ class ReferenceDatasetExtractor(SourceDataExtractor):
 
 
 class ExtractCountriesAndTerritoriesReferenceDataset(ReferenceDatasetExtractor):
+    name = Source.COUNTRIES_AND_TERRITORIES.value
     group_slug = 'countries_and_territories_group_slug'
     mapping = {
         'ID': 'country_iso_alpha2_code',
@@ -71,6 +74,7 @@ class ExtractCountriesAndTerritoriesReferenceDataset(ReferenceDatasetExtractor):
 
 
 class ExtractDatahubCompanyDataset(SourceDataExtractor):
+    name = Source.DATAHUB_COMPANY.value
     dataset_id_config_key = 'datahub_companies_dataset_id'
     mapping = {
         'id': 'datahub_company_id',
@@ -118,6 +122,7 @@ class ExtractDatahubCompanyDataset(SourceDataExtractor):
 
 
 class ExtractDatahubContactDataset(SourceDataExtractor):
+    name = Source.DATAHUB_CONTACT.value
     dataset_id_config_key = 'datahub_contacts_dataset_id'
     mapping = {
         'id': 'datahub_contact_id',
@@ -145,6 +150,7 @@ class ExtractDatahubContactDataset(SourceDataExtractor):
 
 
 class ExtractDatahubExportToCountries(SourceDataExtractor):
+    name = Source.DATAHUB_EXPORT_TO_COUNTRIES.value
     dataset_id_config_key = 'datahub_export_countries_dataset_id'
     mapping = {
         'company_id': 'company_id',
@@ -164,6 +170,7 @@ class ExtractDatahubExportToCountries(SourceDataExtractor):
 
 
 class ExtractDatahubFutureInterestCountries(SourceDataExtractor):
+    name = Source.DATAHUB_FUTURE_INTEREST_COUNTRIES.value
     dataset_id_config_key = 'datahub_future_interest_countries_dataset_id'
     mapping = {
         'company_id': 'company_id',
@@ -183,6 +190,7 @@ class ExtractDatahubFutureInterestCountries(SourceDataExtractor):
 
 
 class ExtractDatahubInteractions(SourceDataExtractor):
+    name = Source.DATAHUB_INTERACTIONS.value
     dataset_id_config_key = 'datahub_interactions_dataset_id'
     mapping = {
         'id': 'datahub_interaction_id',
@@ -222,6 +230,7 @@ class ExtractDatahubInteractions(SourceDataExtractor):
 
 
 class ExtractDatahubOmis(SourceDataExtractor):
+    name = Source.DATAHUB_OMIS.value
     dataset_id_config_key = 'datahub_omis_dataset_id'
     mapping = {
         'company_id': 'company_id',
@@ -254,24 +263,8 @@ class ExtractDatahubOmis(SourceDataExtractor):
     unique_key = 'datahub_omis_order_id'
 
 
-class ExtractDatahubSectors(SourceDataExtractor):
-    dataset_id_config_key = 'datahub_sectors_dataset_id'
-    mapping = {
-        'id': 'id',
-        'sector': 'sector',
-    }
-    model = models.DatahubSectors
-    source_table_id_config_key = 'datahub_sectors_source_table_id'
-    stub_data = {
-        'headers': ['id', 'sector'],
-        'values': [
-            ['c3467472-3a97-4359-91f4-f860597e1837', 'Aerospace'],
-            ['698d0cc3-ce8e-453b-b3c4-99818c5a9070', 'Food'],
-        ],
-    }
-
-
 class ExtractExportWins(SourceDataExtractor):
+    name = Source.EXPORT_WINS.value
     dataset_id_config_key = 'export_wins_dataset_id'
     mapping = {
         'id': 'export_wins_id',
@@ -343,10 +336,9 @@ def get_hawk_headers(
     return headers
 
 
-def populate_table_paginated(model, mapping, unique_key, url):
+def populate_table_paginated(model, extractor_name, mapping, unique_key, url):
     client_id = flask_app.config['dataworkspace']['hawk_client_id']
     client_key = flask_app.config['dataworkspace']['hawk_client_key']
-
     next_page = url
     n_rows = 0
     while next_page is not None:
@@ -354,14 +346,14 @@ def populate_table_paginated(model, mapping, unique_key, url):
         response = requests.get(next_page, headers=headers)
         data = response.json()
         output = populate_table(
-            data, model, mapping, unique_key, overwrite=next_page == url
+            data, model, extractor_name, mapping, unique_key, overwrite=next_page == url
         )
         n_rows = n_rows + output['rows']
         next_page = data['next']
-    return {'table': model.__tablename__, 'rows': n_rows, 'status': 200}
+    return {'extractor': extractor_name, 'rows': n_rows, 'status': 200}
 
 
-def populate_table(data, model, mapping, unique_key, overwrite=True):
+def populate_table(data, model, extractor_name, mapping, unique_key, overwrite=True):
     connection = sql_alchemy.engine.connect()
     transaction = connection.begin()
     try:
@@ -391,7 +383,7 @@ def populate_table(data, model, mapping, unique_key, overwrite=True):
     finally:
         connection.close()
 
-    return {'table': model.__tablename__, 'rows': n_rows, 'status': 200}
+    return {'extractor': extractor_name, 'rows': n_rows, 'status': 200}
 
 
 def map_headers(data_item, db_headers):
@@ -401,16 +393,3 @@ def map_headers(data_item, db_headers):
         if header:
             mapped_item[header] = v
     return mapped_item
-
-
-extract_countries_and_territories_reference = (
-    ExtractCountriesAndTerritoriesReferenceDataset()
-)
-extract_datahub_company_dataset = ExtractDatahubCompanyDataset()
-extract_datahub_contact_dataset = ExtractDatahubContactDataset()
-extract_datahub_export_to_countries = ExtractDatahubExportToCountries()
-extract_datahub_future_interest_countries = ExtractDatahubFutureInterestCountries()
-extract_datahub_interactions = ExtractDatahubInteractions()
-extract_datahub_omis = ExtractDatahubOmis()
-extract_datahub_sectors = ExtractDatahubSectors()
-extract_export_wins = ExtractExportWins()

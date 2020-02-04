@@ -12,7 +12,7 @@ from app.etl import ETLTask
 
 sql = f'''
 with results as (
-    select
+    select distinct
         d.export_wins_company_id::text as service_company_id,
         null::int4 as company_match_id,
         case
@@ -51,7 +51,7 @@ insert into {CountriesAndSectorsInterestTemp.get_fq_table_name()} (
 
 class Task(ETLTask):
 
-    name = 'export_wins'
+    name = constants.Task.EXPORT_WINS.value
 
     def __init__(self, sql=sql, model=CountriesAndSectorsInterestTemp, *args, **kwargs):
         super().__init__(

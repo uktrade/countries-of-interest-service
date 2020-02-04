@@ -55,7 +55,7 @@ class TestExportCountries:
             df['service_company_id'].values[0] == '08c5f419-f85f-4051-b640-d3cfef8ef85d'
         )
         assert df['country'].values[0] == 'United Kingdom'
-        assert df['source'].values[0] == 'datahub_export_countries'
+        assert df['source'].values[0] == 'export_countries'
         assert df['source_id'].values[0] == '0'
         assert not df['timestamp'].values[0]
 
@@ -63,6 +63,6 @@ class TestExportCountries:
             df['service_company_id'].values[1] == '08c5f419-f85f-4051-b640-d3cfef8ef85d'
         )
         assert df['country'].values[1] is None
-        assert df['source'].values[1] == 'datahub_export_countries'
+        assert df['source'].values[1] == 'export_countries'
         assert df['source_id'].values[1] == '1'
         assert not df['timestamp'].values[1]

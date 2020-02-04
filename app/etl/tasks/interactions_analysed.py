@@ -1,11 +1,10 @@
 from app.algorithm.interaction_coi_extraction import analyse_interactions
-from app.db.models.internal import InteractionsAnalysed
+from app.config import constants
 
 
 class Task:
 
-    name = 'interactions_analysed_task'
-    table_name = InteractionsAnalysed.__tablename__
+    name = constants.Task.INTERACTIONS_ANALYSED.value
 
     def __init__(self, *args, **kwargs):
         pass
@@ -14,6 +13,5 @@ class Task:
         analyse_interactions()
         return {
             'status': 200,
-            'n_rows': None,
-            'table': InteractionsAnalysed.__tablename__,
+            'task': self.name,
         }

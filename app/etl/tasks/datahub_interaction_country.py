@@ -9,7 +9,7 @@ from app.etl import ETLTask
 
 sql = f'''
 with results as (
-    select
+    select distinct
         datahub_company_id::text as service_company_id,
         null::int4 as company_match_id,
         standardized_place::text as country,
@@ -43,7 +43,7 @@ insert into {CountriesAndSectorsInterestTemp.get_fq_table_name()} (
 
 class Task(ETLTask):
 
-    name = "mentioned_in_interactions"
+    name = constants.Task.MENTIONED_IN_INTERACTIONS.value
 
     def __init__(self, sql=sql, model=CountriesAndSectorsInterestTemp, *args, **kwargs):
         super().__init__(
