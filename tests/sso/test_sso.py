@@ -8,13 +8,6 @@ import app.sso.token as token
 
 
 @pytest.fixture(scope="function")
-def sso_authenticated_request():
-    with unittest.mock.patch('app.sso.token.is_authenticated') as mock_is_authenticated:
-        mock_is_authenticated.return_value = True
-        yield
-
-
-@pytest.fixture(scope="function")
 def sso_client(app):
     kwargs = {
         'access_token_url': 'access_token_url',

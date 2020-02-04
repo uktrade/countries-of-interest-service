@@ -1,4 +1,5 @@
 import datetime
+import unittest.mock
 
 import pytest
 import sqlalchemy_utils
@@ -54,6 +55,13 @@ def app_with_db_module(app):
     app.db.session.remove()
     app.db.drop_all()
     sqlalchemy_utils.drop_database(app.config['SQLALCHEMY_DATABASE_URI'])
+
+
+@pytest.fixture(scope="function")
+def sso_authenticated_request():
+    with unittest.mock.patch('app.sso.token.is_authenticated') as mock_is_authenticated:
+        mock_is_authenticated.return_value = True
+        yield
 
 
 def _create_testing_db_name():
