@@ -132,31 +132,3 @@ class TestGetNextUrl:
             response = sso_client._get_next_url()
         assert response == '/apples'
 
-
-def test_authenticated_view(app, sso_authenticated_request):
-
-    from flask.blueprints import Blueprint
-
-    test_sso = Blueprint(
-        name='tests.sso.test_sso_2.test_authenticated_view', import_name=__name__
-    )
-
-    @token.login_required
-    @test_sso.route('/test-view')
-    def test_view():
-        return 'success'
-
-    app.register_blueprint(test_sso)
-
-    with app.test_client() as c:
-        c.get('/test-view')
-
-
-def test_authenticated_view_2(app, sso_authenticated_request):
-    @token.login_required
-    def test_view():
-        return 'success'
-
-    with app.test_request_context():
-        response = test_view()
-        assert response == 'success'
