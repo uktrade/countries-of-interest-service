@@ -39,7 +39,7 @@ class App extends React.Component {
                 ]
             },
             {
-                name: 'datahub_interactions',
+                name: 'interactions',
                 service: 'datahub',
                 title: 'Interactions',
                 groups: [
@@ -326,7 +326,7 @@ class App extends React.Component {
                     this.state.dataSource !== undefined ? this.state.dataSource.groups.map(
                         (group, i) => {
                             return (
-                                <option value={group.value}>
+                                <option key={i} value={group.value}>
                                   {group.title}
                                 </option>
                             );

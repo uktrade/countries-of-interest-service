@@ -277,7 +277,7 @@ def data_visualisation_data(field):
     date_trunc = request.args.get('date_trunc', 'quarter')
     data_source = request.args['data-source']
     interests_table = internal_models.CountriesAndSectorsInterest.__tablename__
-    valid_data_sources = ['export_wins', 'datahub_interactions', 'omis']
+    valid_data_sources = ['export_wins', 'interactions', 'omis']
     valid_fields = ['country', 'sector']
 
     if field not in valid_fields:
