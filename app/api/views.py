@@ -273,11 +273,17 @@ def populate_database():
 
 @api.route('/api/v1/get-data-visualisation-data/<field>')
 @login_required
-def data_visualisation_data(field):
+def get_data_visualisation_data(field):
     date_trunc = request.args.get('date_trunc', 'quarter')
     data_source = request.args['data-source']
     interests_table = internal_models.CountriesAndSectorsInterest.__tablename__
-    valid_data_sources = ['export_wins', 'interactions', 'omis']
+    from app.config import constants
+
+    valid_data_sources = [
+        constants.Source.EXPORT_WINS.value,
+        constants.Source.DATAHUB_INTERACTIONS.value,
+        constants.Source.DATAHUB_OMIS.value,
+    ]
     valid_fields = ['country', 'sector']
 
     if field not in valid_fields:
@@ -289,9 +295,10 @@ def data_visualisation_data(field):
             f'valid values: {valid_data_sources}'
         )
 
-    if field == 'sector' and data_source == 'interactions':
+    if field == 'sector' and data_source == constants.Source.DATAHUB_INTERACTIONS.value:
         raise BadRequest(
-            'invalid args: data-source: intreactions not supported by sector'
+            f'invalid args: data-source: {constants.Source.DATAHUB_INTERACTIONS.value}'
+            ' not supported by sector'
         )
 
     sql = '''
