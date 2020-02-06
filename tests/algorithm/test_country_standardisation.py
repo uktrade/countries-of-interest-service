@@ -156,12 +156,10 @@ def test_standardise_country():
     assert _standardise_country('german', choices, lower_choices) == [('Germany', 88)]
     assert _standardise_country('Belgiun', choices, lower_choices) == [('Belgium', 86)]
     assert _standardise_country('Belgiu', choices, lower_choices) == [('Belgium', 88)]
-    assert _standardise_country(
-        'democratic republic of congo', choices, lower_choices
-    ) == [('Congo (Democratic Republic)', 91)]
-    assert _standardise_country('bahamas', choices, lower_choices) == [
-        ('The Bahamas', 100)
+    assert _standardise_country('democratic republic of congo', choices, lower_choices) == [
+        ('Congo (Democratic Republic)', 91)
     ]
+    assert _standardise_country('bahamas', choices, lower_choices) == [('The Bahamas', 100)]
     assert _standardise_country('bahamas', choices, lower_choices) == [('The Bahamas', 90)]
     assert _standardise_country('ao', choices, lower_choices) == [('Laos', 86)]
 
