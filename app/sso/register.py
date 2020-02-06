@@ -16,9 +16,7 @@ def register_sso_component(flask_app, role_based=True):
         flask_app.config['SECURITY_TRACKABLE'] = True
         flask_app.config['SECURITY_USER_IDENTITY_ATTRIBUTES'] = 'user_id'
         flask_app.user_datastore = SQLAlchemyUserDatastore(flask_app.db, User, Role)
-        flask_app.security = Security(
-            flask_app, flask_app.user_datastore, register_blueprint=False
-        )
+        flask_app.security = Security(flask_app, flask_app.user_datastore, register_blueprint=False)
         sso_client = SSORoleBasedClient
         user_datastore = flask_app.user_datastore
     else:

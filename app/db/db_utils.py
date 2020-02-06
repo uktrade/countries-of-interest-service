@@ -103,9 +103,7 @@ def dsv_buffer_to_table(
     connection = sql_alchemy.engine.raw_connection()
     cursor = connection.cursor()
     fq_table_name = f'"{schema}"."{table}"'
-    sql = _get_sql_copy_statement(
-        fq_table_name, columns, has_header, sep, null, quote, encoding
-    )
+    sql = _get_sql_copy_statement(fq_table_name, columns, has_header, sep, null, quote, encoding)
     try:
         cursor.copy_expert(sql, csv_buffer)
         connection.commit()
@@ -119,9 +117,7 @@ def dsv_buffer_to_table(
     connection.close()
 
 
-def _get_sql_copy_statement(
-    table, columns, has_header, delimiter, null_value, quote, encoding
-):
+def _get_sql_copy_statement(table, columns, has_header, delimiter, null_value, quote, encoding):
     sql = 'COPY {}'.format(table)
     if columns:
         sql += ' ({})'.format(','.join(columns))

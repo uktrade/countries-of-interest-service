@@ -22,10 +22,5 @@ class InteractionAnalyser:
     @log.write('extracting coi from interactions')
     def analyse(self):
         process_interactions(
-            input_table,
-            input_schema,
-            log_table,
-            output_schema,
-            output_table,
-            batch_size=1000,
+            input_table, input_schema, log_table, output_schema, output_table, batch_size=1000,
         )

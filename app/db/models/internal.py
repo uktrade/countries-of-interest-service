@@ -39,11 +39,7 @@ class HawkUsers(BaseModel):
     def add_user(cls, client_id, client_key, client_scope, description):
         cls.get_or_create(
             id=client_id,
-            defaults={
-                'key': client_key,
-                'scope': client_scope,
-                'description': description,
-            },
+            defaults={'key': client_key, 'scope': client_scope, 'description': description},
         )
 
 

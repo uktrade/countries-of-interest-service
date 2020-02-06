@@ -164,8 +164,7 @@ def test_company_matching(
     ]
 
     assert rows_equal_query_results(
-        expected_rows,
-        f'SELECT * FROM {CountriesAndSectorsInterest.get_fq_table_name()}',
+        expected_rows, f'SELECT * FROM {CountriesAndSectorsInterest.get_fq_table_name()}',
     )
 
 

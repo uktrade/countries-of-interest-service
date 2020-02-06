@@ -51,9 +51,7 @@ class TestInit:
 
 
 class TestLogin:
-    def test_returns_oauth_broker_authorize(
-        self, app, mock_oauth, mock_url_for, sso_client
-    ):
+    def test_returns_oauth_broker_authorize(self, app, mock_oauth, mock_url_for, sso_client):
         sso_client.login()
         mock_oauth.authorize.assert_called_once_with(
             callback=mock_url_for('sso.callback', _external=True)

@@ -23,18 +23,10 @@ class TestDatabaseCommand:
         ),
     )
     def test_run_cmd(
-        self,
-        app_with_db,
-        keep_tables,
-        extractors,
-        tasks,
-        expected_called_task_with,
-        expected_msg,
+        self, app_with_db, keep_tables, extractors, tasks, expected_called_task_with, expected_msg,
     ):
         runner = app_with_db.test_cli_runner()
-        with mock.patch(
-            'app.etl.tasks.populate_database'
-        ) as mock_populate_database_task:
+        with mock.patch('app.etl.tasks.populate_database') as mock_populate_database_task:
             mock_populate_database_task.return_value = []
             args = []
             if keep_tables:
@@ -45,9 +37,7 @@ class TestDatabaseCommand:
                 args.extend(['--tasks', tasks])
             result = runner.invoke(populate, args)
         if expected_called_task_with:
-            mock_populate_database_task.assert_called_once_with(
-                *expected_called_task_with
-            )
+            mock_populate_database_task.assert_called_once_with(*expected_called_task_with)
         else:
             assert mock_populate_database_task.called is False
             assert expected_msg in result.output

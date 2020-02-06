@@ -202,13 +202,7 @@ class ExtractDatahubInteractions(SourceDataExtractor):
     model = models.Interactions
     source_table_id_config_key = 'datahub_interactions_source_table_id'
     stub_data = {
-        'headers': [
-            'id',
-            'company_id',
-            'interaction_notes',
-            'interaction_subject',
-            'created_on',
-        ],
+        'headers': ['id', 'company_id', 'interaction_notes', 'interaction_subject', 'created_on'],
         'values': [
             [
                 'a8cb910f-51df-4d8e-a953-01c0be435d36',
@@ -326,11 +320,7 @@ def get_hawk_headers(
     credentials = {'id': client_id, 'key': client_key, 'algorithm': 'sha256'}
 
     sender = mohawk.Sender(
-        credentials=credentials,
-        url=url,
-        method=method,
-        content=content,
-        content_type=content_type,
+        credentials=credentials, url=url, method=method, content=content, content_type=content_type,
     )
     headers = {'Authorization': sender.request_header, 'Content-Type': content_type}
     return headers
@@ -366,9 +356,7 @@ def populate_table(data, model, extractor_name, mapping, unique_key, overwrite=T
             items.append(data_item)
 
         insert_stmt = postgresql.insert(model.__table__).values(items)
-        update_columns = {
-            col.name: col for col in insert_stmt.excluded if col.name not in ('id',)
-        }
+        update_columns = {col.name: col for col in insert_stmt.excluded if col.name not in ('id',)}
         update_statement = insert_stmt.on_conflict_do_update(
             index_elements=[unique_key], set_=update_columns
         )

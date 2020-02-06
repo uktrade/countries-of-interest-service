@@ -50,9 +50,7 @@ class TestLoginRequired:
     @unittest.mock.patch('app.sso.token.redirect')
     @unittest.mock.patch('app.sso.token.request')
     @unittest.mock.patch('app.sso.token.url_for')
-    def test_if_not_authenticated_redirect(
-        self, url_for, request, redirect, is_authenticated
-    ):
+    def test_if_not_authenticated_redirect(self, url_for, request, redirect, is_authenticated):
         is_authenticated.return_value = False
 
         def view():

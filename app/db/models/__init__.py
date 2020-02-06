@@ -66,9 +66,7 @@ class BaseModel(db.Model):
         if instance:
             return instance, False
         else:
-            params = dict(
-                (k, v) for k, v in kwargs.items() if not isinstance(v, ClauseElement)
-            )
+            params = dict((k, v) for k, v in kwargs.items() if not isinstance(v, ClauseElement))
             params.update(defaults or {})
             instance = cls(**params)
             instance.save()

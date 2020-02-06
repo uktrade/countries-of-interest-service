@@ -39,12 +39,7 @@ class TestAuthentication:
                 'hawk_localtime_offset_in_seconds': 0,
                 'hawk_timestamp_skew_in_seconds': 60,
                 'issuers': [
-                    {
-                        'issuer': 'iss1',
-                        'key': 'secret1',
-                        'description': 'test user',
-                        'scope': '*',
-                    }
+                    {'issuer': 'iss1', 'key': 'secret1', 'description': 'test user', 'scope': '*'}
                 ],
             }
         )
@@ -62,11 +57,7 @@ class TestAuthentication:
 
     def test_successful_authentication(self):
         sender = Sender(
-            credentials={
-                'id': self.client_id,
-                'key': self.client_key,
-                'algorithm': 'sha256',
-            },
+            credentials={'id': self.client_id, 'key': self.client_key, 'algorithm': 'sha256'},
             url='http://localhost:80/test/',
             method='GET',
             content='',
