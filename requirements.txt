@@ -7,6 +7,7 @@
 amqp==2.5.2               # via kombu
 appdirs==1.4.3            # via black
 apscheduler==3.6.3
+argh==0.26.2
 attrs==19.3.0             # via black, pytest
 babel==2.8.0              # via flask-babelex
 backcall==0.1.0           # via ipython

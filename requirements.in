@@ -1,3 +1,4 @@
+argh==0.26.2
 flask==1.1.1
 psycopg2==2.8.4
 pyyaml==5.3
