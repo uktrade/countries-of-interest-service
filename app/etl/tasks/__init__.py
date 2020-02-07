@@ -58,6 +58,5 @@ def populate_database(drop_table, extractors, tasks):
 
 
 def pretty_log_output(output):
-    flask_app.logger.info('\n --OUTPUT-- \n')
     for log_entry in output['output']:
-        flask_app.logger.info(log_entry)
+        flask_app.logger.info('', extra=log_entry)
