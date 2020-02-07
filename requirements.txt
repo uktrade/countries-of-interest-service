@@ -83,7 +83,7 @@ pytest==5.3.5
 python-dateutil==2.8.1    # via freezegun, pandas
 pytz==2019.3              # via apscheduler, babel, celery, pandas, tzlocal
 pyyaml==5.3
-redis==3.3.11
+redis==3.4.1
 regex==2020.1.8           # via black
 requests-oauthlib==1.1.0
 requests==2.22.0          # via codecov, requests-oauthlib, spacy
