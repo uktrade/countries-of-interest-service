@@ -159,7 +159,7 @@ def test_standardise_country():
     assert _standardise_country('democratic republic of congo', choices, lower_choices) == [
         ('Congo (Democratic Republic)', 91)
     ]
-    assert _standardise_country('bahamas', choices, lower_choices) == [('The Bahamas', 90)]
+    assert _standardise_country('bahamas', choices, lower_choices) == [('The Bahamas', 100)]
     assert _standardise_country('ao', choices, lower_choices) == [('Laos', 86)]
 
     # test mismatches

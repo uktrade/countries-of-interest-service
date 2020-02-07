@@ -82,11 +82,31 @@ regions = [
     'far east',
 ]
 replacements = {
-    'uae': 'united arab emirates',
-    'ksa': 'saudi arabia',
-    'usa': 'united states',
+    'bahamas': 'the bahamas',
+    'cabo verde': 'cape verde',
+    'congo (the democratic republic of the)': 'congo',
     'czech republic': 'czechia',
+    "côte d'ivoire": 'ivory coast',
+    'gambia': 'the gambia',
     'holland': 'the netherlands',
+    'ksa': 'saudi arabia',
+    'macedonia': 'north macedonia',
+    'micronesia (federated states of)': 'micronesia',
+    'myanmar': 'myanmar (burma)',
+    'myanmar (burma)': 'myanmar (burma)',
+    'palestine, state of': 'occupied palestinian territories',
+    'saint helena, ascension and tristan da cunha': 'saint helena',
+    'saint kitts and nevis': 'st kitts and nevis',
+    'saint lucia': 'st lucia',
+    'saint vincent and the grenadines': 'st vincent',
+    'st martin': 'saint-martin (french part)',
+    'swaziland': 'eswatini',
+    'uae': 'united arab emirates',
+    'usa': 'united states',
+    'united states of america': 'united states',
+    'united states minor outlying islands': 'united states',
+    'virgin islands (british)': 'british virgin islands',
+    'virgin islands (u.s.)': 'united states virgin islands',
 }
 split_mappings = {
     'Netherlands Antilles': [
@@ -106,7 +126,10 @@ def _standardise_country(country, choices, lower_choices):
         lower_value = '0' * len(lower_value)
     # reformat countries
     for key, value in replacements.items():
-        lower_value = lower_value.replace(key, value)
+        if key == lower_value:
+            lower_value = value
+            break
+
     # check for direct match
     index = lower_choices.index(lower_value) if lower_value in lower_choices else None
     if index:
