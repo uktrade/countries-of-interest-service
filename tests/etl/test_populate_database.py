@@ -45,30 +45,45 @@ class TestPopulateDatabase:
         extract_countries_and_territories_reference_dataset,
         extract_export_wins,
     ):
-        extract_countries_and_territories_reference_dataset.return_value = (
-            'countries_and_territories_reference_dataset'
-        )
-        extract_datahub_contact_dataset.return_value = 'datahub_contact_dataset'
-        extract_datahub_company_dataset.return_value = 'datahub_company_dataset'
-        extract_datahub_export_to_countries.return_value = 'datahub_export_to_countries'
-        extract_datahub_future_interest_countries.return_value = 'datahub_future_interest_countries'
-        extract_datahub_interactions.return_value = 'datahub_interaction'
-        extract_datahub_omis.return_value = 'datahub_omis'
-        extract_export_wins.return_value = 'export_wins'
+        extract_countries_and_territories_reference_dataset.return_value = {
+            'dataset': 'countries_and_territories_reference_dataset'
+        }
+        extract_datahub_contact_dataset.return_value = {'dataset': 'datahub_contact_dataset'}
+        extract_datahub_company_dataset.return_value = {'dataset': 'datahub_company_dataset'}
+        extract_datahub_export_to_countries.return_value = {
+            'dataset': 'datahub_export_to_countries'
+        }
+        extract_datahub_future_interest_countries.return_value = {
+            'dataset': 'datahub_future_interest_countries'
+        }
+        extract_datahub_interactions.return_value = {'dataset': 'datahub_interaction'}
+        extract_datahub_omis.return_value = {'dataset': 'datahub_omis'}
+        extract_export_wins.return_value = {'dataset': 'export_wins'}
 
-        populate_standardised_countries_task.return_value = 'populate_standardised_countries'
-        populate_company_matching_task.return_value = 'populate_company_matching'
-        populate_datahub_country_interest_task.return_value = 'populate_datahub_country_interest'
-        populate_datahub_country_export_task.return_value = 'populate_datahub_country_export'
-        populate_datahub_omis_country_sector_interest_task.return_value = (
-            'populate_datahub_omis_country_sector_interest'
-        )
-        populate_datahub_country_interest_task.return_value = 'populate_datahub_country_interest'
-        populate_datahub_interaction_country_task.return_value = (
-            'populate_datahub_interaction_country'
-        )
-        populate_interactions_analysed_task.return_value = 'populate_interactions_analysed'
-        populate_export_wins_task.return_value = 'populate_export_wins'
+        populate_standardised_countries_task.return_value = {
+            'dataset': 'populate_standardised_countries'
+        }
+        populate_company_matching_task.return_value = {'dataset': 'populate_company_matching'}
+        populate_datahub_country_interest_task.return_value = {
+            'dataset': 'populate_datahub_country_interest'
+        }
+        populate_datahub_country_export_task.return_value = {
+            'dataset': 'populate_datahub_country_export'
+        }
+        populate_datahub_omis_country_sector_interest_task.return_value = {
+            'dataset': 'populate_datahub_omis_country_sector_interest'
+        }
+
+        populate_datahub_country_interest_task.return_value = {
+            'dataset': 'populate_datahub_country_interest'
+        }
+        populate_datahub_interaction_country_task.return_value = {
+            'dataset': 'populate_datahub_interaction_country'
+        }
+        populate_interactions_analysed_task.return_value = {
+            'dataset': 'populate_interactions_analysed'
+        }
+        populate_export_wins_task.return_value = {'dataset': 'populate_export_wins'}
 
     @patch('app.etl.tasks.execute_statement')
     def test_tasks_are_run(
@@ -134,22 +149,22 @@ class TestPopulateDatabase:
 
         assert output == {
             'output': [
-                'countries_and_territories_reference_dataset',
-                'datahub_company_dataset',
-                'datahub_contact_dataset',
-                'datahub_export_to_countries',
-                'datahub_interaction',
-                'datahub_future_interest_countries',
-                'datahub_omis',
-                'export_wins',
-                'populate_standardised_countries',
-                'populate_interactions_analysed',
-                'populate_datahub_country_export',
-                'populate_datahub_country_interest',
-                'populate_datahub_omis_country_sector_interest',
-                'populate_company_matching',
-                'populate_datahub_interaction_country',
-                'populate_export_wins',
+                {'dataset': 'countries_and_territories_reference_dataset'},
+                {'dataset': 'datahub_company_dataset'},
+                {'dataset': 'datahub_contact_dataset'},
+                {'dataset': 'datahub_export_to_countries'},
+                {'dataset': 'datahub_interaction'},
+                {'dataset': 'datahub_future_interest_countries'},
+                {'dataset': 'datahub_omis'},
+                {'dataset': 'export_wins'},
+                {'dataset': 'populate_standardised_countries'},
+                {'dataset': 'populate_interactions_analysed'},
+                {'dataset': 'populate_datahub_country_export'},
+                {'dataset': 'populate_datahub_country_interest'},
+                {'dataset': 'populate_datahub_omis_country_sector_interest'},
+                {'dataset': 'populate_company_matching'},
+                {'dataset': 'populate_datahub_interaction_country'},
+                {'dataset': 'populate_export_wins'},
             ]
         }
 
@@ -219,13 +234,13 @@ class TestPopulateDatabase:
 
         assert output == {
             'output': [
-                'datahub_company_dataset',
-                'populate_datahub_country_export',
-                'populate_datahub_country_interest',
-                'populate_datahub_omis_country_sector_interest',
-                'populate_company_matching',
-                'populate_datahub_interaction_country',
-                'populate_export_wins',
+                {'dataset': 'datahub_company_dataset'},
+                {'dataset': 'populate_datahub_country_export'},
+                {'dataset': 'populate_datahub_country_interest'},
+                {'dataset': 'populate_datahub_omis_country_sector_interest'},
+                {'dataset': 'populate_company_matching'},
+                {'dataset': 'populate_datahub_interaction_country'},
+                {'dataset': 'populate_export_wins'},
             ]
         }
 

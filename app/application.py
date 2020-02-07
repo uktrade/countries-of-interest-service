@@ -18,10 +18,13 @@ from app.sso.register import register_sso_component
 logging_config = {
     'version': 1,
     'disable_existing_loggers': False,
-    'root': {'level': 'INFO', 'handlers': ['console']},
-    'formatters': {'verbose': {'format': '[%(levelname)s] [%(name)s] %(message)s'}},
+    'root': {'level': 'INFO', 'handlers': ['console'], 'formatter': 'json'},
+    'formatters': {
+        'verbose': {'format': '[%(levelname)s] [%(name)s] %(message)s'},
+        'json': {'()': 'app.api.settings.JSONLogFormatter'},
+    },
     'handlers': {
-        'console': {'level': 'DEBUG', 'class': 'logging.StreamHandler', 'formatter': 'verbose'}
+        'console': {'level': 'DEBUG', 'class': 'logging.StreamHandler', 'formatter': 'json'}
     },
 }
 
