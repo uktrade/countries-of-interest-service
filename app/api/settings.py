@@ -1,5 +1,7 @@
 import datetime
 
+
+import json_log_formatter
 import numpy as np
 import pandas as pd
 from flask.json import JSONEncoder
@@ -18,3 +20,15 @@ class CustomJSONEncoder(JSONEncoder):
         if isinstance(obj, np.floating):
             return float(obj)
         return str(obj)
+
+
+class JSONLogFormatter(json_log_formatter.JSONFormatter):
+    def json_record(self, message, extra, record):
+        extra['message'] = message
+        if 'time' not in extra:
+            extra['time'] = datetime.datetime.now()
+        extra['level'] = record.levelname
+        if record.levelname == 'ERROR':
+            extra['lineno'] = record.lineno
+            extra['filename'] = record.pathname
+        return extra
