@@ -1,5 +1,5 @@
 import datetime
-
+import logging
 
 import json_log_formatter
 import numpy as np
@@ -28,7 +28,7 @@ class JSONLogFormatter(json_log_formatter.JSONFormatter):
         if 'time' not in extra:
             extra['time'] = datetime.datetime.now()
         extra['level'] = record.levelname
-        if record.levelname == 'ERROR':
+        if record.levelno >= logging.ERROR:
             extra['lineno'] = record.lineno
             extra['filename'] = record.pathname
         return extra
