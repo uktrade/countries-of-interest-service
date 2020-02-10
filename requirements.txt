@@ -47,7 +47,7 @@ ipython==7.11.1           # via flask-shell-ipython
 itsdangerous==1.1.0       # via flask, flask-security
 jedi==0.16.0              # via ipython
 jinja2==2.11.0            # via flask, flask-babelex
-json_log_formatter==0.2.0
+json_log_formatter==0.3.0
 kombu==4.6.7              # via celery
 markupsafe==1.1.1         # via jinja2
 mccabe==0.6.1             # via flake8
