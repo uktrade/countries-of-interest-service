@@ -1,4 +1,4 @@
-PORT ?= 5000
+PORT ?= 8888
 TEST ?=.
 COV ?= --cov
 BLACK_CONFIG ?= --exclude=venv --skip-string-normalization --line-length 100

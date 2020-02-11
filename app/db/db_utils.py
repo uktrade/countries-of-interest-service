@@ -23,19 +23,9 @@ def execute_query(query, data=None, df=True, raise_if_fail=False):
 
 def execute_statement(stmt, data=None, raise_if_fail=False):
     connection = sql_alchemy.engine.connect()
-    transaction = connection.begin()
     try:
-        status = connection.execute(stmt, data)
-        transaction.commit()
-        connection.close()
-        return status
-    except sqlalchemy.exc.ProgrammingError as err:
-        transaction.rollback()
-        flask_app.logger.error("Execute statement error:")
-        exc_type, exc_value, exc_traceback = sys.exc_info()
-        traceback.print_exception(exc_type, exc_value, exc_traceback, file=sys.stdout)
-        if raise_if_fail:
-            raise err
+        return connection.execute(stmt, data)
+    finally:
         connection.close()
 
 
