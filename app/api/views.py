@@ -252,7 +252,7 @@ def populate_database():
 @api.route('/api/v1/get-data-visualisation-data/<field>')
 @login_required
 def get_data_visualisation_data(field):
-    date_trunc = request.args.get('date_trunc', 'quarter')
+    date_trunc = 'quarter'
     data_source = request.args['data-source']
     interests_table = internal_models.CountriesAndSectorsInterest.__tablename__
     from app.config import constants
