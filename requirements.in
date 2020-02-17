@@ -1,7 +1,5 @@
-APScheduler==3.*
 argh==0.26.2
 black==19.10b0
-celery==4.4.0
 codecov==2.0.15
 flake8-import-order==0.18.1
 flake8==3.7.9
