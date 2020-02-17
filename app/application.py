@@ -3,7 +3,6 @@ from logging.config import dictConfig
 
 import certifi
 import redis
-from celery import Celery
 from flask import Flask, json
 from sqlalchemy.engine.url import make_url
 
@@ -29,22 +28,6 @@ logging_config = {
 }
 
 dictConfig(logging_config)
-
-
-def make_celery(flask_app):
-    backend_url = _get_redis_url(flask_app) or ""
-    flask_app.config['broker_url'] = f"{backend_url}/0"
-    flask_app.config['result_backend'] = f"{backend_url}/0"
-
-    celery = Celery('application', broker=backend_url)
-
-    celery.conf.broker_transport_options = {
-        'max_retries': 3,
-        'interval_start': 0,
-        'interval_step': 0.2,
-        'interval_max': 0.2,
-    }
-    return celery
 
 
 def get_or_create():
@@ -101,8 +84,6 @@ def _create_base_app():
     from app.api.settings import CustomJSONEncoder
 
     flask_app.json_encoder = CustomJSONEncoder
-    celery = make_celery(flask_app)
-    flask_app.celery = celery
     flask_app = _register_components(flask_app)
     flask_app = register_sso_component(flask_app, role_based=False)
     return flask_app
