@@ -1,36 +1,20 @@
 # Countries of interest service
 The countries of interest service aims to provide insight into the countries that a specific company is interested in or currently exporting to. The service makes use several data sources including,
 
+* Export wins
+* Data Hub interactions
 * OMIS orders
-* Datahub company profiles
+* Data Hub company profiles
 
 to give the most informed view into a companies intereset in particular countries.
 
 ## Installation
 The backend is built in Python using the Flask framework. Authentication implemented using Hawk and OAUTH2(SSO) authentication. The majority of the functionality is through API calls but a light front end is provided for documentation and dashboarding. This front end uses React and d3 and uses the webpack javascript module bundler. 
 
-### local installation
-1. Create a python virtual environment. Below are instructions on how to do this with `Anaconda` but other virtual environments are possible.
-    <br />`conda create -n countries_of_interest_service python=3`
-2. Activate the virtual environment
-    <br />`source activate countries_of_interest_service`
-3. Install the python dependencies
-    <br />`pip install -r requirements.txt`
-4. Install Node package manager
-    <br />https://www.npmjs.com/get-npm
-5. Install the required node packages
-    <br />`npm install` # from the project base directory
-6. Build javascript bundles
-    <br />`npm run build`
-7. Setup environment variables, an example environment variable file can be found in the `envs` directory. I recommend that the virtual environment sets the evnironemnts with this file when the environment is activated. For anaconda you can do this in the `env_vars.sh` script which is located at `${ANACONDA_HOME}/envs/countries_of_interest_service/etc/conda/activate.d`
-8. run the app
-    <br />`python app.py`
-9. go to `http://localhost:5000`
-
 ### local Docker installation
 1. Move your environment variables file to `$PROJECT_HOME/.env`
 2. `docker-compose build`
-3. `docker-compose run`
+3. `docker-compose up`
 
 You can configure how `docker-compose` runs with environment variables,
 * change the port the application runs on with the `PORT` environment variable
@@ -40,19 +24,15 @@ You can configure how `docker-compose` runs with environment variables,
 ## Testing
 From the project base directory use the command,
 
-`FLASK_ENV=test python -m unittest`
+`TESTING=1 pytest`
 
 to run tests for a specific test module, do,
 
-`FLASK_ENV=test python -m unittest tests.<test_module>`
+`TESTING=1 pytest tests/<test_module>`
 
 to run tests in a specific directory do,
 
-`FLASK_ENV=test python -m unittest discover -s <test directory>`
-
-### running tests in Docker
-`docker-compose build; docker-compose run -e FLASK_ENV=test web python -m unittest`
-
+`TESTING=1 pytest tests/<test_directory>`
 
 ## Deployment
 
@@ -78,11 +58,8 @@ deploy via jenkins > Build with Parameters
 ### ssh into cloud foundry
 `cf ssh countries-of-interest-service`
 
-### activate conda envionment
-`source /home/vcap/deps/0/conda/bin/activate`
-
-### activate conda environment for app
-`source activate dep_env`
+### create an app shell
+`/tmp/lifecycle/shell`
 
 ### create tables
 `python app/manage.py dev db --create_tables # create tables`
