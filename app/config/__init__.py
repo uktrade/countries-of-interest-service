@@ -3,8 +3,8 @@ import os
 import re
 from pathlib import Path
 
-from dotenv import load_dotenv
 import yaml
+from dotenv import load_dotenv
 
 __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
