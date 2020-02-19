@@ -12,6 +12,7 @@ def get_config():
     default = _get_default_config()
     _parse_env_vars(default)
     local = _get_local_config()
+    _parse_env_vars(local)
     _update_dict(default, local)
     return default
 
