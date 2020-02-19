@@ -23,6 +23,7 @@ run_dev_server:
 run_tests:
 	TESTING=1 pytest -p no:sugar ${TEST} ${COV}
 
+
 .PHONY: run_tests_local
 run_tests_local:
 	USE_DOTENV=1 TESTING=1 pytest -s ${TEST}
