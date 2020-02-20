@@ -5,6 +5,7 @@
 #    pip-compile --output-file=requirements.txt requirements.in
 #
 appdirs==1.4.3            # via black
+appnope==0.1.0            # via ipython
 argh==0.26.2
 attrs==19.3.0             # via black, pytest
 babel==2.8.0              # via flask-babelex
@@ -76,6 +77,7 @@ pytest-cov==2.8.1
 pytest-mock==2.0.0
 pytest==5.3.5
 python-dateutil==2.8.1    # via freezegun, pandas
+python-dotenv==0.11.0
 pytz==2019.3              # via babel, pandas
 pyyaml==5.3
 redis==3.4.1

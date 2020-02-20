@@ -4,14 +4,20 @@ import re
 from pathlib import Path
 
 import yaml
+from dotenv import load_dotenv
 
 __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
 
 def get_config():
+    if bool(int(os.environ.get('USE_DOTENV', '0'))):
+        # Load environment variables from .env file, this does not
+        # override existing System environment variables
+        load_dotenv(override=False)
     default = _get_default_config()
     _parse_env_vars(default)
     local = _get_local_config()
+    _parse_env_vars(local)
     _update_dict(default, local)
     return default
 
