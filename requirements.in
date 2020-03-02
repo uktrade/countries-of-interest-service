@@ -15,7 +15,7 @@ json_log_formatter==0.3.0
 mohawk==1.1.0
 numpy==1.*
 pandas==1.0.1
-pip-tools==4.5.0
+pip-tools==4.5.1
 psycopg2==2.8.4
 pycountry==19.8.18
 pytest-cov==2.8.1
