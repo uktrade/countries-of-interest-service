@@ -55,7 +55,7 @@ class DatahubExportCountryHistory(BaseModel):
     __tablename__ = 'datahub_export_country_history'
     __table_args__ = {'schema': 'public'}
 
-    company_id = _col(UUID(as_uuid=True))    
+    company_id = _col(UUID(as_uuid=True))
     country = _col(_text)
     country_iso_alpha2_code = _col(_text)
     history_date = _col(_dt)

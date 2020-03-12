@@ -171,7 +171,7 @@ class ExtractDatahubExportCountryHistory(SourceDataExtractor):
             'history_date',
             'history_type',
             'id',
-            'status'
+            'status',
         ],
         'values': [
             [
@@ -194,6 +194,7 @@ class ExtractDatahubExportCountryHistory(SourceDataExtractor):
             ],
         ],
     }
+
 
 class ExtractDatahubExportToCountries(SourceDataExtractor):
     name = Source.DATAHUB_EXPORT_TO_COUNTRIES.value
