@@ -20,7 +20,7 @@ psycopg2==2.8.4
 pycountry==19.8.18
 pytest-cov==2.8.1
 pytest-mock==2.0.0
-pytest==5.3.5
+pytest==5.4.1
 python-dotenv==0.11.0
 pyyaml==5.3
 redis==3.4.1
