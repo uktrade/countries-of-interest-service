@@ -12,7 +12,7 @@ backcall==0.1.0           # via ipython
 black==19.10b0            # via -r requirements.in
 blinker==1.4              # via flask-mail, flask-principal
 blis==0.4.1               # via spacy, thinc
-catalogue==1.0.0          # via spacy
+catalogue==1.0.0          # via spacy, thinc
 certifi==2019.11.28       # via requests
 chardet==3.0.4            # via requests
 click==7.0                # via black, flask, flask-shell-ipython, pip-tools
@@ -84,15 +84,15 @@ regex==2020.1.8           # via black
 requests-oauthlib==1.1.0  # via -r requirements.in, flask-oauthlib
 requests==2.22.0          # via codecov, requests-oauthlib, spacy
 six==1.14.0               # via freezegun, mohawk, packaging, pip-tools, python-dateutil, sqlalchemy-utils, traitlets
-spacy==2.2.3              # via -r requirements.in
+spacy==2.2.4              # via -r requirements.in
 speaklater==1.3           # via flask-babelex
 sqlalchemy-utils==0.36.1  # via -r requirements.in
 sqlalchemy==1.3.15        # via -r requirements.in, flask-sqlalchemy, sqlalchemy-utils
-srsly==1.0.1              # via spacy, thinc
-thinc==7.3.1              # via spacy
+srsly==1.0.2              # via spacy, thinc
+thinc==7.4.0              # via spacy
 toml==0.10.0              # via black
 toolz==0.10.0             # via -r requirements.in
-tqdm==4.42.0              # via thinc
+tqdm==4.42.0              # via spacy, thinc
 traitlets==4.3.3          # via ipython
 typed-ast==1.4.1          # via black
 urllib3==1.25.8           # via requests
