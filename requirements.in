@@ -5,7 +5,7 @@ flake8-import-order==0.18.1
 flake8==3.7.9
 flask-oauthlib==0.9.5
 flask-security==3.0.0
-flask-shell-ipython==0.4.1https://github.com/uktrade/countries-of-interest-service/pulls
+flask-shell-ipython==0.4.1
 flask-sqlalchemy==2.4.1
 flask==1.1.1
 freezegun==0.3.15
