@@ -3,6 +3,7 @@ import pytest
 from app.db.models.external import (
     DatahubCompany,
     DatahubContact,
+    DatahubExportCountryHistory,
     DatahubExportToCountries,
     DatahubFutureInterestCountries,
     DatahubOmis,
@@ -57,6 +58,24 @@ def add_datahub_export_to_countries(app_with_db_module):
                 'id': record.get('id', None),
             }
             DatahubExportToCountries.get_or_create(id=record.get('id', None), defaults=defaults)
+
+    return _method
+
+
+@pytest.fixture(scope='module')
+def add_datahub_export_country_history(app_with_db_module):
+    def _method(records):
+        for record in records:
+            defaults = {
+                'company_id': record.get('company_id', None),
+                'country': record.get('country', None),
+                'country_iso_alpha2_code': record.get('country_iso_alpha2_code', None),
+                'history_date': record.get('history_date', None),
+                'history_type': record.get('history_type', None),
+                'id': record.get('id', None),
+                'status': record.get('status', None),
+            }
+            DatahubExportCountryHistory.get_or_create(id=record.get('id', None), defaults=defaults)
 
     return _method
 
