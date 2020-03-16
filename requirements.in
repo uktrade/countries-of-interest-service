@@ -1,6 +1,6 @@
 argh==0.26.2
 black==19.10b0
-codecov==2.0.15
+codecov==2.0.16
 flake8-import-order==0.18.1
 flake8==3.7.9
 flask-oauthlib==0.9.5
