@@ -32,6 +32,9 @@ with export_country_history as (
             on d.country_iso_alpha2_code = c.country_iso_alpha2_code
         left join {StandardisedCountries.get_fq_table_name()} s
             on d.country = s.country and similarity > 90
+
+    where status = 'future_interest'
+
     order by source, source_id
 
 ), future_interest_countries as (

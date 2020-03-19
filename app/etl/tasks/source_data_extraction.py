@@ -157,8 +157,8 @@ class ExtractDatahubExportCountryHistory(SourceDataExtractor):
         'country': 'country',
         'country_iso_alpha2_code': 'country_iso_alpha2_code',
         'history_date': 'history_date',
+        'history_id': 'id',
         'history_type': 'history_type',
-        'id': 'id',
         'status': 'status',
     }
     model = models.DatahubExportCountryHistory
@@ -169,8 +169,8 @@ class ExtractDatahubExportCountryHistory(SourceDataExtractor):
             'country_iso_alpha2_code',
             'country',
             'history_date',
+            'history_id',
             'history_type',
-            'id',
             'status',
         ],
         'values': [
@@ -179,8 +179,8 @@ class ExtractDatahubExportCountryHistory(SourceDataExtractor):
                 'US',
                 'united states',
                 '2020-01-01 01:00',
-                'insert',
                 '897c05c7-7836-4d36-b44d-56d1c3ae6a9a',
+                'insert',
                 'future_interest',
             ],
             [
@@ -188,8 +188,8 @@ class ExtractDatahubExportCountryHistory(SourceDataExtractor):
                 'MY',
                 'myanmar',
                 '2020-01-01 02:00',
-                'delete',
                 '450879d1-6169-4e32-965f-47474640f3ae',
+                'delete',
                 'not_interested',
             ],
         ],
