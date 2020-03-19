@@ -33,7 +33,7 @@ with export_country_history as (
         left join {StandardisedCountries.get_fq_table_name()} s
             on d.country = s.country and similarity > 90
 
-    where status = 'currently_exporting'
+    where status = '{DatahubExportCountryHistory.Status.CURRENTLY_EXPORTING.value}'
 
     order by source, source_id
 

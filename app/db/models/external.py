@@ -1,3 +1,5 @@
+from enum import Enum
+
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 
@@ -54,6 +56,10 @@ class DatahubExportCountryHistory(BaseModel):
 
     __tablename__ = 'datahub_export_country_history'
     __table_args__ = {'schema': 'public'}
+
+    class Status(Enum):
+        CURRENTLY_EXPORTING = 'currently_exporting'
+        FUTURE_INTEREST = 'future_interest'
 
     id = _col(_int, primary_key=True, autoincrement=True)
     company_id = _col(UUID(as_uuid=True))
