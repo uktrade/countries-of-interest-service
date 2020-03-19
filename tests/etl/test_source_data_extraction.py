@@ -194,8 +194,8 @@ class TestExtractDatahubExportCountryHistory(SourceDataExtractBaseTestCase):
             'country_iso_alpha2_code': 'US',
             'country': 'united states',
             'history_date': '2020-01-01 01:00:00',
+            'history_id': 'afd47aa2-b3fd-4c2e-a28b-44fef679c26e',
             'history_type': 'update',
-            'id': 'afd47aa2-b3fd-4c2e-a28b-44fef679c26e',
             'status': 'not_interested',
         },
         {
@@ -203,11 +203,13 @@ class TestExtractDatahubExportCountryHistory(SourceDataExtractBaseTestCase):
             'country_iso_alpha2_code': 'CN',
             'country': 'china',
             'history_date': '2020-01-01 02:00:00',
+            'history_id': '592ff565-88d0-43d7-b5d3-7e44fef6ed56',
             'history_type': 'insert',
-            'id': '592ff565-88d0-43d7-b5d3-7e44fef6ed56',
             'status': 'currently_exporting',
         },
     ]
+    item_pk = 'history_id'
+
     source_data = {
         'headers': [
             'company_id',
@@ -243,6 +245,7 @@ class TestExtractDatahubExportCountryHistory(SourceDataExtractBaseTestCase):
             ],
         ],
     }
+
     source_table_id_config_key = 'datahub_export_country_history_source_table_id'
     extractor = source_data_extraction.ExtractDatahubExportCountryHistory
 

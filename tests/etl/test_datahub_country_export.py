@@ -21,8 +21,8 @@ class TestExportCountries:
                     'country': 'Japan',
                     'country_iso_alpha2_code': 'JP',
                     'history_date': '2020-01-01 01:00:00',
+                    'history_id': '4737be58-3638-47da-b85e-5b9290f8025e',
                     'history_type': 'insert',
-                    'id': '4737be58-3638-47da-b85e-5b9290f8025e',
                     'status': 'future_interest',
                 },
                 {
@@ -30,8 +30,8 @@ class TestExportCountries:
                     'country': 'South Korea',
                     'country_iso_alpha2_code': 'KR',
                     'history_date': '2020-01-01 02:00:00',
+                    'history_id': 'c2a48897-876c-4242-9504-1a73c048f57b',
                     'history_type': 'insert',
-                    'id': 'c2a48897-876c-4242-9504-1a73c048f57b',
                     'status': 'currently_exporting',
                 },
             ]

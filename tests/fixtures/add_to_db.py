@@ -71,8 +71,8 @@ def add_datahub_export_country_history(app_with_db_module):
                 'country': record.get('country', None),
                 'country_iso_alpha2_code': record.get('country_iso_alpha2_code', None),
                 'history_date': record.get('history_date', None),
+                'history_id': record.get('history_id', None),
                 'history_type': record.get('history_type', None),
-                'id': record.get('id', None),
                 'status': record.get('status', None),
             }
             DatahubExportCountryHistory.get_or_create(id=record.get('id', None), defaults=defaults)

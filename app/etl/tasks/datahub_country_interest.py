@@ -24,7 +24,7 @@ with export_country_history as (
         history_type || '_' || status as type,
         '{constants.Service.DATAHUB.value}' as service,
         '{constants.Source.DATAHUB_EXPORT_COUNTRY_HISTORY.value}' as source,
-        d.id::text as source_id,
+        d.history_id::text as source_id,
         history_date::timestamp as timestamp
 
     from {DatahubExportCountryHistory.get_fq_table_name()} d
