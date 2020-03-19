@@ -69,6 +69,7 @@ class TestCountriesAndSectorsOfInterest:
         assert df['service_company_id'].values[0] == '16475539-7189-41a3-88c4-506b8f5d2086'
         assert df['company_match_id'].values[0] is None
         assert df['country'].values[0] == 'Japan'
+        assert df['service'].values[0] == 'datahub'
         assert df['source'].values[0] == 'export_country_history'
         assert df['source_id'].values[0] == '4737be58-3638-47da-b85e-5b9290f8025e'
         assert df['type'].values[0] == 'insert_future_interest'
@@ -77,6 +78,7 @@ class TestCountriesAndSectorsOfInterest:
         assert df['service_company_id'].values[1] == '08c5f419-f85f-4051-b640-d3cfef8ef85d'
         assert df['company_match_id'].values[1] is None
         assert df['country'].values[1] == 'United Kingdom'
+        assert df['service'].values[1] == 'datahub'
         assert df['source'].values[1] == 'future_interest_countries'
         assert df['source_id'].values[1] == '0'
         assert df['type'].values[1] == 'interested'

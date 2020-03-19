@@ -75,6 +75,7 @@ class TestExportCountries:
 
         assert df['service_company_id'].values[0] == '2bf393fa-a94b-43ae-a907-5e21340414f8'
         assert df['country'].values[0] == 'South Korea'
+        assert df['service'].values[0] == 'datahub'
         assert df['source'].values[0] == 'export_country_history'
         assert df['source_id'].values[0] == 'c2a48897-876c-4242-9504-1a73c048f57b'
         assert str(df['timestamp'].values[0]) == '2020-01-01T02:00:00.000000000'
@@ -82,6 +83,7 @@ class TestExportCountries:
 
         assert df['service_company_id'].values[1] == '08c5f419-f85f-4051-b640-d3cfef8ef85d'
         assert df['country'].values[1] == 'United Kingdom'
+        assert df['service'].values[1] == 'datahub'
         assert df['source'].values[1] == 'export_countries'
         assert df['source_id'].values[1] == '0'
         print(df['timestamp'].values[1])
@@ -89,6 +91,7 @@ class TestExportCountries:
         assert df['type'].values[1] == 'exported'
 
         assert df['service_company_id'].values[2] == '08c5f419-f85f-4051-b640-d3cfef8ef85d'
+        assert df['service'].values[2] == 'datahub'
         assert df['country'].values[2] is None
         assert df['source'].values[2] == 'export_countries'
         assert df['source_id'].values[2] == '1'
