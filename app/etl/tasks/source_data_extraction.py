@@ -149,6 +149,53 @@ class ExtractDatahubContactDataset(SourceDataExtractor):
     unique_key = 'datahub_contact_id'
 
 
+class ExtractDatahubExportCountryHistory(SourceDataExtractor):
+    name = Source.DATAHUB_EXPORT_COUNTRY_HISTORY.value
+    dataset_id_config_key = 'datahub_export_country_history_dataset_id'
+    mapping = {
+        'company_id': 'company_id',
+        'country': 'country',
+        'country_iso_alpha2_code': 'country_iso_alpha2_code',
+        'history_date': 'history_date',
+        'history_id': 'history_id',
+        'history_type': 'history_type',
+        'status': 'status',
+    }
+    model = models.DatahubExportCountryHistory
+    source_table_id_config_key = 'datahub_export_country_history_source_table_id'
+    stub_data = {
+        'headers': [
+            'company_id',
+            'country_iso_alpha2_code',
+            'country',
+            'history_date',
+            'history_id',
+            'history_type',
+            'status',
+        ],
+        'values': [
+            [
+                'c31e4492-1f16-48a2-8c5e-8c0334d959a3',
+                'US',
+                'united states',
+                '2020-01-01 01:00',
+                '897c05c7-7836-4d36-b44d-56d1c3ae6a9a',
+                'insert',
+                'future_interest',
+            ],
+            [
+                'd0af8e52-ff34-4088-98e3-d2d22cd250ae',
+                'MY',
+                'myanmar',
+                '2020-01-01 02:00',
+                '450879d1-6169-4e32-965f-47474640f3ae',
+                'delete',
+                'not_interested',
+            ],
+        ],
+    }
+
+
 class ExtractDatahubExportToCountries(SourceDataExtractor):
     name = Source.DATAHUB_EXPORT_TO_COUNTRIES.value
     dataset_id_config_key = 'datahub_export_countries_dataset_id'

@@ -185,6 +185,71 @@ class TestExtractDatahubExportCountries(SourceDataExtractBaseTestCase):
     extractor = source_data_extraction.ExtractDatahubExportToCountries
 
 
+class TestExtractDatahubExportCountryHistory(SourceDataExtractBaseTestCase):
+    __test__ = True
+    dataset_id_config_key = 'datahub_export_country_history_dataset_id'
+    expected_data = [
+        {
+            'company_id': '6ef62b18-fe0f-4e0e-8cbf-3ca3399df788',
+            'country_iso_alpha2_code': 'US',
+            'country': 'united states',
+            'history_date': '2020-01-01 01:00:00',
+            'history_id': 'afd47aa2-b3fd-4c2e-a28b-44fef679c26e',
+            'history_type': 'update',
+            'status': 'not_interested',
+        },
+        {
+            'company_id': '6a877ef4-d907-4dc0-a432-f140deabef2b',
+            'country_iso_alpha2_code': 'CN',
+            'country': 'china',
+            'history_date': '2020-01-01 02:00:00',
+            'history_id': '592ff565-88d0-43d7-b5d3-7e44fef6ed56',
+            'history_type': 'insert',
+            'status': 'currently_exporting',
+        },
+    ]
+    item_pk = 'history_id'
+
+    source_data = {
+        'headers': [
+            'company_id',
+            'country_iso_alpha2_code',
+            'country',
+            'history_date',
+            'history_id',
+            'history_type',
+            'status',
+            'extraField',
+        ],
+        'next': None,
+        'values': [
+            [
+                '6ef62b18-fe0f-4e0e-8cbf-3ca3399df788',
+                'US',
+                'united states',
+                '2020-01-01 01:00:00',
+                'afd47aa2-b3fd-4c2e-a28b-44fef679c26e',
+                'update',
+                'not_interested',
+                'extra_field_1',
+            ],
+            [
+                '6a877ef4-d907-4dc0-a432-f140deabef2b',
+                'CN',
+                'china',
+                '2020-01-01 02:00:00',
+                '592ff565-88d0-43d7-b5d3-7e44fef6ed56',
+                'insert',
+                'currently_exporting',
+                'extra_field_2',
+            ],
+        ],
+    }
+
+    source_table_id_config_key = 'datahub_export_country_history_source_table_id'
+    extractor = source_data_extraction.ExtractDatahubExportCountryHistory
+
+
 class TestExtractDatahubFutureInterestCountries(SourceDataExtractBaseTestCase):
     __test__ = True
     dataset_id_config_key = 'datahub_future_interest_countries_dataset_id'
