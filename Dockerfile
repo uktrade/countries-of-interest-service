@@ -1,7 +1,6 @@
 FROM python:3.6
 
 RUN apt-get update -y
-RUN apt-get install -y libpq-dev
 
 ADD requirements.txt /tmp/requirements.txt
 
