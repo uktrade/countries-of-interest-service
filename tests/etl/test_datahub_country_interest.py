@@ -23,7 +23,16 @@ class TestCountriesAndSectorsOfInterest:
                     'history_type': 'insert',
                     'id': '4737be58-3638-47da-b85e-5b9290f8025e',
                     'status': 'future_interest',
-                }
+                },
+                {
+                    'company_id': '2bf393fa-a94b-43ae-a907-5e21340414f8',
+                    'country': 'South Korea',
+                    'country_iso_alpha2_code': 'KR',
+                    'history_date': '2020-01-01 02:00:00',
+                    'history_type': 'insert',
+                    'id': 'c2a48897-876c-4242-9504-1a73c048f57b',
+                    'status': 'currently_exporting',
+                },
             ]
         )
 
