@@ -49,7 +49,7 @@ mccabe==0.6.1             # via flake8
 mohawk==1.1.0             # via -r requirements.in
 more-itertools==8.2.0     # via pytest
 murmurhash==1.0.2         # via preshed, spacy, thinc
-numpy==1.18.1             # via -r requirements.in, blis, pandas, spacy, thinc
+numpy==1.18.2             # via -r requirements.in, blis, pandas, spacy, thinc
 oauthlib==2.1.0           # via flask-oauthlib, requests-oauthlib
 packaging==20.1           # via pytest
 pandas==1.0.2             # via -r requirements.in
