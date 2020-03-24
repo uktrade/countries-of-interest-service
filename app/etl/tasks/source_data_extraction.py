@@ -374,8 +374,8 @@ def get_hawk_headers(
 
 
 def populate_table_paginated(model, extractor_name, mapping, unique_key, url):
-    client_id = flask_app.config['dataworkspace']['hawk_client_id']
-    client_key = flask_app.config['dataworkspace']['hawk_client_key']
+    client_id = flask_app.config['access_control']['hawk_client_id']
+    client_key = flask_app.config['access_control']['hawk_client_key']
     next_page = url
     n_rows = 0
     while next_page is not None:

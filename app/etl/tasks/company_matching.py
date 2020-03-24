@@ -150,8 +150,8 @@ class Task:
         def get_sender():
             return Sender(
                 credentials={
-                    'id': flask_app.config['cms']['hawk_client_id'],
-                    'key': flask_app.config['cms']['hawk_client_key'],
+                    'id': flask_app.config['access_control']['hawk_client_id'],
+                    'key': flask_app.config['access_control']['hawk_client_key'],
                     'algorithm': 'sha256',
                 },
                 url=url,
