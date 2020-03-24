@@ -157,7 +157,7 @@ class ExtractDatahubExportCountryHistory(SourceDataExtractor):
         'country': 'country',
         'country_iso_alpha2_code': 'country_iso_alpha2_code',
         'history_date': 'history_date',
-        'history_id': 'history_id',
+        'id': 'history_id',
         'history_type': 'history_type',
         'status': 'status',
     }
@@ -169,7 +169,7 @@ class ExtractDatahubExportCountryHistory(SourceDataExtractor):
             'country_iso_alpha2_code',
             'country',
             'history_date',
-            'history_id',
+            'id',
             'history_type',
             'status',
         ],

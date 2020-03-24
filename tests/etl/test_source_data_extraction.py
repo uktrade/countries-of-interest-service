@@ -216,7 +216,7 @@ class TestExtractDatahubExportCountryHistory(SourceDataExtractBaseTestCase):
             'country_iso_alpha2_code',
             'country',
             'history_date',
-            'history_id',
+            'id',
             'history_type',
             'status',
             'extraField',
