@@ -270,6 +270,54 @@ class ExtractDatahubInteractions(SourceDataExtractor):
     unique_key = 'datahub_interaction_id'
 
 
+class ExtractDatahubInteractionsExportCountry(SourceDataExtractor):
+    name = Source.DATAHUB_INTERACTIONS_EXPORT_COUNTRY.value
+    dataset_id_config_key = 'datahub_interactions_export_country_dataset_id'
+    mapping = {
+        'company_id': 'datahub_company_id',
+        'country_name': 'country_name',
+        'country_iso_alpha2_code': 'country_iso_alpha2_code',
+        'created_on': 'created_on',
+        'id': 'datahub_interaction_export_country_id',
+        'interaction_id': 'datahub_interaction_id',
+        'status': 'status',
+    }
+    model = models.InteractionsExportCountry
+    source_table_id_config_key = 'datahub_interactions_export_country_source_table_id'
+    stub_data = {
+        'headers': [
+            'company_id',
+            'country_name',
+            'country_iso_alpha2_code',
+            'created_on',
+            'id',
+            'interaction_id',
+            'status',
+        ],
+        'values': [
+            [
+                '9fc28ad0-5c8c-46e3-8f4b-109757a14f24',
+                'South Africa',
+                'ZA',
+                '2020-01-01 00:00:00',
+                'b12e5a23-50c8-4c60-be21-0754e714e092',
+                'bedd9f73-794a-4a7e-b7b5-30add35bc8f9',
+                'future_interest',
+            ],
+            [
+                'ec52e994-ba0a-40b2-af50-a6d241eb40fe',
+                'Slovenia',
+                'SI',
+                '2020-01-01 01:00:00',
+                'c3eef76d-bb17-4d90-8647-2da113cf1d24',
+                'd696b459-19f9-4cf5-81a9-5880e7d09fbc',
+                'currently_exporting',
+            ],
+        ],
+    }
+    unique_key = 'datahub_interaction_export_country_id'
+
+
 class ExtractDatahubOmis(SourceDataExtractor):
     name = Source.DATAHUB_OMIS.value
     dataset_id_config_key = 'datahub_omis_dataset_id'

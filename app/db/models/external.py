@@ -136,3 +136,22 @@ class Interactions(BaseModel):
         UniqueConstraint(datahub_interaction_id),
         {'schema': 'public'},
     )
+
+
+class InteractionsExportCountry(BaseModel):
+
+    __tablename__ = 'interactions_export_country'
+
+    id = _col(_int, primary_key=True, autoincrement=True)
+    country_iso_alpha2_code = _col(_text)
+    country_name = _col(_text)
+    created_on = _col(_dt)
+    datahub_company_id = _col(UUID(as_uuid=True))
+    datahub_interaction_export_country_id = _col(UUID(as_uuid=True))
+    datahub_interaction_id = _col(UUID(as_uuid=True))
+    status = _col(_text)
+
+    __table_args__ = (
+        UniqueConstraint(datahub_interaction_export_country_id),
+        {'schema': 'public'},
+    )

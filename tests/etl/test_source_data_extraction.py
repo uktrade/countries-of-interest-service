@@ -323,6 +323,67 @@ class TestExtractDatahubInteractions(SourceDataExtractBaseTestCase):
     extractor = source_data_extraction.ExtractDatahubInteractions
 
 
+class TestExtractDatahubInteractionsExportCountry(SourceDataExtractBaseTestCase):
+    __test__ = True
+    dataset_id_config_key = 'datahub_interactions_export_country_dataset_id'
+    expected_data = [
+        {
+            'country_name': 'Tajikistan',
+            'country_iso_alpha2_code': 'TJ',
+            'created_on': '2020-01-02 00:00:00',
+            'datahub_company_id': '7b75ba30-88ae-4755-a096-fa842d18106c',
+            'datahub_interaction_export_country_id': '7b8993d9-7ad7-4498-8e2c-f1913a14ea63',
+            'datahub_interaction_id': '77c0d1a8-4fd4-4ef3-aac6-4d09cc45a710',
+            'status': 'future_interest',
+        },
+        {
+            'country_name': 'Saint Martin',
+            'country_iso_alpha2_code': 'MF',
+            'created_on': '2020-01-02 01:00:00',
+            'datahub_company_id': 'a858d27a-16e0-41e5-b925-5d0dd2dd6b69',
+            'datahub_interaction_export_country_id': '337d599f-823f-4327-84d6-5cddfe26d02f',
+            'datahub_interaction_id': '7e183db1-94d5-4266-a871-aac823afeb63',
+            'status': 'currently_exporting',
+        },
+    ]
+    extractor = source_data_extraction.ExtractDatahubInteractionsExportCountry
+    item_pk = 'datahub_interaction_export_country_id'
+
+    source_data = {
+        'headers': [
+            'company_id',
+            'country_name',
+            'country_iso_alpha2_code',
+            'created_on',
+            'id',
+            'interaction_id',
+            'status',
+        ],
+        'values': [
+            [
+                '7b75ba30-88ae-4755-a096-fa842d18106c',
+                'Tajikistan',
+                'TJ',
+                '2020-01-02 00:00:00',
+                '7b8993d9-7ad7-4498-8e2c-f1913a14ea63',
+                '77c0d1a8-4fd4-4ef3-aac6-4d09cc45a710',
+                'future_interest',
+            ],
+            [
+                'a858d27a-16e0-41e5-b925-5d0dd2dd6b69',
+                'Saint Martin',
+                'MF',
+                '2020-01-02 01:00:00',
+                '337d599f-823f-4327-84d6-5cddfe26d02f',
+                '7e183db1-94d5-4266-a871-aac823afeb63',
+                'currently_exporting',
+            ],
+        ],
+        'next': None,
+    }
+    source_table_id_config_key = 'datahub_interactions_export_country_source_table_id'
+
+
 class TestExtractDatahubOmis(SourceDataExtractBaseTestCase):
     __test__ = True
     dataset_id_config_key = 'datahub_omis_dataset_id'
