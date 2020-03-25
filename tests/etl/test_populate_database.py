@@ -16,6 +16,7 @@ from app.etl.tasks import populate_database
 @patch('app.etl.tasks.source_data_extraction.' 'ExtractDatahubExportCountryHistory.__call__')
 @patch('app.etl.tasks.source_data_extraction.' 'ExtractDatahubExportToCountries.__call__')
 @patch('app.etl.tasks.source_data_extraction.' 'ExtractDatahubFutureInterestCountries.__call__')
+@patch('app.etl.tasks.source_data_extraction.' 'ExtractDatahubInteractionsExportCountry.__call__')
 @patch('app.etl.tasks.source_data_extraction.' 'ExtractDatahubInteractions.__call__')
 @patch('app.etl.tasks.source_data_extraction.ExtractDatahubOmis.__call__')
 @patch('app.etl.tasks.country_standardisation.PopulateStandardisedCountriesTask.__call__')
@@ -39,6 +40,7 @@ class TestPopulateDatabase:
         populate_standardised_countries_task,
         extract_datahub_omis,
         extract_datahub_interactions,
+        extract_datahub_interactions_export_country,
         extract_datahub_future_interest_countries,
         extract_datahub_export_country_history,
         extract_datahub_export_to_countries,
@@ -62,6 +64,9 @@ class TestPopulateDatabase:
             'dataset': 'datahub_future_interest_countries'
         }
         extract_datahub_interactions.return_value = {'dataset': 'datahub_interaction'}
+        extract_datahub_interactions_export_country.return_value = {
+            'dataset': 'datahub_interactions_export_country'
+        }
         extract_datahub_omis.return_value = {'dataset': 'datahub_omis'}
         extract_export_wins.return_value = {'dataset': 'export_wins'}
 
@@ -104,6 +109,7 @@ class TestPopulateDatabase:
         populate_standardised_countries_task,
         extract_datahub_omis,
         extract_datahub_interactions,
+        extract_datahub_interactions_export_country,
         extract_datahub_future_interest_countries,
         extract_datahub_export_country_history,
         extract_datahub_export_to_countries,
@@ -125,6 +131,7 @@ class TestPopulateDatabase:
             populate_standardised_countries_task,
             extract_datahub_omis,
             extract_datahub_interactions,
+            extract_datahub_interactions_export_country,
             extract_datahub_future_interest_countries,
             extract_datahub_export_country_history,
             extract_datahub_export_to_countries,
@@ -143,6 +150,7 @@ class TestPopulateDatabase:
         assert extract_datahub_export_to_countries.called is True
         assert extract_datahub_future_interest_countries.called is True
         assert extract_datahub_interactions.called is True
+        assert extract_datahub_interactions_export_country.called is True
         assert extract_datahub_omis.called is True
         assert extract_export_wins.called is True
 
@@ -163,6 +171,7 @@ class TestPopulateDatabase:
                 {'dataset': 'datahub_export_to_countries'},
                 {'dataset': 'datahub_export_country_history'},
                 {'dataset': 'datahub_interaction'},
+                {'dataset': 'datahub_interactions_export_country'},
                 {'dataset': 'datahub_future_interest_countries'},
                 {'dataset': 'datahub_omis'},
                 {'dataset': 'export_wins'},
@@ -191,6 +200,7 @@ class TestPopulateDatabase:
         populate_standardised_countries_task,
         extract_datahub_omis,
         extract_datahub_interactions,
+        extract_datahub_interactions_export_country,
         extract_datahub_future_interest_countries,
         extract_datahub_export_country_history,
         extract_datahub_export_to_countries,
@@ -212,6 +222,7 @@ class TestPopulateDatabase:
             populate_standardised_countries_task,
             extract_datahub_omis,
             extract_datahub_interactions,
+            extract_datahub_interactions_export_country,
             extract_datahub_future_interest_countries,
             extract_datahub_export_country_history,
             extract_datahub_export_to_countries,
@@ -232,6 +243,7 @@ class TestPopulateDatabase:
         assert extract_datahub_export_to_countries.called is False
         assert extract_datahub_future_interest_countries.called is False
         assert extract_datahub_interactions.called is False
+        assert extract_datahub_interactions_export_country.called is False
         assert extract_datahub_omis.called is False
         assert extract_export_wins.called is False
 
@@ -270,6 +282,7 @@ class TestPopulateDatabase:
         populate_standardised_countries_task,
         extract_datahub_omis,
         extract_datahub_interactions,
+        extract_datahub_interactions_export_country,
         extract_datahub_future_interest_countries,
         extract_datahub_export_country_history,
         extract_datahub_export_to_countries,
@@ -290,6 +303,7 @@ class TestPopulateDatabase:
             populate_standardised_countries_task,
             extract_datahub_omis,
             extract_datahub_interactions,
+            extract_datahub_interactions_export_country,
             extract_datahub_future_interest_countries,
             extract_datahub_export_country_history,
             extract_datahub_export_to_countries,
