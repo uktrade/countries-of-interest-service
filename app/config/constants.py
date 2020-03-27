@@ -25,6 +25,7 @@ class Source(BaseEnum):
 
 
 class Task(BaseEnum):
+    INTERACTIONS_EXPORT_COUNTRY = 'interactions_export_country'
     STANDARDISE_COUNTRIES = 'standardise_countries'
     INTERACTIONS_ANALYSED = 'interactions_analysed'
     COUNTRY_SECTOR_INTEREST = 'country_sector_interest'

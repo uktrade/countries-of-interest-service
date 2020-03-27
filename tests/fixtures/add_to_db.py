@@ -10,6 +10,7 @@ from app.db.models.external import (
     DITCountryTerritoryRegister,
     ExportWins,
     Interactions,
+    InteractionsExportCountry,
 )
 from app.db.models.internal import (
     CountriesAndSectorsInterest,
@@ -93,6 +94,26 @@ def add_datahub_future_interest_countries(app_with_db_module):
             DatahubFutureInterestCountries.get_or_create(
                 id=record.get('id', None), defaults=defaults
             )
+
+    return _method
+
+
+@pytest.fixture(scope='module')
+def add_datahub_interactions_export_country(app_with_db_module):
+    def _method(records):
+        for record in records:
+            defaults = {
+                'country_iso_alpha2_code': record.get('country_iso_alpha2_code', None),
+                'country_name': record.get('country_name', None),
+                'created_on': record.get('created_on', None),
+                'datahub_company_id': record.get('datahub_company_id', None),
+                'datahub_interaction_export_country_id': record.get(
+                    'datahub_interaction_export_country_id', None
+                ),
+                'datahub_interaction_id': record.get('datahub_interaction_id', None),
+                'status': record.get('status', None),
+            }
+            InteractionsExportCountry.get_or_create(id=record.get('id', None), defaults=defaults)
 
     return _method
 
