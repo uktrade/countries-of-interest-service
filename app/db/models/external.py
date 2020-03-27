@@ -147,11 +147,8 @@ class InteractionsExportCountry(BaseModel):
     country_name = _col(_text)
     created_on = _col(_dt)
     datahub_company_id = _col(UUID(as_uuid=True))
-    datahub_interaction_export_country_id = _col(UUID(as_uuid=True))
+    datahub_interaction_export_country_id = _col(UUID(as_uuid=True), unique=True)
     datahub_interaction_id = _col(UUID(as_uuid=True))
     status = _col(_text)
 
-    __table_args__ = (
-        UniqueConstraint(datahub_interaction_export_country_id),
-        {'schema': 'public'},
-    )
+    __table_args__ = ({'schema': 'public'},)
