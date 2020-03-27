@@ -19,6 +19,7 @@ from app.etl.tasks.source_data_extraction import (
     ExtractDatahubExportToCountries,
     ExtractDatahubFutureInterestCountries,
     ExtractDatahubInteractions,
+    ExtractDatahubInteractionsExportCountry,
     ExtractDatahubOmis,
     ExtractExportWins,
 )
@@ -31,6 +32,7 @@ EXTRACTORS_LIST = [
     ExtractDatahubExportCountryHistory,
     ExtractDatahubExportToCountries,
     ExtractDatahubInteractions,
+    ExtractDatahubInteractionsExportCountry,
     ExtractDatahubFutureInterestCountries,
     ExtractDatahubOmis,
     ExtractExportWins,
