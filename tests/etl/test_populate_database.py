@@ -27,9 +27,11 @@ from app.etl.tasks import populate_database
 @patch('app.etl.tasks.datahub_omis_country_sector_interest.Task.__call__')
 @patch('app.etl.tasks.interactions_analysed.Task.__call__')
 @patch('app.etl.tasks.datahub_interaction_country.Task.__call__')
+@patch('app.etl.tasks.datahub_interactions_export_country.Task.__call__')
 class TestPopulateDatabase:
     def _patch_tasks(
         self,
+        populate_datahub_interactions_export_country_task,
         populate_datahub_interaction_country_task,
         populate_interactions_analysed_task,
         populate_datahub_omis_country_sector_interest_task,
@@ -90,6 +92,9 @@ class TestPopulateDatabase:
         populate_datahub_interaction_country_task.return_value = {
             'dataset': 'populate_datahub_interaction_country'
         }
+        populate_datahub_interactions_export_country_task.return_value = {
+            'dataset': 'populate_datahub_interactions_export_country'
+        }
         populate_interactions_analysed_task.return_value = {
             'dataset': 'populate_interactions_analysed'
         }
@@ -99,6 +104,7 @@ class TestPopulateDatabase:
     def test_tasks_are_run(
         self,
         execute_statement,
+        populate_datahub_interactions_export_country_task,
         populate_datahub_interaction_country_task,
         populate_interactions_analysed_task,
         populate_datahub_omis_country_sector_interest_task,
@@ -121,6 +127,7 @@ class TestPopulateDatabase:
     ):
         execute_statement.return_value = None
         self._patch_tasks(
+            populate_datahub_interactions_export_country_task,
             populate_datahub_interaction_country_task,
             populate_interactions_analysed_task,
             populate_datahub_omis_country_sector_interest_task,
@@ -159,6 +166,7 @@ class TestPopulateDatabase:
         assert populate_datahub_country_export_task.called is True
         assert populate_datahub_omis_country_sector_interest_task.called is True
         assert populate_datahub_interaction_country_task.called is True
+        assert populate_datahub_interactions_export_country_task.called is True
         assert populate_export_wins_task.called is True
         assert populate_interactions_analysed_task.called is True
         assert populate_company_matching_task.called is True
@@ -182,6 +190,7 @@ class TestPopulateDatabase:
                 {'dataset': 'populate_datahub_omis_country_sector_interest'},
                 {'dataset': 'populate_company_matching'},
                 {'dataset': 'populate_datahub_interaction_country'},
+                {'dataset': 'populate_datahub_interactions_export_country'},
                 {'dataset': 'populate_export_wins'},
             ]
         }
@@ -190,6 +199,7 @@ class TestPopulateDatabase:
     def test_only_specified_tasks_are_run(
         self,
         execute_statement,
+        populate_datahub_interactions_export_country_task,
         populate_datahub_interaction_country_task,
         populate_interactions_analysed_task,
         populate_datahub_omis_country_sector_interest_task,
@@ -212,6 +222,7 @@ class TestPopulateDatabase:
     ):
         execute_statement.return_value = None
         self._patch_tasks(
+            populate_datahub_interactions_export_country_task,
             populate_datahub_interaction_country_task,
             populate_interactions_analysed_task,
             populate_datahub_omis_country_sector_interest_task,
@@ -252,6 +263,7 @@ class TestPopulateDatabase:
         assert populate_datahub_country_export_task.called is True
         assert populate_datahub_omis_country_sector_interest_task.called is True
         assert populate_datahub_interaction_country_task.called is True
+        assert populate_datahub_interactions_export_country_task.called is True
         assert populate_export_wins_task.called is True
         assert populate_interactions_analysed_task.called is False
         assert populate_company_matching_task.called is True
@@ -264,6 +276,7 @@ class TestPopulateDatabase:
                 {'dataset': 'populate_datahub_omis_country_sector_interest'},
                 {'dataset': 'populate_company_matching'},
                 {'dataset': 'populate_datahub_interaction_country'},
+                {'dataset': 'populate_datahub_interactions_export_country'},
                 {'dataset': 'populate_export_wins'},
             ]
         }
@@ -272,6 +285,7 @@ class TestPopulateDatabase:
     def test_updates_task_status_to_success(
         self,
         mock_datetime,
+        populate_datahub_interactions_export_country_task,
         populate_datahub_interaction_country_task,
         populate_interactions_analysed_task,
         populate_datahub_omis_country_sector_interest_task,
@@ -293,6 +307,7 @@ class TestPopulateDatabase:
         app_with_db,
     ):
         self._patch_tasks(
+            populate_datahub_interactions_export_country_task,
             populate_datahub_interaction_country_task,
             populate_interactions_analysed_task,
             populate_datahub_omis_country_sector_interest_task,
