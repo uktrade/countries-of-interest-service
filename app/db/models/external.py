@@ -41,6 +41,21 @@ class DatahubCompany(BaseModel):
     modified_on = _col(_dt)
 
 
+class DatahubCompanyExportCountry(BaseModel):
+
+    __tablename__ = 'datahub_company_export_country'
+    __table_args__ = {'schema': 'public'}
+
+    id = _col(_int, primary_key=True, autoincrement=True)
+    country = _col(_text)
+    country_iso_alpha2_code = _col(_text)
+    created_on = _col(_dt)
+    datahub_company_id = _col(UUID(as_uuid=True))
+    company_export_country_id = _col(UUID(as_uuid=True))
+    modified_on = _col(_dt)
+    status = _col(_text)
+
+
 class DatahubContact(BaseModel):
 
     __tablename__ = 'datahub_contact'

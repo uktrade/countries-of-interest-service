@@ -15,6 +15,7 @@ class Source(BaseEnum):
     COUNTRIES_AND_TERRITORIES = 'countries_and_territories'
     DATAHUB_CONTACT = 'contact'
     DATAHUB_COMPANY = 'company'
+    DATAHUB_COMPANY_EXPORT_COUNTRY = 'company_export_country'
     DATAHUB_EXPORT_COUNTRY_HISTORY = 'export_country_history'
     DATAHUB_EXPORT_TO_COUNTRIES = 'export_countries'
     DATAHUB_INTERACTIONS = 'interactions'

@@ -121,6 +121,53 @@ class ExtractDatahubCompanyDataset(SourceDataExtractor):
     unique_key = 'datahub_company_id'
 
 
+class ExtractDatahubCompanyExportCountry(SourceDataExtractor):
+    name = Source.DATAHUB_COMPANY_EXPORT_COUNTRY.value
+    dataset_id_config_key = 'datahub_company_export_country_dataset_id'
+    mapping = {
+        'company_id': 'datahub_company_id',
+        'country_name': 'country',
+        'country_iso_alpha2_code': 'country_iso_alpha2_code',
+        'created_on': 'created_on',
+        'id': 'company_export_country_id',
+        'modified_on': 'modified_on',
+        'status': 'status',
+    }
+    model = models.DatahubCompanyExportCountry
+    source_table_id_config_key = 'datahub_company_export_country_source_table_id'
+    stub_data = {
+        'headers': [
+            'company_id',
+            'country_name',
+            'country_iso_alpha2_code',
+            'created_on',
+            'id',
+            'modified_on',
+            'status',
+        ],
+        'values': [
+            [
+                'c31e4492-1f16-48a2-8c5e-8c0334d959a3',
+                'Argentina',
+                'AR',
+                '2020-01-01 01:00:00',
+                '41a83926-b771-4a33-b3d2-e944fa35b366',
+                '2020-01-01 02:00:00',
+                'currently_exporting',
+            ],
+            [
+                'd0af8e52-ff34-4088-98e3-d2d22cd250ae',
+                'Georgia',
+                'GE',
+                '2020-01-02 01:00:00',
+                '6b9c0565-d007-48ae-888c-77638633b434',
+                '2020-01-02 02:00:00',
+                'future_interest',
+            ],
+        ],
+    }
+
+
 class ExtractDatahubContactDataset(SourceDataExtractor):
     name = Source.DATAHUB_CONTACT.value
     dataset_id_config_key = 'datahub_contacts_dataset_id'
@@ -455,6 +502,7 @@ def populate_table(data, model, extractor_name, mapping, unique_key, overwrite=T
         update_statement = insert_stmt.on_conflict_do_update(
             index_elements=[unique_key], set_=update_columns
         )
+
         status = connection.execute(update_statement)
         n_rows = int(status.rowcount)
         transaction.commit()
