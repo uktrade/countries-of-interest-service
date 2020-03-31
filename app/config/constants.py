@@ -30,6 +30,7 @@ class Task(BaseEnum):
     STANDARDISE_COUNTRIES = 'standardise_countries'
     INTERACTIONS_ANALYSED = 'interactions_analysed'
     COUNTRY_SECTOR_INTEREST = 'country_sector_interest'
+    COMPANY_EXPORT_COUNTRY = 'company_export_country'
     COMPANY_MATCHING = 'company_matching'
     EXPORT_COUNTRIES = 'export_countries'
     COUNTRIES_OF_INTEREST = 'countries_of_interest'
