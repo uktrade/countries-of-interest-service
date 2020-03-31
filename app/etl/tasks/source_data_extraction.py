@@ -502,7 +502,6 @@ def populate_table(data, model, extractor_name, mapping, unique_key, overwrite=T
         update_statement = insert_stmt.on_conflict_do_update(
             index_elements=[unique_key], set_=update_columns
         )
-
         status = connection.execute(update_statement)
         n_rows = int(status.rowcount)
         transaction.commit()
