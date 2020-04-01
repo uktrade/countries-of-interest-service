@@ -20,33 +20,35 @@ from app.etl.tasks import populate_database
 @patch('app.etl.tasks.source_data_extraction.' 'ExtractDatahubInteractionsExportCountry.__call__')
 @patch('app.etl.tasks.source_data_extraction.' 'ExtractDatahubInteractions.__call__')
 @patch('app.etl.tasks.source_data_extraction.ExtractDatahubOmis.__call__')
-@patch('app.etl.tasks.country_standardisation.PopulateStandardisedCountriesTask.__call__')
-@patch('app.etl.tasks.export_wins_country.Task.__call__')
 @patch('app.etl.tasks.company_matching.Task.__call__')
-@patch('app.etl.tasks.datahub_country_interest.Task.__call__')
+@patch('app.etl.tasks.country_standardisation.PopulateStandardisedCountriesTask.__call__')
+@patch('app.etl.tasks.datahub_company_export_country.Task.__call__')
 @patch('app.etl.tasks.datahub_country_export.Task.__call__')
-@patch('app.etl.tasks.datahub_omis_country_sector_interest.Task.__call__')
-@patch('app.etl.tasks.interactions_analysed.Task.__call__')
+@patch('app.etl.tasks.datahub_country_interest.Task.__call__')
 @patch('app.etl.tasks.datahub_interaction_country.Task.__call__')
 @patch('app.etl.tasks.datahub_interactions_export_country.Task.__call__')
+@patch('app.etl.tasks.datahub_omis_country_sector_interest.Task.__call__')
+@patch('app.etl.tasks.export_wins_country.Task.__call__')
+@patch('app.etl.tasks.interactions_analysed.Task.__call__')
 class TestPopulateDatabase:
     def _patch_tasks(
         self,
+        populate_interactions_analysed_task,
+        populate_export_wins_task,
+        populate_datahub_omis_country_sector_interest_task,
         populate_datahub_interactions_export_country_task,
         populate_datahub_interaction_country_task,
-        populate_interactions_analysed_task,
-        populate_datahub_omis_country_sector_interest_task,
-        populate_datahub_country_export_task,
         populate_datahub_country_interest_task,
-        populate_export_wins_task,
-        populate_company_matching_task,
+        populate_datahub_country_export_task,
+        populate_datahub_company_export_country_task,
         populate_standardised_countries_task,
+        populate_company_matching_task,
         extract_datahub_omis,
         extract_datahub_interactions,
         extract_datahub_interactions_export_country,
         extract_datahub_future_interest_countries,
-        extract_datahub_export_country_history,
         extract_datahub_export_to_countries,
+        extract_datahub_export_country_history,
         extract_datahub_contact_dataset,
         extract_datahub_company_export_country,
         extract_datahub_company_dataset,
@@ -82,6 +84,9 @@ class TestPopulateDatabase:
             'dataset': 'populate_standardised_countries'
         }
         populate_company_matching_task.return_value = {'dataset': 'populate_company_matching'}
+        populate_datahub_company_export_country_task.return_value = {
+            'dataset': 'populate_datahub_company_export_country'
+        }
         populate_datahub_country_interest_task.return_value = {
             'dataset': 'populate_datahub_country_interest'
         }
@@ -110,23 +115,24 @@ class TestPopulateDatabase:
     def test_tasks_are_run(
         self,
         execute_statement,
+        populate_interactions_analysed_task,
+        populate_export_wins_task,
+        populate_datahub_omis_country_sector_interest_task,
         populate_datahub_interactions_export_country_task,
         populate_datahub_interaction_country_task,
-        populate_interactions_analysed_task,
-        populate_datahub_omis_country_sector_interest_task,
-        populate_datahub_country_export_task,
         populate_datahub_country_interest_task,
-        populate_export_wins_task,
-        populate_company_matching_task,
+        populate_datahub_country_export_task,
+        populate_datahub_company_export_country_task,
         populate_standardised_countries_task,
+        populate_company_matching_task,
         extract_datahub_omis,
         extract_datahub_interactions,
         extract_datahub_interactions_export_country,
         extract_datahub_future_interest_countries,
-        extract_datahub_export_country_history,
         extract_datahub_export_to_countries,
+        extract_datahub_export_country_history,
         extract_datahub_contact_dataset,
-        extract_datahub_company_export_country_dataset,
+        extract_datahub_company_export_country,
         extract_datahub_company_dataset,
         extract_countries_and_territories_reference_dataset,
         extract_export_wins,
@@ -134,23 +140,24 @@ class TestPopulateDatabase:
     ):
         execute_statement.return_value = None
         self._patch_tasks(
+            populate_interactions_analysed_task,
+            populate_export_wins_task,
+            populate_datahub_omis_country_sector_interest_task,
             populate_datahub_interactions_export_country_task,
             populate_datahub_interaction_country_task,
-            populate_interactions_analysed_task,
-            populate_datahub_omis_country_sector_interest_task,
-            populate_datahub_country_export_task,
             populate_datahub_country_interest_task,
-            populate_export_wins_task,
-            populate_company_matching_task,
+            populate_datahub_country_export_task,
+            populate_datahub_company_export_country_task,
             populate_standardised_countries_task,
+            populate_company_matching_task,
             extract_datahub_omis,
             extract_datahub_interactions,
             extract_datahub_interactions_export_country,
             extract_datahub_future_interest_countries,
-            extract_datahub_export_country_history,
             extract_datahub_export_to_countries,
+            extract_datahub_export_country_history,
             extract_datahub_contact_dataset,
-            extract_datahub_company_export_country_dataset,
+            extract_datahub_company_export_country,
             extract_datahub_company_dataset,
             extract_countries_and_territories_reference_dataset,
             extract_export_wins,
@@ -160,7 +167,7 @@ class TestPopulateDatabase:
 
         assert extract_countries_and_territories_reference_dataset.called is True
         assert extract_datahub_company_dataset.called is True
-        assert extract_datahub_company_export_country_dataset.called is True
+        assert extract_datahub_company_export_country.called is True
         assert extract_datahub_contact_dataset.called is True
         assert extract_datahub_export_country_history.called is True
         assert extract_datahub_export_to_countries.called is True
@@ -178,6 +185,7 @@ class TestPopulateDatabase:
         assert populate_datahub_interactions_export_country_task.called is True
         assert populate_export_wins_task.called is True
         assert populate_interactions_analysed_task.called is True
+        assert populate_datahub_company_export_country_task.called is True
         assert populate_company_matching_task.called is True
 
         assert output == {
@@ -186,8 +194,8 @@ class TestPopulateDatabase:
                 {'dataset': 'datahub_company_dataset'},
                 {'dataset': 'datahub_company_export_country'},
                 {'dataset': 'datahub_contact_dataset'},
-                {'dataset': 'datahub_export_to_countries'},
                 {'dataset': 'datahub_export_country_history'},
+                {'dataset': 'datahub_export_to_countries'},
                 {'dataset': 'datahub_interaction'},
                 {'dataset': 'datahub_interactions_export_country'},
                 {'dataset': 'datahub_future_interest_countries'},
@@ -195,13 +203,14 @@ class TestPopulateDatabase:
                 {'dataset': 'export_wins'},
                 {'dataset': 'populate_standardised_countries'},
                 {'dataset': 'populate_interactions_analysed'},
+                {'dataset': 'populate_datahub_company_export_country'},
                 {'dataset': 'populate_datahub_country_export'},
                 {'dataset': 'populate_datahub_country_interest'},
                 {'dataset': 'populate_datahub_omis_country_sector_interest'},
-                {'dataset': 'populate_company_matching'},
+                {'dataset': 'populate_export_wins'},
                 {'dataset': 'populate_datahub_interaction_country'},
                 {'dataset': 'populate_datahub_interactions_export_country'},
-                {'dataset': 'populate_export_wins'},
+                {'dataset': 'populate_company_matching'},
             ]
         }
 
@@ -209,23 +218,24 @@ class TestPopulateDatabase:
     def test_only_specified_tasks_are_run(
         self,
         execute_statement,
+        populate_interactions_analysed_task,
+        populate_export_wins_task,
+        populate_datahub_omis_country_sector_interest_task,
         populate_datahub_interactions_export_country_task,
         populate_datahub_interaction_country_task,
-        populate_interactions_analysed_task,
-        populate_datahub_omis_country_sector_interest_task,
-        populate_datahub_country_export_task,
         populate_datahub_country_interest_task,
-        populate_export_wins_task,
-        populate_company_matching_task,
+        populate_datahub_country_export_task,
+        populate_datahub_company_export_country_task,
         populate_standardised_countries_task,
+        populate_company_matching_task,
         extract_datahub_omis,
         extract_datahub_interactions,
         extract_datahub_interactions_export_country,
         extract_datahub_future_interest_countries,
-        extract_datahub_export_country_history,
         extract_datahub_export_to_countries,
+        extract_datahub_export_country_history,
         extract_datahub_contact_dataset,
-        extract_datahub_company_export_country_dataset,
+        extract_datahub_company_export_country,
         extract_datahub_company_dataset,
         extract_countries_and_territories_reference_dataset,
         extract_export_wins,
@@ -233,23 +243,24 @@ class TestPopulateDatabase:
     ):
         execute_statement.return_value = None
         self._patch_tasks(
+            populate_interactions_analysed_task,
+            populate_export_wins_task,
+            populate_datahub_omis_country_sector_interest_task,
             populate_datahub_interactions_export_country_task,
             populate_datahub_interaction_country_task,
-            populate_interactions_analysed_task,
-            populate_datahub_omis_country_sector_interest_task,
-            populate_datahub_country_export_task,
             populate_datahub_country_interest_task,
-            populate_export_wins_task,
-            populate_company_matching_task,
+            populate_datahub_country_export_task,
+            populate_datahub_company_export_country_task,
             populate_standardised_countries_task,
+            populate_company_matching_task,
             extract_datahub_omis,
             extract_datahub_interactions,
             extract_datahub_interactions_export_country,
             extract_datahub_future_interest_countries,
-            extract_datahub_export_country_history,
             extract_datahub_export_to_countries,
+            extract_datahub_export_country_history,
             extract_datahub_contact_dataset,
-            extract_datahub_company_export_country_dataset,
+            extract_datahub_company_export_country,
             extract_datahub_company_dataset,
             extract_countries_and_territories_reference_dataset,
             extract_export_wins,
@@ -262,7 +273,7 @@ class TestPopulateDatabase:
         assert extract_countries_and_territories_reference_dataset.called is False
         assert extract_datahub_contact_dataset.called is False
         assert extract_datahub_company_dataset.called is True
-        assert extract_datahub_company_export_country_dataset.called is False
+        assert extract_datahub_company_export_country.called is False
         assert extract_datahub_export_country_history.called is False
         assert extract_datahub_export_to_countries.called is False
         assert extract_datahub_future_interest_countries.called is False
@@ -279,18 +290,20 @@ class TestPopulateDatabase:
         assert populate_datahub_interactions_export_country_task.called is True
         assert populate_export_wins_task.called is True
         assert populate_interactions_analysed_task.called is False
+        assert populate_datahub_company_export_country_task.called is True
         assert populate_company_matching_task.called is True
 
         assert output == {
             'output': [
                 {'dataset': 'datahub_company_dataset'},
+                {'dataset': 'populate_datahub_company_export_country'},
                 {'dataset': 'populate_datahub_country_export'},
                 {'dataset': 'populate_datahub_country_interest'},
                 {'dataset': 'populate_datahub_omis_country_sector_interest'},
-                {'dataset': 'populate_company_matching'},
+                {'dataset': 'populate_export_wins'},
                 {'dataset': 'populate_datahub_interaction_country'},
                 {'dataset': 'populate_datahub_interactions_export_country'},
-                {'dataset': 'populate_export_wins'},
+                {'dataset': 'populate_company_matching'},
             ]
         }
 
@@ -298,46 +311,48 @@ class TestPopulateDatabase:
     def test_updates_task_status_to_success(
         self,
         mock_datetime,
+        populate_interactions_analysed_task,
+        populate_export_wins_task,
+        populate_datahub_omis_country_sector_interest_task,
         populate_datahub_interactions_export_country_task,
         populate_datahub_interaction_country_task,
-        populate_interactions_analysed_task,
-        populate_datahub_omis_country_sector_interest_task,
-        populate_datahub_country_export_task,
         populate_datahub_country_interest_task,
-        populate_export_wins_task,
-        populate_company_matching_task,
+        populate_datahub_country_export_task,
+        populate_datahub_company_export_country_task,
         populate_standardised_countries_task,
+        populate_company_matching_task,
         extract_datahub_omis,
         extract_datahub_interactions,
         extract_datahub_interactions_export_country,
         extract_datahub_future_interest_countries,
-        extract_datahub_export_country_history,
         extract_datahub_export_to_countries,
+        extract_datahub_export_country_history,
         extract_datahub_contact_dataset,
-        extract_datahub_company_export_country_dataset,
+        extract_datahub_company_export_country,
         extract_datahub_company_dataset,
         extract_countries_and_territories_reference_dataset,
         extract_export_wins,
         app_with_db,
     ):
         self._patch_tasks(
+            populate_interactions_analysed_task,
+            populate_export_wins_task,
+            populate_datahub_omis_country_sector_interest_task,
             populate_datahub_interactions_export_country_task,
             populate_datahub_interaction_country_task,
-            populate_interactions_analysed_task,
-            populate_datahub_omis_country_sector_interest_task,
-            populate_datahub_country_export_task,
             populate_datahub_country_interest_task,
-            populate_export_wins_task,
-            populate_company_matching_task,
+            populate_datahub_country_export_task,
+            populate_datahub_company_export_country_task,
             populate_standardised_countries_task,
+            populate_company_matching_task,
             extract_datahub_omis,
             extract_datahub_interactions,
             extract_datahub_interactions_export_country,
             extract_datahub_future_interest_countries,
-            extract_datahub_export_country_history,
             extract_datahub_export_to_countries,
+            extract_datahub_export_country_history,
             extract_datahub_contact_dataset,
-            extract_datahub_company_export_country_dataset,
+            extract_datahub_company_export_country,
             extract_datahub_company_dataset,
             extract_countries_and_territories_reference_dataset,
             extract_export_wins,
