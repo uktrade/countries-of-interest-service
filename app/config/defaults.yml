@@ -33,7 +33,7 @@ dataworkspace:
   datahub_interactions_dataset_id: $ENV{DATAHUB_INTERACTIONS_DATASET_ID, }
   datahub_interactions_source_table_id: $ENV{DATAHUB_INTERACTIONS_SOURCE_TABLE_ID, }
   datahub_interactions_export_country_dataset_id: $ENV{DATAHUB_INTERACTIONS_EXPORT_COUNTRY_DATASET_ID, }
-  datahub_interactions_export_countrysource_table_id: $ENV{DATAHUB_INTERACTIONS_EXPORT_COUNTRY_SOURCE_TABLE_ID, }
+  datahub_interactions_export_country_source_table_id: $ENV{DATAHUB_INTERACTIONS_EXPORT_COUNTRY_SOURCE_TABLE_ID, }
   datahub_omis_dataset_id: $ENV{DATAHUB_OMIS_DATASET_ID, }
   datahub_omis_source_table_id: $ENV{DATAHUB_OMIS_SOURCE_TABLE_ID, }
   export_wins_dataset_id: $ENV{EXPORT_WINS_DATASET_ID, }
