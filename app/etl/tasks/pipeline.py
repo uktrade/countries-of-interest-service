@@ -17,6 +17,7 @@ from app.etl.tasks.interactions_analysed import Task as PopulateAnalysedInteract
 from app.etl.tasks.source_data_extraction import (
     ExtractCountriesAndTerritoriesReferenceDataset,
     ExtractDatahubCompanyDataset,
+    ExtractDatahubCompanyExportCountry,
     ExtractDatahubContactDataset,
     ExtractDatahubExportCountryHistory,
     ExtractDatahubExportToCountries,
@@ -31,6 +32,7 @@ from app.etl.tasks.source_data_extraction import (
 EXTRACTORS_LIST = [
     ExtractCountriesAndTerritoriesReferenceDataset,
     ExtractDatahubCompanyDataset,
+    ExtractDatahubCompanyExportCountry,
     ExtractDatahubContactDataset,
     ExtractDatahubExportCountryHistory,
     ExtractDatahubExportToCountries,

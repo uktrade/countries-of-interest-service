@@ -156,6 +156,67 @@ class TestExtractDatahubCompany(SourceDataExtractBaseTestCase):
     extractor = source_data_extraction.ExtractDatahubCompanyDataset
 
 
+class TestExtractDatahubCompanyExportCountry(SourceDataExtractBaseTestCase):
+
+    __test__ = True
+    dataset_id_config_key = 'datahub_company_export_country_dataset_id'
+    expected_data = [
+        {
+            'datahub_company_id': 'c31e4492-1f16-48a2-8c5e-8c0334d959a3',
+            'country': 'Canada',
+            'country_iso_alpha2_code': 'CA',
+            'created_on': '2020-01-01 01:00:00',
+            'company_export_country_id': '41a83926-b771-4a33-b3d2-e944fa35b366',
+            'modified_on': '2020-01-01 02:00:00',
+            'status': 'currently_exporting',
+        },
+        {
+            'datahub_company_id': 'd0af8e52-ff34-4088-98e3-d2d22cd250ae',
+            'country': 'Georgia',
+            'country_iso_alpha2_code': 'GE',
+            'created_on': '2020-01-02 01:00:00',
+            'company_export_country_id': '6b9c0565-d007-48ae-888c-77638633b434',
+            'modified_on': '2020-01-02 02:00:00',
+            'status': 'future_interest',
+        },
+    ]
+    item_pk = 'company_export_country_id'
+    source_data = {
+        'headers': [
+            'company_id',
+            'country_name',
+            'country_iso_alpha2_code',
+            'created_on',
+            'id',
+            'modified_on',
+            'status',
+        ],
+        'next': None,
+        'values': [
+            [
+                'c31e4492-1f16-48a2-8c5e-8c0334d959a3',
+                'Canada',
+                'CA',
+                '2020-01-01 01:00:00',
+                '41a83926-b771-4a33-b3d2-e944fa35b366',
+                '2020-01-01 02:00:00',
+                'currently_exporting',
+            ],
+            [
+                'd0af8e52-ff34-4088-98e3-d2d22cd250ae',
+                'Georgia',
+                'GE',
+                '2020-01-02 01:00:00',
+                '6b9c0565-d007-48ae-888c-77638633b434',
+                '2020-01-02 02:00:00',
+                'future_interest',
+            ],
+        ],
+    }
+    source_table_id_config_key = 'datahub_company_export_country_source_table_id'
+    extractor = source_data_extraction.ExtractDatahubCompanyExportCountry
+
+
 class TestExtractDatahubExportCountries(SourceDataExtractBaseTestCase):
     __test__ = True
     dataset_id_config_key = 'datahub_export_countries_dataset_id'
