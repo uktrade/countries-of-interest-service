@@ -184,7 +184,7 @@ class TestExtractDatahubCompanyExportCountry(SourceDataExtractBaseTestCase):
     source_data = {
         'headers': [
             'company_id',
-            'country_name',
+            'country',
             'country_iso_alpha2_code',
             'created_on',
             'id',
