@@ -126,7 +126,7 @@ class ExtractDatahubCompanyExportCountry(SourceDataExtractor):
     dataset_id_config_key = 'datahub_company_export_country_dataset_id'
     mapping = {
         'company_id': 'datahub_company_id',
-        'country_name': 'country',
+        'country': 'country',
         'country_iso_alpha2_code': 'country_iso_alpha2_code',
         'created_on': 'created_on',
         'id': 'company_export_country_id',
@@ -138,7 +138,7 @@ class ExtractDatahubCompanyExportCountry(SourceDataExtractor):
     stub_data = {
         'headers': [
             'company_id',
-            'country_name',
+            'country',
             'country_iso_alpha2_code',
             'created_on',
             'id',
