@@ -19,7 +19,7 @@ pip-tools==4.5.1
 psycopg2==2.8.4
 pycountry==19.8.18
 pytest-cov==2.8.1
-pytest-mock==2.0.0
+pytest-mock==3.0.0
 pytest==5.4.1
 python-dotenv==0.12.0
 pyyaml==5.3.1
