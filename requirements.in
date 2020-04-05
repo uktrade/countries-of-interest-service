@@ -7,7 +7,7 @@ flask-oauthlib==0.9.5
 flask-security==3.0.0
 flask-shell-ipython==0.4.1
 flask-sqlalchemy==2.4.1
-flask==1.1.1
+flask==1.1.2
 freezegun==0.3.15
 fuzzywuzzy==0.18.0
 gunicorn==20.*
