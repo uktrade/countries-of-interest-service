@@ -16,7 +16,7 @@ mohawk==1.1.0
 numpy==1.*
 pandas==1.0.3
 pip-tools==4.5.1
-psycopg2==2.8.4
+psycopg2==2.8.5
 pycountry==19.8.18
 pytest-cov==2.8.1
 pytest-mock==2.0.0
