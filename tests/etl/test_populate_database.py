@@ -160,11 +160,6 @@ class TestPopulateDatabase:
         assert populate_datahub_company_export_country_task.called is True
         assert populate_company_matching_task.called is True
 
-        print('output:')
-        print(output)
-
-        print
-        print('expected:')
         expected = {
             'output': [
                 {'dataset': 'countries_and_territories_reference_dataset'},
@@ -187,7 +182,6 @@ class TestPopulateDatabase:
                 {'dataset': 'populate_company_matching'},
             ]
         }
-        print(expected)
 
         assert output == expected
 
