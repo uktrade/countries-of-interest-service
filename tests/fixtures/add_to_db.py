@@ -4,9 +4,7 @@ from app.db.models.external import (
     DatahubCompany,
     DatahubCompanyExportCountry,
     DatahubContact,
-    DatahubExportCountryHistory,
-    DatahubExportToCountries,
-    DatahubFutureInterestCountries,
+    DatahubCompanyExportCountryHistory,
     DatahubOmis,
     DITCountryTerritoryRegister,
     ExportWins,
@@ -56,10 +54,10 @@ def add_datahub_company_export_country(app_with_db_module):
             defaults = {
                 'id': record.get('id', None),
                 'company_export_country_id': record.get('company_export_country_id', None),
+                'company_id': record.get('datahub_company_id', None),
                 'country': record.get('country', None),
                 'country_iso_alpha2_code': record.get('country_iso_alpha2_code', None),
                 'created_on': record.get('created_on', None),
-                'datahub_company_id': record.get('datahub_company_id', None),
                 'modified_on': record.get('modified_on', None),
                 'status': record.get('status', None),
             }
@@ -69,22 +67,7 @@ def add_datahub_company_export_country(app_with_db_module):
 
 
 @pytest.fixture(scope='module')
-def add_datahub_export_to_countries(app_with_db_module):
-    def _method(records):
-        for record in records:
-            defaults = {
-                'company_id': record.get('company_id', None),
-                'country': record.get('country', None),
-                'country_iso_alpha2_code': record.get('country_iso_alpha2_code', None),
-                'id': record.get('id', None),
-            }
-            DatahubExportToCountries.get_or_create(id=record.get('id', None), defaults=defaults)
-
-    return _method
-
-
-@pytest.fixture(scope='module')
-def add_datahub_export_country_history(app_with_db_module):
+def add_datahub_company_export_country_history(app_with_db_module):
     def _method(records):
         for record in records:
             defaults = {
@@ -96,24 +79,7 @@ def add_datahub_export_country_history(app_with_db_module):
                 'history_type': record.get('history_type', None),
                 'status': record.get('status', None),
             }
-            DatahubExportCountryHistory.get_or_create(id=record.get('id', None), defaults=defaults)
-
-    return _method
-
-
-@pytest.fixture(scope='module')
-def add_datahub_future_interest_countries(app_with_db_module):
-    def _method(records):
-        for record in records:
-            defaults = {
-                'company_id': record.get('company_id', None),
-                'country': record.get('country', None),
-                'country_iso_alpha2_code': record.get('country_iso_alpha2_code', None),
-                'id': record.get('id', None),
-            }
-            DatahubFutureInterestCountries.get_or_create(
-                id=record.get('id', None), defaults=defaults
-            )
+            DatahubCompanyExportCountryHistory.get_or_create(id=record.get('id', None), defaults=defaults)
 
     return _method
 

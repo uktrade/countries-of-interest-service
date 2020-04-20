@@ -22,10 +22,10 @@ dataworkspace:
   datahub_companies_source_table_id: $ENV{DATAHUB_COMPANIES_SOURCE_TABLE_ID, }
   datahub_company_export_country_dataset_id: $ENV{DATAHUB_COMPANY_EXPORT_COUNTRY_DATASET_ID, }
   datahub_company_export_country_source_table_id: $ENV{DATAHUB_COMPANY_EXPORT_COUNTRY_SOURCE_TABLE_ID, }
+  datahub_company_export_country_history_dataset_id: $ENV{DATAHUB_COMPANY_EXPORT_COUNTRY_HISTORY_DATASET_ID, }
+  datahub_company_export_country_history_source_table_id: $ENV{DATAHUB_COMPANY_EXPORT_COUNTRY_HISTORY_SOURCE_TABLE_ID, }
   datahub_contacts_dataset_id: $ENV{DATAHUB_CONTACTS_DATASET_ID, }
   datahub_contacts_source_table_id: $ENV{DATAHUB_CONTACTS_SOURCE_TABLE_ID, }
-  datahub_export_country_history_dataset_id: $ENV{DATAHUB_EXPORT_COUNTRY_HISTORY_DATASET_ID, }
-  datahub_export_country_history_source_table_id: $ENV{DATAHUB_EXPORT_COUNTRY_HISTORY_SOURCE_TABLE_ID, }
   datahub_export_countries_dataset_id: $ENV{DATAHUB_EXPORT_COUNTRIES_DATASET_ID, }
   datahub_export_countries_source_table_id: $ENV{DATAHUB_EXPORT_COUNTRIES_SOURCE_TABLE_ID, }
   datahub_future_interest_countries_dataset_id: $ENV{DATAHUB_FUTURE_INTEREST_COUNTRIES_DATASET_ID, }

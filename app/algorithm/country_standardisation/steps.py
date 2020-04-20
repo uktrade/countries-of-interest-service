@@ -6,8 +6,8 @@ from fuzzywuzzy import fuzz, process
 from app.db import db_utils
 from app.db.db_utils import dsv_buffer_to_table
 from app.db.models.external import (
-    DatahubExportToCountries,
-    DatahubFutureInterestCountries,
+    DatahubCompanyExportCountry,
+    DatahubCompanyExportCountryHistory,
     DatahubOmis,
     DITCountryTerritoryRegister,
     ExportWins,
@@ -21,10 +21,10 @@ def extract_interested_exported_countries():
     with countries as (
         select distinct country from (
             select trim(country) as country
-            from {DatahubExportToCountries.get_fq_table_name()}
+            from {DatahubCompanyExportCountry.get_fq_table_name()}
             union
             select trim(country) as country
-            from {DatahubFutureInterestCountries.get_fq_table_name()}
+            from {DatahubCompanyExportCountryHistory.get_fq_table_name()}
             union
             select trim(market) as country
             from {DatahubOmis.get_fq_table_name()}
