@@ -3,8 +3,8 @@ import pytest
 from app.db.models.external import (
     DatahubCompany,
     DatahubCompanyExportCountry,
-    DatahubContact,
     DatahubCompanyExportCountryHistory,
+    DatahubContact,
     DatahubOmis,
     DITCountryTerritoryRegister,
     ExportWins,
@@ -79,7 +79,9 @@ def add_datahub_company_export_country_history(app_with_db_module):
                 'history_type': record.get('history_type', None),
                 'status': record.get('status', None),
             }
-            DatahubCompanyExportCountryHistory.get_or_create(id=record.get('id', None), defaults=defaults)
+            DatahubCompanyExportCountryHistory.get_or_create(
+                id=record.get('id', None), defaults=defaults
+            )
 
     return _method
 

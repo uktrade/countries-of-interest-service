@@ -19,7 +19,7 @@ def test(
                 'country_iso_alpha2_code': 'UK',
                 'created_on': '2020-01-01',
                 'modified_on': '2020-01-02',
-                'status': 'currently_exporting'
+                'status': 'currently_exporting',
             },
         ]
     )

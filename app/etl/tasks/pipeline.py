@@ -6,7 +6,9 @@ from app.etl.tasks.country_standardisation import PopulateStandardisedCountriesT
 from app.etl.tasks.datahub_company_export_country import (
     Task as PopulateDatahubCompanyExportCountryTask,
 )
-from app.etl.tasks.datahub_company_export_country_history import Task as PopulateDatahubCompanyExportCountryHistoryTask
+from app.etl.tasks.datahub_company_export_country_history import (
+    Task as PopulateDatahubCompanyExportCountryHistoryTask,
+)
 from app.etl.tasks.datahub_interaction_country import Task as PopulateMentionedInInteractionsTask
 from app.etl.tasks.datahub_interactions_export_country import (
     Task as PopulateDatahubInteractionsExportCountryTask,

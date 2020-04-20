@@ -20,7 +20,7 @@ def test_country_mapping(
                 'country_iso_alpha2_code': 'AF',
                 'created_on': '2020-01-01',
                 'modified_on': '2020-01-02',
-                'status': 'currently_exporting'
+                'status': 'currently_exporting',
             },
             {
                 'company_export_country_id': '8272b09f-f778-417f-a613-daae5c8a50c3',
@@ -29,7 +29,7 @@ def test_country_mapping(
                 'country_iso_alpha2_code': 'AN',
                 'created_on': '2020-02-01',
                 'modified_on': '2020-02-02',
-                'status': 'future_interest'
+                'status': 'future_interest',
             },
         ]
     )
@@ -47,7 +47,7 @@ def test_country_mapping(
             }
         ]
     )
-    
+
     add_datahub_omis(
         [
             {
@@ -59,7 +59,7 @@ def test_country_mapping(
             }
         ]
     )
-    
+
     add_export_wins(
         [
             {
