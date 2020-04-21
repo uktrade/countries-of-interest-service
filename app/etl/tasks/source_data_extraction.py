@@ -417,8 +417,6 @@ def get_hawk_headers(
     if https is False:
         # todo: ask data workspace to fix the https/http x-forwarded-for
         url = url.replace('https', 'http')
-    # strip query string
-    url = url.split('?')[0]
     credentials = {'id': client_id, 'key': client_key, 'algorithm': 'sha256'}
 
     sender = mohawk.Sender(
