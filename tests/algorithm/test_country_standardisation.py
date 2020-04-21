@@ -4,40 +4,50 @@ from tests.utils import rows_equal_query_results
 
 
 def test_country_mapping(
-    add_datahub_export_to_countries,
-    add_datahub_future_interest_countries,
+    add_datahub_company_export_country,
+    add_datahub_company_export_country_history,
     add_datahub_omis,
     add_export_wins,
     add_country_territory_registry,
 ):
 
-    add_datahub_export_to_countries(
+    add_datahub_company_export_country(
         [
             {
+                'company_export_country_id': '9c83fe1f-24c9-4f44-8d04-3a6b82d6ca34',
                 'company_id': '25262ffe-e062-49af-a620-a84d4f3feb8b',
-                'country_iso_alpha2_code': 'AF',
                 'country': 'afganistan',
-                'id': 0,
+                'country_iso_alpha2_code': 'AF',
+                'created_on': '2020-01-01',
+                'modified_on': '2020-01-02',
+                'status': 'currently_exporting',
             },
             {
+                'company_export_country_id': '8272b09f-f778-417f-a613-daae5c8a50c3',
                 'company_id': '25262ffe-e062-49af-a620-a84d4f3feb8b',
-                'country_iso_alpha2_code': 'AN',
                 'country': 'netherlands antilles',
-                'id': 1,
+                'country_iso_alpha2_code': 'AN',
+                'created_on': '2020-02-01',
+                'modified_on': '2020-02-02',
+                'status': 'future_interest',
             },
         ]
     )
 
-    add_datahub_future_interest_countries(
+    add_datahub_company_export_country_history(
         [
             {
                 'company_id': 'd584c5e2-ef16-4aba-91d4-71949078831f',
-                'country_iso_alpha2_code': 'AD',
                 'country': 'Andorra',
-                'id': 0,
+                'country_iso_alpha2_code': 'AD',
+                'history_date': '2020-01-01',
+                'history_id': 'd413d348-8828-48a7-88a1-1e8a1d7a2f1f',
+                'history_type': 'insert',
+                'status': 'future_interest',
             }
         ]
     )
+
     add_datahub_omis(
         [
             {
@@ -49,6 +59,7 @@ def test_country_mapping(
             }
         ]
     )
+
     add_export_wins(
         [
             {

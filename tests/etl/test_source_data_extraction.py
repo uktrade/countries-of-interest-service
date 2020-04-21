@@ -162,7 +162,7 @@ class TestExtractDatahubCompanyExportCountry(SourceDataExtractBaseTestCase):
     dataset_id_config_key = 'datahub_company_export_country_dataset_id'
     expected_data = [
         {
-            'datahub_company_id': 'c31e4492-1f16-48a2-8c5e-8c0334d959a3',
+            'company_id': 'c31e4492-1f16-48a2-8c5e-8c0334d959a3',
             'country': 'Canada',
             'country_iso_alpha2_code': 'CA',
             'created_on': '2020-01-01 01:00:00',
@@ -171,7 +171,7 @@ class TestExtractDatahubCompanyExportCountry(SourceDataExtractBaseTestCase):
             'status': 'currently_exporting',
         },
         {
-            'datahub_company_id': 'd0af8e52-ff34-4088-98e3-d2d22cd250ae',
+            'company_id': 'd0af8e52-ff34-4088-98e3-d2d22cd250ae',
             'country': 'Georgia',
             'country_iso_alpha2_code': 'GE',
             'created_on': '2020-01-02 01:00:00',
@@ -217,38 +217,9 @@ class TestExtractDatahubCompanyExportCountry(SourceDataExtractBaseTestCase):
     extractor = source_data_extraction.ExtractDatahubCompanyExportCountry
 
 
-class TestExtractDatahubExportCountries(SourceDataExtractBaseTestCase):
+class TestExtractDatahubCompanyExportCountryHistory(SourceDataExtractBaseTestCase):
     __test__ = True
-    dataset_id_config_key = 'datahub_export_countries_dataset_id'
-    expected_data = [
-        {
-            'company_id': 'c31e4492-1f16-48a2-8c5e-8c0334d959a3',
-            'country_iso_alpha2_code': 'SK',
-            'country': 'slovakia',
-            'id': 0,
-        },
-        {
-            'company_id': 'd0af8e52-ff34-4088-98e3-d2d22cd250ae',
-            'country_iso_alpha2_code': 'SD',
-            'country': 'sudan',
-            'id': 1,
-        },
-    ]
-    source_data = {
-        'headers': ['id', 'company_id', 'country_iso_alpha2_code', 'country', 'extraField'],
-        'next': None,
-        'values': [
-            [0, 'c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'SK', 'slovakia', 'extra'],
-            [1, 'd0af8e52-ff34-4088-98e3-d2d22cd250ae', 'SD', 'sudan', 'extra'],
-        ],
-    }
-    source_table_id_config_key = 'datahub_export_countries_source_table_id'
-    extractor = source_data_extraction.ExtractDatahubExportToCountries
-
-
-class TestExtractDatahubExportCountryHistory(SourceDataExtractBaseTestCase):
-    __test__ = True
-    dataset_id_config_key = 'datahub_export_country_history_dataset_id'
+    dataset_id_config_key = 'datahub_company_export_country_history_dataset_id'
     expected_data = [
         {
             'company_id': '6ef62b18-fe0f-4e0e-8cbf-3ca3399df788',
@@ -307,37 +278,8 @@ class TestExtractDatahubExportCountryHistory(SourceDataExtractBaseTestCase):
         ],
     }
 
-    source_table_id_config_key = 'datahub_export_country_history_source_table_id'
-    extractor = source_data_extraction.ExtractDatahubExportCountryHistory
-
-
-class TestExtractDatahubFutureInterestCountries(SourceDataExtractBaseTestCase):
-    __test__ = True
-    dataset_id_config_key = 'datahub_future_interest_countries_dataset_id'
-    expected_data = [
-        {
-            'company_id': 'c31e4492-1f16-48a2-8c5e-8c0334d959a3',
-            'country_iso_alpha2_code': 'SK',
-            'country': 'slovakia',
-            'id': 0,
-        },
-        {
-            'company_id': 'd0af8e52-ff34-4088-98e3-d2d22cd250ae',
-            'country_iso_alpha2_code': 'SD',
-            'country': 'sudan',
-            'id': 1,
-        },
-    ]
-    source_data = {
-        'headers': ['id', 'company_id', 'country_iso_alpha2_code', 'country', 'extra_field'],
-        'next': None,
-        'values': [
-            [0, 'c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'SK', 'slovakia', 'extra'],
-            [1, 'd0af8e52-ff34-4088-98e3-d2d22cd250ae', 'SD', 'sudan', 'extra'],
-        ],
-    }
-    source_table_id_config_key = 'datahub_future_interest_countries_source_table_id'
-    extractor = source_data_extraction.ExtractDatahubFutureInterestCountries
+    source_table_id_config_key = 'datahub_company_export_country_history_source_table_id'
+    extractor = source_data_extraction.ExtractDatahubCompanyExportCountryHistory
 
 
 class TestExtractDatahubInteractions(SourceDataExtractBaseTestCase):

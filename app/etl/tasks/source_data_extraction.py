@@ -125,7 +125,7 @@ class ExtractDatahubCompanyExportCountry(SourceDataExtractor):
     name = Source.DATAHUB_COMPANY_EXPORT_COUNTRY.value
     dataset_id_config_key = 'datahub_company_export_country_dataset_id'
     mapping = {
-        'company_id': 'datahub_company_id',
+        'company_id': 'company_id',
         'country': 'country',
         'country_iso_alpha2_code': 'country_iso_alpha2_code',
         'created_on': 'created_on',
@@ -168,37 +168,9 @@ class ExtractDatahubCompanyExportCountry(SourceDataExtractor):
     }
 
 
-class ExtractDatahubContactDataset(SourceDataExtractor):
-    name = Source.DATAHUB_CONTACT.value
-    dataset_id_config_key = 'datahub_contacts_dataset_id'
-    mapping = {
-        'id': 'datahub_contact_id',
-        'company_id': 'datahub_company_id',
-        'email': 'email',
-    }
-    model = models.DatahubContact
-    source_table_id_config_key = 'datahub_contacts_source_table_id'
-    stub_data = {
-        'headers': ['id', 'company_id', 'email'],
-        'values': [
-            [
-                'c31e4492-1f16-48a2-8c5e-8c0334d959a3',
-                '6294212e-f863-44cc-b98c-6041384d6d56',
-                'test@test.com',
-            ],
-            [
-                'd0af8e52-ff34-4088-98e3-d2d22cd250ae',
-                'a86018c3-e811-4472-af0f-125d36e858a6',
-                'john@test.com',
-            ],
-        ],
-    }
-    unique_key = 'datahub_contact_id'
-
-
-class ExtractDatahubExportCountryHistory(SourceDataExtractor):
-    name = Source.DATAHUB_EXPORT_COUNTRY_HISTORY.value
-    dataset_id_config_key = 'datahub_export_country_history_dataset_id'
+class ExtractDatahubCompanyExportCountryHistory(SourceDataExtractor):
+    name = Source.DATAHUB_COMPANY_EXPORT_COUNTRY_HISTORY.value
+    dataset_id_config_key = 'datahub_company_export_country_history_dataset_id'
     mapping = {
         'company_id': 'company_id',
         'country': 'country',
@@ -208,8 +180,8 @@ class ExtractDatahubExportCountryHistory(SourceDataExtractor):
         'history_type': 'history_type',
         'status': 'status',
     }
-    model = models.DatahubExportCountryHistory
-    source_table_id_config_key = 'datahub_export_country_history_source_table_id'
+    model = models.DatahubCompanyExportCountryHistory
+    source_table_id_config_key = 'datahub_company_export_country_history_source_table_id'
     stub_data = {
         'headers': [
             'company_id',
@@ -243,44 +215,32 @@ class ExtractDatahubExportCountryHistory(SourceDataExtractor):
     }
 
 
-class ExtractDatahubExportToCountries(SourceDataExtractor):
-    name = Source.DATAHUB_EXPORT_TO_COUNTRIES.value
-    dataset_id_config_key = 'datahub_export_countries_dataset_id'
+class ExtractDatahubContactDataset(SourceDataExtractor):
+    name = Source.DATAHUB_CONTACT.value
+    dataset_id_config_key = 'datahub_contacts_dataset_id'
     mapping = {
-        'company_id': 'company_id',
-        'country_iso_alpha2_code': 'country_iso_alpha2_code',
-        'country': 'country',
-        'id': 'id',
+        'id': 'datahub_contact_id',
+        'company_id': 'datahub_company_id',
+        'email': 'email',
     }
-    model = models.DatahubExportToCountries
-    source_table_id_config_key = 'datahub_export_countries_source_table_id'
+    model = models.DatahubContact
+    source_table_id_config_key = 'datahub_contacts_source_table_id'
     stub_data = {
-        'headers': ['company_id', 'country_iso_alpha2_code', 'country', 'id'],
+        'headers': ['id', 'company_id', 'email'],
         'values': [
-            ['c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'US', 'united states', 1],
-            ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'MY', 'myanmar', 2],
+            [
+                'c31e4492-1f16-48a2-8c5e-8c0334d959a3',
+                '6294212e-f863-44cc-b98c-6041384d6d56',
+                'test@test.com',
+            ],
+            [
+                'd0af8e52-ff34-4088-98e3-d2d22cd250ae',
+                'a86018c3-e811-4472-af0f-125d36e858a6',
+                'john@test.com',
+            ],
         ],
     }
-
-
-class ExtractDatahubFutureInterestCountries(SourceDataExtractor):
-    name = Source.DATAHUB_FUTURE_INTEREST_COUNTRIES.value
-    dataset_id_config_key = 'datahub_future_interest_countries_dataset_id'
-    mapping = {
-        'company_id': 'company_id',
-        'country_iso_alpha2_code': 'country_iso_alpha2_code',
-        'country': 'country',
-        'id': 'id',
-    }
-    model = models.DatahubFutureInterestCountries
-    source_table_id_config_key = 'datahub_future_interest_countries_source_table_id'
-    stub_data = {
-        'headers': ['company_id', 'country_iso_alpha2_code', 'country', 'id'],
-        'values': [
-            ['c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'CN', 'china', 1],
-            ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'DE', 'germany', 2],
-        ],
-    }
+    unique_key = 'datahub_contact_id'
 
 
 class ExtractDatahubInteractions(SourceDataExtractor):

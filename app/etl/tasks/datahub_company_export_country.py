@@ -13,7 +13,7 @@ from app.etl import ETLTask
 sql = f'''
 with results as (
     select distinct
-        datahub_company_id::text as service_company_id,
+        company_id::text as service_company_id,
         null::int4 as company_match_id,
         case
             when c.name is not null then c.name

@@ -48,26 +48,15 @@ class DatahubCompanyExportCountry(BaseModel):
 
     id = _col(_int, primary_key=True, autoincrement=True)
     company_export_country_id = _col(UUID(as_uuid=True))
+    company_id = _col(UUID(as_uuid=True))
     country = _col(_text)
     country_iso_alpha2_code = _col(_text)
     created_on = _col(_dt)
-    datahub_company_id = _col(UUID(as_uuid=True))
     modified_on = _col(_dt)
     status = _col(_text)
 
 
-class DatahubContact(BaseModel):
-
-    __tablename__ = 'datahub_contact'
-    __table_args__ = {'schema': 'public'}
-
-    id = _col(_int, primary_key=True, autoincrement=True)
-    datahub_contact_id = _col(UUID(as_uuid=True), unique=True)
-    datahub_company_id = _col(UUID(as_uuid=True))
-    email = _col(_text)
-
-
-class DatahubExportCountryHistory(BaseModel):
+class DatahubCompanyExportCountryHistory(BaseModel):
 
     __tablename__ = 'datahub_export_country_history'
     __table_args__ = {'schema': 'public'}
@@ -86,26 +75,15 @@ class DatahubExportCountryHistory(BaseModel):
     status = _col(_text)
 
 
-class DatahubExportToCountries(BaseModel):
+class DatahubContact(BaseModel):
 
-    __tablename__ = 'datahub_export_countries'
+    __tablename__ = 'datahub_contact'
     __table_args__ = {'schema': 'public'}
 
-    id = _col(_int, primary_key=True)
-    company_id = _col(UUID(as_uuid=True))
-    country = _col(_text)
-    country_iso_alpha2_code = _col(_text)
-
-
-class DatahubFutureInterestCountries(BaseModel):
-
-    __tablename__ = 'datahub_future_interest_countries'
-    __table_args__ = {'schema': 'public'}
-
-    id = _col(_int, primary_key=True)
-    company_id = _col(UUID(as_uuid=True))
-    country = _col(_text)
-    country_iso_alpha2_code = _col(_text)
+    id = _col(_int, primary_key=True, autoincrement=True)
+    datahub_contact_id = _col(UUID(as_uuid=True), unique=True)
+    datahub_company_id = _col(UUID(as_uuid=True))
+    email = _col(_text)
 
 
 class ExportWins(BaseModel):
