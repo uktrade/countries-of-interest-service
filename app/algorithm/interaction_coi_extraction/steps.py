@@ -5,10 +5,9 @@ import traceback
 
 import pycountry
 import spacy
+from data_engineering.common.db.models import sql_alchemy
 from flask import current_app as flask_app
 
-from app.db import sql_alchemy
-from app.db.db_utils import dsv_buffer_to_table
 from app.utils import log
 
 REPLACEMENTS = {
@@ -317,14 +316,10 @@ def process_interactions(
         transaction = connection.begin()
 
         try:
-            dsv_buffer_to_table(
+            flask_app.dbi.dsv_buffer_to_table(
                 chunk,
-                table=output_table,
-                schema=output_schema,
-                sep=',',
-                null='',
-                has_header=False,
-                columns=[
+                f'{output_schema}.{output_table}',
+                [
                     'datahub_interaction_id',
                     'place',
                     'standardized_place',
@@ -333,8 +328,10 @@ def process_interactions(
                     'context',
                     'negation',
                 ],
+                sep=',',
+                null='',
+                has_header=False,
                 quote='$',
-                reraise=True,
             )
 
             sql = f'''

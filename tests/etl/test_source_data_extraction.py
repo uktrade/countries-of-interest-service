@@ -3,9 +3,10 @@ from unittest.mock import Mock, patch
 
 import pytest
 import sqlalchemy.exc
+from flask import current_app as flask_app
+
 
 import app.db.models.external as models
-from app.db.db_utils import execute_statement
 from app.etl.tasks import source_data_extraction
 
 
@@ -521,7 +522,7 @@ class TestPopulateTable:
 
     def get_rows(self):
         sql = f'select * from {self.model.__tablename__} order by id'
-        status = execute_statement(sql, raise_if_fail=True)
+        status = flask_app.dbi.execute_statement(sql, raise_if_fail=True)
         return status.fetchall()
 
     def test_rollback_when_there_is_an_error(self, add_datahub_contact):
@@ -790,7 +791,7 @@ class TestPopulateTable:
             f'id,datahub_interaction_id,datahub_company_id,subject,notes,created_on '
             f'from {models.Interactions.__tablename__} order by id'
         )
-        status = execute_statement(sql, raise_if_fail=True)
+        status = flask_app.dbi.execute_statement(sql, raise_if_fail=True)
         rows = status.fetchall()
         assert len(rows) == 3
         assert rows == [

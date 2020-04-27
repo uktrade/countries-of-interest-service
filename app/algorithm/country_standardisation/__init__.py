@@ -1,5 +1,6 @@
+from flask import current_app as flask_app
+
 from app.algorithm.country_standardisation import steps as sql
-from app.db import db_utils
 from app.db.models.internal import StandardisedCountries
 from app.utils import log
 
@@ -15,7 +16,7 @@ def standardise_countries():
 class CountryMapper:
     @log.write('rebuilding country mapping')
     def map(self):
-        db_utils.execute_statement(
+        flask_app.dbi.execute_statement(
             "SET statement_timeout TO '1h' "
         )  # If a query takes longer over 1hour, stop it!
         countries = sql.extract_interested_exported_countries()

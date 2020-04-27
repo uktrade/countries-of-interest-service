@@ -1,13 +1,13 @@
 import datetime
 
 import pytest
+from data_engineering.common.tests.utils import rows_equal_query_results
 from flask import current_app as flask_app
 from spacy.language import Language
 
 import app.algorithm.interaction_coi_extraction as mapper
 from app.db.models.external import Interactions
 from app.db.models.internal import InteractionsAnalysedInteractionIdLog
-from tests.utils import rows_equal_query_results
 
 
 @pytest.fixture
@@ -68,7 +68,9 @@ def test_interaction_coi_extraction_when_interaction_does_not_have_a_note(
 
     expected_rows = []
     assert rows_equal_query_results(
-        expected_rows, f'SELECT * FROM "{mapper.output_schema}"."{mapper.output_table}"'
+        flask_app.dbi,
+        expected_rows,
+        f'SELECT * FROM "{mapper.output_schema}"."{mapper.output_table}"',
     )
 
     session = flask_app.db.session
@@ -111,7 +113,9 @@ def test_interaction_coi_extraction(add_objects, add_side_effect, mock_datetime)
         )
     ]
     assert rows_equal_query_results(
-        expected_rows, f'SELECT * FROM "{mapper.output_schema}"."{mapper.output_table}"'
+        flask_app.dbi,
+        expected_rows,
+        f'SELECT * FROM "{mapper.output_schema}"."{mapper.output_table}"',
     )
 
     session = flask_app.db.session
@@ -173,6 +177,7 @@ def test_interaction_already_seen(add_objects, add_side_effect):
     ]
 
     assert rows_equal_query_results(
+        flask_app.dbi,
         expected_rows,
         f'SELECT datahub_interaction_id,place,'
         f'standardized_place,action,type,context,negation'

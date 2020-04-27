@@ -1,8 +1,9 @@
 import datetime
 from unittest.mock import patch
 
+from flask import current_app as flask_app
+
 from app.config.constants import Source, Task
-from app.db.db_utils import execute_query, execute_statement
 from app.etl.tasks import populate_database
 
 
@@ -92,7 +93,7 @@ class TestPopulateDatabase:
         }
         populate_export_wins_task.return_value = {'dataset': 'populate_export_wins'}
 
-    @patch('app.etl.tasks.execute_statement')
+    @patch('app.etl.tasks.flask_app.dbi.execute_statement')
     def test_tasks_are_run(
         self,
         execute_statement,
@@ -185,7 +186,7 @@ class TestPopulateDatabase:
 
         assert output == expected
 
-    @patch('app.etl.tasks.execute_statement')
+    @patch('app.etl.tasks.flask_app.dbi.execute_statement')
     def test_only_specified_tasks_are_run(
         self,
         execute_statement,
@@ -314,10 +315,10 @@ class TestPopulateDatabase:
         )
         mock_datetime.datetime.now.return_value = datetime.datetime(2019, 1, 1, 2)
         sql = "insert into etl_status (status, timestamp) values" "('RUNNING', '2019-01-01 01:00')"
-        execute_statement(sql)
+        flask_app.dbi.execute_statement(sql)
         populate_database(True, [], [])
         sql = 'select * from etl_status'
-        rows = execute_query(sql, df=False)
+        rows = flask_app.dbi.execute_query(sql, df=False)
         assert len(rows) == 1
         assert rows[0][1] == 'SUCCESS'
         assert rows[0][2] == datetime.datetime(2019, 1, 1, 2)

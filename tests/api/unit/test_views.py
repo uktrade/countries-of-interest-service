@@ -2,18 +2,17 @@ import datetime
 import unittest.mock
 
 import redis
+from data_engineering.common.views import get_client_scope, json_error, seen_nonce
 from werkzeug.exceptions import BadRequest, NotFound
-
-import app.api.views as views
 
 
 class TestGetClientScope(unittest.TestCase):
-    @unittest.mock.patch('app.api.views.HawkUsers')
+    @unittest.mock.patch('data_engineering.common.db.models.HawkUsers')
     def test_if_client_scope_is_not_found_return_error(self, HawkUsers):
         client_id = 0
         HawkUsers.get_client_scope.return_value = None
         with self.assertRaises(LookupError):
-            views.get_client_scope(client_id)
+            get_client_scope(client_id)
 
 
 class TestSeenNonce(unittest.TestCase):
@@ -24,7 +23,7 @@ class TestSeenNonce(unittest.TestCase):
         nonce = 'asdf'
         timestamp = datetime.datetime(2019, 1, 1)
         app.cache.get.side_effect = redis.exceptions.ConnectionError()
-        result = views.seen_nonce(sender_id, nonce, timestamp)
+        result = seen_nonce(sender_id, nonce, timestamp)
         self.assertTrue(result)
         logging.error.assert_called_once()
 
@@ -34,7 +33,7 @@ class TestJsonError:
         def f():
             raise NotFound()
 
-        wrapped = views.json_error(f)
+        wrapped = json_error(f)
         response = wrapped()
         assert response.status_code == 404
         assert response.json == {}
@@ -43,7 +42,7 @@ class TestJsonError:
         def f():
             raise BadRequest('error msg')
 
-        wrapped = views.json_error(f)
+        wrapped = json_error(f)
         response = wrapped()
         assert response.status_code == 400
         assert response.json == {'error': 'error msg'}
@@ -52,6 +51,6 @@ class TestJsonError:
         def f():
             raise Exception('error msg')
 
-        wrapped = views.json_error(f)
+        wrapped = json_error(f)
         response = wrapped()
         assert response.status_code == 500

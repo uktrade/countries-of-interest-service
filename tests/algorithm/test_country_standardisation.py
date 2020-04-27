@@ -1,6 +1,8 @@
+from data_engineering.common.tests.utils import rows_equal_query_results
+from flask import current_app as flask_app
+
 import app.algorithm.country_standardisation as mapper
 from app.algorithm.country_standardisation.steps import _standardise_country
-from tests.utils import rows_equal_query_results
 
 
 def test_country_mapping(
@@ -132,7 +134,9 @@ def test_country_mapping(
         (9, 'usa', 'United States', 100),
     ]
     assert rows_equal_query_results(
-        expected_rows, f'SELECT * FROM "{mapper.output_schema}"."{mapper.output_table}"'
+        flask_app.dbi,
+        expected_rows,
+        f'SELECT * FROM "{mapper.output_schema}"."{mapper.output_table}"',
     )
 
 

@@ -1,10 +1,10 @@
 import math
 from io import StringIO
 
+from flask import current_app as flask_app
 from fuzzywuzzy import fuzz, process
 
-from app.db import db_utils
-from app.db.db_utils import dsv_buffer_to_table
+
 from app.db.models.external import (
     DatahubCompanyExportCountry,
     DatahubCompanyExportCountryHistory,
@@ -35,7 +35,7 @@ def extract_interested_exported_countries():
     )
     select country from countries order by LOWER(country)
     """
-    rows = db_utils.execute_query(stmt, df=False)
+    rows = flask_app.dbi.execute_query(stmt, df=False)
     countries = [row[0] for row in rows]
     return countries
 
@@ -45,7 +45,7 @@ def create_standardised_interested_exported_country_table(countries, output_sche
     stmt = f"""
     SELECT distinct name FROM {DITCountryTerritoryRegister.__tablename__}
 """
-    result = db_utils.execute_query(stmt, df=False)
+    result = flask_app.dbi.execute_query(stmt, df=False)
     choices = [r[0] for r in result] + list(split_mappings.keys())
     lower_choices = [choice.lower() for choice in choices]
     columns = ['id', 'country', 'standardised_country', 'similarity']
@@ -66,7 +66,7 @@ def create_standardised_interested_exported_country_table(countries, output_sche
     tsv_data.writelines(tsv_lines)
     tsv_data.seek(0)
     _create_output_table(output_schema, output_table, drop=True)
-    dsv_buffer_to_table(tsv_data, output_table, output_schema, columns=columns)
+    flask_app.dbi.dsv_buffer_to_table(tsv_data, f'{output_schema}.{output_table}', columns)
 
 
 regions = [
@@ -186,4 +186,4 @@ def _create_output_table(output_schema, output_table, drop=False):
         similarity INT
     );
     """
-    db_utils.execute_statement(stmt)
+    flask_app.dbi.execute_statement(stmt)

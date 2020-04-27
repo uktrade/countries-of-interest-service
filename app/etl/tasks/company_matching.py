@@ -3,13 +3,11 @@ import re
 import urllib.parse
 
 import requests
+from data_engineering.common.db.models import db
 from flask import current_app as flask_app
 from mohawk import Sender
 
 from app.config import constants
-from app.db import db_utils
-from app.db.db_utils import execute_statement
-from app.db.models import db
 from app.db.models.external import DatahubCompany, DatahubContact, ExportWins
 from app.db.models.internal import (
     CountriesAndSectorsInterest,
@@ -88,7 +86,7 @@ class Task:
                 similarity text
             );
         """
-        execute_statement(stmt)
+        flask_app.dbi.execute_statement(stmt)
 
         for request in self._build_request(cursor):
             status_code, data = self._post_request(
@@ -110,7 +108,7 @@ class Task:
                     similarity
                 FROM json_populate_recordset(null::company_matching, %s);
             """
-            execute_statement(stmt, data=(json.dumps(data['matches']),))
+            flask_app.dbi.execute_statement(stmt, data=(json.dumps(data['matches']),))
 
     def _build_request(self, cursor, batch_size=100000):
         batch_count = 0
@@ -229,9 +227,10 @@ class Task:
             ) ew_cm on ew_cm.id = csi.source_id and csi.service = 'export_wins'
             WHERE csi.service = 'export_wins')) SQ ORDER BY id;
         """
-        execute_statement(stmt)
+        flask_app.dbi.execute_statement(stmt)
         CountriesAndSectorsInterest.drop_table()
-        db_utils.rename_table(
+        flask_app.dbi.rename_table(
+            CountriesAndSectorsInterestMatched.__table_args__[0]['schema'],
             CountriesAndSectorsInterestMatched.__tablename__,
             CountriesAndSectorsInterest.__tablename__,
         )
