@@ -1,8 +1,8 @@
 import datetime
 
 import pandas as pd
-from data_engineering.common.api.utils import response_orientation_decorator, to_web_dict
-from data_engineering.common.views import ac, json_error
+from data_engineering.common.api.utils import to_web_dict
+from data_engineering.common.views import ac, json_error, response_orientation_decorator
 from flask import current_app as flask_app
 from flask import render_template, request
 from werkzeug.exceptions import BadRequest
