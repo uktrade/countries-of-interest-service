@@ -86,7 +86,7 @@ requests==2.22.0          # via codecov, requests-oauthlib, spacy
 six==1.14.0               # via freezegun, mohawk, packaging, pip-tools, python-dateutil, sqlalchemy-utils, traitlets
 spacy==2.2.4              # via -r requirements.in
 speaklater==1.3           # via flask-babelex
-sqlalchemy-utils==0.36.3  # via -r requirements.in
+sqlalchemy-utils==0.36.5  # via -r requirements.in
 sqlalchemy==1.3.16        # via -r requirements.in, flask-sqlalchemy, sqlalchemy-utils
 srsly==1.0.2              # via spacy, thinc
 thinc==7.4.0              # via spacy
