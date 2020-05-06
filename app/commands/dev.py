@@ -48,19 +48,13 @@ def db(create, drop, drop_tables, create_tables, recreate_tables):
             drop_schemas()
         if create or create_tables or recreate_tables:
             click.echo('Creating DB tables')
-            create_schemas()
+            flask_app.db.create_all()
 
 
 def drop_schemas():
     schemas = get_schemas()
     for schema in schemas:
         flask_app.dbi.drop_schema(schema)
-
-
-def create_schemas():
-    schemas = get_schemas()
-    for schema in schemas:
-        flask_app.dbi.create_schema(schema)
 
 
 @cmd_group.command('add_hawk_user')
