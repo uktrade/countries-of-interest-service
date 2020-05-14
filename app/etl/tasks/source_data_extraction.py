@@ -1,12 +1,12 @@
 import mohawk
 import requests
+from data_engineering.common.db.models import sql_alchemy
 from flask import current_app as flask_app
 from sqlalchemy import exc
 from sqlalchemy.dialects import postgresql
 
 import app.db.models.external as models
 from app.config.constants import Source
-from app.db.models import sql_alchemy
 
 
 class SourceDataExtractor:

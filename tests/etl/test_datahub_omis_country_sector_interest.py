@@ -1,6 +1,6 @@
 import numpy as np
+from flask import current_app as flask_app
 
-from app.db.db_utils import execute_query
 from app.db.models.internal import CountriesAndSectorsInterestTemp
 from app.etl.tasks.datahub_omis_country_sector_interest import Task
 
@@ -36,7 +36,7 @@ class TestCountriesAndSectorsOfInterest:
         task()
 
         sql = f'''select * from {CountriesAndSectorsInterestTemp.get_fq_table_name()}'''
-        df = execute_query(sql)
+        df = flask_app.dbi.execute_query(sql, df=True)
 
         assert len(df) == 2
 

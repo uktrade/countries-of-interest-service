@@ -1,4 +1,5 @@
-from app.db.db_utils import execute_query
+from flask import current_app as flask_app
+
 from app.db.models.internal import CountriesAndSectorsInterestTemp
 from app.etl.tasks.datahub_company_export_country import Task
 
@@ -41,7 +42,7 @@ class TestDatahubCompanyExportCountry:
         task()
 
         sql = f''' select * from {CountriesAndSectorsInterestTemp.__tablename__} '''
-        df = execute_query(sql)
+        df = flask_app.dbi.execute_query(sql, df=True)
 
         assert len(df) == 2
 

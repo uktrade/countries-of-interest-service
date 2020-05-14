@@ -2,7 +2,6 @@ import datetime
 
 from flask import current_app as flask_app
 
-from app.db.db_utils import execute_statement
 from app.etl.tasks.pipeline import (
     EXTRACTORS,
     EXTRACTORS_LIST,
@@ -46,11 +45,11 @@ def populate_database(drop_table, extractors, tasks):
 
     sql = 'insert into etl_runs (timestamp) values (%s)'
     ts_finish = datetime.datetime.now()
-    execute_statement(sql, [ts_finish])
+    flask_app.dbi.execute_statement(sql, [ts_finish])
     sql = 'delete from etl_status'
-    execute_statement(sql)
+    flask_app.dbi.execute_statement(sql)
     sql = '''insert into etl_status (status, timestamp) values (%s, %s)'''
-    execute_statement(sql, ['SUCCESS', ts_finish])
+    flask_app.dbi.execute_statement(sql, ['SUCCESS', ts_finish])
 
     output = {'output': output}
     pretty_log_output(output)
