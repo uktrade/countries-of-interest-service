@@ -1,5 +1,8 @@
 from app.config import constants
-from app.db.models.external import DatahubExportToCountries, DITCountryTerritoryRegister
+from app.db.models.external import (
+    DatahubCompanyExportCountryHistory,
+    DITCountryTerritoryRegister,
+)
 from app.db.models.internal import (
     CountriesAndSectorsInterestTemp,
     StandardisedCountries,
@@ -7,7 +10,7 @@ from app.db.models.internal import (
 from app.etl import ETLTask
 
 sql = f'''
-with results as (
+with export_country_history as (
     select distinct
         company_id::text as service_company_id,
         null::int4 as company_match_id,
@@ -17,17 +20,22 @@ with results as (
             else NULL
         end as country,
         null as sector,
-        '{constants.Type.EXPORTED.value}' as type,
+        history_type || '_' || status as type,
         '{constants.Service.DATAHUB.value}' as service,
-        '{constants.Source.DATAHUB_EXPORT_TO_COUNTRIES.value}' as source,
-        d.id::text as source_id,
-        null::timestamp as timestamp
-    from {DatahubExportToCountries.get_fq_table_name()} d
+        '{constants.Source.DATAHUB_COMPANY_EXPORT_COUNTRY_HISTORY.value}' as source,
+        d.history_id::text as source_id,
+        history_date::timestamp as timestamp
+
+    from {DatahubCompanyExportCountryHistory.get_fq_table_name()} d
         left join {DITCountryTerritoryRegister.get_fq_table_name()} c
             on d.country_iso_alpha2_code = c.country_iso_alpha2_code
         left join {StandardisedCountries.get_fq_table_name()} s
-            on d.country = s.country and s.similarity > 90
+            on d.country = s.country and similarity > 90
+
     order by source, source_id
+
+), results as (
+    select * from export_country_history
 )
 
 insert into {CountriesAndSectorsInterestTemp.get_fq_table_name()} (

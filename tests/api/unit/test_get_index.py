@@ -2,9 +2,9 @@ import datetime
 from unittest.mock import patch
 
 import pytest
+from flask import current_app as flask_app
 
 from app.api.views import get_index, populate_database
-from app.db.db_utils import execute_query, execute_statement
 
 
 @patch('app.api.views.populate_database_task')
@@ -44,7 +44,7 @@ class TestPopulateDatabase:
             request.request.args = {'drop-table': ''}
             populate_database()
         sql = 'select * from etl_status'
-        rows = execute_query(sql, df=False)
+        rows = flask_app.dbi.execute_query(sql, df=False)
         populate_database_task.delay.assert_called_once()
         assert rows[0][1] == 'RUNNING'
         assert rows[0][2] == datetime.datetime(2019, 1, 1, 1)
@@ -55,11 +55,9 @@ class TestPopulateDatabase:
             populate_database()
         populate_database_task.delay.assert_called_once()
 
-    def test_if_force_update_rerun_while_another_task_is_running(
-        self, populate_database_task
-    ):
+    def test_if_force_update_rerun_while_another_task_is_running(self, populate_database_task):
         sql = 'insert into etl_status (status, timestamp) values (%s, %s)'
-        execute_statement(sql, data=['RUNNING', '2019-01-01 01:00'])
+        flask_app.dbi.execute_statement(sql, data=['RUNNING', '2019-01-01 01:00'])
         with self.app.test_request_context() as request:
             request.request.args = {'force-update': ''}
             populate_database()
@@ -67,14 +65,14 @@ class TestPopulateDatabase:
 
     def test_does_not_rerun_while_another_task_is_running(self, populate_database_task):
         sql = 'insert into etl_status (status, timestamp) values (%s, %s)'
-        execute_statement(sql, data=['RUNNING', '2019-01-01 01:00'])
+        flask_app.dbi.execute_statement(sql, data=['RUNNING', '2019-01-01 01:00'])
         with self.app.test_request_context():
             populate_database()
         populate_database_task.delay.assert_not_called()
 
     def test_reruns_task_if_last_was_succesful(self, populate_database_task):
         sql = 'insert into etl_status (status, timestamp) values (%s, %s)'
-        execute_statement(sql, data=['SUCCESS', '2019-01-01 01:00'])
+        flask_app.dbi.execute_statement(sql, data=['SUCCESS', '2019-01-01 01:00'])
         with self.app.test_request_context():
             populate_database()
         populate_database_task.delay.assert_called_once()
@@ -94,7 +92,7 @@ class TestGetIndex:
             ('2019-01-01 01:00',),
             ('2019-01-01 02:00',),
         ]
-        execute_statement(sql, values)
+        flask_app.dbi.execute_statement(sql, values)
         with self.app.test_client() as c:
             with c.session_transaction() as sess:
                 sess['_authbroker_token'] = 'Test'
@@ -107,9 +105,7 @@ class TestGetIndex:
 
     @patch('app.sso.token.is_authenticated')
     @patch('app.api.views.render_template')
-    def test_returns_message_if_there_are_no_prior_runs(
-        self, render_template, is_authenticated
-    ):
+    def test_returns_message_if_there_are_no_prior_runs(self, render_template, is_authenticated):
         is_authenticated.return_value = True
         with self.app.test_request_context():
             get_index()

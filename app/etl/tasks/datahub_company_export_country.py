@@ -1,6 +1,6 @@
 from app.config import constants
 from app.db.models.external import (
-    DatahubFutureInterestCountries,
+    DatahubCompanyExportCountry,
     DITCountryTerritoryRegister,
 )
 from app.db.models.internal import (
@@ -8,6 +8,7 @@ from app.db.models.internal import (
     StandardisedCountries,
 )
 from app.etl import ETLTask
+
 
 sql = f'''
 with results as (
@@ -20,17 +21,23 @@ with results as (
             else NULL
         end as country,
         null as sector,
-        '{constants.Type.INTERESTED.value}' as type,
+        status as type,
         '{constants.Service.DATAHUB.value}' as service,
-        '{constants.Source.DATAHUB_FUTURE_INTEREST_COUNTRIES.value}' as source,
-        d.id::text as source_id,
-        null::timestamp as timestamp
-    from {DatahubFutureInterestCountries.get_fq_table_name()} d
+        '{constants.Source.DATAHUB_COMPANY_EXPORT_COUNTRY.value}' as source,
+        company_export_country_id as source_id,
+        case
+            when modified_on is not null then modified_on
+            else created_on
+        end as timestamp
+
+    from {DatahubCompanyExportCountry.get_fq_table_name()} d
         left join {DITCountryTerritoryRegister.get_fq_table_name()} c
             on d.country_iso_alpha2_code = c.country_iso_alpha2_code
         left join {StandardisedCountries.get_fq_table_name()} s
             on d.country = s.country and similarity > 90
+
     order by source, source_id
+
 )
 
 insert into {CountriesAndSectorsInterestTemp.get_fq_table_name()} (
@@ -50,7 +57,7 @@ insert into {CountriesAndSectorsInterestTemp.get_fq_table_name()} (
 
 class Task(ETLTask):
 
-    name = constants.Task.COUNTRIES_OF_INTEREST.value
+    name = constants.Task.COMPANY_EXPORT_COUNTRY.value
 
     def __init__(self, sql=sql, model=CountriesAndSectorsInterestTemp, *args, **kwargs):
         super().__init__(

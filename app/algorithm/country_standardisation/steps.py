@@ -1,13 +1,13 @@
 import math
 from io import StringIO
 
+from flask import current_app as flask_app
 from fuzzywuzzy import fuzz, process
 
-from app.db import db_utils
-from app.db.db_utils import dsv_buffer_to_table
+
 from app.db.models.external import (
-    DatahubExportToCountries,
-    DatahubFutureInterestCountries,
+    DatahubCompanyExportCountry,
+    DatahubCompanyExportCountryHistory,
     DatahubOmis,
     DITCountryTerritoryRegister,
     ExportWins,
@@ -21,10 +21,10 @@ def extract_interested_exported_countries():
     with countries as (
         select distinct country from (
             select trim(country) as country
-            from {DatahubExportToCountries.get_fq_table_name()}
+            from {DatahubCompanyExportCountry.get_fq_table_name()}
             union
             select trim(country) as country
-            from {DatahubFutureInterestCountries.get_fq_table_name()}
+            from {DatahubCompanyExportCountryHistory.get_fq_table_name()}
             union
             select trim(market) as country
             from {DatahubOmis.get_fq_table_name()}
@@ -35,19 +35,17 @@ def extract_interested_exported_countries():
     )
     select country from countries order by LOWER(country)
     """
-    rows = db_utils.execute_query(stmt, df=False)
+    rows = flask_app.dbi.execute_query(stmt, df=False)
     countries = [row[0] for row in rows]
     return countries
 
 
 @log.write('Step 2/2 - create standardised country table')
-def create_standardised_interested_exported_country_table(
-    countries, output_schema, output_table
-):
+def create_standardised_interested_exported_country_table(countries, output_schema, output_table):
     stmt = f"""
     SELECT distinct name FROM {DITCountryTerritoryRegister.__tablename__}
 """
-    result = db_utils.execute_query(stmt, df=False)
+    result = flask_app.dbi.execute_query(stmt, df=False)
     choices = [r[0] for r in result] + list(split_mappings.keys())
     lower_choices = [choice.lower() for choice in choices]
     columns = ['id', 'country', 'standardised_country', 'similarity']
@@ -68,7 +66,7 @@ def create_standardised_interested_exported_country_table(
     tsv_data.writelines(tsv_lines)
     tsv_data.seek(0)
     _create_output_table(output_schema, output_table, drop=True)
-    dsv_buffer_to_table(tsv_data, output_table, output_schema, columns=columns)
+    flask_app.dbi.dsv_buffer_to_table(tsv_data, f'{output_schema}.{output_table}', columns)
 
 
 regions = [
@@ -84,11 +82,31 @@ regions = [
     'far east',
 ]
 replacements = {
-    'uae': 'united arab emirates',
-    'ksa': 'saudi arabia',
-    'usa': 'united states',
+    'bahamas': 'the bahamas',
+    'cabo verde': 'cape verde',
+    'congo (the democratic republic of the)': 'congo',
     'czech republic': 'czechia',
+    "côte d'ivoire": 'ivory coast',
+    'gambia': 'the gambia',
     'holland': 'the netherlands',
+    'ksa': 'saudi arabia',
+    'macedonia': 'north macedonia',
+    'micronesia (federated states of)': 'micronesia',
+    'myanmar': 'myanmar (burma)',
+    'myanmar (burma)': 'myanmar (burma)',
+    'palestine, state of': 'occupied palestinian territories',
+    'saint helena, ascension and tristan da cunha': 'saint helena',
+    'saint kitts and nevis': 'st kitts and nevis',
+    'saint lucia': 'st lucia',
+    'saint vincent and the grenadines': 'st vincent',
+    'st martin': 'saint-martin (french part)',
+    'swaziland': 'eswatini',
+    'uae': 'united arab emirates',
+    'usa': 'united states',
+    'united states of america': 'united states',
+    'united states minor outlying islands': 'united states',
+    'virgin islands (british)': 'british virgin islands',
+    'virgin islands (u.s.)': 'united states virgin islands',
 }
 split_mappings = {
     'Netherlands Antilles': [
@@ -108,7 +126,10 @@ def _standardise_country(country, choices, lower_choices):
         lower_value = '0' * len(lower_value)
     # reformat countries
     for key, value in replacements.items():
-        lower_value = lower_value.replace(key, value)
+        if key == lower_value:
+            lower_value = value
+            break
+
     # check for direct match
     index = lower_choices.index(lower_value) if lower_value in lower_choices else None
     if index:
@@ -133,10 +154,7 @@ def _standardise_country(country, choices, lower_choices):
                 match[0],
                 max(
                     match[1]
-                    - math.ceil(
-                        abs(len(country) - len(match[0])) / (max(len(country), 1))
-                    )
-                    * 4,
+                    - math.ceil(abs(len(country) - len(match[0])) / (max(len(country), 1))) * 4,
                     0,
                 )
                 if match[0].lower().replace('the ', '') not in country.lower()
@@ -168,4 +186,4 @@ def _create_output_table(output_schema, output_table, drop=False):
         similarity INT
     );
     """
-    db_utils.execute_statement(stmt)
+    flask_app.dbi.execute_statement(stmt)

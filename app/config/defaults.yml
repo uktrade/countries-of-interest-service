@@ -16,12 +16,14 @@ sso:
   client_secret: $ENV{ABC_CLIENT_SECRET, sso_client_secret}
 dataworkspace:
   base_url: $ENV{DATAWORKSPACE_BASE_URL, localapps.com:8000}
-  hawk_client_id: $ENV{DATAWORKSPACE_HAWK_CLIENT_ID, dataworkspace_client_id}
-  hawk_client_key: $ENV{DATAWORKSPACE_HAWK_CLIENT_KEY, dataworkspace_client_key}
   countries_and_territories_group_slug: $ENV{COUNTRIES_AND_TERRITORIES_GROUP_SLUG, test}
   countries_and_territories_reference_slug: $ENV{COUNTRIES_AND_TERRITORIES_REFERENCE_SLUG, countries-and-territories}
   datahub_companies_dataset_id: $ENV{DATAHUB_COMPANIES_DATASET_ID, }
   datahub_companies_source_table_id: $ENV{DATAHUB_COMPANIES_SOURCE_TABLE_ID, }
+  datahub_company_export_country_dataset_id: $ENV{DATAHUB_COMPANY_EXPORT_COUNTRY_DATASET_ID, }
+  datahub_company_export_country_source_table_id: $ENV{DATAHUB_COMPANY_EXPORT_COUNTRY_SOURCE_TABLE_ID, }
+  datahub_company_export_country_history_dataset_id: $ENV{DATAHUB_COMPANY_EXPORT_COUNTRY_HISTORY_DATASET_ID, }
+  datahub_company_export_country_history_source_table_id: $ENV{DATAHUB_COMPANY_EXPORT_COUNTRY_HISTORY_SOURCE_TABLE_ID, }
   datahub_contacts_dataset_id: $ENV{DATAHUB_CONTACTS_DATASET_ID, }
   datahub_contacts_source_table_id: $ENV{DATAHUB_CONTACTS_SOURCE_TABLE_ID, }
   datahub_export_countries_dataset_id: $ENV{DATAHUB_EXPORT_COUNTRIES_DATASET_ID, }
@@ -30,6 +32,8 @@ dataworkspace:
   datahub_future_interest_countries_source_table_id: $ENV{DATAHUB_FUTURE_INTEREST_COUNTRIES_SOURCE_TABLE_ID, }
   datahub_interactions_dataset_id: $ENV{DATAHUB_INTERACTIONS_DATASET_ID, }
   datahub_interactions_source_table_id: $ENV{DATAHUB_INTERACTIONS_SOURCE_TABLE_ID, }
+  datahub_interactions_export_country_dataset_id: $ENV{DATAHUB_INTERACTIONS_EXPORT_COUNTRY_DATASET_ID, }
+  datahub_interactions_export_country_source_table_id: $ENV{DATAHUB_INTERACTIONS_EXPORT_COUNTRY_SOURCE_TABLE_ID, }
   datahub_omis_dataset_id: $ENV{DATAHUB_OMIS_DATASET_ID, }
   datahub_omis_source_table_id: $ENV{DATAHUB_OMIS_SOURCE_TABLE_ID, }
   export_wins_dataset_id: $ENV{EXPORT_WINS_DATASET_ID, }
@@ -44,6 +48,8 @@ cache:
   password: $ENV{CACHE_PWD, }
   ssl: $ENV{CACHE_SSL, True}
 access_control:
+  hawk_client_id: $ENV{HAWK_CLIENT_ID, client_id}
+  hawk_client_key: $ENV{HAWK_CLIENT_KEY, client_key}
   hawk_enabled: $ENV{AC_HAWK_ENABLED, True}
   hawk_nonce_enabled: $ENV{AC_HAWK_NONCE_ENABLED, True}
   hawk_response_header: $ENV{AC_HAWK_RESPONSE_HEADER, True}
@@ -55,5 +61,3 @@ session:
   secret_key: $ENV{SESSION_SECRET_KEY, _authbroker_token}
 cms:
   base_url: $ENV{CMS_BASE_URL, }
-  hawk_client_id: $ENV{CMS_HAWK_CLIENT_ID, }
-  hawk_client_key: $ENV{CMS_HAWK_CLIENT_KEY, }

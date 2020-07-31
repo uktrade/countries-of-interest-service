@@ -23,10 +23,8 @@ class TestDevCommand:
     @pytest.mark.parametrize(
         'client_id,expected_add_user_called', (('client_id', True), (None, False),),
     )
-    @mock.patch('app.db.models.internal.HawkUsers.add_user')
-    def test_run_hawk_user(
-        self, mock_add_user, client_id, expected_add_user_called, app_with_db
-    ):
+    @mock.patch('data_engineering.common.db.models.HawkUsers.add_user')
+    def test_run_hawk_user(self, mock_add_user, client_id, expected_add_user_called, app_with_db):
         mock_add_user.return_value = None
         runner = app_with_db.test_cli_runner()
 
@@ -47,8 +45,7 @@ class TestDevCommand:
             assert result.output.startswith('All parameters are required')
 
     @pytest.mark.parametrize(
-        'drop_database,create_tables,drop_tables,'
-        'create_database,recreate_tables,expected_msg',
+        'drop_database,create_tables,drop_tables,' 'create_database,recreate_tables,expected_msg',
         (
             (False, False, False, False, False, True),
             (True, False, False, False, False, False),
@@ -58,8 +55,8 @@ class TestDevCommand:
             (False, False, False, False, True, False),
         ),
     )
-    @mock.patch('flask_sqlalchemy.SQLAlchemy.create_all')
-    @mock.patch('flask_sqlalchemy.SQLAlchemy.drop_all')
+    @mock.patch('app.commands.dev.flask_app.db.create_all')
+    @mock.patch('data_engineering.common.db.dbi.DBI.drop_schema')
     @mock.patch('sqlalchemy_utils.create_database')
     @mock.patch('sqlalchemy_utils.drop_database')
     def test_run_db(
@@ -98,9 +95,7 @@ class TestDevCommand:
         assert mock_drop_database.called is drop_database
         assert mock_create_database.called is create_database
         assert mock_drop_tables.called is any([drop_tables, recreate_tables])
-        assert mock_create.called is any(
-            [create_tables, create_database, recreate_tables]
-        )
+        assert mock_create.called is any([create_tables, create_database, recreate_tables])
 
         if expected_msg:
             assert result.output.startswith('Usage: db [OPTIONS]')

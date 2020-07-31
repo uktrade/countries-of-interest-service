@@ -1,85 +1,18 @@
 import datetime
-from functools import wraps
 
 import pandas as pd
-import redis
+from data_engineering.common.api.utils import to_web_dict
+from data_engineering.common.views import ac, json_error, response_orientation_decorator
 from flask import current_app as flask_app
-from flask import jsonify, make_response, render_template, request
-from flask.blueprints import Blueprint
-from werkzeug.exceptions import BadRequest, NotFound, Unauthorized
+from flask import render_template, request
+from werkzeug.exceptions import BadRequest
 
-from app.api.access_control import AccessControl
 from app.api.tasks import populate_database_task
-from app.api.utils import response_orientation_decorator, to_web_dict
-from app.db.db_utils import execute_query, execute_statement, table_exists
 from app.db.models import internal as internal_models
 from app.db.models.internal import CountriesAndSectorsInterest
-from app.db.models.internal import HawkUsers
 from app.sso.token import login_required
 
-api = Blueprint(name="api", import_name=__name__)
-ac = AccessControl()
 
-
-@ac.client_key_loader
-def get_client_key(client_id):
-    client_key = HawkUsers.get_client_key(client_id)
-    if client_key:
-        return client_key
-    else:
-        raise LookupError()
-
-
-@ac.client_scope_loader
-def get_client_scope(client_id):
-    client_scope = HawkUsers.get_client_scope(client_id)
-    if client_scope:
-        return client_scope
-    else:
-        raise LookupError()
-
-
-@ac.nonce_checker
-def seen_nonce(sender_id, nonce, timestamp):
-    key = f'{sender_id}:{nonce}:{timestamp}'
-    try:
-        if flask_app.cache.get(key):
-            # We have already processed this nonce + timestamp.
-            return True
-        else:
-            # Save this nonce + timestamp for later.
-            flask_app.cache.set(key, 'True', ex=300)
-            return False
-    except redis.exceptions.ConnectionError as e:
-        flask_app.logger.error(f'failed to connect to caching server: {str(e)}')
-        return True
-
-
-def json_error(f):
-    @wraps(f)
-    def error_handler(*args, **kwargs):
-        try:
-            response = f(*args, **kwargs)
-        except NotFound:
-            response = jsonify({})
-            response.status_code = 404
-        except BadRequest as e:
-            response = jsonify({'error': e.description})
-            response.status_code = 400
-        except Unauthorized:
-            response = make_response('')
-            response.status_code = 401
-        except Exception as e:
-            flask_app.logger.error(f'unexpected exception for API request: {str(e)}')
-            response = make_response('')
-            response.status_code = 500
-        return response
-
-    return error_handler
-
-
-# views
-@api.route('/api/v1/get-company-countries-and-sectors-of-interest')
 @json_error
 @response_orientation_decorator
 @ac.authentication_required
@@ -97,28 +30,18 @@ def get_company_countries_and_sectors_of_interest(orientation):
 
     where = ''
     values = (
-        countries
-        + sectors
-        + service_company_ids
-        + company_match_ids
-        + types
-        + sources
-        + services
+        countries + sectors + service_company_ids + company_match_ids + types + sources + services
     )
     if len(countries) == 1:
         where = 'where country=%s'
     elif len(countries) > 1:
-        where = (
-            'where country in (' + ','.join('%s' for i in range(len(countries))) + ')'
-        )
+        where = 'where country in (' + ','.join('%s' for i in range(len(countries))) + ')'
     if len(sectors) == 1:
         where = where + ' and' if where != '' else 'where'
         where = where + ' sector=%s'
     elif len(sectors) > 1:
         where = where + ' and' if where != '' else 'where'
-        where = (
-            where + ' sector in (' + ','.join(['%s' for i in range(len(sectors))]) + ')'
-        )
+        where = where + ' sector in (' + ','.join(['%s' for i in range(len(sectors))]) + ')'
     if len(service_company_ids) == 1:
         where = where + ' and' if where != '' else 'where'
         where = where + ' service_company_id=%s'
@@ -152,20 +75,13 @@ def get_company_countries_and_sectors_of_interest(orientation):
         where = where + ' source=%s'
     elif len(sources) > 1:
         where = where + ' and' if where != '' else 'where'
-        where = (
-            where + ' source in (' + ','.join(['%s' for i in range(len(sources))]) + ')'
-        )
+        where = where + ' source in (' + ','.join(['%s' for i in range(len(sources))]) + ')'
     if len(services) == 1:
         where = where + ' and' if where != '' else 'where'
         where = where + ' service=%s'
     elif len(services) > 1:
         where = where + ' and' if where != '' else 'where'
-        where = (
-            where
-            + ' service in ('
-            + ','.join(['%s' for i in range(len(services))])
-            + ')'
-        )
+        where = where + ' service in (' + ','.join(['%s' for i in range(len(services))]) + ')'
     if next_id is not None:
         where = where + ' and' if where != '' else 'where'
         where = where + ' id >= %s'
@@ -189,14 +105,11 @@ def get_company_countries_and_sectors_of_interest(orientation):
         limit {pagination_size} + 1
     '''
 
-    df = execute_query(sql_query, data=values)
+    df = flask_app.dbi.execute_query(sql_query, data=values, df=True)
     if len(df) == pagination_size + 1:
         next_ = '{}{}?'.format(request.host_url[:-1], request.path)
         next_ += '&'.join(
-            [
-                'service-company-id={}'.format(company_id)
-                for company_id in service_company_ids
-            ]
+            ['service-company-id={}'.format(company_id) for company_id in service_company_ids]
         )
         next_ += '&'.join(
             [
@@ -220,13 +133,12 @@ def get_company_countries_and_sectors_of_interest(orientation):
     return flask_app.make_response(web_dict)
 
 
-@api.route('/')
 @login_required
 def get_index():
     last_updated = None
-    if table_exists('etl_runs'):
+    if flask_app.dbi.table_exists('public', 'etl_runs'):
         sql = 'select max(timestamp) from etl_runs'
-        df = execute_query(sql)
+        df = flask_app.dbi.execute_query(sql, df=True)
         last_updated = pd.to_datetime(df.values[0][0])
     if last_updated is None:
         last_updated = 'Database not yet initialised'
@@ -235,7 +147,6 @@ def get_index():
     return render_template('index.html', last_updated=last_updated)
 
 
-@api.route('/api/v1/populate-database')
 @json_error
 @ac.authentication_required
 @ac.authorization_required
@@ -252,16 +163,14 @@ def populate_database():
 
     sql = 'select * from etl_status'
 
-    df = execute_query(sql)
+    df = flask_app.dbi.execute_query(sql, df=True)
     if force_update is True or len(df) == 0 or df['status'].values[0] == 'SUCCESS':
         populate_database_task.delay(drop_table, extractors, tasks)
         sql = 'delete from etl_status'
-        execute_statement(sql)
+        flask_app.dbi.execute_statement(sql)
         sql = '''insert into etl_status (status, timestamp) values (%s, %s)'''
-        execute_statement(sql, data=['RUNNING', datetime.datetime.now()])
-        return flask_app.make_response(
-            {'status': 200, 'message': 'started populate_database task'}
-        )
+        flask_app.dbi.execute_statement(sql, data=['RUNNING', datetime.datetime.now()])
+        return flask_app.make_response({'status': 200, 'message': 'started populate_database task'})
     else:
         timestamp = df['timestamp'].values[0]
         response = {
@@ -271,27 +180,32 @@ def populate_database():
         return flask_app.make_response(response)
 
 
-@api.route('/api/v1/get-data-visualisation-data/<field>')
 @login_required
-def data_visualisation_data(field):
-    date_trunc = request.args.get('date_trunc', 'quarter')
-    exporter_status = request.args['exporter-status']
+def get_data_visualisation_data(field):
+    date_trunc = 'quarter'
+    data_source = request.args['data-source']
     interests_table = internal_models.CountriesAndSectorsInterest.__tablename__
-    valid_exporter_statuses = ['interested', 'mentioned']
+    from app.config import constants
+
+    valid_data_sources = [
+        constants.Source.EXPORT_WINS.value,
+        constants.Source.DATAHUB_INTERACTIONS.value,
+        constants.Source.DATAHUB_OMIS.value,
+    ]
     valid_fields = ['country', 'sector']
 
     if field not in valid_fields:
         raise BadRequest(f'invalid field: {field}, valid values: {valid_fields}')
 
-    if exporter_status not in valid_exporter_statuses:
+    if data_source not in valid_data_sources:
         raise BadRequest(
-            f'invalid exporter-status: {exporter_status}, '
-            f'valid values: {valid_exporter_statuses}'
+            f'invalid data-source: {data_source}, ' f'valid values: {valid_data_sources}'
         )
 
-    if field == 'sector' and exporter_status == 'mentioned':
+    if field == 'sector' and data_source == constants.Source.DATAHUB_INTERACTIONS.value:
         raise BadRequest(
-            'invalid args: exporter-status: mentioned not supported by sector'
+            f'invalid args: data-source: {constants.Source.DATAHUB_INTERACTIONS.value}'
+            ' not supported by sector'
         )
 
     sql = '''
@@ -303,7 +217,7 @@ def data_visualisation_data(field):
 
         from {interests_table}
 
-        where type = '{exporter_status}'
+        where source = '{data_source}'
             and {field} != ''
             and {field} is not null
             and {field} != 'United Kingdom'
@@ -370,12 +284,12 @@ def data_visualisation_data(field):
 
     '''.format(
         date_trunc=date_trunc,
-        exporter_status=exporter_status,
+        data_source=data_source,
         field=field,
         interests_table=interests_table,
     )
 
-    df = execute_query(sql)
+    df = flask_app.dbi.execute_query(sql, df=True)
     df_top = df.groupby(field)[['n_interests_cumulative']].max()
     df_top = df_top.reset_index()
     df_top = df_top.sort_values('n_interests_cumulative', ascending=False)
@@ -388,12 +302,6 @@ def data_visualisation_data(field):
     return output
 
 
-@api.route('/data-visualisation')
 @login_required
 def data_visualisation():
     return render_template('data-visualisation.html')
-
-
-@api.route('/healthcheck/', methods=["GET"])
-def healthcheck():
-    return jsonify({"status": "OK"})

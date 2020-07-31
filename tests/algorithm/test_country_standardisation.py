@@ -1,43 +1,55 @@
+from data_engineering.common.tests.utils import rows_equal_query_results
+from flask import current_app as flask_app
+
 import app.algorithm.country_standardisation as mapper
 from app.algorithm.country_standardisation.steps import _standardise_country
-from tests.utils import rows_equal_query_results
 
 
 def test_country_mapping(
-    add_datahub_export_to_countries,
-    add_datahub_future_interest_countries,
+    add_datahub_company_export_country,
+    add_datahub_company_export_country_history,
     add_datahub_omis,
     add_export_wins,
     add_country_territory_registry,
 ):
 
-    add_datahub_export_to_countries(
+    add_datahub_company_export_country(
         [
             {
+                'company_export_country_id': '9c83fe1f-24c9-4f44-8d04-3a6b82d6ca34',
                 'company_id': '25262ffe-e062-49af-a620-a84d4f3feb8b',
-                'country_iso_alpha2_code': 'AF',
                 'country': 'afganistan',
-                'id': 0,
+                'country_iso_alpha2_code': 'AF',
+                'created_on': '2020-01-01',
+                'modified_on': '2020-01-02',
+                'status': 'currently_exporting',
             },
             {
+                'company_export_country_id': '8272b09f-f778-417f-a613-daae5c8a50c3',
                 'company_id': '25262ffe-e062-49af-a620-a84d4f3feb8b',
-                'country_iso_alpha2_code': 'AN',
                 'country': 'netherlands antilles',
-                'id': 1,
+                'country_iso_alpha2_code': 'AN',
+                'created_on': '2020-02-01',
+                'modified_on': '2020-02-02',
+                'status': 'future_interest',
             },
         ]
     )
 
-    add_datahub_future_interest_countries(
+    add_datahub_company_export_country_history(
         [
             {
                 'company_id': 'd584c5e2-ef16-4aba-91d4-71949078831f',
-                'country_iso_alpha2_code': 'AD',
                 'country': 'Andorra',
-                'id': 0,
+                'country_iso_alpha2_code': 'AD',
+                'history_date': '2020-01-01',
+                'history_id': 'd413d348-8828-48a7-88a1-1e8a1d7a2f1f',
+                'history_type': 'insert',
+                'status': 'future_interest',
             }
         ]
     )
+
     add_datahub_omis(
         [
             {
@@ -49,6 +61,7 @@ def test_country_mapping(
             }
         ]
     )
+
     add_export_wins(
         [
             {
@@ -121,7 +134,9 @@ def test_country_mapping(
         (9, 'usa', 'United States', 100),
     ]
     assert rows_equal_query_results(
-        expected_rows, f'SELECT * FROM "{mapper.output_schema}"."{mapper.output_table}"'
+        flask_app.dbi,
+        expected_rows,
+        f'SELECT * FROM "{mapper.output_schema}"."{mapper.output_table}"',
     )
 
 
@@ -144,44 +159,28 @@ def test_standardise_country():
 
     # test sensible matches (threshold > 85)
     assert _standardise_country('Belgium', choices, lower_choices) == [('Belgium', 100)]
-    assert _standardise_country('South Africa', choices, lower_choices) == [
-        ('South Africa', 100)
-    ]
-    assert _standardise_country('uae', choices, lower_choices) == [
-        ('United Arab Emirates', 100)
-    ]
-    assert _standardise_country('usa', choices, lower_choices) == [
-        ('United States', 100)
-    ]
-    assert _standardise_country('Africa Belgium', choices, lower_choices) == [
-        ('Belgium', 90)
-    ]
+    assert _standardise_country('South Africa', choices, lower_choices) == [('South Africa', 100)]
+    assert _standardise_country('uae', choices, lower_choices) == [('United Arab Emirates', 100)]
+    assert _standardise_country('usa', choices, lower_choices) == [('United States', 100)]
+    assert _standardise_country('Africa Belgium', choices, lower_choices) == [('Belgium', 90)]
     assert _standardise_country('Africa Belgium Austria', choices, lower_choices) == [
         ('Belgium', 90),
         ('Austria', 90),
     ]
-    assert _standardise_country('Africa and Belgium', choices, lower_choices) == [
-        ('Belgium', 90)
-    ]
+    assert _standardise_country('Africa and Belgium', choices, lower_choices) == [('Belgium', 90)]
     assert _standardise_country('german', choices, lower_choices) == [('Germany', 88)]
     assert _standardise_country('Belgiun', choices, lower_choices) == [('Belgium', 86)]
     assert _standardise_country('Belgiu', choices, lower_choices) == [('Belgium', 88)]
-    assert _standardise_country(
-        'democratic republic of congo', choices, lower_choices
-    ) == [('Congo (Democratic Republic)', 91)]
-    assert _standardise_country('bahamas', choices, lower_choices) == [
-        ('The Bahamas', 90)
+    assert _standardise_country('democratic republic of congo', choices, lower_choices) == [
+        ('Congo (Democratic Republic)', 91)
     ]
+    assert _standardise_country('bahamas', choices, lower_choices) == [('The Bahamas', 100)]
     assert _standardise_country('ao', choices, lower_choices) == [('Laos', 86)]
 
     # test mismatches
     assert _standardise_country('Africa', choices, lower_choices) == [('Belgium', 0)]
-    assert _standardise_country('Unknown', choices, lower_choices) == [
-        ('United Arab Emirates', 19)
-    ]
-    assert _standardise_country('africa (any)', choices, lower_choices) == [
-        ('South Africa', 71)
-    ]
+    assert _standardise_country('Unknown', choices, lower_choices) == [('United Arab Emirates', 19)]
+    assert _standardise_country('africa (any)', choices, lower_choices) == [('South Africa', 71)]
     assert _standardise_country('a', choices, lower_choices) == [
         ('Austria', 66),
         ('Germany', 66),
@@ -190,9 +189,9 @@ def test_standardise_country():
     assert _standardise_country('anywhere in the world', choices, lower_choices) == [
         ('The Bahamas', 82)
     ]
-    assert _standardise_country(
-        'Central African Replublic', choices, lower_choices
-    ) == [('Central African Replublic', 100)]
+    assert _standardise_country('Central African Replublic', choices, lower_choices) == [
+        ('Central African Replublic', 100)
+    ]
     assert _standardise_country('Netherlands Anilles', choices, lower_choices) == [
         ('Bonaire', 93),
         ('Saint Eustatius', 93),

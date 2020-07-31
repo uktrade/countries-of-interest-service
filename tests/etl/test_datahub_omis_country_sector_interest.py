@@ -1,16 +1,13 @@
 import numpy as np
+from flask import current_app as flask_app
 
-from app.db.db_utils import execute_query
 from app.db.models.internal import CountriesAndSectorsInterestTemp
 from app.etl.tasks.datahub_omis_country_sector_interest import Task
 
 
 class TestCountriesAndSectorsOfInterest:
     def test(
-        self,
-        add_country_territory_registry,
-        add_datahub_omis,
-        add_standardised_countries,
+        self, add_country_territory_registry, add_datahub_omis, add_standardised_countries,
     ):
         add_datahub_omis(
             [
@@ -39,14 +36,12 @@ class TestCountriesAndSectorsOfInterest:
         task()
 
         sql = f'''select * from {CountriesAndSectorsInterestTemp.get_fq_table_name()}'''
-        df = execute_query(sql)
+        df = flask_app.dbi.execute_query(sql, df=True)
 
         assert len(df) == 2
 
         # check first record
-        assert (
-            df['service_company_id'].values[0] == 'a4881825-6c7c-46f3-b638-6a1346274a6b'
-        )
+        assert df['service_company_id'].values[0] == 'a4881825-6c7c-46f3-b638-6a1346274a6b'
         assert df['company_match_id'].values[0] is None
         assert df['country'].values[0] is None
         assert df['sector'].values[0] == 'Food'
@@ -55,9 +50,7 @@ class TestCountriesAndSectorsOfInterest:
         assert df['timestamp'].values[0] == np.datetime64('2019-01-01 01:00')
 
         # check second record
-        assert (
-            df['service_company_id'].values[1] == 'f89d85d2-78c7-484d-bf63-228f32bf8d26'
-        )
+        assert df['service_company_id'].values[1] == 'f89d85d2-78c7-484d-bf63-228f32bf8d26'
         assert df['company_match_id'].values[1] is None
         assert df['country'].values[1] == 'United Kingdom'
         assert df['sector'].values[1] == 'Engineering'

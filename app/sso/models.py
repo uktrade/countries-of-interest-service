@@ -1,6 +1,4 @@
-from flask_security import RoleMixin, UserMixin
-
-from app.db.models import (
+from data_engineering.common.db.models import (
     _bool,
     _col,
     _dt,
@@ -9,6 +7,7 @@ from app.db.models import (
     BaseModel,
     db,
 )
+from flask_security import RoleMixin, UserMixin
 
 
 class UserRole(BaseModel):

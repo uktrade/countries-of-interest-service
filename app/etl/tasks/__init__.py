@@ -2,7 +2,6 @@ import datetime
 
 from flask import current_app as flask_app
 
-from app.db.db_utils import execute_statement
 from app.etl.tasks.pipeline import (
     EXTRACTORS,
     EXTRACTORS_LIST,
@@ -42,17 +41,15 @@ def populate_database(drop_table, extractors, tasks):
                 try:
                     output = output + [subtask()]
                 except Exception as e:
-                    output = output + [
-                        {'task': subtask.name, 'status': 500, 'error': str(e)}
-                    ]
+                    output = output + [{'task': subtask.name, 'status': 500, 'error': str(e)}]
 
     sql = 'insert into etl_runs (timestamp) values (%s)'
     ts_finish = datetime.datetime.now()
-    execute_statement(sql, [ts_finish])
+    flask_app.dbi.execute_statement(sql, [ts_finish])
     sql = 'delete from etl_status'
-    execute_statement(sql)
+    flask_app.dbi.execute_statement(sql)
     sql = '''insert into etl_status (status, timestamp) values (%s, %s)'''
-    execute_statement(sql, ['SUCCESS', ts_finish])
+    flask_app.dbi.execute_statement(sql, ['SUCCESS', ts_finish])
 
     output = {'output': output}
     pretty_log_output(output)
@@ -60,6 +57,5 @@ def populate_database(drop_table, extractors, tasks):
 
 
 def pretty_log_output(output):
-    flask_app.logger.info('\n --OUTPUT-- \n')
     for log_entry in output['output']:
-        flask_app.logger.info(log_entry)
+        flask_app.logger.info('', extra=log_entry)

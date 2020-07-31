@@ -1,12 +1,12 @@
 import mohawk
 import requests
+from data_engineering.common.db.models import sql_alchemy
 from flask import current_app as flask_app
 from sqlalchemy import exc
 from sqlalchemy.dialects import postgresql
 
 import app.db.models.external as models
 from app.config.constants import Source
-from app.db.models import sql_alchemy
 
 
 class SourceDataExtractor:
@@ -121,6 +121,100 @@ class ExtractDatahubCompanyDataset(SourceDataExtractor):
     unique_key = 'datahub_company_id'
 
 
+class ExtractDatahubCompanyExportCountry(SourceDataExtractor):
+    name = Source.DATAHUB_COMPANY_EXPORT_COUNTRY.value
+    dataset_id_config_key = 'datahub_company_export_country_dataset_id'
+    mapping = {
+        'company_id': 'company_id',
+        'country': 'country',
+        'country_iso_alpha2_code': 'country_iso_alpha2_code',
+        'created_on': 'created_on',
+        'id': 'company_export_country_id',
+        'modified_on': 'modified_on',
+        'status': 'status',
+    }
+    model = models.DatahubCompanyExportCountry
+    source_table_id_config_key = 'datahub_company_export_country_source_table_id'
+    stub_data = {
+        'headers': [
+            'company_id',
+            'country',
+            'country_iso_alpha2_code',
+            'created_on',
+            'id',
+            'modified_on',
+            'status',
+        ],
+        'values': [
+            [
+                'c31e4492-1f16-48a2-8c5e-8c0334d959a3',
+                'Argentina',
+                'AR',
+                '2020-01-01 01:00:00',
+                '41a83926-b771-4a33-b3d2-e944fa35b366',
+                '2020-01-01 02:00:00',
+                'currently_exporting',
+            ],
+            [
+                'd0af8e52-ff34-4088-98e3-d2d22cd250ae',
+                'Georgia',
+                'GE',
+                '2020-01-02 01:00:00',
+                '6b9c0565-d007-48ae-888c-77638633b434',
+                '2020-01-02 02:00:00',
+                'future_interest',
+            ],
+        ],
+    }
+
+
+class ExtractDatahubCompanyExportCountryHistory(SourceDataExtractor):
+    name = Source.DATAHUB_COMPANY_EXPORT_COUNTRY_HISTORY.value
+    dataset_id_config_key = 'datahub_company_export_country_history_dataset_id'
+    mapping = {
+        'company_id': 'company_id',
+        'country': 'country',
+        'country_iso_alpha2_code': 'country_iso_alpha2_code',
+        'history_date': 'history_date',
+        'id': 'history_id',
+        'history_type': 'history_type',
+        'status': 'status',
+    }
+    model = models.DatahubCompanyExportCountryHistory
+    source_table_id_config_key = 'datahub_company_export_country_history_source_table_id'
+    stub_data = {
+        'headers': [
+            'company_id',
+            'country_iso_alpha2_code',
+            'country',
+            'history_date',
+            'id',
+            'history_type',
+            'status',
+        ],
+        'values': [
+            [
+                'c31e4492-1f16-48a2-8c5e-8c0334d959a3',
+                'US',
+                'united states',
+                '2020-01-01 01:00',
+                '897c05c7-7836-4d36-b44d-56d1c3ae6a9a',
+                'insert',
+                'future_interest',
+            ],
+            [
+                'd0af8e52-ff34-4088-98e3-d2d22cd250ae',
+                'MY',
+                'myanmar',
+                '2020-01-01 02:00',
+                '450879d1-6169-4e32-965f-47474640f3ae',
+                'delete',
+                'not_interested',
+            ],
+        ],
+    }
+
+
 class ExtractDatahubContactDataset(SourceDataExtractor):
     name = Source.DATAHUB_CONTACT.value
     dataset_id_config_key = 'datahub_contacts_dataset_id'
@@ -149,46 +243,6 @@ class ExtractDatahubContactDataset(SourceDataExtractor):
     unique_key = 'datahub_contact_id'
 
 
-class ExtractDatahubExportToCountries(SourceDataExtractor):
-    name = Source.DATAHUB_EXPORT_TO_COUNTRIES.value
-    dataset_id_config_key = 'datahub_export_countries_dataset_id'
-    mapping = {
-        'company_id': 'company_id',
-        'country_iso_alpha2_code': 'country_iso_alpha2_code',
-        'country': 'country',
-        'id': 'id',
-    }
-    model = models.DatahubExportToCountries
-    source_table_id_config_key = 'datahub_export_countries_source_table_id'
-    stub_data = {
-        'headers': ['company_id', 'country_iso_alpha2_code', 'country', 'id'],
-        'values': [
-            ['c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'US', 'united states', 1],
-            ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'MY', 'myanmar', 2],
-        ],
-    }
-
-
-class ExtractDatahubFutureInterestCountries(SourceDataExtractor):
-    name = Source.DATAHUB_FUTURE_INTEREST_COUNTRIES.value
-    dataset_id_config_key = 'datahub_future_interest_countries_dataset_id'
-    mapping = {
-        'company_id': 'company_id',
-        'country_iso_alpha2_code': 'country_iso_alpha2_code',
-        'country': 'country',
-        'id': 'id',
-    }
-    model = models.DatahubFutureInterestCountries
-    source_table_id_config_key = 'datahub_future_interest_countries_source_table_id'
-    stub_data = {
-        'headers': ['company_id', 'country_iso_alpha2_code', 'country', 'id'],
-        'values': [
-            ['c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'CN', 'china', 1],
-            ['d0af8e52-ff34-4088-98e3-d2d22cd250ae', 'DE', 'germany', 2],
-        ],
-    }
-
-
 class ExtractDatahubInteractions(SourceDataExtractor):
     name = Source.DATAHUB_INTERACTIONS.value
     dataset_id_config_key = 'datahub_interactions_dataset_id'
@@ -202,13 +256,7 @@ class ExtractDatahubInteractions(SourceDataExtractor):
     model = models.Interactions
     source_table_id_config_key = 'datahub_interactions_source_table_id'
     stub_data = {
-        'headers': [
-            'id',
-            'company_id',
-            'interaction_notes',
-            'interaction_subject',
-            'created_on',
-        ],
+        'headers': ['id', 'company_id', 'interaction_notes', 'interaction_subject', 'created_on'],
         'values': [
             [
                 'a8cb910f-51df-4d8e-a953-01c0be435d36',
@@ -227,6 +275,54 @@ class ExtractDatahubInteractions(SourceDataExtractor):
         ],
     }
     unique_key = 'datahub_interaction_id'
+
+
+class ExtractDatahubInteractionsExportCountry(SourceDataExtractor):
+    name = Source.DATAHUB_INTERACTIONS_EXPORT_COUNTRY.value
+    dataset_id_config_key = 'datahub_interactions_export_country_dataset_id'
+    mapping = {
+        'company_id': 'datahub_company_id',
+        'country_name': 'country_name',
+        'country_iso_alpha2_code': 'country_iso_alpha2_code',
+        'created_on': 'created_on',
+        'id': 'datahub_interaction_export_country_id',
+        'interaction_id': 'datahub_interaction_id',
+        'status': 'status',
+    }
+    model = models.InteractionsExportCountry
+    source_table_id_config_key = 'datahub_interactions_export_country_source_table_id'
+    stub_data = {
+        'headers': [
+            'company_id',
+            'country_name',
+            'country_iso_alpha2_code',
+            'created_on',
+            'id',
+            'interaction_id',
+            'status',
+        ],
+        'values': [
+            [
+                '9fc28ad0-5c8c-46e3-8f4b-109757a14f24',
+                'South Africa',
+                'ZA',
+                '2020-01-01 00:00:00',
+                'b12e5a23-50c8-4c60-be21-0754e714e092',
+                'bedd9f73-794a-4a7e-b7b5-30add35bc8f9',
+                'future_interest',
+            ],
+            [
+                'ec52e994-ba0a-40b2-af50-a6d241eb40fe',
+                'Slovenia',
+                'SI',
+                '2020-01-01 01:00:00',
+                'c3eef76d-bb17-4d90-8647-2da113cf1d24',
+                'd696b459-19f9-4cf5-81a9-5880e7d09fbc',
+                'currently_exporting',
+            ],
+        ],
+    }
+    unique_key = 'datahub_interaction_export_country_id'
 
 
 class ExtractDatahubOmis(SourceDataExtractor):
@@ -321,24 +417,18 @@ def get_hawk_headers(
     if https is False:
         # todo: ask data workspace to fix the https/http x-forwarded-for
         url = url.replace('https', 'http')
-    # strip query string
-    url = url.split('?')[0]
     credentials = {'id': client_id, 'key': client_key, 'algorithm': 'sha256'}
 
     sender = mohawk.Sender(
-        credentials=credentials,
-        url=url,
-        method=method,
-        content=content,
-        content_type=content_type,
+        credentials=credentials, url=url, method=method, content=content, content_type=content_type,
     )
     headers = {'Authorization': sender.request_header, 'Content-Type': content_type}
     return headers
 
 
 def populate_table_paginated(model, extractor_name, mapping, unique_key, url):
-    client_id = flask_app.config['dataworkspace']['hawk_client_id']
-    client_key = flask_app.config['dataworkspace']['hawk_client_key']
+    client_id = flask_app.config['access_control']['hawk_client_id']
+    client_key = flask_app.config['access_control']['hawk_client_key']
     next_page = url
     n_rows = 0
     while next_page is not None:
@@ -366,9 +456,7 @@ def populate_table(data, model, extractor_name, mapping, unique_key, overwrite=T
             items.append(data_item)
 
         insert_stmt = postgresql.insert(model.__table__).values(items)
-        update_columns = {
-            col.name: col for col in insert_stmt.excluded if col.name not in ('id',)
-        }
+        update_columns = {col.name: col for col in insert_stmt.excluded if col.name not in ('id',)}
         update_statement = insert_stmt.on_conflict_do_update(
             index_elements=[unique_key], set_=update_columns
         )

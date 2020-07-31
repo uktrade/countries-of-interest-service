@@ -11,18 +11,11 @@ services:
       - redis
     volumes:
       - .:/app
-  celery:
-    build:
-      context: .
-    volumes:
-      - .:/app
-    entrypoint: dockerize -wait tcp://postgres:5432 -wait tcp://redis:6379 -wait tcp://web:5000 -timeout 180s
-    env_file:
-      - ${ENV_FILE:-.env}
-    command: /app/scripts/celery_entrypoint.sh
 
   postgres:
     image: "postgres"
+    env_file:
+      - ${ENV_FILE:-.env}
     ports:
       - "5433:5432"
   redis:

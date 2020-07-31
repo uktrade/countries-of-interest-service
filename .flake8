@@ -7,3 +7,5 @@ exclude =
     venv,
     .venv
 import_order_style = smarkets
+max-line-length = 100
+extend-ignore = E203

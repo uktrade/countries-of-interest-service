@@ -1,8 +1,9 @@
 import requests
+from data_engineering.common.tests.utils import rows_equal_query_results
+from flask import current_app as flask_app
 
 from app.db.models.internal import CountriesAndSectorsInterest
 from app.etl.tasks.company_matching import Task
-from tests.utils import rows_equal_query_results
 
 
 def test_company_matching(
@@ -164,6 +165,7 @@ def test_company_matching(
     ]
 
     assert rows_equal_query_results(
+        flask_app.dbi,
         expected_rows,
         f'SELECT * FROM {CountriesAndSectorsInterest.get_fq_table_name()}',
     )

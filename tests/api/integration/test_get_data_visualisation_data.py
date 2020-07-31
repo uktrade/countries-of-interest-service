@@ -11,7 +11,7 @@ entry_1 = {
     'sector': 'sector1',
     'type': 'interested',
     'service': 'datahub',
-    'source': 'source1',
+    'source': 'omis',
     'source_id': 'source_id_1',
     'timestamp': '2009-10-10T12:12:12',
 }
@@ -22,8 +22,8 @@ entry_2 = {
     'country': 'country2',
     'sector': None,
     'type': 'exported',
-    'service': 'datahub',
-    'source': 'source2',
+    'service': 'export_wins',
+    'source': 'export_wins',
     'source_id': 'source_id_2',
     'timestamp': '2009-10-10T13:00:00',
 }
@@ -35,7 +35,7 @@ entry_3 = {
     'sector': 'sector3',
     'type': 'interested',
     'service': 'export-wins',
-    'source': 'source3',
+    'source': 'omis',
     'source_id': 'source_id_1',
     'timestamp': '2009-10-11T13:00:00',
 }
@@ -66,7 +66,7 @@ def test_get_countries(app):
             utils.assert_api_response(
                 app_context=app_context,
                 api=url,
-                params='exporter-status=interested',
+                params='data-source=omis',
                 expected_response=(
                     200,
                     {
@@ -102,7 +102,7 @@ def test_get_sectors(app):
             utils.assert_api_response(
                 app_context=app_context,
                 api=url,
-                params='exporter-status=interested',
+                params='data-source=omis',
                 expected_response=(
                     200,
                     {
@@ -130,7 +130,7 @@ def test_get_sectors(app):
             )
 
 
-def test_get_countries_mentioned(app):
+def test_get_countries_interactions(app):
     with mock.patch('app.sso.token.is_authenticated') as mock_is_authenticated:
         mock_is_authenticated.return_value = True
         url = 'http://localhost:80/api/v1/get-data-visualisation-data/country'
@@ -138,7 +138,7 @@ def test_get_countries_mentioned(app):
             utils.assert_api_response(
                 app_context=app_context,
                 api=url,
-                params='exporter-status=mentioned',
+                params='data-source=interactions',
                 expected_response=(
                     200,
                     {
@@ -158,7 +158,7 @@ def test_get_countries_mentioned(app):
             )
 
 
-def test_invalid_exporter_status(app):
+def test_invalid_data_source(app):
     with mock.patch('app.sso.token.is_authenticated') as mock_is_authenticated:
         mock_is_authenticated.return_value = True
         url = 'http://localhost:80/api/v1/get-data-visualisation-data/country'
@@ -166,7 +166,7 @@ def test_invalid_exporter_status(app):
             utils.assert_api_response(
                 app_context=app_context,
                 api=url,
-                params='exporter-status=invalid',
+                params='data-source=invalid',
                 expected_response=(400, None),
             )
 
@@ -179,12 +179,12 @@ def test_invalid_fields_status(app):
             utils.assert_api_response(
                 app_context=app_context,
                 api=url,
-                params='exporter-status=invalid',
+                params='data-source=invalid',
                 expected_response=(400, None),
             )
 
 
-def test_invalid_sector_exporter_status(app):
+def test_invalid_sector_data_source(app):
     with mock.patch('app.sso.token.is_authenticated') as mock_is_authenticated:
         mock_is_authenticated.return_value = True
         url = 'http://localhost:80/api/v1/get-data-visualisation-data/sector'
@@ -192,6 +192,6 @@ def test_invalid_sector_exporter_status(app):
             utils.assert_api_response(
                 app_context=app_context,
                 api=url,
-                params='exporter-status=mentioned',
+                params='data-source=interactions',
                 expected_response=(400, None),
             )

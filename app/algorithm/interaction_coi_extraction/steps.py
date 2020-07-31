@@ -5,10 +5,9 @@ import traceback
 
 import pycountry
 import spacy
+from data_engineering.common.db.models import sql_alchemy
 from flask import current_app as flask_app
 
-from app.db import sql_alchemy
-from app.db.db_utils import dsv_buffer_to_table
 from app.utils import log
 
 REPLACEMENTS = {
@@ -167,9 +166,7 @@ def _load_model():
 
 
 def _get_place_contexts(doc):
-    places = [
-        (ent, ent.label_) for ent in doc.ents if ent.label_ in ('GPE', 'LOC', 'NORP')
-    ]
+    places = [(ent, ent.label_) for ent in doc.ents if ent.label_ in ('GPE', 'LOC', 'NORP')]
     segment_nb, token_segments, token_pos = 1, [], []
     for token in doc:
         if (
@@ -222,24 +219,18 @@ def _analyse_interaction(interaction_doc):
             'new',
         ):
             continue
-        if set(INTERESTED_INDICATORS) & set(
-            [verb.replace('not ', '') for verb in verb_list]
-        ):
+        if set(INTERESTED_INDICATORS) & set([verb.replace('not ', '') for verb in verb_list]):
             action = 'interested'
             if neg:
                 action = 'not ' + action
-        elif set(EXPORTED_INDICATORS) & set(
-            [verb.replace('not ', '') for verb in verb_list]
-        ):
+        elif set(EXPORTED_INDICATORS) & set([verb.replace('not ', '') for verb in verb_list]):
             action = 'exported'
             if neg:
                 action = 'not ' + action
         if label == 'GPE':
             mapped_place = REPLACEMENTS.get(place.lower(), None)
             try:
-                mapped_place = pycountry.countries.search_fuzzy(mapped_place or place)[
-                    0
-                ].name
+                mapped_place = pycountry.countries.search_fuzzy(mapped_place or place)[0].name
                 mapped_place = REFERENCE_COUNTRY_MAPPING.get(mapped_place, mapped_place)
             except Exception:
                 pass
@@ -303,9 +294,7 @@ def process_interactions(
                             [
                                 f'${datahub_interaction_id}$',
                                 f"${place.replace('$','')}$",
-                                ''
-                                if not mapped_place
-                                else f"${mapped_place.replace('$','')}$",
+                                '' if not mapped_place else f"${mapped_place.replace('$','')}$",
                                 '' if not action else f'${action}$',
                                 f'${label}$',
                                 f'''${{{filtered_verbs}}}$''',
@@ -327,14 +316,10 @@ def process_interactions(
         transaction = connection.begin()
 
         try:
-            dsv_buffer_to_table(
+            flask_app.dbi.dsv_buffer_to_table(
                 chunk,
-                table=output_table,
-                schema=output_schema,
-                sep=',',
-                null='',
-                has_header=False,
-                columns=[
+                f'{output_schema}.{output_table}',
+                [
                     'datahub_interaction_id',
                     'place',
                     'standardized_place',
@@ -343,8 +328,10 @@ def process_interactions(
                     'context',
                     'negation',
                 ],
+                sep=',',
+                null='',
+                has_header=False,
                 quote='$',
-                reraise=True,
             )
 
             sql = f'''
@@ -356,9 +343,7 @@ def process_interactions(
 
         except Exception:
             exc_type, exc_value, exc_traceback = sys.exc_info()
-            traceback.print_exception(
-                exc_type, exc_value, exc_traceback, file=sys.stdout
-            )
+            traceback.print_exception(exc_type, exc_value, exc_traceback, file=sys.stdout)
             transaction.rollback()
         finally:
             connection.close()

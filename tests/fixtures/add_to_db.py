@@ -2,13 +2,14 @@ import pytest
 
 from app.db.models.external import (
     DatahubCompany,
+    DatahubCompanyExportCountry,
+    DatahubCompanyExportCountryHistory,
     DatahubContact,
-    DatahubExportToCountries,
-    DatahubFutureInterestCountries,
     DatahubOmis,
     DITCountryTerritoryRegister,
     ExportWins,
     Interactions,
+    InteractionsExportCountry,
 )
 from app.db.models.internal import (
     CountriesAndSectorsInterest,
@@ -47,16 +48,38 @@ def add_countries_and_sectors_of_interest(app_with_db_module):
 
 
 @pytest.fixture(scope='module')
-def add_datahub_export_to_countries(app_with_db_module):
+def add_datahub_company_export_country(app_with_db_module):
+    def _method(records):
+        for record in records:
+            defaults = {
+                'id': record.get('id', None),
+                'company_export_country_id': record.get('company_export_country_id', None),
+                'company_id': record.get('datahub_company_id', None),
+                'country': record.get('country', None),
+                'country_iso_alpha2_code': record.get('country_iso_alpha2_code', None),
+                'created_on': record.get('created_on', None),
+                'modified_on': record.get('modified_on', None),
+                'status': record.get('status', None),
+            }
+            DatahubCompanyExportCountry.get_or_create(id=record.get('id', None), defaults=defaults)
+
+    return _method
+
+
+@pytest.fixture(scope='module')
+def add_datahub_company_export_country_history(app_with_db_module):
     def _method(records):
         for record in records:
             defaults = {
                 'company_id': record.get('company_id', None),
                 'country': record.get('country', None),
                 'country_iso_alpha2_code': record.get('country_iso_alpha2_code', None),
-                'id': record.get('id', None),
+                'history_date': record.get('history_date', None),
+                'history_id': record.get('history_id', None),
+                'history_type': record.get('history_type', None),
+                'status': record.get('status', None),
             }
-            DatahubExportToCountries.get_or_create(
+            DatahubCompanyExportCountryHistory.get_or_create(
                 id=record.get('id', None), defaults=defaults
             )
 
@@ -64,18 +87,21 @@ def add_datahub_export_to_countries(app_with_db_module):
 
 
 @pytest.fixture(scope='module')
-def add_datahub_future_interest_countries(app_with_db_module):
+def add_datahub_interactions_export_country(app_with_db_module):
     def _method(records):
         for record in records:
             defaults = {
-                'company_id': record.get('company_id', None),
-                'country': record.get('country', None),
                 'country_iso_alpha2_code': record.get('country_iso_alpha2_code', None),
-                'id': record.get('id', None),
+                'country_name': record.get('country_name', None),
+                'created_on': record.get('created_on', None),
+                'datahub_company_id': record.get('datahub_company_id', None),
+                'datahub_interaction_export_country_id': record.get(
+                    'datahub_interaction_export_country_id', None
+                ),
+                'datahub_interaction_id': record.get('datahub_interaction_id', None),
+                'status': record.get('status', None),
             }
-            DatahubFutureInterestCountries.get_or_create(
-                id=record.get('id', None), defaults=defaults
-            )
+            InteractionsExportCountry.get_or_create(id=record.get('id', None), defaults=defaults)
 
     return _method
 
@@ -92,8 +118,7 @@ def add_datahub_omis(app_with_db_module):
                 'datahub_omis_order_id': record.get('datahub_omis_order_id', None),
             }
             DatahubOmis.get_or_create(
-                datahub_omis_order_id=record.get('datahub_omis_order_id', None),
-                defaults=defaults,
+                datahub_omis_order_id=record.get('datahub_omis_order_id', None), defaults=defaults,
             )
 
     return _method
@@ -181,9 +206,7 @@ def add_standardised_countries(app_with_db_module):
                 'standardised_country': record.get('standardised_country', None),
                 'similarity': record.get('similarity', None),
             }
-            StandardisedCountries.get_or_create(
-                id=record.get('id', None), defaults=defaults
-            )
+            StandardisedCountries.get_or_create(id=record.get('id', None), defaults=defaults)
 
     return _method
 

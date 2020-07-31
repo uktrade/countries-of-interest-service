@@ -3,9 +3,10 @@ from unittest.mock import Mock, patch
 
 import pytest
 import sqlalchemy.exc
+from flask import current_app as flask_app
+
 
 import app.db.models.external as models
-from app.db.db_utils import execute_statement
 from app.etl.tasks import source_data_extraction
 
 
@@ -86,9 +87,7 @@ class ReferenceDatasetExtractBaseTestCase(SourceDataExtractBaseTestCase):
         }
 
 
-class TestExtractCountriesAndTerritoriesReferenceDataset(
-    ReferenceDatasetExtractBaseTestCase
-):
+class TestExtractCountriesAndTerritoriesReferenceDataset(ReferenceDatasetExtractBaseTestCase):
 
     __test__ = True
     group_slug_config_key = 'countries_and_territories_group_slug'
@@ -158,74 +157,130 @@ class TestExtractDatahubCompany(SourceDataExtractBaseTestCase):
     extractor = source_data_extraction.ExtractDatahubCompanyDataset
 
 
-class TestExtractDatahubExportCountries(SourceDataExtractBaseTestCase):
+class TestExtractDatahubCompanyExportCountry(SourceDataExtractBaseTestCase):
+
     __test__ = True
-    dataset_id_config_key = 'datahub_export_countries_dataset_id'
+    dataset_id_config_key = 'datahub_company_export_country_dataset_id'
     expected_data = [
         {
             'company_id': 'c31e4492-1f16-48a2-8c5e-8c0334d959a3',
-            'country_iso_alpha2_code': 'SK',
-            'country': 'slovakia',
-            'id': 0,
+            'country': 'Canada',
+            'country_iso_alpha2_code': 'CA',
+            'created_on': '2020-01-01 01:00:00',
+            'company_export_country_id': '41a83926-b771-4a33-b3d2-e944fa35b366',
+            'modified_on': '2020-01-01 02:00:00',
+            'status': 'currently_exporting',
         },
         {
             'company_id': 'd0af8e52-ff34-4088-98e3-d2d22cd250ae',
-            'country_iso_alpha2_code': 'SD',
-            'country': 'sudan',
-            'id': 1,
+            'country': 'Georgia',
+            'country_iso_alpha2_code': 'GE',
+            'created_on': '2020-01-02 01:00:00',
+            'company_export_country_id': '6b9c0565-d007-48ae-888c-77638633b434',
+            'modified_on': '2020-01-02 02:00:00',
+            'status': 'future_interest',
         },
     ]
+    item_pk = 'company_export_country_id'
     source_data = {
         'headers': [
+            'company_id',
+            'country',
+            'country_iso_alpha2_code',
+            'created_on',
             'id',
+            'modified_on',
+            'status',
+        ],
+        'next': None,
+        'values': [
+            [
+                'c31e4492-1f16-48a2-8c5e-8c0334d959a3',
+                'Canada',
+                'CA',
+                '2020-01-01 01:00:00',
+                '41a83926-b771-4a33-b3d2-e944fa35b366',
+                '2020-01-01 02:00:00',
+                'currently_exporting',
+            ],
+            [
+                'd0af8e52-ff34-4088-98e3-d2d22cd250ae',
+                'Georgia',
+                'GE',
+                '2020-01-02 01:00:00',
+                '6b9c0565-d007-48ae-888c-77638633b434',
+                '2020-01-02 02:00:00',
+                'future_interest',
+            ],
+        ],
+    }
+    source_table_id_config_key = 'datahub_company_export_country_source_table_id'
+    extractor = source_data_extraction.ExtractDatahubCompanyExportCountry
+
+
+class TestExtractDatahubCompanyExportCountryHistory(SourceDataExtractBaseTestCase):
+    __test__ = True
+    dataset_id_config_key = 'datahub_company_export_country_history_dataset_id'
+    expected_data = [
+        {
+            'company_id': '6ef62b18-fe0f-4e0e-8cbf-3ca3399df788',
+            'country_iso_alpha2_code': 'US',
+            'country': 'united states',
+            'history_date': '2020-01-01 01:00:00',
+            'history_id': 'afd47aa2-b3fd-4c2e-a28b-44fef679c26e',
+            'history_type': 'update',
+            'status': 'not_interested',
+        },
+        {
+            'company_id': '6a877ef4-d907-4dc0-a432-f140deabef2b',
+            'country_iso_alpha2_code': 'CN',
+            'country': 'china',
+            'history_date': '2020-01-01 02:00:00',
+            'history_id': '592ff565-88d0-43d7-b5d3-7e44fef6ed56',
+            'history_type': 'insert',
+            'status': 'currently_exporting',
+        },
+    ]
+    item_pk = 'history_id'
+
+    source_data = {
+        'headers': [
             'company_id',
             'country_iso_alpha2_code',
             'country',
+            'history_date',
+            'id',
+            'history_type',
+            'status',
             'extraField',
         ],
         'next': None,
         'values': [
-            [0, 'c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'SK', 'slovakia', 'extra'],
-            [1, 'd0af8e52-ff34-4088-98e3-d2d22cd250ae', 'SD', 'sudan', 'extra'],
+            [
+                '6ef62b18-fe0f-4e0e-8cbf-3ca3399df788',
+                'US',
+                'united states',
+                '2020-01-01 01:00:00',
+                'afd47aa2-b3fd-4c2e-a28b-44fef679c26e',
+                'update',
+                'not_interested',
+                'extra_field_1',
+            ],
+            [
+                '6a877ef4-d907-4dc0-a432-f140deabef2b',
+                'CN',
+                'china',
+                '2020-01-01 02:00:00',
+                '592ff565-88d0-43d7-b5d3-7e44fef6ed56',
+                'insert',
+                'currently_exporting',
+                'extra_field_2',
+            ],
         ],
     }
-    source_table_id_config_key = 'datahub_export_countries_source_table_id'
-    extractor = source_data_extraction.ExtractDatahubExportToCountries
 
-
-class TestExtractDatahubFutureInterestCountries(SourceDataExtractBaseTestCase):
-    __test__ = True
-    dataset_id_config_key = 'datahub_future_interest_countries_dataset_id'
-    expected_data = [
-        {
-            'company_id': 'c31e4492-1f16-48a2-8c5e-8c0334d959a3',
-            'country_iso_alpha2_code': 'SK',
-            'country': 'slovakia',
-            'id': 0,
-        },
-        {
-            'company_id': 'd0af8e52-ff34-4088-98e3-d2d22cd250ae',
-            'country_iso_alpha2_code': 'SD',
-            'country': 'sudan',
-            'id': 1,
-        },
-    ]
-    source_data = {
-        'headers': [
-            'id',
-            'company_id',
-            'country_iso_alpha2_code',
-            'country',
-            'extra_field',
-        ],
-        'next': None,
-        'values': [
-            [0, 'c31e4492-1f16-48a2-8c5e-8c0334d959a3', 'SK', 'slovakia', 'extra'],
-            [1, 'd0af8e52-ff34-4088-98e3-d2d22cd250ae', 'SD', 'sudan', 'extra'],
-        ],
-    }
-    source_table_id_config_key = 'datahub_future_interest_countries_source_table_id'
-    extractor = source_data_extraction.ExtractDatahubFutureInterestCountries
+    source_table_id_config_key = 'datahub_company_export_country_history_source_table_id'
+    extractor = source_data_extraction.ExtractDatahubCompanyExportCountryHistory
 
 
 class TestExtractDatahubInteractions(SourceDataExtractBaseTestCase):
@@ -249,13 +304,7 @@ class TestExtractDatahubInteractions(SourceDataExtractBaseTestCase):
         },
     ]
     source_data = {
-        'headers': [
-            'id',
-            'company_id',
-            'interaction_notes',
-            'interaction_subject',
-            'created_on',
-        ],
+        'headers': ['id', 'company_id', 'interaction_notes', 'interaction_subject', 'created_on'],
         'values': [
             [
                 '798c74ef-7de6-4c3a-aa46-51692c2093b8',
@@ -276,6 +325,67 @@ class TestExtractDatahubInteractions(SourceDataExtractBaseTestCase):
     }
     source_table_id_config_key = 'datahub_interactions_source_table_id'
     extractor = source_data_extraction.ExtractDatahubInteractions
+
+
+class TestExtractDatahubInteractionsExportCountry(SourceDataExtractBaseTestCase):
+    __test__ = True
+    dataset_id_config_key = 'datahub_interactions_export_country_dataset_id'
+    expected_data = [
+        {
+            'country_name': 'Tajikistan',
+            'country_iso_alpha2_code': 'TJ',
+            'created_on': '2020-01-02 00:00:00',
+            'datahub_company_id': '7b75ba30-88ae-4755-a096-fa842d18106c',
+            'datahub_interaction_export_country_id': '7b8993d9-7ad7-4498-8e2c-f1913a14ea63',
+            'datahub_interaction_id': '77c0d1a8-4fd4-4ef3-aac6-4d09cc45a710',
+            'status': 'future_interest',
+        },
+        {
+            'country_name': 'Saint Martin',
+            'country_iso_alpha2_code': 'MF',
+            'created_on': '2020-01-02 01:00:00',
+            'datahub_company_id': 'a858d27a-16e0-41e5-b925-5d0dd2dd6b69',
+            'datahub_interaction_export_country_id': '337d599f-823f-4327-84d6-5cddfe26d02f',
+            'datahub_interaction_id': '7e183db1-94d5-4266-a871-aac823afeb63',
+            'status': 'currently_exporting',
+        },
+    ]
+    extractor = source_data_extraction.ExtractDatahubInteractionsExportCountry
+    item_pk = 'datahub_interaction_export_country_id'
+
+    source_data = {
+        'headers': [
+            'company_id',
+            'country_name',
+            'country_iso_alpha2_code',
+            'created_on',
+            'id',
+            'interaction_id',
+            'status',
+        ],
+        'values': [
+            [
+                '7b75ba30-88ae-4755-a096-fa842d18106c',
+                'Tajikistan',
+                'TJ',
+                '2020-01-02 00:00:00',
+                '7b8993d9-7ad7-4498-8e2c-f1913a14ea63',
+                '77c0d1a8-4fd4-4ef3-aac6-4d09cc45a710',
+                'future_interest',
+            ],
+            [
+                'a858d27a-16e0-41e5-b925-5d0dd2dd6b69',
+                'Saint Martin',
+                'MF',
+                '2020-01-02 01:00:00',
+                '337d599f-823f-4327-84d6-5cddfe26d02f',
+                '7e183db1-94d5-4266-a871-aac823afeb63',
+                'currently_exporting',
+            ],
+        ],
+        'next': None,
+    }
+    source_table_id_config_key = 'datahub_interactions_export_country_source_table_id'
 
 
 class TestExtractDatahubOmis(SourceDataExtractBaseTestCase):
@@ -412,7 +522,7 @@ class TestPopulateTable:
 
     def get_rows(self):
         sql = f'select * from {self.model.__tablename__} order by id'
-        status = execute_statement(sql, raise_if_fail=True)
+        status = flask_app.dbi.execute_statement(sql, raise_if_fail=True)
         return status.fetchall()
 
     def test_rollback_when_there_is_an_error(self, add_datahub_contact):
@@ -448,11 +558,7 @@ class TestPopulateTable:
                 data,
                 self.model,
                 source_data_extraction.ExtractDatahubContactDataset.name,
-                {
-                    'id': 'datahub_contact_id',
-                    'company_id': 'datahub_company_id',
-                    'email': 'email',
-                },
+                {'id': 'datahub_contact_id', 'company_id': 'datahub_company_id', 'email': 'email'},
                 'datahub_contact_id',
                 overwrite=False,
             )
@@ -512,11 +618,7 @@ class TestPopulateTable:
             data,
             self.model,
             source_data_extraction.ExtractDatahubContactDataset.name,
-            {
-                'id': 'datahub_contact_id',
-                'company_id': 'datahub_company_id',
-                'email': 'email',
-            },
+            {'id': 'datahub_contact_id', 'company_id': 'datahub_company_id', 'email': 'email'},
             'datahub_contact_id',
             overwrite=True,
         )
@@ -579,11 +681,7 @@ class TestPopulateTable:
             data,
             self.model,
             source_data_extraction.ExtractDatahubContactDataset.name,
-            {
-                'id': 'datahub_contact_id',
-                'company_id': 'datahub_company_id',
-                'email': 'email',
-            },
+            {'id': 'datahub_contact_id', 'company_id': 'datahub_company_id', 'email': 'email'},
             'datahub_contact_id',
             overwrite=False,
         )
@@ -616,9 +714,7 @@ class TestPopulateTable:
             ),
         ]
 
-    def test_if_overwrite_is_false_upserts_to_interaction_table(
-        self, add_datahub_interaction
-    ):
+    def test_if_overwrite_is_false_upserts_to_interaction_table(self, add_datahub_interaction):
         add_datahub_interaction(
             [
                 {
@@ -695,7 +791,7 @@ class TestPopulateTable:
             f'id,datahub_interaction_id,datahub_company_id,subject,notes,created_on '
             f'from {models.Interactions.__tablename__} order by id'
         )
-        status = execute_statement(sql, raise_if_fail=True)
+        status = flask_app.dbi.execute_statement(sql, raise_if_fail=True)
         rows = status.fetchall()
         assert len(rows) == 3
         assert rows == [

@@ -1,11 +1,10 @@
 import click
 import sqlalchemy_utils
-from flask import current_app as app
+from data_engineering.common.db.models import HawkUsers
+from flask import current_app as flask_app
 from flask.cli import AppGroup, with_appcontext
-from sqlalchemy import create_engine
 
-from app.db.db_utils import create_schemas
-from app.db.models.internal import HawkUsers
+from app.db.models import get_schemas
 
 
 cmd_group = AppGroup('dev', help='Commands to build database')
@@ -19,9 +18,7 @@ cmd_group = AppGroup('dev', help='Commands to build database')
     help='Create database using database name specified in (local) config',
 )
 @click.option(
-    '--drop',
-    is_flag=True,
-    help='Drop database using database name specified in (local) config',
+    '--drop', is_flag=True, help='Drop database using database name specified in (local) config',
 )
 @click.option('--create_tables', is_flag=True, help='Create database tables')
 @click.option(
@@ -38,7 +35,7 @@ def db(create, drop, drop_tables, create_tables, recreate_tables):
         ctx = click.get_current_context()
         click.echo(ctx.get_help())
     else:
-        db_url = app.config['SQLALCHEMY_DATABASE_URI']
+        db_url = flask_app.config['SQLALCHEMY_DATABASE_URI']
         db_name = db_url.database
         if drop:
             click.echo(f'Dropping {db_name} database')
@@ -48,12 +45,16 @@ def db(create, drop, drop_tables, create_tables, recreate_tables):
             sqlalchemy_utils.create_database(db_url, encoding='utf8')
         if drop_tables or recreate_tables:
             click.echo('Drop DB tables')
-            app.db.drop_all()
+            drop_schemas()
         if create or create_tables or recreate_tables:
-            engine = create_engine(db_url)
-            create_schemas(engine)
             click.echo('Creating DB tables')
-            app.db.create_all()
+            flask_app.db.create_all()
+
+
+def drop_schemas():
+    schemas = get_schemas()
+    for schema in schemas:
+        flask_app.dbi.drop_schema(schema)
 
 
 @cmd_group.command('add_hawk_user')
