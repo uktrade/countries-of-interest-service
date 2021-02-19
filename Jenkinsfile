@@ -50,7 +50,7 @@ void ci_pipeline(env, version) {
   lock("countries-of-interest-ci-pipeline-${env}") {
     build job: "ci-pipeline", parameters: [
         string(name: "Team", value: "data-workspace-apps"),
-        string(name: "Project", value: "countries-of-interest"),
+        string(name: "Project", value: "countries-of-interest-service"),
         string(name: "Environment", value: env),
         string(name: "Version", value: version)
     ]
