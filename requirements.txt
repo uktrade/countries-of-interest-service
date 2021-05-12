@@ -6,8 +6,6 @@
 #
 appdirs==1.4.3
     # via black
-appnope==0.1.2
-    # via ipython
 argh==0.26.2
     # via -r requirements.in
 attrs==19.3.0
@@ -144,7 +142,7 @@ itsdangerous==1.1.0
     #   flask-security
 jedi==0.16.0
     # via ipython
-jinja2==2.11.0
+jinja2==2.11.3
     # via
     #   flask
     #   flask-babelex
