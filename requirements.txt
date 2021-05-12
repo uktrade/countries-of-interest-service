@@ -6,8 +6,6 @@
 #
 appdirs==1.4.3
     # via black
-appnope==0.1.2
-    # via ipython
 argh==0.26.2
     # via -r requirements.in
 attrs==19.3.0
@@ -217,7 +215,7 @@ psycopg2==2.8.5
     #   data-engineering-common
 ptyprocess==0.6.0
     # via pexpect
-py==1.8.1
+py==1.10.0
     # via pytest
 pycodestyle==2.5.0
     # via
