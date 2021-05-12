@@ -39,7 +39,10 @@ class TestSSoClient:
 
 
 class TestLoginRequired:
-    def test_if_authenticated_return_view(self, sso_authenticated_request):
+    @unittest.mock.patch('app.sso.token.is_authenticated')
+    def test_if_authenticated_return_view(self, is_authenticated):
+        is_authenticated.return_value = True
+
         def view():
             return "view"
 
