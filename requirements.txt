@@ -253,7 +253,7 @@ pytz==2019.3
     # via
     #   babel
     #   pandas
-pyyaml==5.4
+pyyaml==5.4.1
     # via
     #   -r requirements.in
     #   data-engineering-common
