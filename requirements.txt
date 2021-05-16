@@ -57,6 +57,8 @@ cymem==2.0.3
     #   thinc
 git+https://github.com/uktrade/data-engineering-common.git
     # via -r requirements.in
+dataclasses==0.8
+    # via werkzeug
 decorator==4.4.1
     # via
     #   ipython
@@ -326,7 +328,7 @@ wcwidth==0.1.8
     # via
     #   prompt-toolkit
     #   pytest
-werkzeug==0.16.1
+werkzeug==2.0.0
     # via
     #   -r requirements.in
     #   data-engineering-common
