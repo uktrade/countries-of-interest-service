@@ -221,7 +221,7 @@ pycodestyle==2.5.0
     # via
     #   flake8
     #   flake8-import-order
-pycountry==19.8.18
+pycountry==20.7.3
     # via -r requirements.in
 pyflakes==2.1.1
     # via flake8
