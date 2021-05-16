@@ -209,7 +209,7 @@ preshed==3.0.2
     #   thinc
 prompt-toolkit==3.0.3
     # via ipython
-psycopg2==2.8.5
+psycopg2==2.8.6
     # via
     #   -r requirements.in
     #   data-engineering-common
