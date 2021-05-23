@@ -46,7 +46,7 @@ click==7.0
     #   pip-tools
 codecov==2.0.22
     # via -r requirements.in
-coverage==5.0.3
+coverage[toml]==5.5
     # via
     #   codecov
     #   pytest-cov
@@ -229,7 +229,7 @@ pygments==2.7.4
     # via ipython
 pyparsing==2.4.6
     # via packaging
-pytest-cov==2.8.1
+pytest-cov==2.12.0
     # via
     #   -r requirements.in
     #   data-engineering-common
@@ -303,7 +303,9 @@ srsly==1.0.2
 thinc==7.4.0
     # via spacy
 toml==0.10.0
-    # via black
+    # via
+    #   black
+    #   coverage
 toolz==0.10.0
     # via -r requirements.in
 tqdm==4.42.0
