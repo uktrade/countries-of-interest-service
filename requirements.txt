@@ -245,7 +245,7 @@ python-dateutil==2.8.1
     # via
     #   freezegun
     #   pandas
-python-dotenv==0.13.0
+python-dotenv==0.17.1
     # via
     #   -r requirements.in
     #   data-engineering-common
