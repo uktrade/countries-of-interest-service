@@ -4,7 +4,6 @@ codecov
 git+https://github.com/uktrade/data-engineering-common.git
 flake8-import-order
 flake8
-flask-oauthlib
 flask-security
 flask-shell-ipython
 flask-sqlalchemy
