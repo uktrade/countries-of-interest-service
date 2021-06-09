@@ -9,10 +9,8 @@ appdirs==1.4.3
 argh==0.26.2
     # via -r requirements.in
 attrs==19.3.0
-    # via
-    #   black
-    #   pytest
-babel==2.8.0
+    # via pytest
+babel==2.9.1
     # via flask-babelex
 backcall==0.1.0
     # via ipython
@@ -28,15 +26,18 @@ blis==0.4.1
     # via
     #   spacy
     #   thinc
-catalogue==1.0.0
+cachelib==0.1.1
+    # via flask-oauthlib
+catalogue==2.0.4
     # via
     #   spacy
+    #   srsly
     #   thinc
-certifi==2019.11.28
+certifi==2021.5.30
     # via
     #   data-engineering-common
     #   requests
-chardet==3.0.4
+chardet==4.0.0
     # via requests
 click==7.0
     # via
@@ -44,7 +45,8 @@ click==7.0
     #   flask
     #   flask-shell-ipython
     #   pip-tools
-codecov==2.0.22
+    #   typer
+codecov==2.1.11
     # via -r requirements.in
 coverage==5.0.3
     # via
@@ -58,9 +60,8 @@ cymem==2.0.3
 git+https://github.com/uktrade/data-engineering-common.git
     # via -r requirements.in
 decorator==4.4.1
-    # via
-    #   ipython
-    #   traitlets
+    # via ipython
+    # traitlets
 dnspython==2.1.0
     # via email-validator
 email-validator==1.1.2
@@ -82,9 +83,7 @@ flask-login==0.4.1
 flask-mail==0.9.1
     # via flask-security
 flask-oauthlib==0.9.5
-    # via
-    #   -r requirements.in
-    #   data-engineering-common
+    # via data-engineering-common
 flask-principal==0.4.0
     # via flask-security
 flask-security==3.0.0
@@ -122,7 +121,7 @@ greenlet==1.1.0
     # via sqlalchemy
 gunicorn==20.0.4
     # via -r requirements.in
-idna==2.8
+idna==2.10
     # via
     #   email-validator
     #   requests
@@ -132,6 +131,8 @@ importlib-metadata==1.5.0
     #   pluggy
     #   pytest
     #   sqlalchemy
+iniconfig==1.1.1
+    # via pytest
 ipython-genutils==0.2.0
     # via traitlets
 ipython==7.11.1
@@ -146,12 +147,14 @@ jinja2==2.11.3
     # via
     #   flask
     #   flask-babelex
+    #   spacy
 json-log-formatter==0.3.0
     # via
     #   -r requirements.in
     #   data-engineering-common
 markupsafe==1.1.1
-    # via jinja2
+    # via
+    #   jinja2
 mccabe==0.6.1
     # via flake8
 mohawk==1.1.0
@@ -165,6 +168,8 @@ murmurhash==1.0.2
     #   preshed
     #   spacy
     #   thinc
+mypy-extensions==0.4.3
+    # via black
 numpy==1.18.4
     # via
     #   -r requirements.in
@@ -178,7 +183,8 @@ oauthlib==2.1.0
     #   flask-oauthlib
     #   requests-oauthlib
 packaging==20.1
-    # via pytest
+    # via
+    #   pytest
 pandas==1.0.3
     # via
     #   -r requirements.in
@@ -191,6 +197,8 @@ pathspec==0.7.0
     # via black
 pathtools==0.1.2
     # via watchdog
+pathy==0.5.2
+    # via spacy
 pexpect==4.8.0
     # via ipython
 pickleshare==0.7.5
@@ -268,21 +276,18 @@ requests-oauthlib==1.1.0
     #   -r requirements.in
     #   data-engineering-common
     #   flask-oauthlib
-requests==2.22.0
+requests==2.25.1
     # via
     #   codecov
     #   data-engineering-common
     #   requests-oauthlib
+    #   smart-open
     #   spacy
 six==1.14.0
     # via
-    #   freezegun
     #   mohawk
-    #   packaging
-    #   pip-tools
     #   python-dateutil
     #   sqlalchemy-utils
-    #   traitlets
 spacy==2.2.4
     # via -r requirements.in
 speaklater==1.3
@@ -303,18 +308,19 @@ srsly==1.0.2
 thinc==7.4.0
     # via spacy
 toml==0.10.0
-    # via black
+    # via
+    #   black
 toolz==0.10.0
     # via -r requirements.in
 tqdm==4.42.0
-    # via
-    #   spacy
-    #   thinc
+    # via spacy
 traitlets==4.3.3
-    # via ipython
+    # via
+    #   ipython
+    #   matplotlib-inline
 typed-ast==1.4.1
     # via black
-urllib3==1.25.8
+urllib3==1.26.5
     # via requests
 wasabi==0.6.0
     # via
@@ -323,9 +329,7 @@ wasabi==0.6.0
 watchdog==0.10.2
     # via -r requirements.in
 wcwidth==0.1.8
-    # via
-    #   prompt-toolkit
-    #   pytest
+    # via prompt-toolkit
 werkzeug==0.16.1
     # via
     #   -r requirements.in

@@ -72,10 +72,6 @@ job_defaults: &job_defaults
         command: npm run-script build
 
     - run:
-        name: Check node packages
-        command: npm audit
-
-    - run:
         name: Run tests
         command: |
           make run_tests COV='--cov=. --cov-report=html'
