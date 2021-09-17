@@ -27,6 +27,7 @@
   },
   "scripts": {
     "build": "webpack",
+    "preinstall": "npx npm-force-resolutions",
     "start": "npm run build"
   },
   "author": "",
@@ -34,5 +35,11 @@
   "bugs": {
     "url": "https://github.com/uktrade/countries-of-interest-service/issues"
   },
-  "homepage": "https://github.com/uktrade/countries-of-interest-service#readme"
+  "homepage": "https://github.com/uktrade/countries-of-interest-service#readme",
+   "resolutions": {
+       "set-value": "4.0.1"
+   },
+   "optionalDependencies": {
+    "fsevents": "2.1.3"
+   }
 }
