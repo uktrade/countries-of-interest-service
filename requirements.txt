@@ -130,6 +130,8 @@ importlib-metadata==1.5.0
     #   pluggy
     #   pytest
     #   sqlalchemy
+iniconfig==1.1.1
+    # via pytest
 ipython==7.16.3
     # via flask-shell-ipython
 ipython-genutils==0.2.0
@@ -156,8 +158,6 @@ mohawk==1.1.0
     # via
     #   -r requirements.in
     #   data-engineering-common
-more-itertools==8.2.0
-    # via pytest
 murmurhash==1.0.2
     # via
     #   preshed
@@ -227,7 +227,7 @@ pygments==2.7.4
     # via ipython
 pyparsing==2.4.6
     # via packaging
-pytest==5.4.2
+pytest==7.0.0
     # via
     #   -r requirements.in
     #   data-engineering-common
@@ -302,6 +302,8 @@ thinc==7.4.0
     # via spacy
 toml==0.10.0
     # via black
+tomli==1.2.3
+    # via pytest
 toolz==0.10.0
     # via -r requirements.in
 tqdm==4.42.0
@@ -321,9 +323,7 @@ wasabi==0.6.0
 watchdog==0.10.2
     # via -r requirements.in
 wcwidth==0.1.8
-    # via
-    #   prompt-toolkit
-    #   pytest
+    # via prompt-toolkit
 werkzeug==0.16.1
     # via
     #   -r requirements.in
