@@ -6,7 +6,10 @@ from app.etl.tasks.export_wins_country import Task
 
 class TestExportCountries:
     def test(
-        self, add_country_territory_registry, add_standardised_countries, add_export_wins,
+        self,
+        add_country_territory_registry,
+        add_standardised_countries,
+        add_export_wins,
     ):
 
         add_export_wins(

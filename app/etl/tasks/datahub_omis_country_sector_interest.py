@@ -52,5 +52,8 @@ class Task(ETLTask):
 
     def __init__(self, sql=sql, model=CountriesAndSectorsInterestTemp, *args, **kwargs):
         super().__init__(
-            sql=sql, model=model, *args, **kwargs,
+            sql=sql,
+            model=model,
+            *args,
+            **kwargs,
         )

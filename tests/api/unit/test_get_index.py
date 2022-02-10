@@ -100,7 +100,8 @@ class TestGetIndex:
                     get_index()
         assert is_authenticated.called
         render_template.assert_called_once_with(
-            'index.html', last_updated='2019-01-01 02:00:00',
+            'index.html',
+            last_updated='2019-01-01 02:00:00',
         )
 
     @patch('app.sso.token.is_authenticated')
@@ -111,5 +112,6 @@ class TestGetIndex:
             get_index()
         assert is_authenticated.called
         render_template.assert_called_once_with(
-            'index.html', last_updated='Database not yet initialised',
+            'index.html',
+            last_updated='Database not yet initialised',
         )

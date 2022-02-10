@@ -8,7 +8,9 @@ from app.etl.tasks.datahub_interaction_country import Task
 
 class TestTask:
     def test(
-        self, add_datahub_interaction, add_interactions_analysed,
+        self,
+        add_datahub_interaction,
+        add_interactions_analysed,
     ):
 
         add_datahub_interaction(

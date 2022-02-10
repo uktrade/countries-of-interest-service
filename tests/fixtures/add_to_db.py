@@ -37,11 +37,13 @@ def add_countries_and_sectors_of_interest(app_with_db_module):
             }
             if temp:
                 CountriesAndSectorsInterestTemp.get_or_create(
-                    id=record.get('id', None), defaults=defaults,
+                    id=record.get('id', None),
+                    defaults=defaults,
                 )
             else:
                 CountriesAndSectorsInterest.get_or_create(
-                    id=record.get('id', None), defaults=defaults,
+                    id=record.get('id', None),
+                    defaults=defaults,
                 )
 
     return _method
@@ -118,7 +120,8 @@ def add_datahub_omis(app_with_db_module):
                 'datahub_omis_order_id': record.get('datahub_omis_order_id', None),
             }
             DatahubOmis.get_or_create(
-                datahub_omis_order_id=record.get('datahub_omis_order_id', None), defaults=defaults,
+                datahub_omis_order_id=record.get('datahub_omis_order_id', None),
+                defaults=defaults,
             )
 
     return _method
@@ -223,7 +226,8 @@ def add_datahub_interaction(app_with_db_module):
                 'created_on': record.get('created_on', None),
             }
             Interactions.get_or_create(
-                id=record.get('id', None), defaults=defaults,
+                id=record.get('id', None),
+                defaults=defaults,
             )
 
     return _method
@@ -243,7 +247,8 @@ def add_interactions_analysed(app_with_db_module):
                 'negation': record.get('negation', None),
             }
             InteractionsAnalysed.get_or_create(
-                id=record.get('id', None), defaults=defaults,
+                id=record.get('id', None),
+                defaults=defaults,
             )
 
     return _method

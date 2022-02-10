@@ -7,7 +7,10 @@ from app.etl.tasks.datahub_omis_country_sector_interest import Task
 
 class TestCountriesAndSectorsOfInterest:
     def test(
-        self, add_country_territory_registry, add_datahub_omis, add_standardised_countries,
+        self,
+        add_country_territory_registry,
+        add_datahub_omis,
+        add_standardised_countries,
     ):
         add_datahub_omis(
             [

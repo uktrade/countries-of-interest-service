@@ -61,7 +61,7 @@ job_defaults: &job_defaults
 
     - run:
         name: Install node
-        command: curl -sL https://deb.nodesource.com/setup_10.x | bash && apt-get install -y nodejs
+        command: curl -sL https://deb.nodesource.com/setup_10.x | bash && apt-get install -y nodejs npm
 
     - run:
         name: Install packages
@@ -97,6 +97,6 @@ workflows:
     jobs:
       - build:
           publish_coverage: true
-          python_image: python:3.6.8
+          python_image: python:3.9.10
           postgres_image: postgres:10.5
           redis_image: redis:3.2

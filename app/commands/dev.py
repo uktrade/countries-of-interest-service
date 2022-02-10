@@ -18,14 +18,20 @@ cmd_group = AppGroup('dev', help='Commands to build database')
     help='Create database using database name specified in (local) config',
 )
 @click.option(
-    '--drop', is_flag=True, help='Drop database using database name specified in (local) config',
+    '--drop',
+    is_flag=True,
+    help='Drop database using database name specified in (local) config',
 )
 @click.option('--create_tables', is_flag=True, help='Create database tables')
 @click.option(
-    '--drop_tables', is_flag=True, help='Drop database tables',
+    '--drop_tables',
+    is_flag=True,
+    help='Drop database tables',
 )
 @click.option(
-    '--recreate_tables', is_flag=True, help='Drop and recreate database tables',
+    '--recreate_tables',
+    is_flag=True,
+    help='Drop and recreate database tables',
 )
 def db(create, drop, drop_tables, create_tables, recreate_tables):
     """
@@ -60,13 +66,19 @@ def drop_schemas():
 @cmd_group.command('add_hawk_user')
 @click.option('--client_id', type=str, help="a unique id for the client")
 @click.option(
-    '--client_key', type=str, help="secret key only known by the client and server",
+    '--client_key',
+    type=str,
+    help="secret key only known by the client and server",
 )
 @click.option(
-    '--client_scope', type=str, help="comma separated list of endpoints",
+    '--client_scope',
+    type=str,
+    help="comma separated list of endpoints",
 )
 @click.option(
-    '--description', type=str, help="describe the usage of these credentials",
+    '--description',
+    type=str,
+    help="describe the usage of these credentials",
 )
 def add_hawk_user(client_id, client_key, client_scope, description):
     """
