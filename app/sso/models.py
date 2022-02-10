@@ -48,7 +48,11 @@ class User(BaseModel, UserMixin):
     current_login_ip = _col(_text())
     login_count = _col(_int())
 
-    roles = db.relationship('Role', secondary='admin.users_roles', backref='users',)
+    roles = db.relationship(
+        'Role',
+        secondary='admin.users_roles',
+        backref='users',
+    )
 
     def __str__(self):
         return self.email

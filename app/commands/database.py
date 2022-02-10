@@ -20,7 +20,9 @@ cmd_group = AppGroup('database', help='Commands to extract data from external so
     default='',
 )
 @click.option(
-    '--keep_tables', is_flag=True, help="Don't drop tables before inserting data",
+    '--keep_tables',
+    is_flag=True,
+    help="Don't drop tables before inserting data",
 )
 def populate(keep_tables, extractors, tasks):
     from app.api.tasks import populate_database_task

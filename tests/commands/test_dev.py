@@ -21,7 +21,11 @@ class TestDevCommand:
         assert result.exception is None
 
     @pytest.mark.parametrize(
-        'client_id,expected_add_user_called', (('client_id', True), (None, False),),
+        'client_id,expected_add_user_called',
+        (
+            ('client_id', True),
+            (None, False),
+        ),
     )
     @mock.patch('data_engineering.common.db.models.HawkUsers.add_user')
     def test_run_hawk_user(self, mock_add_user, client_id, expected_add_user_called, app_with_db):
@@ -39,7 +43,10 @@ class TestDevCommand:
         if client_id:
             args.extend(['--client_id', client_id])
 
-        result = runner.invoke(add_hawk_user, args,)
+        result = runner.invoke(
+            add_hawk_user,
+            args,
+        )
         assert mock_add_user.called is expected_add_user_called
         if not expected_add_user_called:
             assert result.output.startswith('All parameters are required')

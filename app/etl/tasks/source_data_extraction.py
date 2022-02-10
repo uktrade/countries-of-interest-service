@@ -412,7 +412,13 @@ class ExtractExportWins(SourceDataExtractor):
 
 
 def get_hawk_headers(
-    url, client_id, client_key, content='', content_type='', https=False, method='GET',
+    url,
+    client_id,
+    client_key,
+    content='',
+    content_type='',
+    https=False,
+    method='GET',
 ):
     if https is False:
         # todo: ask data workspace to fix the https/http x-forwarded-for
@@ -420,7 +426,11 @@ def get_hawk_headers(
     credentials = {'id': client_id, 'key': client_key, 'algorithm': 'sha256'}
 
     sender = mohawk.Sender(
-        credentials=credentials, url=url, method=method, content=content, content_type=content_type,
+        credentials=credentials,
+        url=url,
+        method=method,
+        content=content,
+        content_type=content_type,
     )
     headers = {'Authorization': sender.request_header, 'Content-Type': content_type}
     return headers

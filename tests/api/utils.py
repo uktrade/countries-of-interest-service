@@ -15,7 +15,9 @@ def assert_api_response(app_context, api, expected_response, params='', order_ma
 def _request(params, endpoint, app_context):
     url = f'{endpoint}?{params}'
 
-    res = app_context.get(url,)
+    res = app_context.get(
+        url,
+    )
     status_code = res.status_code
     try:
         data = json.loads(res.get_data())

@@ -51,18 +51,19 @@ class TestLoginRequired:
 
     @unittest.mock.patch('app.sso.token.is_authenticated')
     @unittest.mock.patch('app.sso.token.redirect')
-    @unittest.mock.patch('app.sso.token.request')
-    @unittest.mock.patch('app.sso.token.url_for')
-    def test_if_not_authenticated_redirect(self, url_for, request, redirect, is_authenticated):
+    def test_if_not_authenticated_redirect(self, redirect, is_authenticated, app):
+        from flask import current_app as flask_app
+
         is_authenticated.return_value = False
 
         def view():
             return "view"
 
         wrapped_view = token.login_required(view)
-        response = wrapped_view()
+        with flask_app.test_request_context('/'):
+            wrapped_view()
+
         redirect.assert_called_once()
-        print('response:', response)
 
 
 class TestIsAuthenticated:

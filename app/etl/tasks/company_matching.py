@@ -159,7 +159,9 @@ class Task:
             )
 
         res = requests.post(
-            url, headers={'Authorization': get_sender().request_header}, json=json_query,
+            url,
+            headers={'Authorization': get_sender().request_header},
+            json=json_query,
         )
         status_code = res.status_code
         try:

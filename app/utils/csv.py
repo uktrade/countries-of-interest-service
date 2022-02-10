@@ -30,7 +30,12 @@ def get_coi_csv(output, limit=None):
 def output_csv(data_sets, output, order_by, limit):
     for db_model, db_fields, set_headers in data_sets:
         populate_csv(
-            output, db_model, db_fields, limit, order_by=order_by, set_headers=set_headers,
+            output,
+            db_model,
+            db_fields,
+            limit,
+            order_by=order_by,
+            set_headers=set_headers,
         )
     return output
 

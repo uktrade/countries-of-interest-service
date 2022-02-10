@@ -16,14 +16,44 @@ class TestDatabaseCommand:
     @pytest.mark.parametrize(
         'keep_tables,extractors,tasks,expected_called_task_with,expected_msg',
         (
-            (True, '', '', (False, [], []), '',),
-            (False, '', '', (True, [], []), '',),
-            (False, 'hello', '', False, 'Invalid option: hello',),
-            (False, '', 'goodbye', False, 'Invalid option: goodbye',),
+            (
+                True,
+                '',
+                '',
+                (False, [], []),
+                '',
+            ),
+            (
+                False,
+                '',
+                '',
+                (True, [], []),
+                '',
+            ),
+            (
+                False,
+                'hello',
+                '',
+                False,
+                'Invalid option: hello',
+            ),
+            (
+                False,
+                '',
+                'goodbye',
+                False,
+                'Invalid option: goodbye',
+            ),
         ),
     )
     def test_run_cmd(
-        self, app_with_db, keep_tables, extractors, tasks, expected_called_task_with, expected_msg,
+        self,
+        app_with_db,
+        keep_tables,
+        extractors,
+        tasks,
+        expected_called_task_with,
+        expected_msg,
     ):
         runner = app_with_db.test_cli_runner()
         with mock.patch('app.etl.tasks.populate_database') as mock_populate_database_task:

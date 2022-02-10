@@ -8,10 +8,16 @@ cmd_group = AppGroup('csv', help='Commands to generate csv')
 
 @cmd_group.command('generate_coi_csv')
 @click.option(
-    '--output-filename', type=str, help=f"CSV file name", default='coi_data.csv',
+    '--output-filename',
+    type=str,
+    help=f"CSV file name",
+    default='coi_data.csv',
 )
 @click.option(
-    '--limit', type=int, help=f"Row limit", default=None,
+    '--limit',
+    type=int,
+    help=f"Row limit",
+    default=None,
 )
 def generate_coi_csv(output_filename, limit):
     with open(output_filename, 'w') as f:

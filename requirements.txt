@@ -18,7 +18,7 @@ babel==2.9.1
     # via flask-babelex
 backcall==0.1.0
     # via ipython
-black==19.10b0
+black==22.1.0
     # via
     #   -r requirements.in
     #   data-engineering-common
@@ -40,7 +40,7 @@ certifi==2021.5.30
     #   requests
 chardet==4.0.0
     # via requests
-click==7.0
+click==8.0.3
     # via
     #   black
     #   flask
@@ -51,7 +51,7 @@ coverage==5.0.3
     # via
     #   codecov
     #   pytest-cov
-cymem==2.0.3
+cymem==2.0.6
     # via
     #   preshed
     #   spacy
@@ -164,7 +164,7 @@ murmurhash==1.0.2
     #   preshed
     #   spacy
     #   thinc
-numpy==1.19.5
+numpy==1.22.2
     # via
     #   -r requirements.in
     #   blis
@@ -178,7 +178,7 @@ oauthlib==2.1.0
     #   requests-oauthlib
 packaging==20.1
     # via pytest
-pandas==1.0.3
+pandas==1.4.0
     # via
     #   -r requirements.in
     #   data-engineering-common
@@ -186,7 +186,7 @@ parso==0.6.0
     # via jedi
 passlib==1.7.2
     # via flask-security
-pathspec==0.7.0
+pathspec==0.9.0
     # via black
 pathtools==0.1.2
     # via watchdog
@@ -246,7 +246,7 @@ python-dotenv==0.13.0
     # via
     #   -r requirements.in
     #   data-engineering-common
-pytz==2019.3
+pytz==2021.3
     # via
     #   babel
     #   pandas
@@ -308,7 +308,7 @@ tqdm==4.42.0
     #   thinc
 traitlets==4.3.3
     # via ipython
-typed-ast==1.4.1
+typed-ast==1.5.2
     # via black
 urllib3==1.26.5
     # via requests
