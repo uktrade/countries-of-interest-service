@@ -15,7 +15,6 @@ json_log_formatter
 mohawk
 numpy
 pandas
-pip-tools
 psycopg2
 pycountry
 pytest-cov
