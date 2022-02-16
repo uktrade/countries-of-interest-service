@@ -40,7 +40,8 @@
     "set-value": "4.0.1",
     "path-parse": "1.0.7",
     "follow-redirects": "1.14.7",
-    "ansi-regex": "5.0.1"
+    "ansi-regex": "5.0.1",
+    "glob-parent": "5.1.2"
   },
   "optionalDependencies": {
     "fsevents": "2.1.3"
