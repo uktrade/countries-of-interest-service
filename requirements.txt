@@ -159,7 +159,7 @@ murmurhash==1.0.2
     #   thinc
 mypy-extensions==0.4.3
     # via black
-numpy==1.22.0
+numpy==1.22.2
     # via
     #   -r requirements.in
     #   blis
