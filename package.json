@@ -18,8 +18,8 @@
     "react": "^16.10.2",
     "react-dom": "^16.10.2",
     "style-loader": "^1.0.0",
-    "webpack": "^4.41.0",
-    "webpack-cli": "^3.3.9"
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0"
   },
   "repository": {
     "type": "git",
@@ -28,7 +28,10 @@
   "scripts": {
     "build": "webpack",
     "preinstall": "npx npm-force-resolutions",
-    "start": "npm run build"
+    "start": "npm run build",
+    "push": "npm version patch && git push",
+    "push-minor": "npm version minor && git push",
+    "push-major": "npm version major && git push"
   },
   "author": "",
   "license": "ISC",
@@ -39,7 +42,7 @@
   "resolutions": {
     "set-value": "4.0.1",
     "path-parse": "1.0.7",
-    "follow-redirects": "1.14.7",
+    "follow-redirects": "1.15.1",
     "ansi-regex": "5.0.1",
     "glob-parent": "5.1.2"
   },
