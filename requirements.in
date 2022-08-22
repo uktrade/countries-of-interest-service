@@ -10,6 +10,7 @@ flask-sqlalchemy
 flask
 freezegun
 fuzzywuzzy
+python-Levenshtein
 gunicorn
 json_log_formatter
 mohawk
