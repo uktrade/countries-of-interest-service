@@ -4,8 +4,6 @@
 #
 #    pip-compile
 #
-appnope==0.1.2
-    # via ipython
 argh==0.26.2
     # via -r requirements.in
 attrs==19.3.0
@@ -237,7 +235,7 @@ pytest-cov==2.8.1
     # via
     #   -r requirements.in
     #   data-engineering-common
-pytest-mock==3.1.0
+pytest-mock==3.9.0
     # via -r requirements.in
 python-dateutil==2.8.1
     # via
@@ -318,9 +316,7 @@ typer==0.4.2
     #   pathy
     #   spacy
 typing-extensions==4.3.0
-    # via
-    #   black
-    #   pydantic
+    # via pydantic
 urllib3==1.26.5
     # via requests
 wasabi==0.10.1
