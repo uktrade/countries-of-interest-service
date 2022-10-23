@@ -3,7 +3,8 @@ import unittest.mock
 from urllib.error import URLError
 
 import pytest
-from flask_oauthlib.client import OAuthException
+from authlib.integrations.flask_client import OAuthError
+from data_engineering.common.application import get_or_create
 from werkzeug.exceptions import HTTPException
 
 import app.sso.token as token
@@ -41,29 +42,25 @@ class TestSSoClient:
 class TestLoginRequired:
     @unittest.mock.patch('app.sso.token.is_authenticated')
     def test_if_authenticated_return_view(self, is_authenticated):
-        is_authenticated.return_value = True
-
         def view():
             return "view"
 
         wrapped_view = token.login_required(view)
         assert view() == wrapped_view()
 
-    @unittest.mock.patch('app.sso.token.is_authenticated')
     @unittest.mock.patch('app.sso.token.redirect')
-    def test_if_not_authenticated_redirect(self, redirect, is_authenticated, app):
-        from flask import current_app as flask_app
-
+    @unittest.mock.patch('app.sso.token.is_authenticated')
+    def test_if_not_authenticated_redirect(self, redirect, is_authenticated):
         is_authenticated.return_value = False
 
         def view():
             return "view"
 
-        wrapped_view = token.login_required(view)
-        with flask_app.test_request_context('/'):
-            wrapped_view()
-
-        redirect.assert_called_once()
+        with get_or_create().test_request_context('/'):
+            wrapped_view = token.login_required(view)
+            response = wrapped_view()
+            redirect.assert_called_once()
+        print('response:', response)
 
 
 class TestIsAuthenticated:
@@ -78,7 +75,7 @@ class TestIsAuthenticated:
         from flask import current_app as flask_app
 
         flask_app.sso_client = unittest.mock.Mock()
-        handled_exceptions = [URLError('e'), OAuthException('e'), HTTPException('e')]
+        handled_exceptions = [URLError('e'), OAuthError('e'), HTTPException('e')]
         flask_app.sso_client.get_profile.side_effect = handled_exceptions
         for e in handled_exceptions:
             response = token.is_authenticated()

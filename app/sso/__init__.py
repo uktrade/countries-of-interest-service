@@ -1,7 +1,6 @@
 import certifi
-import werkzeug
+from authlib.integrations.flask_client import OAuth
 from flask import Blueprint, redirect, request, session, url_for
-from flask_oauthlib.client import OAuth
 from werkzeug.exceptions import abort
 
 
@@ -36,23 +35,23 @@ class BaseSSOClient:
         # initialize oauth broker
         oauth = OAuth(app)
         oauth.ca_certs = certifi.where()
-        oauth_broker = oauth.remote_app(
+        oauth_broker = oauth.register(
             'authbroker',
-            base_url=sso_url,
-            request_token_url=None,
+            api_base_url=sso_url,
             access_token_url=access_token_url,
             authorize_url=authorize_url,
-            consumer_key=client_id,
-            consumer_secret=client_secret,
+            client_id=client_id,
+            client_secret=client_secret,
             access_token_method='POST',
-            request_token_params={'state': lambda: werkzeug.security.gen_salt(10)},
+            fetch_token=lambda: session.get(self.sso_session_token_key),
         )
 
-        oauth_broker.tokengetter(lambda: session.get(self.sso_session_token_key))
         self.oauth_broker = oauth_broker
 
     def login(self):
-        return self.oauth_broker.authorize(callback=url_for('sso.callback', _external=True))
+        return self.oauth_broker.authorize_redirect(
+            callback=url_for('sso.callback', _external=True)
+        )
 
     def logout(self):
         session.pop(self.sso_session_token_key, None)
@@ -60,20 +59,19 @@ class BaseSSOClient:
         return redirect(self.logout_url)
 
     def callback(self):
-        resp = self.oauth_broker.authorized_response()
+        access_token = self.oauth_broker.authorize_access_token()
 
-        if resp is None or resp.get('access_token') is None:
-            return 'Access denied: reason=%s error=%s resp=%s' % (
+        if access_token is None:
+            return 'Access denied: reason=%s error=%s' % (
                 request.args['error'],
                 request.args['error_description'],
-                resp,
             )
         else:
-            session[self.sso_session_token_key] = (resp['access_token'], '')
-            self.process_login(resp)
+            session[self.sso_session_token_key] = access_token
+            self.process_login(access_token)
             return redirect(self._get_next_url())
 
-    def process_login(self, resp):
+    def process_login(self, access_token):
         raise NotImplementedError('Process login required')
 
     def process_logout(self):
@@ -82,10 +80,10 @@ class BaseSSOClient:
     def get_profile(self):
         response = self.oauth_broker.get(self.profile_url)
 
-        if response.status != 200:
+        if response.status_code != 200:
             abort(403)
 
-        return response.data
+        return response.json()
 
     def _get_next_url(self):
         if 'next' in request.args:

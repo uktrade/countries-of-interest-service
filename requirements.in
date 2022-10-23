@@ -1,10 +1,10 @@
 argh
 black
 codecov
-git+https://github.com/uktrade/data-engineering-common.git
+git+https://github.com/uktrade/data-engineering-common.git@replace-flask-oauthlib
 flake8-import-order
 flake8
-flask-security
+flask-security-too
 flask-shell-ipython
 flask-sqlalchemy
 flask

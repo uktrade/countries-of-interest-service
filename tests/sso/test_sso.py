@@ -1,6 +1,7 @@
 import unittest.mock
 
 import pytest
+from authlib.integrations.flask_client import OAuthError
 from flask import session
 
 import app.sso as sso
@@ -31,7 +32,7 @@ def sso_client(app):
 @pytest.fixture(scope="function")
 def mock_oauth():
     with unittest.mock.patch('app.sso.OAuth') as mock_oauth:
-        yield mock_oauth().remote_app()
+        yield mock_oauth().register()
 
 
 @pytest.fixture(scope="module")
@@ -53,7 +54,7 @@ class TestInit:
 class TestLogin:
     def test_returns_oauth_broker_authorize(self, app, mock_oauth, mock_url_for, sso_client):
         sso_client.login()
-        mock_oauth.authorize.assert_called_once_with(
+        mock_oauth.authorize_redirect.assert_called_once_with(
             callback=mock_url_for('sso.callback', _external=True)
         )
 
@@ -61,7 +62,7 @@ class TestLogin:
 class TestLogout:
     def test_removes_session_key(self, app, sso_client):
         with app.test_request_context():
-            session['sso_session_token_key'] = ('access_token', '')
+            session['sso_session_token_key'] = 'access_token'
 
         with app.test_client() as c:
             c.get('/logout')
@@ -79,31 +80,32 @@ class TestLogout:
 class TestCallback:
     def test_no_access_token_provided(self, app, sso_client):
         with app.test_request_context('/?error=error&error_description=description'):
-            sso_client.callback()
+            with pytest.raises(OAuthError):
+                sso_client.callback()
             assert 'sso_session_token_key' not in session
 
     def test_adds_token_to_session(self, app, mock_oauth, sso_client):
-        response = {'access_token': 'access_token'}
-        mock_oauth.authorized_response.return_value = response
+        response = 'access_token'
+        mock_oauth.authorize_access_token.return_value = response
         sso_client.oauth_broker = mock_oauth
         with app.test_request_context():
             sso_client.callback()
-            assert session['sso_session_token_key'] == ('access_token', '')
+            assert session['sso_session_token_key'] == 'access_token'
 
 
 class TestGetProfile:
     def test_get_profile(self, app, mock_oauth, sso_client):
 
         mock_response = unittest.mock.Mock()
-        mock_response.status = 200
-        mock_response.data = {"name": "me"}
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"name": "me"}
         mock_oauth.get.return_value = mock_response
         sso_client.oauth_broker = mock_oauth
 
         with app.test_request_context():
             response = sso_client.get_profile()
 
-        assert response == mock_response.data
+        assert response == {"name": "me"}
 
 
 class TestGetNextUrl:
