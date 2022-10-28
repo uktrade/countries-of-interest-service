@@ -40,7 +40,7 @@ job_defaults: &job_defaults
     - restore_cache:
          name: Restore pip cache
          keys:
-           - coi-<< parameters.python_image >>-{{ checksum "requirements.txt" }}
+           - coi-<< parameters.python_image >>-{{ checksum "requirements.txt" }}-v4
          paths:
            - ~/cache/pip
 
@@ -50,7 +50,7 @@ job_defaults: &job_defaults
 
     - save_cache:
         name: Save pip cache
-        key: coi-<< parameters.python_image >>-{{ checksum "requirements.txt" }}
+        key: coi-<< parameters.python_image >>-{{ checksum "requirements.txt" }}-v4
         paths:
           - ~/cache/pip
 
