@@ -1,7 +1,7 @@
 argh
 black
 codecov
-git+https://github.com/uktrade/data-engineering-common.git@replace-flask-oauthlib
+git+https://github.com/uktrade/data-engineering-common.git
 flake8-import-order
 flake8
 flask-security-too
