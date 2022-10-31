@@ -70,6 +70,8 @@ email-validator==1.1.2
     #   flask-security-too
 entrypoints==0.3
     # via flake8
+exceptiongroup==1.0.0
+    # via pytest
 flake8==3.7.9
     # via
     #   -r requirements.in
@@ -118,6 +120,8 @@ idna==2.10
     #   requests
 importlib-metadata==5.0.0
     # via flask
+iniconfig==1.1.1
+    # via pytest
 ipython==7.16.3
     # via flask-shell-ipython
 ipython-genutils==0.2.0
@@ -150,8 +154,6 @@ mohawk==1.1.0
     # via
     #   -r requirements.in
     #   data-engineering-common
-more-itertools==8.2.0
-    # via pytest
 murmurhash==1.0.2
     # via
     #   preshed
@@ -207,8 +209,6 @@ psycopg2==2.8.5
     #   data-engineering-common
 ptyprocess==0.6.0
     # via pexpect
-py==1.10.0
-    # via pytest
 pycodestyle==2.5.0
     # via
     #   flake8
@@ -227,7 +227,7 @@ pygments==2.7.4
     # via ipython
 pyparsing==2.4.6
     # via packaging
-pytest==5.4.2
+pytest==7.2.0
     # via
     #   -r requirements.in
     #   data-engineering-common
@@ -302,7 +302,9 @@ srsly==2.4.4
 thinc==8.1.0
     # via spacy
 tomli==2.0.1
-    # via black
+    # via
+    #   black
+    #   pytest
 toolz==0.10.0
     # via -r requirements.in
 tqdm==4.42.0
@@ -327,9 +329,7 @@ wasabi==0.10.1
 watchdog==0.10.2
     # via -r requirements.in
 wcwidth==0.1.8
-    # via
-    #   prompt-toolkit
-    #   pytest
+    # via prompt-toolkit
 werkzeug==2.2.2
     # via
     #   -r requirements.in
