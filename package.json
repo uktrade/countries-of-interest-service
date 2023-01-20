@@ -44,7 +44,8 @@
     "path-parse": "1.0.7",
     "follow-redirects": "1.15.1",
     "ansi-regex": "5.0.1",
-    "glob-parent": "5.1.2"
+    "glob-parent": "5.1.2",
+    "json5": "2.2.2"
   },
   "optionalDependencies": {
     "fsevents": "2.1.3"
