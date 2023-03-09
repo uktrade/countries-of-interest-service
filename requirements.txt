@@ -328,7 +328,7 @@ watchdog==2.2.1
     # via -r requirements.in
 wcwidth==0.1.8
     # via prompt-toolkit
-werkzeug==2.2.2
+werkzeug==2.2.3
     # via
     #   -r requirements.in
     #   data-engineering-common
