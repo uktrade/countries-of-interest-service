@@ -133,7 +133,7 @@ jinja2==3.1.2
     # via
     #   flask
     #   spacy
-json-log-formatter==0.3.0
+json-log-formatter==0.5.1
     # via
     #   -r requirements.in
     #   data-engineering-common
