@@ -11,7 +11,7 @@ from app.etl.tasks.pipeline import (
 
 
 def populate_database(drop_table, extractors, tasks):
-    flask_app.logger.info(f'populate_database')
+    flask_app.logger.info('populate_database')
     if not extractors and not tasks:
         extractors = EXTRACTORS
         tasks = TASKS

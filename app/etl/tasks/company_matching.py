@@ -96,7 +96,7 @@ class Task:
                 ),
                 json_query=request,
             )
-            stmt = f"""
+            stmt = """
                 INSERT INTO company_matching (
                     id,
                     match_id,
