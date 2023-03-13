@@ -126,7 +126,6 @@ def test_interaction_coi_extraction(add_objects, add_side_effect, mock_datetime)
 
 
 def test_interaction_already_seen(add_objects, add_side_effect):
-
     add_objects(
         Interactions,
         [

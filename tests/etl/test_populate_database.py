@@ -50,7 +50,6 @@ class TestPopulateDatabase:
         extract_countries_and_territories_reference_dataset,
         extract_export_wins,
     ):
-
         extract_countries_and_territories_reference_dataset.return_value = {
             'dataset': 'countries_and_territories_reference_dataset'
         }

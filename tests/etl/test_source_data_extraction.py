@@ -74,7 +74,6 @@ class SourceDataExtractBaseTestCase:
 
 
 class ReferenceDatasetExtractBaseTestCase(SourceDataExtractBaseTestCase):
-
     __test__ = False
 
     def get_dataworkspace_config(self):
@@ -88,7 +87,6 @@ class ReferenceDatasetExtractBaseTestCase(SourceDataExtractBaseTestCase):
 
 
 class TestExtractCountriesAndTerritoriesReferenceDataset(ReferenceDatasetExtractBaseTestCase):
-
     __test__ = True
     group_slug_config_key = 'countries_and_territories_group_slug'
     reference_slug_config_key = 'countries_and_territories_reference_slug'
@@ -129,7 +127,6 @@ class TestExtractCountriesAndTerritoriesReferenceDataset(ReferenceDatasetExtract
 
 
 class TestExtractDatahubCompany(SourceDataExtractBaseTestCase):
-
     __test__ = True
     dataset_id_config_key = 'datahub_companies_dataset_id'
     item_pk = 'datahub_company_id'
@@ -158,7 +155,6 @@ class TestExtractDatahubCompany(SourceDataExtractBaseTestCase):
 
 
 class TestExtractDatahubCompanyExportCountry(SourceDataExtractBaseTestCase):
-
     __test__ = True
     dataset_id_config_key = 'datahub_company_export_country_dataset_id'
     expected_data = [

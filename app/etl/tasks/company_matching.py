@@ -17,7 +17,6 @@ from app.db.models.internal import (
 
 
 class Task:
-
     name = constants.Task.COMPANY_MATCHING.value
     valid_email = re.compile(r"[^@]+@[^@]+\.[^@]+")
 

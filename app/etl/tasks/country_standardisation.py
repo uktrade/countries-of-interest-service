@@ -6,7 +6,6 @@ from app.db.models.internal import StandardisedCountries
 
 
 class PopulateStandardisedCountriesTask:
-
     name = constants.Task.STANDARDISE_COUNTRIES.value
 
     def __init__(self, **kwargs):

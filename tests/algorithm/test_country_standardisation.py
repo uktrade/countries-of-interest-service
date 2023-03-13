@@ -12,7 +12,6 @@ def test_country_mapping(
     add_export_wins,
     add_country_territory_registry,
 ):
-
     add_datahub_company_export_country(
         [
             {
@@ -141,7 +140,6 @@ def test_country_mapping(
 
 
 def test_standardise_country():
-
     choices = [
         'Belgium',
         'Austria',

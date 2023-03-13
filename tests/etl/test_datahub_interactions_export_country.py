@@ -8,7 +8,6 @@ from app.etl.tasks.datahub_interactions_export_country import Task
 
 class TestTask:
     def test(self, add_country_territory_registry, add_datahub_interactions_export_country):
-
         add_datahub_interactions_export_country(
             [
                 {
