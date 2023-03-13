@@ -62,7 +62,7 @@ cymem==2.0.7
     #   preshed
     #   spacy
     #   thinc
-data-engineering-common @ git+https://github.com/uktrade/data-engineering-common@fix/numpy-version-specifier
+data-engineering-common @ git+https://github.com/uktrade/data-engineering-common.git
     # via -r requirements.in
 decorator==5.1.1
     # via ipython
