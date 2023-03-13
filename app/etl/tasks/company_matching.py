@@ -31,12 +31,12 @@ class Task:
         }
 
     def _company_matching(self):
-        connection = db.engine.raw_connection()
-        cursor = self._fetch_companies(connection)
-        self._match_and_store_results(cursor)
-        cursor.close()
-        connection.close()
-        self._populate_csi_matched_table_and_swap()
+        with db.engine.raw_connection() as connection:
+            cursor = self._fetch_companies(connection)
+            self._match_and_store_results(cursor)
+            cursor.close()
+            connection.close()
+            self._populate_csi_matched_table_and_swap()
 
     def _fetch_companies(self, connection):
         cursor = connection.cursor(name='fetch_companies')
