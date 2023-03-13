@@ -454,32 +454,32 @@ def populate_table_paginated(model, extractor_name, mapping, unique_key, url):
 
 
 def populate_table(data, model, extractor_name, mapping, unique_key, overwrite=True):
-    connection = sql_alchemy.engine.connect()
-    transaction = connection.begin()
-    try:
-        if overwrite:
-            model.recreate_table()
-        items = []
-        for item in data['values']:
-            data_item = dict(zip(data['headers'], item))
-            data_item = map_headers(data_item, mapping)
-            items.append(data_item)
+    with sql_alchemy.engine.connect() as connection:
+        with connection.begin() as transaction:
+            try:
+                if overwrite:
+                    model.recreate_table()
+                items = []
+                for item in data['values']:
+                    data_item = dict(zip(data['headers'], item))
+                    data_item = map_headers(data_item, mapping)
+                    items.append(data_item)
 
-        insert_stmt = postgresql.insert(model.__table__).values(items)
-        update_columns = {col.name: col for col in insert_stmt.excluded if col.name not in ('id',)}
-        update_statement = insert_stmt.on_conflict_do_update(
-            index_elements=[unique_key], set_=update_columns
-        )
-        status = connection.execute(update_statement)
-        n_rows = int(status.rowcount)
-        transaction.commit()
-    except (exc.ProgrammingError, exc.DataError) as err:
-        flask_app.logger.error(f'Error populating {model.__tablename__} table')
-        flask_app.logger.error(err)
-        transaction.rollback()
-        raise err
-    finally:
-        connection.close()
+                insert_stmt = postgresql.insert(model.__table__).values(items)
+                update_columns = {col.name: col for col in insert_stmt.excluded if col.name not in ('id',)}
+                update_statement = insert_stmt.on_conflict_do_update(
+                    index_elements=[unique_key], set_=update_columns
+                )
+                status = connection.execute(update_statement)
+                n_rows = int(status.rowcount)
+                transaction.commit()
+            except (exc.ProgrammingError, exc.DataError) as err:
+                flask_app.logger.error(f'Error populating {model.__tablename__} table')
+                flask_app.logger.error(err)
+                transaction.rollback()
+                raise err
+            finally:
+                connection.close()
 
     return {'extractor': extractor_name, 'rows': n_rows, 'status': 200}
 

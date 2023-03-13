@@ -249,24 +249,25 @@ def process_interactions(
     input_table, input_schema, log_table, output_schema, output_table, batch_size=1000
 ):
     nlp = _load_model()
-    raw_connection = sql_alchemy.engine.raw_connection()
-    cursor = raw_connection.cursor(name='fetch_interactions')
-    cursor.execute(
-        f'''
-            SELECT
-                id,
-                datahub_interaction_id,
-                notes
-
-            FROM "{input_schema}"."{input_table}" interactions
-                LEFT JOIN "{output_schema}"."{log_table}" log
-                    USING (datahub_interaction_id)
-
-            WHERE log.datahub_interaction_id IS NULL
-
-            ORDER BY id, created_on
-        '''
-    )
+    with sql_alchemy.engine.raw_connection() as raw_connection:
+        with raw_connection.cursor(name='fetch_interactions') as cursor:
+            cursor.execute(
+                f'''
+                    SELECT
+                        id,
+                        datahub_interaction_id,
+                        notes
+        
+                    FROM "{input_schema}"."{input_table}" interactions
+                        LEFT JOIN "{output_schema}"."{log_table}" log
+                            USING (datahub_interaction_id)
+        
+                    WHERE log.datahub_interaction_id IS NULL
+        
+                    ORDER BY id, created_on
+                '''
+            )
+            raw_connection.close()
 
     def _analysed_interaction_chunks():
         batch_count = 0
@@ -312,43 +313,42 @@ def process_interactions(
 
     analysed_at = datetime.datetime.now()
     for chunk, datahub_interaction_ids in _analysed_interaction_chunks():
-        connection = flask_app.db.engine.connect()
-        transaction = connection.begin()
+        with flask_app.db.engine.connect() as connection:
+            with connection.begin() as transaction:
+                try:
+                    flask_app.dbi.dsv_buffer_to_table(
+                        chunk,
+                        f'{output_schema}.{output_table}',
+                        [
+                            'datahub_interaction_id',
+                            'place',
+                            'standardized_place',
+                            'action',
+                            'type',
+                            'context',
+                            'negation',
+                        ],
+                        sep=',',
+                        null='',
+                        has_header=False,
+                        quote='$',
+                    )
 
-        try:
-            flask_app.dbi.dsv_buffer_to_table(
-                chunk,
-                f'{output_schema}.{output_table}',
-                [
-                    'datahub_interaction_id',
-                    'place',
-                    'standardized_place',
-                    'action',
-                    'type',
-                    'context',
-                    'negation',
-                ],
-                sep=',',
-                null='',
-                has_header=False,
-                quote='$',
-            )
+                    sql = f'''
+                    insert into "{output_schema}"."{log_table}"
+                    values (%s, %s) on conflict do nothing
+                    '''
+                    connection.execute(sql, [[d, analysed_at] for d in datahub_interaction_ids])
+                    transaction.commit()
 
-            sql = f'''
-            insert into "{output_schema}"."{log_table}"
-            values (%s, %s) on conflict do nothing
-            '''
-            connection.execute(sql, [[d, analysed_at] for d in datahub_interaction_ids])
-            transaction.commit()
+                except Exception:
+                    exc_type, exc_value, exc_traceback = sys.exc_info()
+                    traceback.print_exception(exc_type, exc_value, exc_traceback, file=sys.stdout)
+                    transaction.rollback()
+                finally:
+                    connection.close()
 
-        except Exception:
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            traceback.print_exception(exc_type, exc_value, exc_traceback, file=sys.stdout)
-            transaction.rollback()
-        finally:
-            connection.close()
-
-    cursor.close()
+        cursor.close()
 
 
 def make_safe(text):
