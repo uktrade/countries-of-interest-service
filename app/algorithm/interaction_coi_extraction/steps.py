@@ -257,13 +257,10 @@ def process_interactions(
                         id,
                         datahub_interaction_id,
                         notes
-        
                     FROM "{input_schema}"."{input_table}" interactions
                         LEFT JOIN "{output_schema}"."{log_table}" log
                             USING (datahub_interaction_id)
-        
                     WHERE log.datahub_interaction_id IS NULL
-        
                     ORDER BY id, created_on
                 '''
             )
