@@ -6,25 +6,27 @@
 #
 appnope==0.1.3
     # via ipython
-argh==0.26.2
+argh==0.28.1
     # via -r requirements.in
 asttokens==2.2.1
     # via stack-data
-attrs==19.3.0
+async-timeout==4.0.2
+    # via redis
+attrs==22.2.0
     # via pytest
-authlib==1.1.0
+authlib==1.2.0
     # via data-engineering-common
-backcall==0.1.0
+backcall==0.2.0
     # via ipython
-black==22.1.0
+black==23.1.0
     # via
     #   -r requirements.in
     #   data-engineering-common
-blinker==1.4
+blinker==1.5
     # via
     #   flask-principal
     #   flask-security-too
-blis==0.7.8
+blis==0.7.9
     # via thinc
 catalogue==2.0.8
     # via
@@ -37,52 +39,52 @@ certifi==2022.12.7
     #   requests
 cffi==1.15.1
     # via cryptography
-chardet==4.0.0
+charset-normalizer==3.1.0
     # via requests
-click==8.0.3
+click==8.1.3
     # via
     #   black
     #   flask
     #   flask-shell-ipython
     #   typer
-codecov==2.1.11
+codecov==2.1.12
     # via -r requirements.in
-coverage==5.0.3
+confection==0.0.4
+    # via thinc
+coverage[toml]==7.2.1
     # via
     #   codecov
     #   pytest-cov
-cryptography==39.0.1
+cryptography==39.0.2
     # via authlib
-cymem==2.0.6
+cymem==2.0.7
     # via
     #   preshed
     #   spacy
     #   thinc
 data-engineering-common @ git+https://github.com/uktrade/data-engineering-common.git
     # via -r requirements.in
-decorator==4.4.1
+decorator==5.1.1
     # via ipython
-dnspython==2.1.0
+dnspython==2.3.0
     # via email-validator
-email-validator==1.1.2
+email-validator==1.3.1
     # via
     #   data-engineering-common
     #   flask-security-too
-entrypoints==0.3
-    # via flake8
 exceptiongroup==1.1.1
     # via pytest
 executing==1.2.0
     # via stack-data
-flake8==3.7.9
+flake8==6.0.0
     # via
     #   -r requirements.in
     #   data-engineering-common
-flake8-import-order==0.18.1
+flake8-import-order==0.18.2
     # via
     #   -r requirements.in
     #   data-engineering-common
-flask==2.2.2
+flask==2.2.3
     # via
     #   -r requirements.in
     #   data-engineering-common
@@ -96,19 +98,19 @@ flask-login==0.6.2
     # via flask-security-too
 flask-principal==0.4.0
     # via flask-security-too
-flask-security-too==5.0.2
+flask-security-too==5.1.1
     # via
     #   -r requirements.in
     #   data-engineering-common
 flask-shell-ipython==0.4.1
     # via -r requirements.in
-flask-sqlalchemy==3.0.2
+flask-sqlalchemy==3.0.3
     # via
     #   -r requirements.in
     #   data-engineering-common
-flask-wtf==1.0.1
+flask-wtf==1.1.1
     # via flask-security-too
-freezegun==0.3.15
+freezegun==1.2.2
     # via
     #   -r requirements.in
     #   data-engineering-common
@@ -116,54 +118,56 @@ fuzzywuzzy==0.18.0
     # via -r requirements.in
 gunicorn==20.1.0
     # via -r requirements.in
-idna==2.10
+idna==3.4
     # via
     #   email-validator
     #   requests
 importlib-metadata==6.0.0
     # via flask
-iniconfig==1.1.1
+iniconfig==2.0.0
     # via pytest
-ipython==8.10.0
+ipython==8.11.0
     # via flask-shell-ipython
 itsdangerous==2.1.2
     # via
     #   flask
     #   flask-security-too
     #   flask-wtf
-jedi==0.16.0
+jedi==0.18.2
     # via ipython
 jinja2==3.1.2
     # via
     #   flask
     #   spacy
-json-log-formatter==0.3.0
+json-log-formatter==0.5.1
     # via
     #   -r requirements.in
     #   data-engineering-common
 langcodes==3.3.0
     # via spacy
-markupsafe==2.1.1
+levenshtein==0.20.9
+    # via python-levenshtein
+markupsafe==2.1.2
     # via
     #   jinja2
     #   werkzeug
     #   wtforms
 matplotlib-inline==0.1.6
     # via ipython
-mccabe==0.6.1
+mccabe==0.7.0
     # via flake8
 mohawk==1.1.0
     # via
     #   -r requirements.in
     #   data-engineering-common
-murmurhash==1.0.2
+murmurhash==1.0.9
     # via
     #   preshed
     #   spacy
     #   thinc
-mypy-extensions==0.4.3
+mypy-extensions==1.0.0
     # via black
-numpy==1.22.2
+numpy==1.24.2
     # via
     #   -r requirements.in
     #   blis
@@ -173,75 +177,76 @@ numpy==1.22.2
     #   thinc
 oauthlib==2.1.0
     # via requests-oauthlib
-packaging==20.1
+packaging==23.0
     # via
+    #   black
     #   pytest
     #   spacy
-pandas==1.4.0
+    #   thinc
+pandas==1.5.3
     # via
     #   -r requirements.in
     #   data-engineering-common
-parso==0.6.0
+parso==0.8.3
     # via jedi
 passlib==1.7.4
     # via flask-security-too
-pathspec==0.9.0
+pathspec==0.11.0
     # via black
-pathy==0.6.2
+pathy==0.10.1
     # via spacy
 pexpect==4.8.0
     # via ipython
 pickleshare==0.7.5
     # via ipython
-platformdirs==2.5.2
+platformdirs==3.1.1
     # via black
-pluggy==0.13.1
+pluggy==1.0.0
     # via pytest
-preshed==3.0.2
+preshed==3.0.8
     # via
     #   spacy
     #   thinc
-prompt-toolkit==3.0.36
+prompt-toolkit==3.0.38
     # via ipython
-psycopg2==2.8.5
+psycopg2==2.9.5
     # via
     #   -r requirements.in
     #   data-engineering-common
-ptyprocess==0.6.0
+ptyprocess==0.7.0
     # via pexpect
 pure-eval==0.2.2
     # via stack-data
-pycodestyle==2.5.0
+pycodestyle==2.10.0
     # via
     #   flake8
     #   flake8-import-order
-pycountry==19.8.18
+pycountry==22.3.5
     # via -r requirements.in
 pycparser==2.21
     # via cffi
-pydantic==1.9.2
+pydantic==1.10.6
     # via
+    #   confection
     #   spacy
     #   thinc
-pyflakes==2.1.1
+pyflakes==3.0.1
     # via flake8
-pygments==2.7.4
+pygments==2.14.0
     # via ipython
-pyparsing==2.4.6
-    # via packaging
-pytest==7.2.0
+pytest==7.2.2
     # via
     #   -r requirements.in
     #   data-engineering-common
     #   pytest-cov
     #   pytest-mock
-pytest-cov==2.8.1
+pytest-cov==4.0.0
     # via
     #   -r requirements.in
     #   data-engineering-common
-pytest-mock==3.1.0
+pytest-mock==3.10.0
     # via -r requirements.in
-python-dateutil==2.8.1
+python-dateutil==2.8.2
     # via
     #   freezegun
     #   pandas
@@ -249,19 +254,21 @@ python-dotenv==1.0.0
     # via
     #   -r requirements.in
     #   data-engineering-common
-python-levenshtein==0.12.2
+python-levenshtein==0.20.9
     # via -r requirements.in
-pytz==2021.3
+pytz==2022.7.1
     # via pandas
-pyyaml==5.4
+pyyaml==6.0
     # via
     #   -r requirements.in
     #   data-engineering-common
-redis==3.5.1
+rapidfuzz==2.13.7
+    # via levenshtein
+redis==4.5.1
     # via
     #   -r requirements.in
     #   data-engineering-common
-requests==2.25.1
+requests==2.28.2
     # via
     #   codecov
     #   data-engineering-common
@@ -271,21 +278,20 @@ requests-oauthlib==1.1.0
     # via
     #   -r requirements.in
     #   data-engineering-common
-six==1.14.0
+six==1.16.0
     # via
     #   asttokens
-    #   freezegun
     #   mohawk
-    #   packaging
     #   python-dateutil
-    #   sqlalchemy-utils
-smart-open==5.2.1
-    # via pathy
-spacy==3.4.1
+smart-open==6.3.0
+    # via
+    #   pathy
+    #   spacy
+spacy==3.5.1
     # via -r requirements.in
-spacy-legacy==3.0.9
+spacy-legacy==3.0.12
     # via spacy
-spacy-loggers==1.0.3
+spacy-loggers==1.0.4
     # via spacy
 sqlalchemy==2.0.5.post1
     # via
@@ -293,49 +299,50 @@ sqlalchemy==2.0.5.post1
     #   data-engineering-common
     #   flask-sqlalchemy
     #   sqlalchemy-utils
-sqlalchemy-utils==0.37.2
+sqlalchemy-utils==0.40.0
     # via
     #   -r requirements.in
     #   data-engineering-common
-srsly==2.4.4
+srsly==2.4.6
     # via
+    #   confection
     #   spacy
     #   thinc
 stack-data==0.6.2
     # via ipython
-thinc==8.1.0
+thinc==8.1.9
     # via spacy
 tomli==2.0.1
     # via
     #   black
+    #   coverage
     #   pytest
-toolz==0.10.0
+toolz==0.12.0
     # via -r requirements.in
-tqdm==4.42.0
+tqdm==4.65.0
     # via spacy
 traitlets==5.9.0
     # via
     #   ipython
     #   matplotlib-inline
-typer==0.4.2
+typer==0.7.0
     # via
     #   pathy
     #   spacy
-typing-extensions==4.3.0
+typing-extensions==4.5.0
     # via
     #   black
     #   pydantic
     #   sqlalchemy
-urllib3==1.26.5
+urllib3==1.26.15
     # via requests
-wasabi==0.10.1
+wasabi==1.1.1
     # via
     #   spacy
-    #   spacy-loggers
     #   thinc
-watchdog==2.2.1
+watchdog==2.3.1
     # via -r requirements.in
-wcwidth==0.1.8
+wcwidth==0.2.6
     # via prompt-toolkit
 werkzeug==2.2.3
     # via
