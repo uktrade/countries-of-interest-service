@@ -251,7 +251,7 @@ python-levenshtein==0.12.2
     # via -r requirements.in
 pytz==2021.3
     # via pandas
-pyyaml==5.4
+pyyaml==6.0
     # via
     #   -r requirements.in
     #   data-engineering-common
