@@ -82,7 +82,7 @@ flake8-import-order==0.18.1
     # via
     #   -r requirements.in
     #   data-engineering-common
-flask==2.2.2
+flask==2.2.5
     # via
     #   -r requirements.in
     #   data-engineering-common
