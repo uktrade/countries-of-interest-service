@@ -100,7 +100,7 @@ flask-security-too==5.0.2
     #   data-engineering-common
 flask-shell-ipython==0.4.1
     # via -r requirements.in
-flask-sqlalchemy==3.0.2
+flask-sqlalchemy==3.0.3
     # via
     #   -r requirements.in
     #   data-engineering-common
