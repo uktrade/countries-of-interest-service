@@ -37,7 +37,7 @@ certifi==2022.12.7
     #   requests
 cffi==1.15.1
     # via cryptography
-chardet==4.0.0
+charset-normalizer==3.1.0
     # via requests
 click==8.0.3
     # via
@@ -259,7 +259,7 @@ redis==4.4.4
     # via
     #   -r requirements.in
     #   data-engineering-common
-requests==2.25.1
+requests==2.31.0
     # via
     #   codecov
     #   data-engineering-common
