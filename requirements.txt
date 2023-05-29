@@ -175,7 +175,7 @@ packaging==20.1
     # via
     #   pytest
     #   spacy
-pandas==1.4.0
+pandas==2.0.1
     # via
     #   -r requirements.in
     #   data-engineering-common
@@ -239,7 +239,7 @@ pytest-cov==2.8.1
     #   data-engineering-common
 pytest-mock==3.1.0
     # via -r requirements.in
-python-dateutil==2.8.1
+python-dateutil==2.8.2
     # via
     #   freezegun
     #   pandas
@@ -319,6 +319,8 @@ typer==0.4.2
     #   spacy
 typing-extensions==4.3.0
     # via pydantic
+tzdata==2023.3
+    # via pandas
 urllib3==1.26.5
     # via requests
 wasabi==0.10.1
