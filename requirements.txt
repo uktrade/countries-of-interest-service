@@ -276,7 +276,6 @@ six==1.14.0
     #   mohawk
     #   packaging
     #   python-dateutil
-    #   sqlalchemy-utils
 smart-open==5.2.1
     # via pathy
 spacy==3.4.1
@@ -291,7 +290,7 @@ sqlalchemy==1.4.42
     #   data-engineering-common
     #   flask-sqlalchemy
     #   sqlalchemy-utils
-sqlalchemy-utils==0.37.2
+sqlalchemy-utils==0.41.1
     # via
     #   -r requirements.in
     #   data-engineering-common
