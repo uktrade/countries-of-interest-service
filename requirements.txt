@@ -51,7 +51,7 @@ coverage==5.0.3
     # via
     #   codecov
     #   pytest-cov
-cryptography==41.0.0
+cryptography==41.0.2
     # via authlib
 cymem==2.0.6
     # via
