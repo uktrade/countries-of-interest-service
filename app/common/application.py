@@ -133,12 +133,6 @@ def _register_components(flask_app):
     redis_uri = _get_redis_url(flask_app)
     flask_app.cache = redis.from_url(redis_uri)
 
-    try:
-        from app.application import register_app_components
-    except ImportError:
-        pass
-    else:
-        flask_app = register_app_components(flask_app)
     return flask_app
 
 
