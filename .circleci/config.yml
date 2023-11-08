@@ -61,7 +61,7 @@ job_defaults: &job_defaults
 
     - run:
         name: Install node
-        command: curl -sL https://deb.nodesource.com/setup_10.x | bash && apt-get install -y nodejs npm
+        command: curl -sL https://deb.nodesource.com/setup_12.x | bash && apt-get install -y nodejs npm
 
     - run:
         name: Install packages
