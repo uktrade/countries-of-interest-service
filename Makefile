@@ -11,17 +11,17 @@ build_assets:
 
 .PHONY: run_server
 run_server: build_assets
-	exec gunicorn 'data_engineering.common.application:get_or_create()' -b 0.0.0.0:${PORT} --config 'app/config/gunicorn.conf'
+	exec gunicorn 'app.common.application:get_or_create()' -b 0.0.0.0:${PORT} --config 'app/config/gunicorn.conf'
 
 
 .PHONY: run_dev_server
 run_dev_server:
-	FLASK_DEBUG=1 FLASK_APP='data_engineering.common.application:get_or_create()' flask run --host 0.0.0.0 --port ${PORT}
+	FLASK_DEBUG=1 FLASK_APP='app.common.application:get_or_create()' flask run --host 0.0.0.0 --port ${PORT}
 
 
 .PHONY: run_tests
 run_tests:
-	TESTING=1 pytest -p no:sugar ${TEST} ${COV}
+	TESTING=1 pytest -p no:sugar -vv ${TEST} ${COV}
 
 
 .PHONY: run_tests_local

@@ -5,7 +5,6 @@ import pytest
 import sqlalchemy.exc
 from flask import current_app as flask_app
 
-
 import app.db.models.external as models
 from app.etl.tasks import source_data_extraction
 

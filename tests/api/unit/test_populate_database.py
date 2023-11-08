@@ -55,23 +55,23 @@ class TestPopulateDatabase:
         populate_database_task.delay.assert_called_once()
 
     def test_if_force_update_rerun_while_another_task_is_running(self, populate_database_task):
-        sql = 'insert into etl_status (status, timestamp) values (%s, %s)'
-        flask_app.dbi.execute_statement(sql, data=['RUNNING', '2019-01-01 01:00'])
+        sql = 'insert into etl_status (status, timestamp) values (:status, :ts)'
+        flask_app.dbi.execute_statement(sql, data=[{"status": 'RUNNING', "ts": '2019-01-01 01:00'}])
         with self.app.test_request_context() as request:
             request.request.args = {'force-update': ''}
             populate_database()
         populate_database_task.delay.assert_called_once()
 
     def test_does_not_rerun_while_another_task_is_running(self, populate_database_task):
-        sql = 'insert into etl_status (status, timestamp) values (%s, %s)'
-        flask_app.dbi.execute_statement(sql, data=['RUNNING', '2019-01-01 01:00'])
+        sql = 'insert into etl_status (status, timestamp) values (:status, :ts)'
+        flask_app.dbi.execute_statement(sql, data=[{"status": 'RUNNING', "ts": '2019-01-01 01:00'}])
         with self.app.test_request_context():
             populate_database()
         populate_database_task.delay.assert_not_called()
 
     def test_reruns_task_if_last_was_successful(self, populate_database_task):
-        sql = 'insert into etl_status (status, timestamp) values (%s, %s)'
-        flask_app.dbi.execute_statement(sql, data=['SUCCESS', '2019-01-01 01:00'])
+        sql = 'insert into etl_status (status, timestamp) values (:status, :ts)'
+        flask_app.dbi.execute_statement(sql, data=[{"status": 'SUCCESS', "ts": '2019-01-01 01:00'}])
         with self.app.test_request_context():
             populate_database()
         populate_database_task.delay.assert_called_once()

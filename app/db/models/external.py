@@ -1,6 +1,6 @@
 from enum import Enum
 
-from data_engineering.common.db.models import (
+from app.common.db.models import (
     _col,
     _date,
     _dt,

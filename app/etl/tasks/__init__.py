@@ -43,13 +43,15 @@ def populate_database(drop_table, extractors, tasks):
                 except Exception as e:
                     output = output + [{'task': subtask.name, 'status': 500, 'error': str(e)}]
 
-    sql = 'insert into etl_runs (timestamp) values (%s)'
     ts_finish = datetime.datetime.now()
-    flask_app.dbi.execute_statement(sql, [ts_finish])
-    sql = 'delete from etl_status'
-    flask_app.dbi.execute_statement(sql)
-    sql = '''insert into etl_status (status, timestamp) values (%s, %s)'''
-    flask_app.dbi.execute_statement(sql, ['SUCCESS', ts_finish])
+    flask_app.dbi.execute_statement(
+        'insert into etl_runs (timestamp) values (:finish)', [{"finish": ts_finish}]
+    )
+    flask_app.dbi.execute_statement('delete from etl_status')
+    flask_app.dbi.execute_statement(
+        'insert into etl_status (status, timestamp) values (:status, :finish)',
+        [{"status": 'SUCCESS', "finish": ts_finish}]
+    )
 
     output = {'output': output}
     pretty_log_output(output)

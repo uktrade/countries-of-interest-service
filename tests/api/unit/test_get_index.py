@@ -56,23 +56,23 @@ class TestPopulateDatabase:
         populate_database_task.delay.assert_called_once()
 
     def test_if_force_update_rerun_while_another_task_is_running(self, populate_database_task):
-        sql = 'insert into etl_status (status, timestamp) values (%s, %s)'
-        flask_app.dbi.execute_statement(sql, data=['RUNNING', '2019-01-01 01:00'])
+        sql = 'insert into etl_status (status, timestamp) values (:status, :dt)'
+        flask_app.dbi.execute_statement(sql, data=[{"status": 'RUNNING', "dt": '2019-01-01 01:00'}])
         with self.app.test_request_context() as request:
             request.request.args = {'force-update': ''}
             populate_database()
         populate_database_task.delay.assert_called_once()
 
     def test_does_not_rerun_while_another_task_is_running(self, populate_database_task):
-        sql = 'insert into etl_status (status, timestamp) values (%s, %s)'
-        flask_app.dbi.execute_statement(sql, data=['RUNNING', '2019-01-01 01:00'])
+        sql = 'insert into etl_status (status, timestamp) values (:status, :dt)'
+        flask_app.dbi.execute_statement(sql, data=[{"status": 'RUNNING', "dt": '2019-01-01 01:00'}])
         with self.app.test_request_context():
             populate_database()
         populate_database_task.delay.assert_not_called()
 
     def test_reruns_task_if_last_was_succesful(self, populate_database_task):
-        sql = 'insert into etl_status (status, timestamp) values (%s, %s)'
-        flask_app.dbi.execute_statement(sql, data=['SUCCESS', '2019-01-01 01:00'])
+        sql = 'insert into etl_status (status, timestamp) values (:status, :dt)'
+        flask_app.dbi.execute_statement(sql, data=[{"status": 'SUCCESS', "dt": '2019-01-01 01:00'}])
         with self.app.test_request_context():
             populate_database()
         populate_database_task.delay.assert_called_once()
@@ -87,12 +87,11 @@ class TestGetIndex:
     @patch('app.api.views.render_template')
     def test_last_updated_passed_to_template(self, render_template, is_authenticated):
         is_authenticated.return_value = True
-        sql = 'insert into etl_runs (timestamp) values (%s)'
         values = [
-            ('2019-01-01 01:00',),
-            ('2019-01-01 02:00',),
+            {"ts": '2019-01-01 01:00'},
+            {"ts": '2019-01-01 02:00'},
         ]
-        flask_app.dbi.execute_statement(sql, values)
+        flask_app.dbi.execute_statement('insert into etl_runs (timestamp) values (:ts)', values)
         with self.app.test_client() as c:
             with c.session_transaction() as sess:
                 sess['_authbroker_token'] = 'Test'

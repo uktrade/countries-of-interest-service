@@ -7,7 +7,7 @@ from flask import session
 import app.sso as sso
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="session")
 def sso_client(app):
     kwargs = {
         'access_token_url': 'access_token_url',

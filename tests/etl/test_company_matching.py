@@ -1,5 +1,5 @@
 import requests
-from data_engineering.common.tests.utils import rows_equal_query_results
+from app.common.tests.utils import rows_equal_query_results
 from flask import current_app as flask_app
 
 from app.db.models.internal import CountriesAndSectorsInterest

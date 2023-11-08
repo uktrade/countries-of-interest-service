@@ -3,7 +3,7 @@ import re
 import urllib.parse
 
 import requests
-from data_engineering.common.db.models import db
+from app.common.db.models import db
 from flask import current_app as flask_app
 from mohawk import Sender
 
@@ -106,9 +106,9 @@ class Task:
                     id,
                     match_id,
                     similarity
-                FROM json_populate_recordset(null::company_matching, %s);
+                FROM json_populate_recordset(null::company_matching, :arg);
             """
-            flask_app.dbi.execute_statement(stmt, data=(json.dumps(data['matches']),))
+            flask_app.dbi.execute_statement(stmt, data=({"arg": json.dumps(data['matches'])},))
 
     def _build_request(self, cursor, batch_size=100000):
         batch_count = 0

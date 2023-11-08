@@ -1,6 +1,6 @@
 import mohawk
 import requests
-from data_engineering.common.db.models import sql_alchemy
+from app.common.db.models import sql_alchemy
 from flask import current_app as flask_app
 from sqlalchemy import exc
 from sqlalchemy.dialects import postgresql

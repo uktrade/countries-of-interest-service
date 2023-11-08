@@ -1,4 +1,4 @@
-from data_engineering.common.db.models import (
+from app.common.db.models import (
     _bool,
     _col,
     _dt,
