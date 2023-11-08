@@ -11,7 +11,7 @@ from app.etl.tasks.pipeline import (
 
 
 def populate_database(drop_table, extractors, tasks):
-    flask_app.logger.info(f'populate_database')
+    flask_app.logger.info('populate_database')
     if not extractors and not tasks:
         extractors = EXTRACTORS
         tasks = TASKS
@@ -50,7 +50,7 @@ def populate_database(drop_table, extractors, tasks):
     flask_app.dbi.execute_statement('delete from etl_status')
     flask_app.dbi.execute_statement(
         'insert into etl_status (status, timestamp) values (:status, :finish)',
-        [{"status": 'SUCCESS', "finish": ts_finish}]
+        [{"status": 'SUCCESS', "finish": ts_finish}],
     )
 
     output = {'output': output}

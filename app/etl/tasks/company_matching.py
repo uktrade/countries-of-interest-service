@@ -3,10 +3,10 @@ import re
 import urllib.parse
 
 import requests
-from app.common.db.models import db
 from flask import current_app as flask_app
 from mohawk import Sender
 
+from app.common.db.models import db
 from app.config import constants
 from app.db.models.external import DatahubCompany, DatahubContact, ExportWins
 from app.db.models.internal import (
@@ -17,7 +17,6 @@ from app.db.models.internal import (
 
 
 class Task:
-
     name = constants.Task.COMPANY_MATCHING.value
     valid_email = re.compile(r"[^@]+@[^@]+\.[^@]+")
 
@@ -96,7 +95,7 @@ class Task:
                 ),
                 json_query=request,
             )
-            stmt = f"""
+            stmt = """
                 INSERT INTO company_matching (
                     id,
                     match_id,

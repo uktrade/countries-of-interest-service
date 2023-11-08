@@ -122,6 +122,7 @@ def _register_components(flask_app):
 
     # Routes
     from app.api import routes
+
     for rule, view_func in routes.RULES:
         flask_app.add_url_rule(rule, view_func=view_func)
 

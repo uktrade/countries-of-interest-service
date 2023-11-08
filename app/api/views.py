@@ -1,13 +1,13 @@
 import datetime
 
 import pandas as pd
-from app.common.api.utils import to_web_dict
-from app.common.views import ac, json_error, response_orientation_decorator
 from flask import current_app as flask_app
 from flask import render_template, request
 from werkzeug.exceptions import BadRequest
 
 from app.api.tasks import populate_database_task
+from app.common.api.utils import to_web_dict
+from app.common.views import ac, json_error, response_orientation_decorator
 from app.db.models import internal as internal_models
 from app.db.models.internal import CountriesAndSectorsInterest
 from app.sso.token import login_required
@@ -30,7 +30,7 @@ def get_company_countries_and_sectors_of_interest(orientation):
 
     where = ''
     values = {
-        'countries':tuple(countries),
+        'countries': tuple(countries),
         'sectors': tuple(sectors),
         'service_company_ids': tuple(service_company_ids),
         'company_match_ids': tuple(company_match_ids),
@@ -150,7 +150,7 @@ def populate_database():
         flask_app.dbi.execute_statement('delete from etl_status')
         flask_app.dbi.execute_statement(
             'insert into etl_status (status, timestamp) values (:status, :dt)',
-            data=[{"status": "RUNNING", "dt": datetime.datetime.now()}]
+            data=[{"status": "RUNNING", "dt": datetime.datetime.now()}],
         )
         return flask_app.make_response({'status': 200, 'message': 'started populate_database task'})
     else:

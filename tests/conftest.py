@@ -1,6 +1,3 @@
-pytest_plugins = [
-    "tests.fixtures.add_to_db",
-]
 import datetime
 import unittest
 
@@ -14,6 +11,9 @@ from app.common.db.models import HawkUsers
 from app.common.views import ac, json_error
 
 TESTING_DB_NAME_TEMPLATE = 'test_{}'
+pytest_plugins = [
+    "tests.fixtures.add_to_db",
+]
 
 
 @json_error
@@ -121,9 +121,7 @@ def app_with_mock_cache(app):
 
 @pytest.fixture(scope="function")
 def sso_authenticated_request():
-    with unittest.mock.patch(
-        'app.common.sso.token.is_authenticated'
-    ) as mock_is_authenticated:
+    with unittest.mock.patch('app.common.sso.token.is_authenticated') as mock_is_authenticated:
         mock_is_authenticated.return_value = True
         yield
 

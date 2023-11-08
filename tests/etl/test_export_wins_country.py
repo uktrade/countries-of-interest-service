@@ -11,7 +11,6 @@ class TestExportCountries:
         add_standardised_countries,
         add_export_wins,
     ):
-
         add_export_wins(
             [
                 {

@@ -24,7 +24,6 @@ class TestPopulateDatabase:
         }
 
     def test_called_with_drop_table_in_request(self, populate_database_task):
-
         with self.app.test_request_context() as request:
             request.request.args = {'drop-table': ''}
             output = populate_database()

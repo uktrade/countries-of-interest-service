@@ -7,7 +7,7 @@ from flask import session
 import app.sso as sso
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def sso_client(app):
     kwargs = {
         'access_token_url': 'access_token_url',
@@ -95,7 +95,6 @@ class TestCallback:
 
 class TestGetProfile:
     def test_get_profile(self, app, mock_oauth, sso_client):
-
         mock_response = unittest.mock.Mock()
         mock_response.status_code = 200
         mock_response.json.return_value = {"name": "me"}

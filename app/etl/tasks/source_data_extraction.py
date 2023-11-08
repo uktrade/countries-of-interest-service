@@ -1,11 +1,11 @@
 import mohawk
 import requests
-from app.common.db.models import sql_alchemy
 from flask import current_app as flask_app
 from sqlalchemy import exc
 from sqlalchemy.dialects import postgresql
 
 import app.db.models.external as models
+from app.common.db.models import sql_alchemy
 from app.config.constants import Source
 
 

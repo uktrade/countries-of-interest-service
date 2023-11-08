@@ -1,7 +1,7 @@
 import requests
-from app.common.tests.utils import rows_equal_query_results
 from flask import current_app as flask_app
 
+from app.common.tests.utils import rows_equal_query_results
 from app.db.models.internal import CountriesAndSectorsInterest
 from app.etl.tasks.company_matching import Task
 

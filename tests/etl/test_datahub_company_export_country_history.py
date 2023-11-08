@@ -6,7 +6,6 @@ from app.etl.tasks.datahub_company_export_country_history import Task
 
 class TestDatahubCompanyExportCountryHistory:
     def test(self, add_country_territory_registry, add_datahub_company_export_country_history):
-
         add_datahub_company_export_country_history(
             [
                 {

@@ -12,7 +12,6 @@ from app.common.db.models import (
 
 
 class CountriesAndSectorsInterest(BaseModel):
-
     __tablename__ = "countries_and_sectors_interest"
 
     id = _col(_int, primary_key=True, autoincrement=True)
@@ -30,7 +29,6 @@ class CountriesAndSectorsInterest(BaseModel):
 
 
 class CountriesAndSectorsInterestTemp(BaseModel):
-
     __tablename__ = "countries_and_sectors_interest_temp"
 
     id = _col(_int, primary_key=True, autoincrement=True)
@@ -48,7 +46,6 @@ class CountriesAndSectorsInterestTemp(BaseModel):
 
 
 class CountriesAndSectorsInterestMatched(BaseModel):
-
     __tablename__ = "countries_and_sectors_interest_matched"
 
     id = _col(_int, primary_key=True, autoincrement=True)
@@ -66,7 +63,6 @@ class CountriesAndSectorsInterestMatched(BaseModel):
 
 
 class InteractionsAnalysed(BaseModel):
-
     __tablename__ = 'interactions_analysed'
     __table_args__ = {'schema': 'algorithm'}
 
@@ -81,7 +77,6 @@ class InteractionsAnalysed(BaseModel):
 
 
 class InteractionsAnalysedInteractionIdLog(BaseModel):
-
     __tablename__ = 'interactions_analysed_interaction_id_log'
     __table_args__ = {'schema': 'algorithm'}
 

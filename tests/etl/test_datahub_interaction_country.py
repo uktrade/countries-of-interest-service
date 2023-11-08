@@ -12,7 +12,6 @@ class TestTask:
         add_datahub_interaction,
         add_interactions_analysed,
     ):
-
         add_datahub_interaction(
             [
                 {

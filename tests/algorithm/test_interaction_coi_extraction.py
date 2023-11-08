@@ -1,11 +1,11 @@
 import datetime
 
 import pytest
-from app.common.tests.utils import rows_equal_query_results
 from flask import current_app as flask_app
 from spacy.language import Language
 
 import app.algorithm.interaction_coi_extraction as mapper
+from app.common.tests.utils import rows_equal_query_results
 from app.db.models.external import Interactions
 from app.db.models.internal import InteractionsAnalysedInteractionIdLog
 
@@ -126,7 +126,6 @@ def test_interaction_coi_extraction(add_objects, add_side_effect, mock_datetime)
 
 
 def test_interaction_already_seen(add_objects, add_side_effect):
-
     add_objects(
         Interactions,
         [
@@ -181,7 +180,7 @@ def test_interaction_already_seen(add_objects, add_side_effect):
         expected_rows,
         f'SELECT datahub_interaction_id,place,'
         f'standardized_place,action,type,context,negation'
-        f' FROM "{mapper.output_schema}"."{mapper.output_table}"'
+        f' FROM "{mapper.output_schema}"."{mapper.output_table}"',
     )
 
     session = flask_app.db.session
