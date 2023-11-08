@@ -4,13 +4,8 @@ COV ?= --cov
 BLACK_CONFIG ?= --exclude=venv --skip-string-normalization --line-length 100
 CHECK ?= --check
 
-.PHONY: build_assets
-build_assets:
-	npm run build
-
-
 .PHONY: run_server
-run_server: build_assets
+run_server:
 	exec gunicorn 'app.common.application:get_or_create()' -b 0.0.0.0:${PORT} --config 'app/config/gunicorn.conf'
 
 
