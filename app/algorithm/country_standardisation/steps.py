@@ -4,7 +4,6 @@ from io import StringIO
 from flask import current_app as flask_app
 from fuzzywuzzy import fuzz, process
 
-
 from app.db.models.external import (
     DatahubCompanyExportCountry,
     DatahubCompanyExportCountryHistory,

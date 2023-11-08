@@ -3,7 +3,6 @@ from app.config import constants
 
 
 class Task:
-
     name = constants.Task.INTERACTIONS_ANALYSED.value
 
     def __init__(self, *args, **kwargs):

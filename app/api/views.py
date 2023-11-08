@@ -1,13 +1,13 @@
 import datetime
 
 import pandas as pd
-from data_engineering.common.api.utils import to_web_dict
-from data_engineering.common.views import ac, json_error, response_orientation_decorator
 from flask import current_app as flask_app
 from flask import render_template, request
 from werkzeug.exceptions import BadRequest
 
 from app.api.tasks import populate_database_task
+from app.common.api.utils import to_web_dict
+from app.common.views import ac, json_error, response_orientation_decorator
 from app.db.models import internal as internal_models
 from app.db.models.internal import CountriesAndSectorsInterest
 from app.sso.token import login_required
@@ -29,63 +29,47 @@ def get_company_countries_and_sectors_of_interest(orientation):
     sources = request.args.getlist('source')
 
     where = ''
-    values = (
-        countries + sectors + service_company_ids + company_match_ids + types + sources + services
-    )
-    if len(countries) == 1:
-        where = 'where country=%s'
-    elif len(countries) > 1:
-        where = 'where country in (' + ','.join('%s' for i in range(len(countries))) + ')'
-    if len(sectors) == 1:
+    values = {
+        'countries': tuple(countries),
+        'sectors': tuple(sectors),
+        'service_company_ids': tuple(service_company_ids),
+        'company_match_ids': tuple(company_match_ids),
+        'types': tuple(types),
+        'sources': tuple(sources),
+        'services': tuple(services),
+    }
+
+    if countries:
+        where = 'where country in :countries'
+
+    if sectors:
         where = where + ' and' if where != '' else 'where'
-        where = where + ' sector=%s'
-    elif len(sectors) > 1:
+        where = where + ' sector in :sectors'
+
+    if service_company_ids:
         where = where + ' and' if where != '' else 'where'
-        where = where + ' sector in (' + ','.join(['%s' for i in range(len(sectors))]) + ')'
-    if len(service_company_ids) == 1:
+        where = where + ' service_company_id in :service_company_ids'
+
+    if company_match_ids:
         where = where + ' and' if where != '' else 'where'
-        where = where + ' service_company_id=%s'
-    elif len(service_company_ids) > 1:
+        where = where + ' company_match_id in :company_match_ids'
+
+    if types:
         where = where + ' and' if where != '' else 'where'
-        where = (
-            where
-            + ' service_company_id in ('
-            + ','.join(['%s' for i in range(len(service_company_ids))])
-            + ')'
-        )
-    if len(company_match_ids) == 1:
+        where = where + ' type in :types'
+
+    if sources:
         where = where + ' and' if where != '' else 'where'
-        where = where + ' company_match_id=%s'
-    elif len(company_match_ids) > 1:
+        where = where + ' source in :sources'
+
+    if services:
         where = where + ' and' if where != '' else 'where'
-        where = (
-            where
-            + ' company_match_id in ('
-            + ','.join(['%s' for i in range(len(company_match_ids))])
-            + ')'
-        )
-    if len(types) == 1:
-        where = where + ' and' if where != '' else 'where'
-        where = where + ' type=%s'
-    elif len(types) > 1:
-        where = where + ' and' if where != '' else 'where'
-        where = where + ' type in (' + ','.join(['%s' for i in range(len(types))]) + ')'
-    if len(sources) == 1:
-        where = where + ' and' if where != '' else 'where'
-        where = where + ' source=%s'
-    elif len(sources) > 1:
-        where = where + ' and' if where != '' else 'where'
-        where = where + ' source in (' + ','.join(['%s' for i in range(len(sources))]) + ')'
-    if len(services) == 1:
-        where = where + ' and' if where != '' else 'where'
-        where = where + ' service=%s'
-    elif len(services) > 1:
-        where = where + ' and' if where != '' else 'where'
-        where = where + ' service in (' + ','.join(['%s' for i in range(len(services))]) + ')'
+        where = where + ' service in :services'
+
     if next_id is not None:
         where = where + ' and' if where != '' else 'where'
-        where = where + ' id >= %s'
-        values = values + [next_id]
+        where = where + ' id >= :next_id'
+        values["next_id"] = next_id
 
     sql_query = f'''
         select
@@ -137,8 +121,7 @@ def get_company_countries_and_sectors_of_interest(orientation):
 def get_index():
     last_updated = None
     if flask_app.dbi.table_exists('public', 'etl_runs'):
-        sql = 'select max(timestamp) from etl_runs'
-        df = flask_app.dbi.execute_query(sql, df=True)
+        df = flask_app.dbi.execute_query('select max(timestamp) from etl_runs', df=True)
         last_updated = pd.to_datetime(df.values[0][0])
     if last_updated is None:
         last_updated = 'Database not yet initialised'
@@ -161,15 +144,14 @@ def populate_database():
     if 'tasks' in request.args:
         tasks = request.args['tasks'].split(',')
 
-    sql = 'select * from etl_status'
-
-    df = flask_app.dbi.execute_query(sql, df=True)
+    df = flask_app.dbi.execute_query('select * from etl_status', df=True)
     if force_update is True or len(df) == 0 or df['status'].values[0] == 'SUCCESS':
         populate_database_task.delay(drop_table, extractors, tasks)
-        sql = 'delete from etl_status'
-        flask_app.dbi.execute_statement(sql)
-        sql = '''insert into etl_status (status, timestamp) values (%s, %s)'''
-        flask_app.dbi.execute_statement(sql, data=['RUNNING', datetime.datetime.now()])
+        flask_app.dbi.execute_statement('delete from etl_status')
+        flask_app.dbi.execute_statement(
+            'insert into etl_status (status, timestamp) values (:status, :dt)',
+            data=[{"status": "RUNNING", "dt": datetime.datetime.now()}],
+        )
         return flask_app.make_response({'status': 200, 'message': 'started populate_database task'})
     else:
         timestamp = df['timestamp'].values[0]
@@ -294,6 +276,7 @@ def get_data_visualisation_data(field):
     df_top = df_top.reset_index()
     df_top = df_top.sort_values('n_interests_cumulative', ascending=False)
 
+    # raise Exception(df.head())
     output = {
         'nInterests': to_web_dict(df)['results'],
         'top': df_top[field].tolist(),

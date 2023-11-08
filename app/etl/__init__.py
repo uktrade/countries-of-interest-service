@@ -1,5 +1,6 @@
 import sqlalchemy.exc
 from flask import current_app as flask_app
+from sqlalchemy import text
 
 
 class ETLTask:
@@ -18,7 +19,7 @@ class ETLTask:
                 self.model.drop_table()
             self.model.create_table()
 
-            result = connection.execute(self.sql)
+            result = connection.execute(text(self.sql))
             transaction.commit()
             return {
                 'status': 200,

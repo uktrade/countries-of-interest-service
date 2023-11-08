@@ -1,8 +1,8 @@
-from data_engineering.common.tests.utils import rows_equal_query_results
 from flask import current_app as flask_app
 
 import app.algorithm.country_standardisation as mapper
 from app.algorithm.country_standardisation.steps import _standardise_country
+from app.common.tests.utils import rows_equal_query_results
 
 
 def test_country_mapping(
@@ -12,7 +12,6 @@ def test_country_mapping(
     add_export_wins,
     add_country_territory_registry,
 ):
-
     add_datahub_company_export_country(
         [
             {
@@ -141,7 +140,6 @@ def test_country_mapping(
 
 
 def test_standardise_country():
-
     choices = [
         'Belgium',
         'Austria',

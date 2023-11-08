@@ -60,18 +60,6 @@ job_defaults: &job_defaults
           make check
 
     - run:
-        name: Install node
-        command: curl -sL https://deb.nodesource.com/setup_10.x | bash && apt-get install -y nodejs npm
-
-    - run:
-        name: Install packages
-        command: npm install
-
-    - run:
-        name: Compile assets
-        command: npm run-script build
-
-    - run:
         name: Run tests
         command: |
           make run_tests COV='--cov=. --cov-report=html'

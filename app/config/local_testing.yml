@@ -2,4 +2,4 @@ flask:
   env: test
 app:
   hawk_enabled: True
-  database_url: $ENV{DATABASE_URL, postgresql://postgres@postgres/postgres}
+  database_url: $ENV{DATABASE_URL, postgresql://postgres:postgres@localhost:5432/postgres}

@@ -1,9 +1,9 @@
 import click
 import sqlalchemy_utils
-from data_engineering.common.db.models import HawkUsers
 from flask import current_app as flask_app
 from flask.cli import AppGroup, with_appcontext
 
+from app.common.db.models import HawkUsers
 from app.db.models import get_schemas
 
 

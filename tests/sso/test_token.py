@@ -4,10 +4,10 @@ from urllib.error import URLError
 
 import pytest
 from authlib.integrations.flask_client import OAuthError
-from data_engineering.common.application import get_or_create
 from werkzeug.exceptions import HTTPException
 
 import app.sso.token as token
+from app.common.application import get_or_create
 
 
 @pytest.fixture

@@ -9,7 +9,6 @@ def test(
     add_export_wins,
     add_country_territory_registry,
 ):
-
     add_datahub_company_export_country(
         [
             {

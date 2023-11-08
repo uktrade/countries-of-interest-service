@@ -3,10 +3,10 @@ import re
 import urllib.parse
 
 import requests
-from data_engineering.common.db.models import db
 from flask import current_app as flask_app
 from mohawk import Sender
 
+from app.common.db.models import db
 from app.config import constants
 from app.db.models.external import DatahubCompany, DatahubContact, ExportWins
 from app.db.models.internal import (
@@ -17,7 +17,6 @@ from app.db.models.internal import (
 
 
 class Task:
-
     name = constants.Task.COMPANY_MATCHING.value
     valid_email = re.compile(r"[^@]+@[^@]+\.[^@]+")
 
@@ -96,7 +95,7 @@ class Task:
                 ),
                 json_query=request,
             )
-            stmt = f"""
+            stmt = """
                 INSERT INTO company_matching (
                     id,
                     match_id,
@@ -106,9 +105,9 @@ class Task:
                     id,
                     match_id,
                     similarity
-                FROM json_populate_recordset(null::company_matching, %s);
+                FROM json_populate_recordset(null::company_matching, :arg);
             """
-            flask_app.dbi.execute_statement(stmt, data=(json.dumps(data['matches']),))
+            flask_app.dbi.execute_statement(stmt, data=({"arg": json.dumps(data['matches'])},))
 
     def _build_request(self, cursor, batch_size=100000):
         batch_count = 0

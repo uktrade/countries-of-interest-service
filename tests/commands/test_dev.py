@@ -27,7 +27,7 @@ class TestDevCommand:
             (None, False),
         ),
     )
-    @mock.patch('data_engineering.common.db.models.HawkUsers.add_user')
+    @mock.patch('app.common.db.models.HawkUsers.add_user')
     def test_run_hawk_user(self, mock_add_user, client_id, expected_add_user_called, app_with_db):
         mock_add_user.return_value = None
         runner = app_with_db.test_cli_runner()
@@ -63,7 +63,7 @@ class TestDevCommand:
         ),
     )
     @mock.patch('app.commands.dev.flask_app.db.create_all')
-    @mock.patch('data_engineering.common.db.dbi.DBI.drop_schema')
+    @mock.patch('app.common.db.dbi.DBI.drop_schema')
     @mock.patch('sqlalchemy_utils.create_database')
     @mock.patch('sqlalchemy_utils.drop_database')
     def test_run_db(

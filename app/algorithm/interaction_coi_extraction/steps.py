@@ -5,9 +5,10 @@ import traceback
 
 import pycountry
 import spacy
-from data_engineering.common.db.models import sql_alchemy
 from flask import current_app as flask_app
+from sqlalchemy import text
 
+from app.common.db.models import sql_alchemy
 from app.utils import log
 
 REPLACEMENTS = {
@@ -336,9 +337,12 @@ def process_interactions(
 
             sql = f'''
             insert into "{output_schema}"."{log_table}"
-            values (%s, %s) on conflict do nothing
+            values (:x, :y) on conflict do nothing
             '''
-            connection.execute(sql, [[d, analysed_at] for d in datahub_interaction_ids])
+
+            connection.execute(
+                text(sql), [{"x": d, "y": analysed_at} for d in datahub_interaction_ids]
+            )
             transaction.commit()
 
         except Exception:

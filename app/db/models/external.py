@@ -1,6 +1,6 @@
 from enum import Enum
 
-from data_engineering.common.db.models import (
+from app.common.db.models import (
     _col,
     _date,
     _dt,
@@ -13,7 +13,6 @@ from data_engineering.common.db.models import (
 
 
 class DatahubOmis(BaseModel):
-
     __tablename__ = 'datahub_omis'
     __table_args__ = {'schema': 'public'}
 
@@ -26,7 +25,6 @@ class DatahubOmis(BaseModel):
 
 
 class DatahubCompany(BaseModel):
-
     __tablename__ = 'datahub_company'
     __table_args__ = {'schema': 'public'}
 
@@ -41,7 +39,6 @@ class DatahubCompany(BaseModel):
 
 
 class DatahubCompanyExportCountry(BaseModel):
-
     __tablename__ = 'datahub_company_export_country'
     __table_args__ = {'schema': 'public'}
 
@@ -56,7 +53,6 @@ class DatahubCompanyExportCountry(BaseModel):
 
 
 class DatahubCompanyExportCountryHistory(BaseModel):
-
     __tablename__ = 'datahub_export_country_history'
     __table_args__ = {'schema': 'public'}
 
@@ -75,7 +71,6 @@ class DatahubCompanyExportCountryHistory(BaseModel):
 
 
 class DatahubContact(BaseModel):
-
     __tablename__ = 'datahub_contact'
     __table_args__ = {'schema': 'public'}
 
@@ -86,7 +81,6 @@ class DatahubContact(BaseModel):
 
 
 class ExportWins(BaseModel):
-
     __tablename__ = 'export_wins'
     __table_args__ = {'schema': 'public'}
 
@@ -114,7 +108,6 @@ class DITCountryTerritoryRegister(BaseModel):
 
 
 class Interactions(BaseModel):
-
     __tablename__ = 'interactions'
 
     id = _col(_int, primary_key=True, autoincrement=True)
@@ -131,7 +124,6 @@ class Interactions(BaseModel):
 
 
 class InteractionsExportCountry(BaseModel):
-
     __tablename__ = 'interactions_export_country'
 
     id = _col(_int, primary_key=True, autoincrement=True)

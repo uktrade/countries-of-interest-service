@@ -55,7 +55,6 @@ insert into {CountriesAndSectorsInterestTemp.get_fq_table_name()} (
 
 
 class Task(ETLTask):
-
     name = constants.Task.INTERACTIONS_EXPORT_COUNTRY.value
 
     def __init__(self, sql=sql, model=CountriesAndSectorsInterestTemp, *args, **kwargs):
