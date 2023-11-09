@@ -6,15 +6,13 @@
 #
 annotated-types==0.6.0
     # via pydantic
-appnope==0.1.3
-    # via ipython
 argh==0.30.3
     # via -r requirements.in
 asttokens==2.4.1
     # via stack-data
 authlib==1.2.1
     # via -r requirements.in
-black==23.10.1
+black==23.11.0
     # via -r requirements.in
 blinker==1.7.0
     # via
@@ -95,6 +93,8 @@ freezegun==1.2.2
     # via -r requirements.in
 fuzzywuzzy==0.18.0
     # via -r requirements.in
+greenlet==3.0.1
+    # via sqlalchemy
 gunicorn==21.2.0
     # via -r requirements.in
 idna==3.4
