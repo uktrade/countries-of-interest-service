@@ -68,7 +68,7 @@ flake8==6.1.0
     # via -r requirements.in
 flake8-import-order==0.18.2
     # via -r requirements.in
-flask==2.3.3
+flask==3.0.0
     # via
     #   -r requirements.in
     #   flask-login
