@@ -6,7 +6,7 @@
 #
 annotated-types==0.6.0
     # via pydantic
-argh==0.30.3
+argh==0.30.4
     # via -r requirements.in
 asttokens==2.4.1
     # via stack-data
