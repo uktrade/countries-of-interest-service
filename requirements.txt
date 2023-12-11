@@ -189,7 +189,7 @@ pycodestyle==2.11.1
     # via
     #   flake8
     #   flake8-import-order
-pycountry==22.3.5
+pycountry==23.12.7
     # via -r requirements.in
 pycparser==2.21
     # via cffi
