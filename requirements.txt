@@ -70,7 +70,7 @@ email-validator==2.1.0.post1
     # via flask-security-too
 executing==2.0.1
     # via stack-data
-flake8==6.1.0
+flake8==7.0.0
     # via -r requirements.in
 flake8-import-order==0.18.2
     # via -r requirements.in
@@ -216,7 +216,7 @@ pydantic==2.4.2
     #   weasel
 pydantic-core==2.10.1
     # via pydantic
-pyflakes==3.1.0
+pyflakes==3.2.0
     # via flake8
 pygments==2.16.1
     # via ipython
