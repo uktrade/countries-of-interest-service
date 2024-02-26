@@ -174,7 +174,7 @@ packaging==23.2
     #   spacy
     #   thinc
     #   weasel
-pandas==2.1.4
+pandas==2.2.1
     # via -r requirements.in
 parso==0.8.3
     # via jedi
